@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 
 use Mojolicious::Lite;
+use Data::UUID;
 
 # connect to database
 use DBI;
@@ -27,11 +28,23 @@ while (1) {
 # setup route which receives data and returns to /
 post '/' => sub {
   my $self = shift;
+  # Fetch parameters to write to DB
   my $user = $self->param('user');
   my $company = $self->param('company');
   my $currency = $self->param('currency');
   my $file = $self->req->upload('file');
-  $insert->execute($user, $company, $currency, $file->filename);
+  # Get image type and check extension
+  my $headers = $file->headers->content_type;
+  # Is content type wrong?
+  if ($headers ne 'image/jpeg') {
+      print "Upload fail. Content type is wrong.\n";
+  };
+  # Rewrite header data
+  my $ext = '.jpg';
+  my $uuid = Data::UUID->new->create_str;
+  my $filename = $uuid . $ext;
+  $file->move_to('images/' . $filename);
+  $insert->execute($user, $company, $currency, $filename);
   $self->render(text => 'It did not kaboom!');
 };
 
