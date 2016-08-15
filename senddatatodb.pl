@@ -5,7 +5,11 @@ use Data::UUID;
 
 # connect to database
 use DBI;
-my $dbh = DBI->connect("dbi:SQLite:dbname=foodloop.db") or die "Could not connect";
+my $config = plugin Config => {file => 'myapp.conf'};
+
+use Devel::Dwarn; Dwarn $config;
+
+my $dbh = DBI->connect($config->{dsn}) or die "Could not connect";
 
 # shortcut for use in template
 helper db => sub { $dbh }; 
