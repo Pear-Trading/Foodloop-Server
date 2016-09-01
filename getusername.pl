@@ -4,6 +4,7 @@
 use Mojolicious::Lite;
 use Data::UUID;
 use Devel::Dwarn;
+use Mojo::JSON;
 
 # connect to database
 use DBI;
@@ -32,9 +33,16 @@ post '/' => sub {
   my $self = shift;
 # get the key from user
   my $key = $self->req->json;
+# Check if that token key has been used before
+  my $keyused = $dbh->selectall_arrayref("SELECT keyused FROM accounts WHERE idkey = ?", undef, $key->{token});
+# if the key has been used before, tell the user to sod off
+  unless ($keyused != t) {
+  print "The key $key has already been used!";
+  return $self->render(json => {'success' => Mojo::JSON->false});
+}
 # get from db the username matching the key and then send it back at them
   my $username = $dbh->selectall_arrayref("SELECT username FROM accounts WHERE idkey = ?", undef, $key->{token});
-  $self->render(json => {'username' => $username->[0]}  );
+  $self->render(json => {'username' => $username->[0], success => Mojo::JSON->true}  );
 # When user has submitted json of data, define data
   my $name = $self->req->json;
   my $email = $self->req->json;
