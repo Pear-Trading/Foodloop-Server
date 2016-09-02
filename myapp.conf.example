@@ -1,6 +1,0 @@
-{
-  foo => 'bar',
-  banana => 'monkey',
-# Database connection details
-  dsn => "dbi:SQLite:dbname=foodloop.db",
-};
