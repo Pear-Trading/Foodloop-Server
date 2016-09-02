@@ -16,45 +16,107 @@ Dwarn $config;
 # shortcut for use in template
 helper db => sub { $dbh };
 
-# setup base route
-#any '/' => 'index';
-
-my $insert;
-while (1) {
-  print "Checking if table exists";
-  # create insert statement
-  $insert = eval { $dbh->prepare('UPDATE accounts SET 'name' = ?, email = ?, postcode = ?, age = ?, gender = ?, grouping = ?, password = ?, keyused = ? WHERE username = ?');
-  # break out of loop if statement prepared
-  last if $insert;
-  print "Make the table!";
-}
-
-post '/' => sub {
+any '/' => sub {
   my $self = shift;
-# get the key from user
-  my $key = $self->req->json;
-# Check if that token key has been used before
-  my $keyused = $dbh->selectall_arrayref("SELECT keyused FROM accounts WHERE idkey = ?", undef, $key->{token});
-# if the key has been used before, tell the user to sod off
-  unless ($keyused != t) {
-  print "The key $key has already been used!";
-  return $self->render(json => {'success' => Mojo::JSON->false});
-}
-# get from db the username matching the key and then send it back at them
-  my $username = $dbh->selectall_arrayref("SELECT username FROM accounts WHERE idkey = ?", undef, $key->{token});
-  $self->render(json => {'username' => $username->[0], success => Mojo::JSON->true}  );
-# When user has submitted json of data, define data
-  my $name = $self->req->json;
-  my $email = $self->req->json;
-  my $postcode = $self->req->json;
-  my $age = $self->req->json;
-  my $gender = $self->req->json;
-  my $grouping = $self->req->json;
-  my $password = $self->req->json;
-  my $keyused = "True";
-# send data to db in row matching username
-  $insert->execute($name->{name}, $email->{email}, $postcode->{postcode}, $age->{age}, $gender->{gender}, $grouping->{grouping}, $password->{password}, $keyused, $username);
+
   $self->render(text => 'It did not kaboom!');
 };
+
+post '/upload' => sub {
+  my $self = shift;
+# Fetch parameters to write to DB
+  my $key = $self->param('key');
+# This will include an if function to see if key matches
+  unless ($key eq $config->{key}) {
+    return $self->render( json => { success => Mojo::JSON->false }, status => 403 );
+  } 
+  my $username = $self->param('username');
+  my $company = $self->param('company');
+  my $currency = $self->param('currency');
+  my $file = $self->req->upload('file');
+# Get image type and check extension
+  my $headers = $file->headers->content_type;
+# Is content type wrong?
+  if ($headers ne 'image/jpeg') {
+      print "Upload fail. Content type is wrong.\n";
+  };
+# Rewrite header data
+  my $ext = '.jpg';
+  my $uuid = Data::UUID->new->create_str;
+  my $filename = $uuid . $ext;
+# send photo to image folder on server
+  $file->move_to('images/' . $filename);
+# send data to foodloop db
+  my $insert = $self->db->prepare('INSERT INTO foodloop (username, company, currency, filename) VALUES (?,?,?,?)');
+  $insert->execute($username, $company, $currency, $filename);
+  $self->render(text => 'It did not kaboom!');
+
+};
+
+post '/register' => sub {
+  my $self = shift;
+
+  my $json = $self->req->json;
+
+  my $account = $self->get_account_by_username( $json->{username} );
+
+  unless ( defined $account ) {
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'Username not recognised, has your token expired?',
+    });
+  } elsif ( $account->{keyused} eq 't' ) {
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'Token has already been used',
+    });
+  }
+  my $insert = $self->db->prepare("UPDATE accounts SET 'name' = ?, email = ?, postcode = ?, age = ?, gender = ?, grouping = ?, password = ?, keyused = ? WHERE username = ?");
+  $insert->execute(
+    @{$json}{ qw/ name email postcode age gender grouping password / }, 'True', $account->{username},
+  );
+
+  $self->render( json => { success => Mojo::JSON->true } );
+};
+
+post '/token' => sub {
+  my $self = shift;
+
+  my $json = $self->req->json;
+
+  my $account = $self->get_account_by_token( $json->{token} );
+
+  # TODO change to proper boolean checks
+  if ( ! defined $account || $account->{keyused} eq 't' ) {
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'Token is invalid or has already been used',
+    });
+  }
+  return $self->render( json => {
+    username => $account->{username},
+    success => Mojo::JSON->true,
+  });
+};
+
+sub get_account_by_token {
+  my ( $self, $token ) = @_;
+
+  return $self->db->selectrow_hashref(
+    'SELECT keyused, username FROM accounts WHERE idkey = ?',
+    {},
+    $token,
+  );
+}
+
+sub get_account_by_username {
+  my ( $self, $username ) = @_;
+
+  return $self->db->selectrow_hashref(
+    'SELECT keyused, username FROM accounts WHERE username = ?',
+    {},
+    $username,
+  );
+}
 
 app->start;
