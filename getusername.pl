@@ -79,6 +79,34 @@ post '/register' => sub {
   $self->render( json => { success => Mojo::JSON->true } );
 };
 
+post '/edit' => sub {
+  my $self = shift;
+
+  my $json = $self->req->json;
+
+  my $account = $self->get_account_by_username( $json->{username} );
+
+  unless ( defined $account ) {
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'Username not recognised, has your token expired?',
+    });
+# PLUG SECURITY HOLE
+  } elsif ( $account->{keyused} ne 't' ) {
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'Token has not been used yet!',
+    });
+  }
+  my $insert = $self->db->prepare("UPDATE accounts SET 'name' = ?, postcode = ?, age = ?, gender = ?, WHERE username = ?");
+  $insert->execute(
+    @{$json}{ qw/ name postcode age gender / }, $account->{username},
+  );
+
+  $self->render( json => { success => Mojo::JSON->true } );
+};
+
+
 post '/token' => sub {
   my $self = shift;
 
