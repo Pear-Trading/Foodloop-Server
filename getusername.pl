@@ -25,11 +25,11 @@ any '/' => sub {
 post '/upload' => sub {
   my $self = shift;
 # Fetch parameters to write to DB
-  my $key = $self->param('key');
+#  my $key = $self->param('key');
 # This will include an if function to see if key matches
-  unless ($key eq $config->{key}) {
-    return $self->render( json => { success => Mojo::JSON->false }, status => 403 );
-  } 
+#  unless ($key eq $config->{key}) {
+#    return $self->render( json => { success => Mojo::JSON->false }, status => 403 );
+#  } 
   my $username = $self->param('username');
   my $company = $self->param('company');
   my $currency = $self->param('currency');
@@ -38,7 +38,10 @@ post '/upload' => sub {
   my $headers = $file->headers->content_type;
 # Is content type wrong?
   if ($headers ne 'image/jpeg') {
-      print "Upload fail. Content type is wrong.\n";
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'Wrong image extension!',
+    });
   };
 # Rewrite header data
   my $ext = '.jpg';
