@@ -26,11 +26,11 @@ any '/' => sub {
 post '/upload' => sub {
   my $self = shift;
 # Fetch parameters to write to DB
-#  my $key = $self->param('key');
+  my $key = $self->param('key');
 # This will include an if function to see if key matches
-#  unless ($key eq $config->{key}) {
-#    return $self->render( json => { success => Mojo::JSON->false }, status => 403 );
-#  } 
+  unless ($key eq $config->{key}) {
+    return $self->render( json => { success => Mojo::JSON->false }, status => 403 );
+  } 
   my $username = $self->param('username');
   my $company = $self->param('company');
   my $currency = $self->param('currency');
@@ -53,6 +53,7 @@ post '/upload' => sub {
 # send data to foodloop db
   my $insert = $self->db->prepare('INSERT INTO foodloop (username, company, currency, filename) VALUES (?,?,?,?)');
   $insert->execute($username, $company, $currency, $filename);
+  $self->render( json => { success => Mojo::JSON->true } );
   $self->render(text => 'It did not kaboom!');
 
 };
