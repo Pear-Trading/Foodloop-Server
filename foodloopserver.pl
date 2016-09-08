@@ -132,7 +132,7 @@ post '/token' => sub {
   });
 };
 
-sub get_account_by_token {
+helper get_account_by_token => sub {
   my ( $self, $token ) = @_;
 
   return $self->db->selectrow_hashref(
@@ -140,9 +140,9 @@ sub get_account_by_token {
     {},
     $token,
   );
-}
+};
 
-sub get_account_by_username {
+helper get_account_by_username => sub {
   my ( $self, $username ) = @_;
 
   return $self->db->selectrow_hashref(
@@ -150,6 +150,6 @@ sub get_account_by_username {
     {},
     $username,
   );
-}
+};
 
 app->start;
