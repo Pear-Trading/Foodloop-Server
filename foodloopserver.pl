@@ -120,7 +120,7 @@ post '/token' => sub {
   my $account = $self->get_account_by_token( $json->{token} );
 
   # TODO change to proper boolean checks
-  if ( ! defined $account || $account->{keyused} eq 't' ) {
+  if ( ! defined $account || $account->{keyused} ) {
     return $self->render( json => {
       success => Mojo::JSON->false,
       message => 'Token is invalid or has already been used',
@@ -136,7 +136,7 @@ helper get_account_by_token => sub {
   my ( $self, $token ) = @_;
 
   return $self->db->selectrow_hashref(
-    'SELECT keyused, username FROM accounts WHERE idkey = ?',
+    "SELECT keyused, username FROM accounts WHERE idkey = ?",
     {},
     $token,
   );
@@ -146,7 +146,7 @@ helper get_account_by_username => sub {
   my ( $self, $username ) = @_;
 
   return $self->db->selectrow_hashref(
-    'SELECT keyused, username FROM accounts WHERE username = ?',
+    "SELECT keyused, username FROM accounts WHERE username = ?",
     {},
     $username,
   );
