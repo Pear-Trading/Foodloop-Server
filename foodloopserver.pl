@@ -66,12 +66,15 @@ post '/register' => sub {
 
   my $account = $self->get_account_by_username( $json->{username} );
 
+  $self->app->log->debug( "Account: " . Dumper $account );
+  $self->app->log->debug( "JSON: " . Dumper $json );
+
   unless ( defined $account ) {
     return $self->render( json => {
       success => Mojo::JSON->false,
       message => 'Username not recognised, has your token expired?',
     });
-  } elsif ( $account->{keyused} eq 't' ) {
+  } elsif ( $account->{keyused} ) {
     return $self->render( json => {
       success => Mojo::JSON->false,
       message => 'Token has already been used',
