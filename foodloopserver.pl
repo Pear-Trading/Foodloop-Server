@@ -6,6 +6,7 @@ use Mojolicious::Lite;
 use Data::UUID;
 use Devel::Dwarn;
 use Mojo::JSON;
+use Data::Dumper;
 
 # connect to database
 use DBI;
@@ -119,8 +120,11 @@ post '/token' => sub {
 
   my $account = $self->get_account_by_token( $json->{token} );
 
+  $self->app->log->debug( "Account: " . Dumper $account );
+
   # TODO change to proper boolean checks
   if ( ! defined $account || $account->{keyused} ) {
+    $self->app->log->info("unrecognised or preused token: [" . $json->{token} . "]");
     return $self->render( json => {
       success => Mojo::JSON->false,
       message => 'Token is invalid or has already been used',
