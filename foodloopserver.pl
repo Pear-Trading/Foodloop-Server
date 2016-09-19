@@ -21,7 +21,7 @@ helper db => sub { $dbh };
 any '/' => sub {
   my $self = shift;
 
-  $self->render(text => 'It did not kaboom!');
+  $self->render(text => 'If you are seeing this, then the server is running.');
 };
 
 post '/upload' => sub {
