@@ -80,9 +80,9 @@ post '/register' => sub {
       message => 'Token has already been used',
     });
   }
-  my $insert = $self->db->prepare("UPDATE accounts SET 'name' = ?, email = ?, postcode = ?, age = ?, gender = ?, grouping = ?, password = ?, keyused = ? WHERE username = ?");
+  my $insert = $self->db->prepare("UPDATE accounts SET fullname = ?, email = ?, postcode = ?, age = ?, gender = ?, grouping = ?, password = ?, keyused = ? WHERE username = ?");
   $insert->execute(
-    @{$json}{ qw/ name email postcode age gender grouping password / }, 'True', $account->{username},
+    @{$json}{ qw/ fullname email postcode age gender grouping password / }, 'True', $account->{username},
   );
 
   $self->render( json => { success => Mojo::JSON->true } );
@@ -107,9 +107,9 @@ post '/edit' => sub {
       message => 'Token has not been used yet!',
     });
   }
-  my $insert = $self->db->prepare("UPDATE accounts SET 'name' = ?, postcode = ?, age = ?, gender = ?, WHERE username = ?");
+  my $insert = $self->db->prepare("UPDATE accounts SET fullname = ?, postcode = ?, age = ?, gender = ?, WHERE username = ?");
   $insert->execute(
-    @{$json}{ qw/ name postcode age gender / }, $account->{username},
+    @{$json}{ qw/ fullname postcode age gender / }, $account->{username},
   );
 
   $self->render( json => { success => Mojo::JSON->true } );
