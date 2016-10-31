@@ -139,14 +139,30 @@ post '/token' => sub {
   });
 };
 
-helper get_account_by_token => sub {
-  my ( $self, $token ) = @_;
+post '/fetchuser' => sub {
+  my $self = shift;
 
-  return $self->db->selectrow_hashref(
-    "SELECT keyused, username FROM accounts WHERE idkey = ?",
-    {},
-    $token,
-  );
+  my $json = $self->req->json;
+
+  my $account = $self->get_account_by_username( $json->{username} );
+
+  unless ( defined $account ) {
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'Username not recognised, has your token expired?',
+    });
+# PLUG SECURITY HOLE
+  } elsif ( $account->{keyused} ne 't' ) {
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'Token has not been used yet!',
+    });
+  }
+
+# Add stuff to send back to user below here!
+  $self->render( json => { 
+  success => Mojo::JSON->true,
+  });
 };
 
 helper get_account_by_username => sub {
