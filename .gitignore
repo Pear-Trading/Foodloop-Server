@@ -1,3 +1,5 @@
 /log
 myapp.conf
 hypnotoad.pid
+*.db
+*~
