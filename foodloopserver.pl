@@ -70,19 +70,47 @@ post '/register' => sub {
   my $self = shift;
 
   my $json = $self->req->json;
+  $self->app->log->debug( "\n\nStart of register");
   $self->app->log->debug( "JSON: " . Dumper $json );
 
-  my $token = $json->{token};
-  if ( ! $self->is_token_unused($token) ) {
+  if ( ! defined $json ){
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
     return $self->render( json => {
       success => Mojo::JSON->false,
-      message => 'Token not valid or has been used.',
+      message => 'No json sent.',
+    },
+    status => 400,); #Malformed request   
+  }
+
+  my $token = $json->{token};
+  if ( ! defined $token ){
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'No token sent.',
+    },
+    status => 400,); #Malformed request   
+  }
+  elsif ( ! $self->is_token_unused($token) ) {
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'Token invalid or has been used.',
     },
     status => 401,); #Unauthorized
   }
 
   my $username = $json->{username};
-  if ($username eq ''){
+  if ( ! defined $username ){
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'No username sent.',
+    },
+    status => 400,); #Malformed request   
+  }
+  elsif ($username eq ''){
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
     return $self->render( json => {
       success => Mojo::JSON->false,
       message => 'Username cannot be blank.',
@@ -90,6 +118,7 @@ post '/register' => sub {
     status => 400,);  #Malformed request   
   }
   elsif ( ! ($username =~ m/^[A-Za-z0-9]+$/)){
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
     return $self->render( json => {
       success => Mojo::JSON->false,
       message => 'Username can only be A-Z, a-z and 0-9 characters.',
@@ -97,6 +126,7 @@ post '/register' => sub {
     status => 400,); #Malformed request
   }
   elsif ( $self->does_username_exist($username) ) {
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
     return $self->render( json => {
       success => Mojo::JSON->false,
       message => 'Username exists.',
@@ -105,7 +135,16 @@ post '/register' => sub {
   }
 
   my $email = $json->{email};
-  if ( ! Email::Valid->address($email)){
+  if ( ! defined $email ){
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'No email sent.',
+    },
+    status => 400,); #Malformed request   
+  }
+  elsif ( ! Email::Valid->address($email)){
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
     return $self->render( json => {
       success => Mojo::JSON->false,
       message => 'Email is invalid.',
@@ -113,6 +152,7 @@ post '/register' => sub {
     status => 400,); #Malformed request
   }
   elsif($self->does_email_exist($email)) {
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
     return $self->render( json => {
       success => Mojo::JSON->false,
       message => 'Email exists.',
@@ -122,9 +162,25 @@ post '/register' => sub {
 
   #TODO test to see if post code is valid.
   my $postcode = $json->{postcode};
+  if ( ! defined $postcode ){
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'No postcode sent.',
+    },
+    status => 400,); #Malformed request   
+  }
 
   #TODO should we enforce password requirements.
   my $password = $json->{password};  
+  if ( ! defined $password ){
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'No password sent.',
+    },
+    status => 400,); #Malformed request   
+  }
   my $hashedPassword = $self->generate_hashed_password($password);
 
   my $secondsTime = time();
@@ -132,11 +188,30 @@ post '/register' => sub {
 
   my $usertype = $json->{usertype};
       
-  if ($usertype eq 'customer'){
+  if ( ! defined $usertype ){
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'No usertype sent.',
+    },
+    status => 400,); #Malformed request   
+  }
+  elsif ($usertype eq 'customer'){
+    $self->app->log->debug('Path: file:' . __FILE__ . ', line: ' . __LINE__);
+
     my $age = $json->{age};
+    if ( ! defined $age ){
+      $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+      return $self->render( json => {
+        success => Mojo::JSON->false,
+        message => 'No age sent.',
+      },
+      status => 400,); #Malformed request   
+    }
 
     my $ageForeignKey = $self->get_age_foreign_key($age);
     if ( ! defined $ageForeignKey ){
+      $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
       return $self->render( json => {
         success => Mojo::JSON->false,
         message => 'Age range is invalid.',
@@ -147,6 +222,7 @@ post '/register' => sub {
     #TODO UNTESTED as it's hard to simulate.
     #Token is no longer valid race condition.
     if ( ! $self->set_token_as_used($token) ){
+      $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
       return $self->render( json => {
         success => Mojo::JSON->false,
         message => 'Token no longer is accepted.',
@@ -169,15 +245,27 @@ post '/register' => sub {
     my $insertUser = $self->db->prepare("INSERT INTO Users (CustomerId_FK, Email, JoinDate, HashedPassword) VALUES (?, ?, ?, ?)");
     my $rowsInsertedUser = $insertUser->execute($idToUse, $email, $date, $hashedPassword);
 
+    $self->app->log->debug('Path Success: file:' . __FILE__ . ', line: ' . __LINE__);
     return $self->render( json => { success => Mojo::JSON->true } );
   }
   elsif ($usertype eq 'organisation') {
+    $self->app->log->debug('Path: file:' . __FILE__ . ', line: ' . __LINE__);
+
     #TODO validation on the address. Or perhaps add the organisation to a "to be inspected" list then manually check them.
     my $fullAddress = $json->{fulladdress};
+    if ( ! defined $fullAddress ){
+      $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+      return $self->render( json => {
+        success => Mojo::JSON->false,
+        message => 'No fulladdress sent.',
+      },
+      status => 400,); #Malformed request   
+    }
 
     #TODO UNTESTED as it's hard to simulate. 
     #Token is no longer valid race condition.
     if ( ! $self->set_token_as_used($token) ){
+      $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
       return $self->render( json => {
         success => Mojo::JSON->false,
         message => 'Token no longer is accepted.',
@@ -200,9 +288,11 @@ post '/register' => sub {
     my $insertUser = $self->db->prepare("INSERT INTO Users (OrganisationalId_FK, Email, JoinDate, HashedPassword) VALUES (?, ?, ?, ?)");
     my $rowsInsertedUser = $insertUser->execute($idToUse, $email, $date, $hashedPassword);
 
+    $self->app->log->debug('Path Success: file:' . __FILE__ . ', line: ' . __LINE__);
     return $self->render( json => { success => Mojo::JSON->true } );
   }
   else{
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
     return $self->render( json => {
       success => Mojo::JSON->false,
       message => '"usertype" is invalid.',
@@ -351,5 +441,6 @@ helper check_password_email => sub{
 
   return $ppr->match($password);
 };
+
 
 app->start;
