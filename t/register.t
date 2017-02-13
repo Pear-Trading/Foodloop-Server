@@ -28,7 +28,7 @@ for (split ';', $sqlDeployment){
 my @names = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
 my @emails = ('a@a.com', 'b@a.com', 'c@a.com', 'd@a.com', 'e@a.com', 'f@a.com', 'g@a.com', 'h@a.com', 'i@a.com', 'j@a.com', 'k@a.com', 'l@a.com', 'm@a.com', 'n@a.com', 'o@a.com', 'p@a.com', 'q@a.com', 'r@a.com', 's@a.com', 't@a.com', 'u@a.com', 'v@a.com', 'w@a.com', 'x@a.com', 'y@a.com', 'z@a.com');
 my @tokens =  ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
-my $tokenStatement = $dbh->prepare('INSERT INTO Tokens (TokenName) VALUES (?)');
+my $tokenStatement = $dbh->prepare('INSERT INTO AccountTokens (AccountTokenName) VALUES (?)');
 foreach (@tokens){
   my $rowsAdded = $tokenStatement->execute($_);
 }

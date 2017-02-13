@@ -5,3 +5,4 @@ requires 'Mojo::JSON';
 requires 'Email::Valid';
 requires 'ORM::Date';
 requires 'Authen::Passphrase::BlowfishCrypt';
+requires 'Time::Fake';
