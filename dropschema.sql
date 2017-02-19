@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS PendingTransactions;
+DROP TABLE IF EXISTS PendingOrganisations;
 DROP TABLE IF EXISTS SessionTokens;
 DROP TABLE IF EXISTS AccountTokens;
 DROP TABLE IF EXISTS Transactions;

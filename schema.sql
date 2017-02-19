@@ -38,9 +38,9 @@ CREATE TABLE Transactions (
   TransactionId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
   BuyerUserId_FK INTEGER NOT NULL,
   SellerOrganisationId_FK INTEGER NOT NULL,
-  Date TEXT NOT NULL,
   ValueMicroCurrency INTEGER NOT NULL,
   ProofImage TEXT NOT NULL UNIQUE,
+  TimeDateSubmitted INTEGER NOT NULL,
   FOREIGN KEY (BuyerUserId_FK) REFERENCES Users (UserId),
   FOREIGN KEY (SellerOrganisationId_FK) REFERENCES Organisations (OrganisationalId)
 );
@@ -57,4 +57,26 @@ CREATE TABLE SessionTokens (
   UserIdAssignedTo_FK INTEGER NOT NULL,
   ExpireDateTime INTEGER NOT NULL,
   FOREIGN KEY (UserIdAssignedTo_FK) REFERENCES Users (UserId)
+);
+
+CREATE TABLE PendingOrganisations (
+  PendingOrganisationId INTEGER PRIMARY KEY UNIQUE NOT NULL,
+  UserSubmitted_FK INTEGER NOT NULL,
+  TimeDateSubmitted INTEGER NOT NULL,
+  Name TEXT NOT NULL,
+  StreetName TEXT, 
+  Town TEXT, 
+  Postcode TEXT,
+  FOREIGN KEY (UserSubmitted_FK) REFERENCES Users (UserId)
+);
+
+CREATE TABLE PendingTransactions (
+  PendingTransactionId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+  BuyerUserId_FK INTEGER NOT NULL,
+  PendingSellerOrganisationId_FK INTEGER NOT NULL,
+  ValueMicroCurrency INTEGER NOT NULL,
+  ProofImage TEXT NOT NULL UNIQUE,
+  TimeDateSubmitted INTEGER NOT NULL,
+  FOREIGN KEY (BuyerUserId_FK) REFERENCES Users (UserId),
+  FOREIGN KEY (PendingSellerOrganisationId_FK) REFERENCES PendingOrganisations (PendingOrganisationId)
 );

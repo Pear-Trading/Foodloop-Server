@@ -6,3 +6,4 @@ requires 'Email::Valid';
 requires 'ORM::Date';
 requires 'Authen::Passphrase::BlowfishCrypt';
 requires 'Time::Fake';
+requires 'Scalar::Util';

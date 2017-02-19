@@ -3,3 +3,4 @@ myapp.conf
 hypnotoad.pid
 *.db
 *~
+/images

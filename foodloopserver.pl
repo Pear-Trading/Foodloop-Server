@@ -10,6 +10,7 @@ use Data::Dumper;
 use Email::Valid;
 use ORM::Date;
 use Authen::Passphrase::BlowfishCrypt;
+use Scalar::Util qw(looks_like_number);
 
 # connect to database
 use DBI;
@@ -38,36 +39,243 @@ any '/' => sub {
 
 post '/upload' => sub {
   my $self = shift;
-# Fetch parameters to write to DB
-  my $key = $self->param('key');
-# This will include an if function to see if key matches
-  unless ($key eq $config->{key}) {
-    return $self->render( json => { success => Mojo::JSON->false }, status => 403 );
-  } 
-  my $username = $self->param('username');
-  my $company = $self->param('company');
-  my $currency = $self->param('currency');
-  my $file = $self->req->upload('file');
-# Get image type and check extension
-  my $headers = $file->headers->content_type;
-# Is content type wrong?
-  if ($headers ne 'image/jpeg') {
+
+  my $userId = $self->get_active_user_id();
+
+  my $json = $self->param('json');
+  if ( ! defined $json ) {
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
     return $self->render( json => {
       success => Mojo::JSON->false,
-      message => 'Wrong image extension!',
-    });
-  };
-# Rewrite header data
+      message => 'JSON is missing.',
+    },
+    status => 400,); #Malformed request   
+  }
+
+  $json = Mojo::JSON::decode_json($json);
+  $self->app->log->debug( "JSON: " . Dumper $json );
+  
+  my $microCurrencyValue = $json->{microCurrencyValue};
+  if ( ! defined $microCurrencyValue ) {
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'microCurrencyValue is missing.',
+    },
+    status => 400,); #Malformed request   
+  }
+  #Is valid number
+  elsif (! Scalar::Util::looks_like_number($microCurrencyValue)){
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'microCurrencyValue does not look like a number.',
+    },
+    status => 400,); #Malformed request   
+  }
+  #Is the number range valid.
+  elsif ($microCurrencyValue <= 0){
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'microCurrencyValue cannot be equal to or less than zero.',
+    },
+    status => 400,); #Malformed request   
+  }
+
+  my $transactionAdditionType = $json->{transactionAdditionType};
+  if ( ! defined $transactionAdditionType ) {
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'transactionAdditionType is missing.',
+    },
+    status => 400,); #Malformed request   
+  }
+
+  my $file = $self->req->upload('file2');
+  $self->app->log->debug( "file: " . Dumper $file );
+
+  if (! defined $file) {
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'no file uploaded.',
+    },
+    status => 400,); #Malformed request   
+  }
+
   my $ext = '.jpg';
   my $uuid = Data::UUID->new->create_str;
   my $filename = $uuid . $ext;
-# send photo to image folder on server
-  $file->move_to('images/' . $filename);
-# send data to foodloop db
-  my $insert = $self->db->prepare('INSERT INTO foodloop (username, company, currency, filename) VALUES (?,?,?,?)');
-  $insert->execute($username, $company, $currency, $filename);
-  $self->render( json => { success => Mojo::JSON->true } );
-  $self->render(text => 'It did not kaboom!');
+
+  #TODO Check for valid image file.
+#  my $headers = $file->headers->content_type;
+#  $self->app->log->debug( "content type: " . Dumper $headers );
+  #Is content type wrong?
+#  if ($headers ne 'image/jpeg') {
+#    return $self->render( json => {
+#    success => Mojo::JSON->false,
+#      message => 'Wrong image extension!',
+#    }, status => 400);
+#  };
+  
+  #Add validated organisation.
+  if ($transactionAdditionType == 1){
+
+    my $addValidatedId = $json->{addValidatedId};
+    if (! defined $addValidatedId){
+      $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+      return $self->render( json => {
+        success => Mojo::JSON->false,
+        message => 'addValidatedId is missing.',
+      },
+      status => 400,); #Malformed request   
+    }
+
+    if (! $self->does_organisational_id_exist($addValidatedId)){
+      $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+      return $self->render( json => {
+        success => Mojo::JSON->false,
+        message => 'addValidatedId does not exist in the database.',
+      },
+      status => 400,); #Malformed request   
+    }
+  
+    my $time = time();
+    my $statement = $self->db->prepare("INSERT INTO Transactions (BuyerUserId_FK, SellerOrganisationId_FK, ValueMicroCurrency, ProofImage, TimeDateSubmitted) VALUES (?, ?, ?, ?, ?)");
+    my $rowsAdded = $statement->execute($userId, $addValidatedId, $microCurrencyValue, $filename, $time);
+    
+    #It was successful.
+    if ($rowsAdded != 0) {
+      $file->move_to('images/' . $filename);
+      $self->app->log->debug('Path Success: file:' . __FILE__ . ', line: ' . __LINE__);
+      return $self->render( json => {
+        success => Mojo::JSON->true,
+        message => 'Added transaction for validated organisation.',
+      },
+      status => 200,);
+    }
+    #TODO Untested, not quite sure how to test it.
+    else {
+      $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+      return $self->render( json => {
+        success => Mojo::JSON->false,
+        message => 'An unknown error occurred when adding the transaction.',
+      },
+      status => 500,);   
+    } 
+  }
+  #2 and 3 are similar by the adding of a transaction at the end.
+  elsif ($transactionAdditionType == 2 || $transactionAdditionType == 3){
+
+    my $unvalidatedOrganisationId = undef;
+
+    if ($transactionAdditionType == 2){
+      $self->app->log->debug('Path: file:' . __FILE__ . ', line: ' . __LINE__);
+
+      $unvalidatedOrganisationId = $json->{addUnvalidatedId};
+      if (! defined $unvalidatedOrganisationId){
+        $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+        return $self->render( json => {
+          success => Mojo::JSON->false,
+          message => 'addUnvalidatedId is missing.',
+        },
+        status => 400,); #Malformed request   
+      } 
+      elsif (! Scalar::Util::looks_like_number($unvalidatedOrganisationId)){
+        $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+        return $self->render( json => {
+          success => Mojo::JSON->false,
+          message => 'addUnvalidatedId does not look like a number.',
+        },
+        status => 400,); #Malformed request   
+      }
+
+      my ($existsRef) = $self->db->selectrow_array("SELECT COUNT(PendingOrganisationId) FROM PendingOrganisations WHERE PendingOrganisationId = ? AND UserSubmitted_FK = ?",undef,($unvalidatedOrganisationId, $userId));
+      if ($existsRef == 0) {
+        $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+        return $self->render( json => {
+          success => Mojo::JSON->false,
+          message => 'addUnvalidatedId does not exist in the database for the user.',
+        },
+        status => 400,); #Malformed request 
+      }
+
+    }
+    #type need to add a organisation for type 3.
+    else{ # ($transactionAdditionType == 3)
+      $self->app->log->debug('Path: file:' . __FILE__ . ', line: ' . __LINE__);
+
+      #TODO more validation.
+      my $organisationName = $json->{organisationName};
+      if (! defined $organisationName){
+        $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+        return $self->render( json => {
+          success => Mojo::JSON->false,
+          message => 'organisationName is missing.',
+        },
+        status => 400,); #Malformed request   
+      }      
+
+      #TODO validation.
+      #TODO check which ones are present.
+      my $streetName = $json->{streetName};
+      my $town = $json->{town};
+      my $postcode = $json->{postcode};
+
+      ($unvalidatedOrganisationId) = $self->db->selectrow_array("SELECT MAX(PendingOrganisationId) FROM PendingOrganisations",undef,());
+      if (defined $unvalidatedOrganisationId){
+        $unvalidatedOrganisationId++;
+      }
+      else{
+        $unvalidatedOrganisationId = 1;
+      }
+
+      my $statement = $self->db->prepare("INSERT INTO PendingOrganisations (PendingOrganisationId, UserSubmitted_FK, TimeDateSubmitted, Name, StreetName, Town, Postcode) VALUES (?, ?, ?, ?, ?, ?, ?)");
+      my $rowsAdded = $statement->execute($unvalidatedOrganisationId,$userId,time(),$organisationName,$streetName,$town,$postcode);
+
+      #TODO, untested. It could not be added for some reason. Most likely race conditions.
+      if ($rowsAdded == 0) {
+        $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+        return $self->render( json => {
+          success => Mojo::JSON->false,
+          message => 'An unknown error occurred when adding the transaction.',
+        },
+        status => 500,);   
+      } 
+    }
+
+
+    my $statement2 = $self->db->prepare("INSERT INTO PendingTransactions (BuyerUserId_FK, PendingSellerOrganisationId_FK, ValueMicroCurrency, ProofImage, TimeDateSubmitted) VALUES (?, ?, ?, ?, ?)");
+    my $rowsAdded2 = $statement2->execute($userId, $unvalidatedOrganisationId, $microCurrencyValue, $filename, time());
+
+    if ($rowsAdded2 != 0) {
+      $file->move_to('images/' . $filename);
+      $self->app->log->debug('Path Success: file:' . __FILE__ . ', line: ' . __LINE__);
+      return $self->render( json => {
+        success => Mojo::JSON->true,
+        message => 'Added transaction for unvalidated organisation.',
+      },
+      status => 200,);    
+    }
+    else {
+      $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+      return $self->render( json => {
+        success => Mojo::JSON->false,
+        message => 'An unknown error occurred when adding the transaction.',
+      },
+      status => 500,);   
+    } 
+  }
+  else{
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+    return $self->render( json => {
+      success => Mojo::JSON->false,
+      message => 'transactionAdditionType is not a valid value.',
+    },
+    status => 400,); #Malformed request   
+  }
 
 };
 
@@ -79,7 +287,7 @@ post '/register' => sub {
   $self->app->log->debug( "JSON: " . Dumper $json );
 
   if ( ! defined $json ){
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
+    $self->app->log->debug('Path: file:' . __FILE__ . ', line: ' . __LINE__);
     return $self->render( json => {
       success => Mojo::JSON->false,
       message => 'No json sent.',
@@ -515,14 +723,21 @@ helper valid_email => sub {
   return (Email::Valid->address($email));
 };
 
-helper get_account_by_username => sub {
-  my ( $self, $username ) = @_;
+helper get_active_user_id => sub {
+  my $self = shift;
 
-  return $self->db->selectrow_hashref(
-    "SELECT keyused, username FROM accounts WHERE username = ?",
-    {},
-    $username,
-  );
+  my $token = $self->get_session_token(); 
+  if (! defined $token){
+    return undef;
+  }
+
+  my @out = $self->db->selectrow_array("SELECT UserIdAssignedTo_FK FROM SessionTokens WHERE SessionTokenName = ?",undef,($token));
+  if (! @out){
+    return undef;
+  }
+  else{
+    return $out[0];
+  }
 };
 
 helper get_session_token => sub {
@@ -649,24 +864,27 @@ helper is_token_unused => sub {
 
 };
 
+#Return true if and only if the token exists and has not been used.
+helper does_organisational_id_exist => sub {
+  my ( $self, $organisationalId ) = @_;
+
+  my ( $out ) = $self->db->selectrow_array("SELECT COUNT(OrganisationalId) FROM Organisations WHERE OrganisationalId = ?", undef, ($organisationalId));
+  return $out != 0;
+};
+
 helper get_age_foreign_key => sub {
   my ( $self, $ageString ) = @_;
 
-  my ($out) = $self->db->selectrow_array(
-    "SELECT AgeRangeId FROM AgeRanges WHERE AgeRangeString = ?",
-    {},
-    $ageString,
-  );
-
+  my ($out) = $self->db->selectrow_array("SELECT AgeRangeId FROM AgeRanges WHERE AgeRangeString = ?", undef, ($ageString));
   return $out;
 };
 
 helper get_userid_foreign_key => sub {
   my ( $self, $email ) = @_;
 
-  my ( $out ) = $self->db->selectrow_array("SELECT UserId FROM Users WHERE Email = ?", undef, ($email));
-
+  my ($out) = $self->db->selectrow_array("SELECT UserId FROM Users WHERE Email = ?", undef, ($email));
   return $out;
+  
 };
 
 
@@ -674,7 +892,6 @@ helper does_username_exist => sub {
   my ( $self, $username ) = @_;
 
   my ($out) = $self->db->selectrow_array("SELECT COUNT(UserName) FROM Customers WHERE UserName = ?", {}, ($username));
-  
   return $out != 0;
 };
 
@@ -682,7 +899,6 @@ helper does_email_exist => sub {
   my ( $self, $email ) = @_;
 
   my ($out) = $self->db->selectrow_array("SELECT COUNT(Email) FROM Users WHERE Email = ?", {}, ($email));
-  
   return $out != 0;
 };
 
