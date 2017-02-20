@@ -80,7 +80,7 @@ post '/search' => sub {
     $statementValidated->execute('%'.$searchName.'%');
 
     while (my ($id, $name, $address, $postcode) = $statementValidated->fetchrow_array()) {
-      push(@validatedOrgs, $self->create_hash_valid($id,$name,$address,$postcode));
+      push(@validatedOrgs, $self->create_hash($id,$name,$address,$postcode));
     }
   }
 
@@ -88,11 +88,11 @@ post '/search' => sub {
 
   my @unvalidatedOrgs = ();
   {
-    my $statementUnvalidated = $dbh->prepare("SELECT PendingOrganisationId, Name, StreetName, Town, Postcode FROM PendingOrganisations WHERE Name LIKE ? AND UserSubmitted_FK = ?");
+    my $statementUnvalidated = $dbh->prepare("SELECT PendingOrganisationId, Name, FullAddress, Postcode FROM PendingOrganisations WHERE Name LIKE ? AND UserSubmitted_FK = ?");
     $statementUnvalidated->execute('%'.$searchName.'%', $userId);
 
-    while (my ($id, $name, $streetName, $town, $postcode) = $statementUnvalidated->fetchrow_array()) {
-      push(@unvalidatedOrgs, $self->create_hash_unvalid($id, $name, $streetName, $town, $postcode));
+    while (my ($id, $name, $fullAddress, $postcode) = $statementUnvalidated->fetchrow_array()) {
+      push(@unvalidatedOrgs, $self->create_hash($id, $name, $fullAddress, $postcode));
     }
   }
   
@@ -303,8 +303,24 @@ post '/upload' => sub {
         $unvalidatedOrganisationId = 1;
       }
 
-      my $statement = $self->db->prepare("INSERT INTO PendingOrganisations (PendingOrganisationId, UserSubmitted_FK, TimeDateSubmitted, Name, StreetName, Town, Postcode) VALUES (?, ?, ?, ?, ?, ?, ?)");
-      my $rowsAdded = $statement->execute($unvalidatedOrganisationId,$userId,time(),$organisationName,$streetName,$town,$postcode);
+      my $fullAddress = "";
+      
+      if ( defined $streetName && ! ($streetName =~ m/^\s*$/) ){
+        $fullAddress = $streetName;
+      }
+
+      if ( defined $town && ! ($town =~ m/^\s*$/) ){
+        if ($fullAddress eq ""){
+          $fullAddress = $town;
+        }
+        else{
+          $fullAddress = $fullAddress . ", " . $town;          
+        }
+
+      }
+
+      my $statement = $self->db->prepare("INSERT INTO PendingOrganisations (PendingOrganisationId, UserSubmitted_FK, TimeDateSubmitted, Name, FullAddress, Postcode) VALUES (?, ?, ?, ?, ?, ?)");
+      my $rowsAdded = $statement->execute($unvalidatedOrganisationId,$userId,time(),$organisationName,$fullAddress,$postcode);
 
       #TODO, untested. It could not be added for some reason. Most likely race conditions.
       if ($rowsAdded == 0) {
@@ -783,7 +799,7 @@ post '/fetchuser' => sub {
   });
 };
 
-helper create_hash_valid => sub{
+helper create_hash => sub{
   my ($self, $id, $name, $fullAddress, $postcode) = @_;
 
   my $hash = {};
@@ -794,41 +810,6 @@ helper create_hash_valid => sub{
   return $hash;
 };
 
-helper create_hash_unvalid => sub{
-  my ($self, $id, $name, $streetName, $town, $postcode) = @_;
-
-  my $hash = {};
-  $hash->{'id'} = $id;
-  $hash->{'name'} = $name;
-
-  my $fullAddress = "";
-  
-  if (defined $streetName && ! ($streetName =~ m/^\s+$/)){
-    $fullAddress = $streetName;
-  }
-
-  if (defined $town && ! ($town =~ m/^\s+$/)){
-    if ($fullAddress eq ""){
-      $fullAddress = $town;
-    }
-    else{
-      $fullAddress = $fullAddress . ", " . $town;
-    }
-  }
-
-  if (defined $postcode && ! ($postcode =~ m/^\s+$/)){
-    if ($fullAddress eq ""){
-      $fullAddress = $postcode;
-    }
-    else{
-      $fullAddress = $fullAddress . ", " . $postcode;
-    }
-  }
-
-  $hash->{'fullAddress'} = $fullAddress;
- 
-  return $hash;
-};
 
 
 helper valid_username => sub {

@@ -64,8 +64,7 @@ CREATE TABLE PendingOrganisations (
   UserSubmitted_FK INTEGER NOT NULL,
   TimeDateSubmitted INTEGER NOT NULL,
   Name TEXT NOT NULL COLLATE nocase,
-  StreetName TEXT COLLATE nocase, 
-  Town TEXT COLLATE nocase, 
+  FullAddress TEXT COLLATE nocase, 
   Postcode TEXT COLLATE nocase,
   FOREIGN KEY (UserSubmitted_FK) REFERENCES Users (UserId)
 );
