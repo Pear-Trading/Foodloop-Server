@@ -1,8 +1,8 @@
 CREATE TABLE Organisations (
   OrganisationalId INTEGER PRIMARY KEY UNIQUE NOT NULL,
-  Name TEXT NOT NULL,
-  FullAddress TEXT NOT NULL,
-  PostCode TEXT NOT NULL
+  Name TEXT NOT NULL COLLATE nocase,
+  FullAddress TEXT NOT NULL COLLATE nocase,
+  PostCode TEXT NOT NULL COLLATE nocase
 );
 
 CREATE TABLE AgeRanges (
@@ -63,10 +63,10 @@ CREATE TABLE PendingOrganisations (
   PendingOrganisationId INTEGER PRIMARY KEY UNIQUE NOT NULL,
   UserSubmitted_FK INTEGER NOT NULL,
   TimeDateSubmitted INTEGER NOT NULL,
-  Name TEXT NOT NULL,
-  StreetName TEXT, 
-  Town TEXT, 
-  Postcode TEXT,
+  Name TEXT NOT NULL COLLATE nocase,
+  StreetName TEXT COLLATE nocase, 
+  Town TEXT COLLATE nocase, 
+  Postcode TEXT COLLATE nocase,
   FOREIGN KEY (UserSubmitted_FK) REFERENCES Users (UserId)
 );
 
