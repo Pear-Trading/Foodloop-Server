@@ -7,9 +7,7 @@ use FindBin;
 $ENV{MOJO_MODE} = 'development';
 $ENV{MOJO_LOG_LEVEL} = 'debug';
 
-require "$FindBin::Bin/../foodloopserver.pl";
-
-my $t = Test::Mojo->new;
+my $t = Test::Mojo->new("Pear::LocalLoop");
 
 my $dbh = $t->app->db;
 
