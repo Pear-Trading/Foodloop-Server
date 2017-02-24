@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS Administrators;
 DROP TABLE IF EXISTS PendingTransactions;
 DROP TABLE IF EXISTS PendingOrganisations;
 DROP TABLE IF EXISTS SessionTokens;

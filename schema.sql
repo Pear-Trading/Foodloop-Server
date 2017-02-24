@@ -1,5 +1,5 @@
 CREATE TABLE Organisations (
-  OrganisationalId INTEGER PRIMARY KEY UNIQUE NOT NULL,
+  OrganisationalId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
   Name TEXT NOT NULL COLLATE nocase,
   FullAddress TEXT NOT NULL COLLATE nocase,
   PostCode TEXT NOT NULL COLLATE nocase
@@ -79,3 +79,8 @@ CREATE TABLE PendingTransactions (
   FOREIGN KEY (BuyerUserId_FK) REFERENCES Users (UserId),
   FOREIGN KEY (PendingSellerOrganisationId_FK) REFERENCES PendingOrganisations (PendingOrganisationId)
 );
+
+CREATE TABLE Administrators (
+  UserId INTEGER PRIMARY KEY UNIQUE NOT NULL,
+  FOREIGN KEY (UserId) REFERENCES Users (UserId)
+)
