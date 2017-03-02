@@ -243,8 +243,8 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions",
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef, ())}[0],1,"1 verified organisations (choco billy)" ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef, ())}[0],0,"No verified transactions." ;
 
-done_testing();
-exit;
+#done_testing();
+#exit;
 
 print "test 13 - add valid transaction (type 2: unvalidated organisation)\n";
 $json = {
@@ -261,7 +261,7 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions",
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef, ())}[0],1,"1 verified organisations (choco billy)" ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef, ())}[0],0,"No verified transactions." ;
 
-print "test 13 - Non-admin (organisation) tries to approve their organisation and fails.\n";
+print "test 14 - Non-admin (organisation) tries to approve their organisation and fails.\n";
 $json = {
   unvalidatedOrganisationId => $newPendingKalmOrgId,
 };
@@ -270,7 +270,7 @@ $t->post_ok('/admin-approve' => json => $json)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/You are not an admin/i);
 
-print "test 12 - Logout Choco Billy\n";
+print "test 15 - Logout Choco Billy\n";
 $t->post_ok('/logout')
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
@@ -281,7 +281,7 @@ $t->post_ok('/logout')
 
 #Login as Admin
 
-print "test 13 - Login - admin\n";
+print "test 16 - Login - admin\n";
 $testJson = {
   'email' => $emailAdmin,
   'password' => $passwordAdmin,
@@ -291,13 +291,13 @@ $t->post_ok('/login' => json => $testJson)
   ->json_is('/success', Mojo::JSON->true);
 
 
-print "test 14 - JSON is missing.\n";
+print "test 17 - JSON is missing.\n";
 $t->post_ok('/admin-approve' => json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/JSON is missing/i);
 
-print "test 15 - unvalidatedOrganisationId missing (non-modify).\n";
+print "test 18 - unvalidatedOrganisationId missing (non-modify).\n";
 $json = {
 };
 $t->post_ok('/admin-approve' => json => $json)
@@ -305,7 +305,7 @@ $t->post_ok('/admin-approve' => json => $json)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/unvalidatedOrganisationId is missing/i);
 
-print "test 16 - unvalidatedOrganisationId not number (non-modify).\n";
+print "test 19 - unvalidatedOrganisationId not number (non-modify).\n";
 $json = {
   unvalidatedOrganisationId => 'Abc',
 };
@@ -315,7 +315,7 @@ $t->post_ok('/admin-approve' => json => $json)
   ->content_like(qr/unvalidatedOrganisationId does not look like a number/i);
 
 
-print "test 17 - unvalidatedOrganisationId does not exist (non-modify).\n";
+print "test 20 - unvalidatedOrganisationId does not exist (non-modify).\n";
 my ($maxPendingId) = $t->app->db->selectrow_array("SELECT MAX(PendingOrganisationId) FROM PendingOrganisations", undef,());
 $json = {
   unvalidatedOrganisationId => ($maxPendingId + 1),
@@ -327,7 +327,7 @@ $t->post_ok('/admin-approve' => json => $json)
 
 #TODO add text to see the specific one has moved.
 
-print "test 18 - valid approval (non-modify).\n";
+print "test 21 - valid approval (non-modify).\n";
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],3,"3 unverified organisations."; 
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions", undef, ())}[0],6,"6 unverified transactions." ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef, ())}[0],1,"1 verified organisations (choco billy)" ;
@@ -347,7 +347,7 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations WHERE N
 
 #TODO check with values missing
 
-print "test 18 - valid approval (non-modify).\n";
+print "test 22 - valid approval (non-modify).\n";
 #TODO if we implement constraints on the input data this will fail
 my $testName = "Change testing turtle name";
 my $testFullAddress = "Change testing turtle address";

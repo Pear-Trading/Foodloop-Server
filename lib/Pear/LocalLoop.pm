@@ -38,6 +38,7 @@ Dwarn $config;
 
 # shortcut for use in template
 $self->helper( db => sub { $dbh });
+$self->helper( schema => sub { $schema });
 
 my $r = $self->routes;
 
@@ -59,77 +60,6 @@ $r->post("/fetchuser")->to('api#post_fetchuser');
 $r->any( '/' => sub {
   my $self = shift;
   return $self->render(text => 'If you are seeing this, then the server is running.', success => Mojo::JSON->true);
-});
-
-
-#TODO this should limit the number of responses returned, when location is implemented that would be the main way of filtering.
-$r->post ('/search' => sub {
-  my $self = shift;
-  my $userId = $self->get_active_user_id();
-
-  my $json = $self->req->json;
-  if ( ! defined $json ) {
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'JSON is missing.',
-    },
-    status => 400,); #Malformed request   
-  }
-
-  my $searchName = $json->{searchName};
-  if ( ! defined $searchName ) {
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'searchName is missing.',
-    },
-    status => 400,); #Malformed request   
-  }
-  #Is blank
-  elsif  ( $searchName =~ m/^\s*$/) {
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'searchName is blank.',
-    },
-    status => 400,); #Malformed request   
-  }
-
-  #Currently ignored
-  #TODO implement further. 
-  my $searchLocation = $json->{searchLocation};
-
-  my @validatedOrgs = ();
-  {
-    my $statementValidated = $dbh->prepare("SELECT OrganisationalId, Name, FullAddress, PostCode FROM Organisations WHERE Name LIKE ?");
-    $statementValidated->execute('%'.$searchName.'%');
-
-    while (my ($id, $name, $address, $postcode) = $statementValidated->fetchrow_array()) {
-      push(@validatedOrgs, $self->create_hash($id,$name,$address,$postcode));
-    }
-  }
-
-  #$self->app->log->debug( "Orgs: " . Dumper @validatedOrgs );
-
-  my @unvalidatedOrgs = ();
-  {
-    my $statementUnvalidated = $dbh->prepare("SELECT PendingOrganisationId, Name, FullAddress, Postcode FROM PendingOrganisations WHERE Name LIKE ? AND UserSubmitted_FK = ?");
-    $statementUnvalidated->execute('%'.$searchName.'%', $userId);
-
-    while (my ($id, $name, $fullAddress, $postcode) = $statementUnvalidated->fetchrow_array()) {
-      push(@unvalidatedOrgs, $self->create_hash($id, $name, $fullAddress, $postcode));
-    }
-  }
-  
-  $self->app->log->debug('Path Success: file:' . __FILE__ . ', line: ' . __LINE__);
-  return $self->render( json => {
-    success => Mojo::JSON->true,
-    unvalidated => \@unvalidatedOrgs,
-    validated => \@validatedOrgs,
-  },
-  status => 200,);    
-
 });
 
 
