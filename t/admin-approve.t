@@ -1,4 +1,4 @@
-use Test::More skip_all => "Test is currently broken";
+use Test::More;
 use Test::Mojo;
 use Mojo::JSON;
 
@@ -119,14 +119,15 @@ $json = {
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/upload' => form => $upload )
   ->status_is(200)
-  ->json_is('/success', Mojo::JSON->true);
+  ->json_is('/success', Mojo::JSON->true)
+  ->json_has('/unvalidatedOrganisationId');
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],1,"1 unverified organisation." ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions", undef, ())}[0],1,"1 unverified transaction." ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef, ())}[0],1,"1 verified organisations (choco billy)" ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef, ())}[0],0,"No verified transactions." ;
 
-my $newPendingTurtleOrgId = $t->app->db->last_insert_id(undef,undef, "PendingOrganisations", "PendingOrganisationId");
-print "Turtle Id: " . $newPendingTurtleOrgId;
+my $newPendingTurtleOrgId = $t->tx->res->json->{unvalidatedOrganisationId};;
+#print "Turtle Id: " . $newPendingTurtleOrgId . "\n";
 
 print "test 6 - Non-admin (customer) tries to approve their organisation and fails.\n";
 $json = {
@@ -176,14 +177,15 @@ $json = {
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/upload' => form => $upload )
   ->status_is(200)
-  ->json_is('/success', Mojo::JSON->true);
+  ->json_is('/success', Mojo::JSON->true)
+  ->json_has('/unvalidatedOrganisationId');
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],2,"2 unverified organisations." ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions", undef, ())}[0],2,"2 unverified transactions." ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef, ())}[0],1,"1 verified organisations (choco billy)" ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef, ())}[0],0,"No verified transactions." ;
 
-my $newPendingKalmOrgId = $t->app->db->last_insert_id(undef,undef, "PendingOrganisations", "PendingOrganisationId");
-print "Kalm Id: " . $newPendingKalmOrgId . "\n";
+my $newPendingKalmOrgId = $t->tx->res->json->{unvalidatedOrganisationId};
+#print "Kalm Id: " . $newPendingKalmOrgId . "\n";
 
 
 print "test 10 - add valid transaction (type 2: unvalidated organisation)\n";
@@ -195,15 +197,14 @@ $json = {
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/upload' => form => $upload )
   ->status_is(200)
-  ->json_is('/success', Mojo::JSON->true);
+  ->json_is('/success', Mojo::JSON->true)
+  ->json_hasnt('/unvalidatedOrganisationId');
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],2,"2 unverified organisations." ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions", undef, ())}[0],3,"3 unverified transactions." ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef, ())}[0],1,"1 verified organisations (choco billy)" ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef, ())}[0],0,"No verified transactions." ;
 
-
 print "test 11 - add valid transaction (type 3: new organisation)\n";
-
 my $nameToTestJunon = 'Store';
 $json = {
   microCurrencyValue => 10,
@@ -216,10 +217,11 @@ $json = {
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/upload' => form => $upload)
   ->status_is(200)
-  ->json_is('/success', Mojo::JSON->true);
+  ->json_is('/success', Mojo::JSON->true)
+  ->json_has('/unvalidatedOrganisationId');
 
-my $newPendingJunonOrgId = $t->app->db->last_insert_id(undef,undef, "PendingOrganisations", "PendingOrganisationId");
-print "Junon Id: " . $newPendingJunonOrgId . "\n";
+my $newPendingJunonOrgId = $t->tx->res->json->{unvalidatedOrganisationId};
+#print "Junon Id: " . $newPendingJunonOrgId . "\n";
 
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],3,"3 unverified organisations." ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions", undef, ())}[0],4,"4 unverified transactions." ;
@@ -237,14 +239,14 @@ $json = {
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/upload' => form => $upload )
   ->status_is(200)
-  ->json_is('/success', Mojo::JSON->true);
+  ->json_is('/success', Mojo::JSON->true)
+  ->json_hasnt('/unvalidatedOrganisationId');
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],3,"3 unverified organisations." ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions", undef, ())}[0],5,"5 unverified transactions." ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef, ())}[0],1,"1 verified organisations (choco billy)" ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef, ())}[0],0,"No verified transactions." ;
 
-#done_testing();
-#exit;
+
 
 print "test 13 - add valid transaction (type 2: unvalidated organisation)\n";
 $json = {
@@ -255,7 +257,8 @@ $json = {
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/upload' => form => $upload )
   ->status_is(200)
-  ->json_is('/success', Mojo::JSON->true);
+  ->json_is('/success', Mojo::JSON->true)
+  ->json_hasnt('/unvalidatedOrganisationId');
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],3,"3 unverified organisations." ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions", undef, ())}[0],6,"6 unverified transactions." ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef, ())}[0],1,"1 verified organisations (choco billy)" ;
@@ -361,10 +364,10 @@ $json = {
 $t->post_ok('/admin-approve' => json => $json)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],2,"2 unverified organisation." ;
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions", undef, ())}[0],4,"4 unverified transaction." ;
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef, ())}[0],2,"2 verified organisations (choco billy and kalm inn)" ;
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef, ())}[0],2,"2 verified transaction." ;
+is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],1,"1 unverified organisation." ;
+is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions", undef, ())}[0],3,"3 unverified transaction." ;
+is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef, ())}[0],3,"3 verified organisations (choco billy, kalm inn and turtle)" ;
+is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef, ())}[0],3,"3 verified transaction." ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations WHERE Name = ?", undef, ($nameToTestTurtle))}[0],0,"Turtle does not exist in pending orgs.";
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations WHERE Name = ?", undef, ($nameToTestTurtle))}[0],0,"Turtle does not exist in verified orgs, it been renamed.";
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations WHERE Name = ? AND FullAddress = ? AND PostCode = ?", undef, ($testName, $testFullAddress, $testPostCode))}[0],1,"Turtle exists and has been renamed in verified orgs.";

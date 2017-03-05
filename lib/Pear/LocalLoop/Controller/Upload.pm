@@ -234,10 +234,17 @@ sub post_upload {
     if ($rowsAdded2 != 0) {
       $file->move_to('images/' . $filename);
       $self->app->log->debug('Path Success: file:' . __FILE__ . ', line: ' . __LINE__);
-      return $self->render( json => {
+    
+      my $returnedJson = {
         success => Mojo::JSON->true,
         message => 'Added transaction for unvalidated organisation.',
-      },
+      };
+
+      if ($transactionAdditionType == 3){
+        $returnedJson->{unvalidatedOrganisationId} = $unvalidatedOrganisationId;
+      }
+
+      return $self->render( json => $returnedJson,
       status => 200,);    
     }
     else {

@@ -77,9 +77,10 @@ sub post_admin_approve {
   my $statementInsOrg = $self->db->prepare("INSERT INTO Organisations (Name, FullAddress, PostCode) VALUES (?, ?, ?)");
   $statementInsOrg->execute($name, $fullAddress, $postcode);
   my $organisationalId = $self->db->last_insert_id(undef,undef, "Organisations", "OrganisationalId") . "\n";
+  #print "OrgId: " . $organisationalId . "\n";
 
   my $statementSelectPendingTrans = $self->db->prepare("SELECT BuyerUserId_FK, ValueMicroCurrency, ProofImage, TimeDateSubmitted FROM PendingTransactions WHERE PendingSellerOrganisationId_FK = ?");
-  $statementSelectPendingTrans->execute($organisationalId);
+  $statementSelectPendingTrans->execute($unvalidatedOrganisationId);
 
   my $statementInsTrans = $self->db->prepare("INSERT INTO Transactions (BuyerUserId_FK, SellerOrganisationId_FK, ValueMicroCurrency, ProofImage, TimeDateSubmitted) VALUES (?, ?, ?, ?, ?)");
 
@@ -100,6 +101,8 @@ sub post_admin_approve {
   status => 200,);  
 
 }
+
+
 
 
 

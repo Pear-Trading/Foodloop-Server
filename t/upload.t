@@ -266,7 +266,10 @@ my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/tes
 $t->post_ok('/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
+  ->json_has('/unvalidatedOrganisationId')
   ->content_like(qr/Added transaction for unvalidated organisation/i);
+my $unvalidatedOrganisationId = $t->tx->res->json->{unvalidatedOrganisationId};
+is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations WHERE PendingOrganisationId = ?", undef, ($unvalidatedOrganisationId))}[0],1,"unvalidatedOrganisationId exists";
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations")}[0],1,"1 pending organisation";
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions")}[0],1,"1 pending transaction";
 
