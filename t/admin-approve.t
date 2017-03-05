@@ -32,13 +32,13 @@ foreach (@accountTokens){
 #This depends on "register.t", "login.t" and "upload.t" working.
 
 #Valid customer, this also tests that redirects are disabled for register.
-print "test 1 - Create customer user account (Rufus)\n";
+print "test 1 - Create customer user account (Reno)\n";
 my $emailReno = 'reno@shinra.energy';
 my $passwordReno = 'turks';
 my $testJson = {
   'usertype' => 'customer', 
   'token' => shift(@accountTokens), 
-  'username' =>  'Rude', 
+  'username' =>  'Reno', 
   'email' => $emailReno, 
   'postcode' => 'E1 MP01', 
   'password' => $passwordReno, 
@@ -367,7 +367,7 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef, ())}[0],2,"2 verified transaction." ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations WHERE Name = ?", undef, ($nameToTestTurtle))}[0],0,"Turtle does not exist in pending orgs.";
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations WHERE Name = ?", undef, ($nameToTestTurtle))}[0],0,"Turtle does not exist in verified orgs, it been renamed.";
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations WHERE Name = ? AND FullAddress = ? AND PostCode = ?", undef, ($testName, $testFullAddress, $testPostCode))}[0],0,"Turtle exists and has been renamed in verified orgs.";
+is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations WHERE Name = ? AND FullAddress = ? AND PostCode = ?", undef, ($testName, $testFullAddress, $testPostCode))}[0],1,"Turtle exists and has been renamed in verified orgs.";
 
 ##############################################
 
