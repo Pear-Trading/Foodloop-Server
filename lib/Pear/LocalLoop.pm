@@ -48,6 +48,7 @@ $r->post("/upload")->to('upload#post_upload');
 $r->post("/search")->to('upload#post_search');
 
 $r->post("/admin-approve")->to('admin#post_admin_approve');
+$r->post("/admin-merge")->to('admin#post_admin_merge');
 
 $r->get("/login")->to('auth#get_login');
 $r->post("/login")->to('auth#post_login');
