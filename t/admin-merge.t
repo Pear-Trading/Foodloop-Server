@@ -4,8 +4,10 @@ use Mojo::JSON;
 
 use FindBin;
 
-$ENV{MOJO_MODE} = 'development';
-$ENV{MOJO_LOG_LEVEL} = 'debug';
+BEGIN {
+  $ENV{MOJO_MODE} = 'testing';
+  $ENV{MOJO_LOG_LEVEL} = 'debug';
+}
 
 my $t = Test::Mojo->new("Pear::LocalLoop");
 
@@ -29,7 +31,7 @@ foreach (@accountTokens){
 }
 
 
-#This depends on "register.t", "login.t" and "upload.t" working.
+#This depends on "register.t", "login.t", "upload.t" and "admin-approve.t" working.
 
 #Valid customer, this also tests that redirects are disabled for register.
 print "test 1 - Create customer user account (Reno)\n";

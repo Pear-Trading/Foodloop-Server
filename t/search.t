@@ -6,8 +6,10 @@ use Text::ParseWords;
 
 use FindBin;
 
-$ENV{MOJO_MODE} = 'development';
-$ENV{MOJO_LOG_LEVEL} = 'debug';
+BEGIN {
+  $ENV{MOJO_MODE} = 'testing';
+  $ENV{MOJO_LOG_LEVEL} = 'debug';
+}
 
 my $t = Test::Mojo->new("Pear::LocalLoop");
 
