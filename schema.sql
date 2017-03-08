@@ -83,4 +83,4 @@ CREATE TABLE PendingTransactions (
 CREATE TABLE Administrators (
   UserId INTEGER PRIMARY KEY UNIQUE NOT NULL,
   FOREIGN KEY (UserId) REFERENCES Users (UserId)
-)
+);
