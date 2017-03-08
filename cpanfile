@@ -10,3 +10,4 @@ requires 'Scalar::Util';
 requires 'DBIx::Class';
 requires 'DBIx::Class::Schema::Loader';
 requires 'DateTime';
+requires 'TryCatch';

@@ -57,6 +57,8 @@ $r->post("/logout")->to('auth#post_logout');
 $r->post("/edit")->to('api#post_edit');
 $r->post("/fetchuser")->to('api#post_fetchuser');
 
+$r->post("/user-history")->to('user#post_user_history');
+
 
 $r->any( '/' => sub {
   my $self = shift;
@@ -73,16 +75,22 @@ $self->hook( before_dispatch => sub {
 
   #See if logged in.
   my $sessionToken = $self->get_session_token();
+  #$self->app->log->debug( "sessionToken: " . $sessionToken);
   
   #0 = no session, npn-0 is has updated session
   my $hasBeenExtended = $self->extend_session($sessionToken);
+  #$self->app->log->debug( "hasBeenExtended: " . $hasBeenExtended);
 
   my $path = $self->req->url->to_abs->path;
 
+  $self->app->log->debug('Path: file:' . __FILE__ . ', line: ' . __LINE__);
+
   #Has valid session
   if ($hasBeenExtended) {
+    $self->app->log->debug('Path: file:' . __FILE__ . ', line: ' . __LINE__);
     #If logged in and requestine the login page redirect to the main page.
     if ($path eq '/login') {
+      $self->app->log->debug('Path: file:' . __FILE__ . ', line: ' . __LINE__);
       #Force expire and redirect.
       $self->res->code(303);
       $self->redirect_to('/');
@@ -90,9 +98,11 @@ $self->hook( before_dispatch => sub {
   }
   #Has expired or did not exist in the first place and the path is not login
   elsif ($path ne '/login' &&  $path ne '/register') {
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
     $self->res->code(303);
     $self->redirect_to('/login');
   }
+  $self->app->log->debug('Path: file:' . __FILE__ . ', line: ' . __LINE__);
 });
 
 
