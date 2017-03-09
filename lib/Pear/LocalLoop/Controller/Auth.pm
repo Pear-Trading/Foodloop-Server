@@ -8,7 +8,7 @@ use Mojo::JSON;
 #Because of "before_dispatch" this will never be accessed unless the user is not logged in.
 sub get_login {
   my $self = shift;
-  $self->render( text => 'This will be the login page.' );
+  return $self->render( success => Mojo::JSON->true, text => 'This will be the login page.', status => 200 );
 }
 
 #TODO set session cookie and add it to the database.
