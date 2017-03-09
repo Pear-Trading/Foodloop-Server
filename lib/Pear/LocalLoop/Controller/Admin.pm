@@ -49,6 +49,7 @@ sub post_admin_approve {
 
   #It does not exist.
   if (! defined $id) {
+    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
     return $self->render( json => {
       success => Mojo::JSON->false,
       message => 'the specified unvalidatedOrganisationId does not exist.',
