@@ -275,9 +275,6 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations 
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations")}[0],1,"1 pending organisation";
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions")}[0],1,"1 pending transaction";
 
-
-my ($organisationId) = $t->app->db->selectrow_array("SELECT PendingOrganisationId FROM PendingOrganisations LIMIT 1",undef,());
-
 # Add type 2 (unverified organisation) checking.
 
 print "test 18 - addUnvalidatedId missing (type 2: existing organisation)\n";
@@ -341,7 +338,7 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions")
 $json = {
   microCurrencyValue => 10,
   transactionAdditionType => 2,
-  addUnvalidatedId => $organisationId,
+  addUnvalidatedId => $unvalidatedOrganisationId,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/upload' => form => $upload )
@@ -376,7 +373,7 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions")
 $json = {
   microCurrencyValue => 10,
   transactionAdditionType => 2,
-  addUnvalidatedId => $organisationId,
+  addUnvalidatedId => $unvalidatedOrganisationId,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/upload' => form => $upload )
