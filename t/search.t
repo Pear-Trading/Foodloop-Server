@@ -220,11 +220,11 @@ sub check_vars{
 };
 
 print "test 12 - Testing expected values with 'booths'\n";
-#Expect 0 validated and 0 unvalidated with "bar".
+#Expect 0 validated and 0 unvalidated with "booths".
 check_vars("booths", 0, 0);
 
 print "test 13 - Testing expected values with 'chip'\n";
-#Expect 2 validated and 0 unvalidated with "chip".
+#Expect 1 validated and 0 unvalidated with "chip".
 check_vars("chip", 1, 0);
 
 print "test 14 - Testing expected values with 'fish, with one unvalidated organisation'\n";
@@ -248,11 +248,11 @@ print "test 17 - Login - Choco billy (cookies, organisation)\n";
 login_billy();
 
 print "test 18 - Testing expected values with 'booths'\n";
-#Expect 0 validated and 0 unvalidated with "bar".
+#Expect 0 validated and 0 unvalidated with "booths".
 check_vars("booths", 0, 0);
 
 print "test 19 - Testing expected values with 'chip'\n";
-#Expect 2 validated and 0 unvalidated with "chip".
+#Expect 1 validated and 0 unvalidated with "chip".
 check_vars("chip", 1, 0);
 
 print "test 20 - Testing expected values with 'fish'\n";
