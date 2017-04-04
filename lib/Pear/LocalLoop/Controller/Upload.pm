@@ -341,26 +341,27 @@ sub post_search {
 
   my @validatedOrgs = ();
   {
-    my $statementValidated = $self->db->prepare("SELECT OrganisationalId, Name, FullAddress, PostCode FROM Organisations WHERE Name LIKE ?");
-    $statementValidated->execute('%'.$searchName.'%');
+    my $statementValidated = $self->db->prepare("SELECT OrganisationalId, Name, FullAddress, PostCode FROM Organisations WHERE UPPER( Name ) LIKE ?");
+    $statementValidated->execute('%'. uc $searchName.'%');
 
     while (my ($id, $name, $address, $postcode) = $statementValidated->fetchrow_array()) {
       push(@validatedOrgs, $self->create_hash($id,$name,$address,$postcode));
     }
   }
 
-  #$self->app->log->debug( "Orgs: " . Dumper @validatedOrgs );
+  $self->app->log->debug( "Orgs: " . Dumper @validatedOrgs );
 
   my @unvalidatedOrgs = ();
   {
-    my $statementUnvalidated = $self->db->prepare("SELECT PendingOrganisationId, Name, FullAddress, Postcode FROM PendingOrganisations WHERE Name LIKE ? AND UserSubmitted_FK = ?");
-    $statementUnvalidated->execute('%'.$searchName.'%', $userId);
+    my $statementUnvalidated = $self->db->prepare("SELECT PendingOrganisationId, Name, FullAddress, Postcode FROM PendingOrganisations WHERE UPPER( Name ) LIKE ? AND UserSubmitted_FK = ?");
+    $statementUnvalidated->execute('%'. uc $searchName.'%', $userId);
 
     while (my ($id, $name, $fullAddress, $postcode) = $statementUnvalidated->fetchrow_array()) {
       push(@unvalidatedOrgs, $self->create_hash($id, $name, $fullAddress, $postcode));
     }
   }
   
+  $self->app->log->debug( "Non Validated Orgs: " . Dumper @unvalidatedOrgs );
   $self->app->log->debug('Path Success: file:' . __FILE__ . ', line: ' . __LINE__);
   return $self->render( json => {
     success => Mojo::JSON->true,
