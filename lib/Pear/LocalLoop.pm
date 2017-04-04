@@ -2,7 +2,6 @@ package Pear::LocalLoop;
 
 use Mojo::Base 'Mojolicious';
 use Data::UUID;
-use Devel::Dwarn;
 use Mojo::JSON;
 use Data::Dumper;
 use Email::Valid;
@@ -33,8 +32,6 @@ $dbh->do("PRAGMA secure_delete = ON");
 my $sessionTimeSeconds = 60 * 60 * 24 * 7; #1 week.
 my $sessionTokenJsonName = 'sessionToken';
 my $sessionExpiresJsonName = 'sessionExpires';
-
-Dwarn $config;
 
 # shortcut for use in template
 $self->helper( db => sub { $dbh });
@@ -70,6 +67,9 @@ $r->any( '/' => sub {
 
 $self->hook( before_dispatch => sub {
   my $self = shift;
+
+  $self->app->log->debug('Before Dispatch');
+  $self->res->headers->header('Access-Control-Allow-Origin' => '*') if $self->app->mode eq 'development';
 
   $self->remove_all_expired_sessions();
 
