@@ -4,3 +4,4 @@ hypnotoad.pid
 *.db
 *~
 /images
+*.swp
