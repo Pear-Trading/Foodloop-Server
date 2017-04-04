@@ -2,6 +2,39 @@ package Pear::LocalLoop::Controller::Upload;
 use Mojo::Base 'Mojolicious::Controller';
 use Data::Dumper;
 
+=head2 post_upload
+
+Takes a file upload, with a file key of 'file2', and a json string under the
+'json' key.
+
+The json string should be an object, with the following keys:
+
+=over
+
+=item * microCurrencyValue
+
+The value of the transaction
+
+=item * transactionAdditionType
+
+Is a value of 1, 2, or 3 - depending on the type of transaction.
+
+=item * addValidatedId
+
+An ID of a valid organisation. used when transactionAdditionType is 1.
+
+=item * addUnvalidatedId
+
+An ID of an unvalidated organisation. Used when transactionAdditionType is 2.
+
+=item * organisationName
+
+The name of an organisation. Used when transactionAdditionType is 3.
+
+=back
+
+=cut
+
 sub post_upload {
   my $self = shift;
 
