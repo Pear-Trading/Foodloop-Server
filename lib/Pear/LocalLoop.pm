@@ -24,6 +24,7 @@ $self->plugin( 'Config', {
 });
 my $config = $self->config;
 
+
 my $schema = Pear::LocalLoop::Schema->connect($config->{dsn},$config->{user},$config->{pass}) or die "Could not connect";
 my $dbh = $schema->storage->dbh;
 $dbh->do("PRAGMA foreign_keys = ON");
@@ -38,6 +39,7 @@ $self->helper( db => sub { $dbh });
 $self->helper( schema => sub { $schema });
 
 my $r = $self->routes;
+$r = $r->any('/api') if $self->app->mode ne 'testing';
 
 $r->post("/register")->to('register#post_register');
 
