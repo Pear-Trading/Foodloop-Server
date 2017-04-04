@@ -1,0 +1,12 @@
+#! /usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Pear::LocalLoop::Schema;
+
+my @con = @ARGV;
+
+my $schema = Pear::LocalLoop::Schema->connect(@con);
+
+$schema->deploy;
