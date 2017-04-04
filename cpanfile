@@ -9,5 +9,6 @@ requires 'Time::Fake';
 requires 'Scalar::Util';
 requires 'DBIx::Class';
 requires 'DBIx::Class::Schema::Loader';
+requires 'SQL::Translator';
 requires 'DateTime';
 requires 'TryCatch';
