@@ -3,11 +3,8 @@ package Pear::LocalLoop;
 use Mojo::Base 'Mojolicious';
 use Data::UUID;
 use Mojo::JSON;
-use Data::Dumper;
 use Email::Valid;
-use ORM::Date;
 use Authen::Passphrase::BlowfishCrypt;
-use Scalar::Util qw(looks_like_number);
 use Pear::LocalLoop::Schema;
 
 has schema => sub {
@@ -22,55 +19,39 @@ has schema => sub {
 sub startup {
   my $self = shift;
 
-  
-$self->plugin( 'Config', {
-  default => {
-    sessionTimeSeconds => 60 * 60 * 24 * 7,
-    sessionTokenJsonName => 'sessionToken',
-    sessionExpiresJsonName => 'sessionExpires',
-  },
-});
-my $config = $self->config;
+  $self->plugin('Config', {
+    default => {
+      sessionTimeSeconds => 60 * 60 * 24 * 7,
+      sessionTokenJsonName => 'sessionToken',
+      sessionExpiresJsonName => 'sessionExpires',
+    },
+  });
+  my $config = $self->config;
+
+  # shortcut for use in template
+  $self->helper( db => sub { $self->app->schema->storage->dbh });
+  $self->helper( schema => sub { $self->app->schema });
 
 
+  my $r = $self->routes;
+  $r = $r->any('/api') if $self->app->mode ne 'testing';
 
-my $sessionTimeSeconds = 60 * 60 * 24 * 7; #1 week.
-my $sessionTokenJsonName = 'sessionToken';
-my $sessionExpiresJsonName = 'sessionExpires';
+  $r->post("/register")->to('register#post_register');
+  $r->post("/upload")->to('upload#post_upload');
+  $r->post("/search")->to('upload#post_search');
+  $r->post("/admin-approve")->to('admin#post_admin_approve');
+  $r->post("/admin-merge")->to('admin#post_admin_merge');
+  $r->get("/login")->to('auth#get_login');
+  $r->post("/login")->to('auth#post_login');
+  $r->post("/logout")->to('auth#post_logout');
+  $r->post("/edit")->to('api#post_edit');
+  $r->post("/fetchuser")->to('api#post_fetchuser');
+  $r->post("/user-history")->to('user#post_user_history');
 
-# shortcut for use in template
-$self->helper( db => sub { $self->app->schema->storage->dbh });
-$self->helper( schema => sub { $self->app->schema });
-
-
-my $r = $self->routes;
-$r = $r->any('/api') if $self->app->mode ne 'testing';
-
-$r->post("/register")->to('register#post_register');
-
-$r->post("/upload")->to('upload#post_upload');
-$r->post("/search")->to('upload#post_search');
-
-$r->post("/admin-approve")->to('admin#post_admin_approve');
-$r->post("/admin-merge")->to('admin#post_admin_merge');
-
-$r->get("/login")->to('auth#get_login');
-$r->post("/login")->to('auth#post_login');
-$r->post("/logout")->to('auth#post_logout');
-
-$r->post("/edit")->to('api#post_edit');
-$r->post("/fetchuser")->to('api#post_fetchuser');
-
-$r->post("/user-history")->to('user#post_user_history');
-
-
-$r->any( '/' => sub {
-  my $self = shift;
-  return $self->render(text => 'If you are seeing this, then the server is running.', success => Mojo::JSON->true);
-});
-
-
-
+  $r->any( '/' => sub {
+    my $self = shift;
+    return $self->render(json => { success => Mojo::JSON->true });
+  });
 
 $self->hook( before_dispatch => sub {
   my $self = shift;
@@ -113,24 +94,21 @@ $self->hook( before_dispatch => sub {
 });
 
 
-$self->helper( is_admin => sub{
-  my ($self, $userId) = @_;
+  $self->helper( is_admin => sub {
+    my ($c, $user_id) = @_;
+    my $admin = $c->schema->resultset('Administrator')->find($user_id);
+    return defined $admin;
+  });
 
-  my ($rowCount) = $self->db->selectrow_array("SELECT COUNT(UserId) FROM Administrators WHERE UserId = ?", undef, ($userId));
+  $self->helper( create_hash => sub{
+    my ($self, $id, $name, $fullAddress, $postcode) = @_;
 
-  return $rowCount != 0;
-});
-
-$self->helper( create_hash => sub{
-  my ($self, $id, $name, $fullAddress, $postcode) = @_;
-
-  my $hash = {};
-  $hash->{'id'} = $id;
-  $hash->{'name'} = $name;
-  $hash->{'fullAddress'} = $fullAddress . ", " . $postcode;
- 
-  return $hash;
-});
+    return {
+      id => $id,
+      name => $name,
+      fullAddress => $fullAddress . ", " . $postcode,
+    }
+  });
 
 
 
@@ -169,11 +147,11 @@ $self->helper(get_session_token => sub {
 
   my $json = $self->req->json;
   if (defined $json) {
-    $sessionToken = $json->{$sessionTokenJsonName};
+    $sessionToken = $json->{$self->app->config->{sessionTokenJsonName}};
   }
 
   if ( ! defined $sessionToken || $sessionToken eq "" ) {
-    $sessionToken = $self->session->{$sessionTokenJsonName};
+    $sessionToken = $self->session->{$self->app->config->{sessionTokenJsonName}};
   }
 
   if (defined $sessionToken && $sessionToken eq "" ) {
@@ -195,9 +173,9 @@ $self->helper(generate_session => sub {
   my $rowsAdded = $insertStatement->execute($sessionToken, $userId, $expireDateTime);
 
   $self->session(expires => $expireDateTime);
-  $self->session->{$sessionTokenJsonName} = $sessionToken;
+  $self->session->{$self->app->config->{sessionTokenJsonName}} = $sessionToken;
   
-  return {$sessionTokenJsonName => $sessionToken, $sessionExpiresJsonName => $expireDateTime};
+  return {$self->app->config->{sessionTokenJsonName} => $sessionToken, $self->app->config->{sessionExpiresJsonName} => $expireDateTime};
 });
 
 $self->helper(generate_session_token => sub {
@@ -214,8 +192,8 @@ $self->helper(expire_all_sessions => sub {
 });
 
 $self->helper(session_token_expiry_date_time => sub {
-  my $self = shift; 
-  return time() + $sessionTimeSeconds;
+  my $c = shift; 
+  return time() + $c->app->config->{sessionTimeSeconds};
 });
 
 $self->helper(remove_all_expired_sessions => sub {
@@ -270,7 +248,7 @@ $self->helper(expire_current_session => sub {
   my $rowsRemoved = $removeStatement->execute($sessionToken);  
 
   $self->session(expires => 1);
-  $self->session->{$sessionTokenJsonName} = $sessionToken;
+  $self->session->{$self->app->config->{sessionTokenJsonName}} = $sessionToken;
 
   return $rowsRemoved != 0;
 });
@@ -330,7 +308,6 @@ $self->helper(set_token_as_used => sub {
   my $statement = $self->db->prepare("UPDATE AccountTokens SET Used = 1 WHERE AccountTokenName = ? AND Used = 0 ");
   my $rows = $statement->execute($token);
 
-  #print '-set_token_as_used-'.(Dumper($rows))."-\n";
 
   return $rows != 0;
 });
