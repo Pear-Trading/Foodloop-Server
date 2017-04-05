@@ -4,7 +4,9 @@ use Mojo::Base 'Mojolicious';
 use Data::UUID;
 use Mojo::JSON;
 use Email::Valid;
+use ORM::Date;
 use Authen::Passphrase::BlowfishCrypt;
+use Scalar::Util qw(looks_like_number);
 use Pear::LocalLoop::Schema;
 
 has schema => sub {
@@ -253,84 +255,66 @@ $self->helper(expire_current_session => sub {
   return $rowsRemoved != 0;
 });
 
-#Return true if and only if the token exists and has not been used.
-$self->helper(is_token_unused => sub {
-  my ( $self, $token ) = @_;
+  $self->helper(is_token_unused => sub {
+    my ( $c, $token ) = @_;
+    return defined $c->schema->resultset('AccountToken')->find({
+      accounttokenname => $token,
+      used => 0,
+    });
+  });
 
-  my ( $out ) = $self->db->selectrow_array("SELECT COUNT(AccountTokenId) FROM AccountTokens WHERE AccountTokenName = ? AND Used = 0", undef, ($token));
+  $self->helper(does_organisational_id_exist => sub {
+    my ( $c, $org_id ) = @_;
+    return defined $c->schema->resultset('Organisation')->find({ organisationalid => $org_id });
+  });
 
-  return $out != 0;
+  $self->helper(get_age_foreign_key => sub {
+    my ( $c, $age_string ) = @_;
+    my $age_range = $c->schema->resultset('AgeRange')->find({ agerangestring => $age_string });
+    return defined $age_range ? $age_range->agerangeid : undef;
+  });
 
-});
+  $self->helper(get_userid_foreign_key => sub {
+    my ( $c, $email ) = @_;
+    my $user = $c->schema->resultset('User')->find({ email => $email });
+    return defined $user ? $user->userid : undef;
+  });
 
-#Return true if and only if the token exists and has not been used.
-$self->helper(does_organisational_id_exist => sub {
-  my ( $self, $organisationalId ) = @_;
+  $self->helper(does_username_exist => sub {
+    my ( $c, $username ) = @_;
+    return defined $c->schema->resultset('Customer')->find({ username => $username });
+  });
 
-  my ( $out ) = $self->db->selectrow_array("SELECT COUNT(OrganisationalId) FROM Organisations WHERE OrganisationalId = ?", undef, ($organisationalId));
-  return $out != 0;
-});
+  $self->helper(does_email_exist => sub {
+    my ( $c, $email ) = @_;
+    return defined $c->schema->resultset('User')->find({ email => $email });
+  });
 
-$self->helper(get_age_foreign_key => sub {
-  my ( $self, $ageString ) = @_;
+  $self->helper(set_token_as_used => sub {
+    my ( $c, $token ) = @_;
+    return defined $c->schema->resultset('AccountToken')->find({
+      accounttokenname => $token,
+      used => 0,
+    })->update({ used => 1 });
+  });
 
-  my ($out) = $self->db->selectrow_array("SELECT AgeRangeId FROM AgeRanges WHERE AgeRangeString = ?", undef, ($ageString));
-  return $out;
-});
-
-$self->helper(get_userid_foreign_key => sub {
-  my ( $self, $email ) = @_;
-
-  my ($out) = $self->db->selectrow_array("SELECT UserId FROM Users WHERE Email = ?", undef, ($email));
-  return $out;
-  
-});
-
-
-$self->helper(does_username_exist => sub {
-  my ( $self, $username ) = @_;
-
-  my ($out) = $self->db->selectrow_array("SELECT COUNT(UserName) FROM Customers WHERE UserName = ?", {}, ($username));
-  return $out != 0;
-});
-
-$self->helper(does_email_exist => sub {
-  my ( $self, $email ) = @_;
-
-  my ($out) = $self->db->selectrow_array("SELECT COUNT(Email) FROM Users WHERE Email = ?", {}, ($email));
-  return $out != 0;
-});
-
-$self->helper(set_token_as_used => sub {
-  my ( $self, $token ) = @_;
-
-  #Return true if and only if the token exists and has not been used.
-  my $statement = $self->db->prepare("UPDATE AccountTokens SET Used = 1 WHERE AccountTokenName = ? AND Used = 0 ");
-  my $rows = $statement->execute($token);
-
-
-  return $rows != 0;
-});
-
-$self->helper(generate_hashed_password => sub {
-  my ( $self, $password ) = @_;
-
-  my $ppr = Authen::Passphrase::BlowfishCrypt->new(
-    cost => 8, salt_random => 1,
-    passphrase => $password);
-  return $ppr->as_crypt;
-
-});
+  $self->helper(generate_hashed_password => sub {
+    my ( $c, $password ) = @_;
+    my $ppr = Authen::Passphrase::BlowfishCrypt->new(
+      cost => 8,
+      salt_random => 1,
+      passphrase => $password,
+    );
+    return $ppr->as_crypt;
+  });
  
-# We assume the user already exists.
-$self->helper(check_password_email => sub{
-  my ( $self, $email, $password) = @_;
-
-  my ($hashedPassword) = $self->db->selectrow_array("SELECT HashedPassword FROM Users WHERE Email = ?", undef, ($email));
-  my $ppr = Authen::Passphrase::BlowfishCrypt->from_crypt($hashedPassword);
-
-  return $ppr->match($password);
-});
+  # We assume the user already exists.
+  $self->helper(check_password_email => sub {
+    my ( $c, $email, $password ) = @_;
+    my $user = $c->schema->resultset('User')->find({ email => $email });
+    my $ppr = Authen::Passphrase::BlowfishCrypt->from_crypt($user->hashedpassword);
+    return $ppr->match($password);
+  });
 
 }
 
