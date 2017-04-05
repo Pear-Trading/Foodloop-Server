@@ -10,6 +10,14 @@ use Authen::Passphrase::BlowfishCrypt;
 use Scalar::Util qw(looks_like_number);
 use Pear::LocalLoop::Schema;
 
+has schema => sub {
+  my $c = shift;
+  return Pear::LocalLoop::Schema->connect(
+    $c->app->config->{dsn},
+    $c->app->config->{user},
+    $c->app->config->{pass},
+  );
+};
 
 sub startup {
   my $self = shift;
@@ -25,18 +33,15 @@ $self->plugin( 'Config', {
 my $config = $self->config;
 
 
-my $schema = Pear::LocalLoop::Schema->connect($config->{dsn},$config->{user},$config->{pass}) or die "Could not connect";
-my $dbh = $schema->storage->dbh;
-$dbh->do("PRAGMA foreign_keys = ON");
-$dbh->do("PRAGMA secure_delete = ON");
 
 my $sessionTimeSeconds = 60 * 60 * 24 * 7; #1 week.
 my $sessionTokenJsonName = 'sessionToken';
 my $sessionExpiresJsonName = 'sessionExpires';
 
 # shortcut for use in template
-$self->helper( db => sub { $dbh });
-$self->helper( schema => sub { $schema });
+$self->helper( db => sub { $self->app->schema->storage->dbh });
+$self->helper( schema => sub { $self->app->schema });
+
 
 my $r = $self->routes;
 $r = $r->any('/api') if $self->app->mode ne 'testing';
