@@ -77,7 +77,7 @@ sub post_admin_approve {
   #FIXME there may be race conditions here, so may get the wrong number, mutux is needed.
   my $statementInsOrg = $self->db->prepare("INSERT INTO Organisations (Name, FullAddress, PostCode) VALUES (?, ?, ?)");
   $statementInsOrg->execute($name, $fullAddress, $postcode);
-  my $organisationalId = $self->db->last_insert_id(undef,undef, "Organisations", "OrganisationalId") . "\n";
+  my $organisationalId = $self->db->last_insert_id(undef,undef, "Organisations", "OrganisationalId");
   #print "OrgId: " . $organisationalId . "\n";
 
   my $statementSelectPendingTrans = $self->db->prepare("SELECT BuyerUserId_FK, ValueMicroCurrency, ProofImage, TimeDateSubmitted FROM PendingTransactions WHERE PendingSellerOrganisationId_FK = ?");
