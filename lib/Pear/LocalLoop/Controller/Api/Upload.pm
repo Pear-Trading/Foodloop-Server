@@ -1,4 +1,4 @@
-package Pear::LocalLoop::Controller::Upload;
+package Pear::LocalLoop::Controller::Api::Upload;
 use Mojo::Base 'Mojolicious::Controller';
 use Data::Dumper;
 

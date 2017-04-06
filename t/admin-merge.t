@@ -46,7 +46,7 @@ my $testJson = {
   'password' => $passwordReno, 
   'age' => '20-35'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -62,7 +62,7 @@ my $testJson = {
   'password' => $passwordBilly, 
   'fulladdress' => 'Chocobo Farm, Eastern Continent, Gaia'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(200) 
   ->json_is('/success', Mojo::JSON->true);
 
@@ -79,7 +79,7 @@ my $testJson = {
   'password' => $passwordAdmin, 
   'age' => '35-50'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -99,7 +99,7 @@ $testJson = {
   'email' => $emailReno,
   'password' => $passwordReno,
 };
-$t->post_ok('/login' => json => $testJson)
+$t->post_ok('/api/login' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -118,7 +118,7 @@ $json = {
   postcode => "NW1 W01"
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload )
+$t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],1,"1 unverified organisation." ;
@@ -131,7 +131,7 @@ print "Turtle Id: " . $newPendingTurtleOrgId . "\n";
 
 
 print "test 7 - Logout Reno\n";
-$t->post_ok('/logout')
+$t->post_ok('/api/logout')
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -146,7 +146,7 @@ $testJson = {
   'email' => $emailBilly,
   'password' => $passwordBilly,
 };
-$t->post_ok('/login' => json => $testJson)
+$t->post_ok('/api/login' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -167,7 +167,7 @@ $json = {
   postcode => ""
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload )
+$t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],2,"2 unverified organisations." ;
@@ -189,7 +189,7 @@ $json = {
   addUnvalidatedId => $newPendingTurtleOrgIdPartial,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload )
+$t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],2,"2 unverified organisations." ;
@@ -209,7 +209,7 @@ $json = {
   postcode => "E6 M02"
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload)
+$t->post_ok('/api/upload' => form => $upload)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -229,7 +229,7 @@ $json = {
   addUnvalidatedId => $newPendingJunonOrgId,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload )
+$t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],3,"3 unverified organisations." ;
@@ -245,7 +245,7 @@ $json = {
   addUnvalidatedId => $newPendingJunonOrgId,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload )
+$t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],3,"3 unverified organisations." ;
@@ -255,7 +255,7 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef,
 
 
 print "test 14 - Logout Choco Billy\n";
-$t->post_ok('/logout')
+$t->post_ok('/api/logout')
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -270,7 +270,7 @@ $testJson = {
   'email' => $emailAdmin,
   'password' => $passwordAdmin,
 };
-$t->post_ok('/login' => json => $testJson)
+$t->post_ok('/api/login' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -282,7 +282,7 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef,
 my $json = {
   unvalidatedOrganisationId => $newPendingTurtleOrgId,
 };
-$t->post_ok('/admin-approve' => json => $json)
+$t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 my $turtleValidatedId = $t->tx->res->json->{validatedOrganisationId};
@@ -292,7 +292,7 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef, ())}[0],1,"1 verified transaction.";  
 
 print "test 17 - Logout Admin\n";
-$t->post_ok('/logout')
+$t->post_ok('/api/logout')
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -307,7 +307,7 @@ $testJson = {
   'email' => $emailBilly,
   'password' => $passwordBilly,
 };
-$t->post_ok('/login' => json => $testJson)
+$t->post_ok('/api/login' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -317,13 +317,13 @@ $json = {
   unvalidatedOrganisationId => $newPendingTurtleOrgIdPartial,
   validatedOrganisationId => $turtleValidatedId,
 };
-$t->post_ok('/admin-merge' => json => $json)
+$t->post_ok('/api/admin-merge' => json => $json)
   ->status_is(403)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/You are not an admin/i);
 
 print "test 20 - Logout Choco Billy\n";
-$t->post_ok('/logout')
+$t->post_ok('/api/logout')
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -338,13 +338,13 @@ $testJson = {
   'email' => $emailAdmin,
   'password' => $passwordAdmin,
 };
-$t->post_ok('/login' => json => $testJson)
+$t->post_ok('/api/login' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
 
 print "test 22 - JSON is missing.\n";
-$t->post_ok('/admin-merge' => json)
+$t->post_ok('/api/admin-merge' => json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/JSON is missing/i);
@@ -354,7 +354,7 @@ print "test 23 - unvalidatedOrganisationId missing.\n";
 $json = {
   validatedOrganisationId => $turtleValidatedId,
 };
-$t->post_ok('/admin-merge' => json => $json)
+$t->post_ok('/api/admin-merge' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/unvalidatedOrganisationId is missing/i);
@@ -365,7 +365,7 @@ $json = {
   unvalidatedOrganisationId => "ABC",
   validatedOrganisationId => $turtleValidatedId,
 };
-$t->post_ok('/admin-merge' => json => $json)
+$t->post_ok('/api/admin-merge' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/unvalidatedOrganisationId does not look like a number/i);
@@ -375,7 +375,7 @@ print "test 25 - validatedOrganisationId missing.\n";
 $json = {
   unvalidatedOrganisationId => $newPendingTurtleOrgIdPartial,
 };
-$t->post_ok('/admin-merge' => json => $json)
+$t->post_ok('/api/admin-merge' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/validatedOrganisationId is missing/i);
@@ -386,7 +386,7 @@ $json = {
   unvalidatedOrganisationId => $newPendingTurtleOrgIdPartial,
   validatedOrganisationId => "ABC",
 };
-$t->post_ok('/admin-merge' => json => $json)
+$t->post_ok('/api/admin-merge' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/validatedOrganisationId does not look like a number/i);
@@ -398,7 +398,7 @@ $json = {
   unvalidatedOrganisationId => ($maxPendingId + 1),
   validatedOrganisationId => $turtleValidatedId,
 };
-$t->post_ok('/admin-merge' => json => $json)
+$t->post_ok('/api/admin-merge' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/unvalidatedOrganisationId does not exist in the database/i);
@@ -410,7 +410,7 @@ $json = {
   unvalidatedOrganisationId => $newPendingTurtleOrgIdPartial,
   validatedOrganisationId => ($maxId + 1),
 };
-$t->post_ok('/admin-merge' => json => $json)
+$t->post_ok('/api/admin-merge' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/validatedOrganisationId does not exist in the database/i);
@@ -427,7 +427,7 @@ $json = {
   unvalidatedOrganisationId => $newPendingTurtleOrgIdPartial,
   validatedOrganisationId => $turtleValidatedId,
 };
-$t->post_ok('/admin-merge' => json => $json)
+$t->post_ok('/api/admin-merge' => json => $json)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],1,"1 unverified organisation." ;

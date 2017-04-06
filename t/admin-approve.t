@@ -46,7 +46,7 @@ my $testJson = {
   'password' => $passwordReno, 
   'age' => '20-35'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -62,7 +62,7 @@ my $testJson = {
   'password' => $passwordBilly, 
   'fulladdress' => 'Chocobo Farm, Eastern Continent, Gaia'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(200) 
   ->json_is('/success', Mojo::JSON->true);
 
@@ -79,7 +79,7 @@ my $testJson = {
   'password' => $passwordAdmin, 
   'age' => '35-50'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -99,7 +99,7 @@ $testJson = {
   'email' => $emailReno,
   'password' => $passwordReno,
 };
-$t->post_ok('/login' => json => $testJson)
+$t->post_ok('/api/login' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -119,7 +119,7 @@ $json = {
   postcode => "NW1 W01"
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload )
+$t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_has('/unvalidatedOrganisationId');
@@ -135,14 +135,14 @@ print "test 7 - Non-admin (customer) tries to approve their organisation and fai
 $json = {
   unvalidatedOrganisationId => $newPendingTurtleOrgId,
 };
-$t->post_ok('/admin-approve' => json => $json)
+$t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(403)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/You are not an admin/i);
 
 
 print "test 8 - Logout Reno\n";
-$t->post_ok('/logout')
+$t->post_ok('/api/logout')
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -157,7 +157,7 @@ $testJson = {
   'email' => $emailBilly,
   'password' => $passwordBilly,
 };
-$t->post_ok('/login' => json => $testJson)
+$t->post_ok('/api/login' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -177,7 +177,7 @@ $json = {
   postcode => "E2 M02"
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload )
+$t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_has('/unvalidatedOrganisationId');
@@ -197,7 +197,7 @@ $json = {
   addUnvalidatedId => $newPendingKalmOrgId,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload )
+$t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_hasnt('/unvalidatedOrganisationId');
@@ -217,7 +217,7 @@ $json = {
   postcode => "E6 M02"
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload)
+$t->post_ok('/api/upload' => form => $upload)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_has('/unvalidatedOrganisationId');
@@ -238,7 +238,7 @@ $json = {
   addUnvalidatedId => $newPendingJunonOrgId,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload )
+$t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_hasnt('/unvalidatedOrganisationId');
@@ -255,7 +255,7 @@ $json = {
   addUnvalidatedId => $newPendingJunonOrgId,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload )
+$t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_hasnt('/unvalidatedOrganisationId');
@@ -268,13 +268,13 @@ print "test 15 - Non-admin (organisation) tries to approve their organisation an
 $json = {
   unvalidatedOrganisationId => $newPendingKalmOrgId,
 };
-$t->post_ok('/admin-approve' => json => $json)
+$t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(403)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/You are not an admin/i);
 
 print "test 16 - Logout Choco Billy\n";
-$t->post_ok('/logout')
+$t->post_ok('/api/logout')
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -289,13 +289,13 @@ $testJson = {
   'email' => $emailAdmin,
   'password' => $passwordAdmin,
 };
-$t->post_ok('/login' => json => $testJson)
+$t->post_ok('/api/login' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
 
 print "test 18 - JSON is missing.\n";
-$t->post_ok('/admin-approve' => json)
+$t->post_ok('/api/admin-approve' => json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/JSON is missing/i);
@@ -303,7 +303,7 @@ $t->post_ok('/admin-approve' => json)
 print "test 19 - unvalidatedOrganisationId missing (non-modify).\n";
 $json = {
 };
-$t->post_ok('/admin-approve' => json => $json)
+$t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/unvalidatedOrganisationId is missing/i);
@@ -312,7 +312,7 @@ print "test 20 - unvalidatedOrganisationId not number (non-modify).\n";
 $json = {
   unvalidatedOrganisationId => 'Abc',
 };
-$t->post_ok('/admin-approve' => json => $json)
+$t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/unvalidatedOrganisationId does not look like a number/i);
@@ -323,7 +323,7 @@ my ($maxPendingId) = $t->app->db->selectrow_array("SELECT MAX(PendingOrganisatio
 $json = {
   unvalidatedOrganisationId => ($maxPendingId + 1),
 };
-$t->post_ok('/admin-approve' => json => $json)
+$t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/the specified unvalidatedOrganisationId does not exist/i);
@@ -338,7 +338,7 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef,
 $json = {
   unvalidatedOrganisationId => $newPendingKalmOrgId,
 };
-$t->post_ok('/admin-approve' => json => $json)
+$t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],2,"2 unverified organisation." ;
@@ -359,7 +359,7 @@ $json = {
   fullAddress => $testFullAddress,
   postCode => $testPostCode,
 };
-$t->post_ok('/admin-approve' => json => $json)
+$t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],1,"1 unverified organisation." ;
@@ -377,7 +377,7 @@ $json = {
   unvalidatedOrganisationId => $newPendingJunonOrgId,
   name => $testName,
 };
-$t->post_ok('/admin-approve' => json => $json)
+$t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],0,"0 unverified organisation." ;

@@ -1,4 +1,4 @@
-package Pear::LocalLoop::Controller::User;
+package Pear::LocalLoop::Controller::Api::User;
 use Mojo::Base 'Mojolicious::Controller';
 use Data::Dumper;
 use Mojo::JSON;

@@ -9,6 +9,6 @@ BEGIN {
 }
 
 my $t = Test::Mojo->new("Pear::LocalLoop");
-$t->get_ok('/login')->status_is(200)->content_like(qr/login page/);
+$t->get_ok('/api/login')->status_is(200)->content_like(qr/login page/);
 
 done_testing();

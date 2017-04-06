@@ -39,17 +39,17 @@ sub startup {
   $r->any('/')->to('root#index');
   my $api = $r->any('/api');
 
-  $api->post("/register")->to('register#post_register');
-  $api->post("/upload")->to('upload#post_upload');
-  $api->post("/search")->to('upload#post_search');
-  $api->post("/admin-approve")->to('admin#post_admin_approve');
-  $api->post("/admin-merge")->to('admin#post_admin_merge');
-  $api->get("/login")->to('auth#get_login');
-  $api->post("/login")->to('auth#post_login');
-  $api->post("/logout")->to('auth#post_logout');
-  $api->post("/edit")->to('api#post_edit');
-  $api->post("/fetchuser")->to('api#post_fetchuser');
-  $api->post("/user-history")->to('user#post_user_history');
+  $api->post("/register")->to('api-register#post_register');
+  $api->post("/upload")->to('api-upload#post_upload');
+  $api->post("/search")->to('api-upload#post_search');
+  $api->post("/admin-approve")->to('api-admin#post_admin_approve');
+  $api->post("/admin-merge")->to('api-admin#post_admin_merge');
+  $api->get("/login")->to('api-auth#get_login');
+  $api->post("/login")->to('api-auth#post_login');
+  $api->post("/logout")->to('api-auth#post_logout');
+  $api->post("/edit")->to('api-api#post_edit');
+  $api->post("/fetchuser")->to('api-api#post_fetchuser');
+  $api->post("/user-history")->to('api-user#post_user_history');
 
   $api->any( '/' => sub {
     my $self = shift;
@@ -80,18 +80,18 @@ $self->hook( before_dispatch => sub {
   if ($hasBeenExtended) {
     $self->app->log->debug('Path: file:' . __FILE__ . ', line: ' . __LINE__);
     #If logged in and requestine the login page redirect to the main page.
-    if ($path eq '/login') {
+    if ($path eq '/api/login') {
       $self->app->log->debug('Path: file:' . __FILE__ . ', line: ' . __LINE__);
       #Force expire and redirect.
       $self->res->code(303);
-      $self->redirect_to('/');
+      $self->redirect_to('/api');
     }
   }
   #Has expired or did not exist in the first place and the path is not login
-  elsif ($path ne '/login' &&  $path ne '/register') {
+  elsif ($path ne '/api/login' &&  $path ne '/api/register') {
     $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
     $self->res->code(303);
-    $self->redirect_to('/login');
+    $self->redirect_to('/api/login');
   }
   $self->app->log->debug('Path: file:' . __FILE__ . ', line: ' . __LINE__);
 });

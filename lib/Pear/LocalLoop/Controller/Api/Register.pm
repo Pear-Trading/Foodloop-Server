@@ -1,4 +1,4 @@
-package Pear::LocalLoop::Controller::Register;
+package Pear::LocalLoop::Controller::Api::Register;
 use Mojo::Base 'Mojolicious::Controller';
 use Data::Dumper;
 

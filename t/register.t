@@ -35,7 +35,7 @@ foreach (@tokens){
 
 #No JSON sent
 print "test1\n\n";
-$t->post_ok('/register')
+$t->post_ok('/api/register')
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/no json sent/i);
@@ -43,7 +43,7 @@ $t->post_ok('/register')
 #Empty JSON
 print "test2\n\n";
 my $testJson = {};
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->json_is('/success', Mojo::JSON->false);
 
 #token missing JSON
@@ -56,7 +56,7 @@ my $testJson = {
   'password' => 'Meh',
   'age' => '50+'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/no token sent/i);
@@ -73,7 +73,7 @@ my $testJson = {
   'password' => 'Meh',
   'age' => '50+'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(401)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/token/i)
@@ -89,7 +89,7 @@ my $testJson = {
   'password' => 'Meh',
   'age' => '50+'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/no username sent/i);
@@ -106,7 +106,7 @@ my $testJson = {
   'password' => 'Meh', 
   'age' => '50+'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/blank/i)
@@ -123,7 +123,7 @@ my $testJson = {
   'password' => 'Meh', 
   'age' => '50+'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(400) 
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/username/i);
@@ -142,7 +142,7 @@ my $testJson = {
   'password' => 'Meh', 
   'age' => '50+'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -157,7 +157,7 @@ my $testJson = {
   'password' => 'Meh', 
   'age' => '35-50'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(200) 
   ->json_is('/success', Mojo::JSON->true);
 
@@ -172,7 +172,7 @@ my $testJson = {
   'password' => 'Meh', 
   'age' => '20-35'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(200) 
   ->json_is('/success', Mojo::JSON->true);
 
@@ -187,7 +187,7 @@ my $testJson = {
   'password' => 'Meh', 
   'age' => '50+'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(403) 
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/exists/i);
@@ -202,7 +202,7 @@ my $testJson = {
   'password' => 'Meh',
   'age' => '50+'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/no email sent/i);
@@ -218,7 +218,7 @@ my $testJson = {
   'password' => 'Meh', 
   'age' => '35-50'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(400) 
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/email/i)
@@ -235,7 +235,7 @@ my $testJson = {
   'password' => 'Meh', 
   'age' => '35-50'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(400) 
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/email/i)
@@ -252,7 +252,7 @@ my $testJson = {
   'password' => 'Meh', 
   'age' => '35-50'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(403) 
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/email/i)
@@ -268,7 +268,7 @@ my $testJson = {
   'password' => 'Meh',
   'age' => '50+'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/no postcode sent/i);
@@ -285,7 +285,7 @@ my $testJson = {
   'postcode' => 'LA1 1AA',
   'age' => '50+'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/no password sent/i);
@@ -302,7 +302,7 @@ my $testJson = {
   'password' => 'Meh',
   'age' => '50+'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/no usertype sent/i);
@@ -318,7 +318,7 @@ my $testJson = {
   'password' => 'Meh', 
   'fulladdress' => 'mary lane testing....'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(400) 
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/usertype/i)
@@ -335,7 +335,7 @@ my $testJson = {
   'postcode' => 'LA1 1AA',
   'password' => 'Meh',
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/no age sent/i);
@@ -351,7 +351,7 @@ my $testJson = {
   'password' => 'Meh', 
   'age' => 'invalid'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(400) 
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/age/i)
@@ -367,7 +367,7 @@ my $testJson = {
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/no fulladdress sent/i);
@@ -385,7 +385,7 @@ my $testJson = {
   'password' => 'Meh', 
   'fulladdress' => 'mary lane testing....'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(200) 
   ->json_is('/success', Mojo::JSON->true);
 
@@ -401,7 +401,7 @@ $t->post_ok('/register' => json => $testJson)
 #  'password' => 'Meh',
 #  'age' => '50+'
 #};
-#$t->post_ok('/register' => json => $testJson)
+#$t->post_ok('/api/register' => json => $testJson)
 #  ->status_is(401)->or(sub{ diag $t->tx->res->body})
 #  ->json_is('/success', Mojo::JSON->false)
 #  ->content_like(qr/token/i);

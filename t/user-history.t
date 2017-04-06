@@ -68,7 +68,7 @@ my $testJson = {
   'password' => $passwordReno, 
   'age' => '20-35'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -84,7 +84,7 @@ my $testJson = {
   'password' => $passwordBilly, 
   'fulladdress' => 'Chocobo Farm, Eastern Continent, Gaia'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(200) 
   ->json_is('/success', Mojo::JSON->true);
 
@@ -101,7 +101,7 @@ my $testJson = {
   'password' => $passwordAdmin, 
   'age' => '35-50'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -112,7 +112,7 @@ $t->app->db->prepare("INSERT INTO Administrators (UserId) VALUES (?)")->execute(
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Administrators")}[0],1,"1 admin";
 
 sub logout {
-  $t->post_ok('/logout')
+  $t->post_ok('/api/logout')
     ->status_is(200)
     ->json_is('/success', Mojo::JSON->true);
 }
@@ -122,7 +122,7 @@ sub login_reno {
     'email' => $emailReno,
     'password' => $passwordReno,
   };
-  $t->post_ok('/login' => json => $testJson)
+  $t->post_ok('/api/login' => json => $testJson)
     ->status_is(200)
     ->json_is('/success', Mojo::JSON->true);
 }
@@ -132,7 +132,7 @@ sub login_chocobilly {
     'email' => $emailBilly,
     'password' => $passwordBilly,
   };
-  $t->post_ok('/login' => json => $testJson)
+  $t->post_ok('/api/login' => json => $testJson)
     ->status_is(200)
     ->json_is('/success', Mojo::JSON->true);
 }
@@ -142,7 +142,7 @@ sub login_admin {
     'email' => $emailAdmin,
     'password' => $passwordAdmin,
   };
-  $t->post_ok('/login' => json => $testJson)
+  $t->post_ok('/api/login' => json => $testJson)
     ->status_is(200)
     ->json_is('/success', Mojo::JSON->true);
 }
@@ -162,7 +162,7 @@ $json = {
   postcode => "NW1 W01"
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload )
+$t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 my $unvalidatedOrganisationId = $t->tx->res->json->{unvalidatedOrganisationId};
@@ -177,7 +177,7 @@ $json = {
   addUnvalidatedId => $unvalidatedOrganisationId,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload )
+$t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -188,7 +188,7 @@ $json = {
   addUnvalidatedId => $unvalidatedOrganisationId,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload )
+$t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -208,7 +208,7 @@ $json = {
   addUnvalidatedId => $unvalidatedOrganisationId,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload )
+$t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -228,7 +228,7 @@ $json = {
   addUnvalidatedId => $unvalidatedOrganisationId,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload )
+$t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -245,7 +245,7 @@ print "test 17 - Admin approves Turtle\'s Paradise.\n";
 $json = {
   unvalidatedOrganisationId => $unvalidatedOrganisationId,
 };
-$t->post_ok('/admin-approve' => json => $json)
+$t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 my $validatedOrganisationId = $t->tx->res->json->{validatedOrganisationId};
@@ -265,7 +265,7 @@ $json = {
   addValidatedId => $validatedOrganisationId,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload )
+$t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -282,7 +282,7 @@ login_reno();
 
 
 print "test 23 - No JSON\n";
-$t->post_ok('/user-history')
+$t->post_ok('/api/user-history')
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/JSON is missing/i);
@@ -293,7 +293,7 @@ $json = {
   monthNumber => $dateTimePlusThreeDays->month(), 
   year => $dateTimePlusThreeDays->year(), 
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/retrieveType is missing/i);
@@ -305,7 +305,7 @@ $json = {
   monthNumber => $dateTimePlusThreeDays->month(), 
   year => $dateTimePlusThreeDays->year(), 
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/retrieveType does not look like a number/i);
@@ -317,7 +317,7 @@ $json = {
   monthNumber => $dateTimePlusThreeDays->month(), 
   year => $dateTimePlusThreeDays->year(), 
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/retrieveType can only be 1 or 2./i);
@@ -330,7 +330,7 @@ $json = {
   monthNumber => $dateTimePlusThreeDays->month(), 
   year => $dateTimePlusThreeDays->year(), 
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/dayNumber is missing./i);
@@ -342,7 +342,7 @@ $json = {
   monthNumber => $dateTimePlusThreeDays->month(), 
   year => $dateTimePlusThreeDays->year(), 
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/dayNumber does not look like a number./i);
@@ -353,7 +353,7 @@ $json = {
   dayNumber => $dateTimePlusThreeDays->day(), 
   year => $dateTimePlusThreeDays->year(), 
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/monthNumber is missing./i);
@@ -365,7 +365,7 @@ $json = {
   monthNumber => "ABC", 
   year => $dateTimePlusThreeDays->year(), 
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/monthNumber does not look like a number./i);
@@ -376,7 +376,7 @@ $json = {
   dayNumber => $dateTimePlusThreeDays->day(), 
   monthNumber => $dateTimePlusThreeDays->month(), 
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/year is missing./i);
@@ -388,7 +388,7 @@ $json = {
   monthNumber => $dateTimePlusThreeDays->month(), 
   year => "I1", 
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/year does not look like a number./i);
@@ -400,7 +400,7 @@ $json = {
   monthNumber => ($dateTimePlusThreeDays->month() + 13), 
   year => $dateTimePlusThreeDays->year(), 
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/date is invalid./i);
@@ -416,7 +416,7 @@ $json = {
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/startDayNumber is missing./i);
@@ -431,7 +431,7 @@ $json = {
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(), 
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/startDayNumber does not look like a number./i);
@@ -446,7 +446,7 @@ $json = {
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/startMonthNumber is missing./i);
@@ -461,7 +461,7 @@ $json = {
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/startMonthNumber does not look like a number./i);
@@ -475,7 +475,7 @@ $json = {
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/startYear is missing./i);
@@ -490,7 +490,7 @@ $json = {
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/startYear does not look like a number./i);
@@ -505,7 +505,7 @@ $json = {
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/start date is invalid./i);
@@ -521,7 +521,7 @@ $json = {
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/endDayNumber is missing./i);
@@ -536,7 +536,7 @@ $json = {
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/endDayNumber does not look like a number./i);
@@ -550,7 +550,7 @@ $json = {
   endDayNumber => $dateTimePlusOneYear->day(),
   endYear => $dateTimePlusOneYear->year(),
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/endMonthNumber is missing./i);
@@ -565,7 +565,7 @@ $json = {
   endMonthNumber => "A5G",
   endYear => $dateTimePlusOneYear->year(),
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/endMonthNumber does not look like a number./i);
@@ -579,7 +579,7 @@ $json = {
   endDayNumber => $dateTimePlusOneYear->day(),
   endMonthNumber => $dateTimePlusOneYear->month(),
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/endYear is missing./i);
@@ -594,7 +594,7 @@ $json = {
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => "ABC",
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/endYear does not look like a number./i);
@@ -609,7 +609,7 @@ $json = {
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/end date is invalid./i);
@@ -623,7 +623,7 @@ $json = {
   monthNumber => $dateTimePlusThreeDays->month(), 
   year => $dateTimePlusThreeDays->year(), 
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_has('/microCurencySpent')
@@ -640,7 +640,7 @@ $json = {
   monthNumber => $dateTimeInitial->month(), 
   year => $dateTimeInitial->year(), 
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_has('/microCurencySpent')
@@ -657,7 +657,7 @@ $json = {
   monthNumber => $dateTimePlusTwoDays->month(), 
   year => $dateTimePlusTwoDays->year(), 
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_has('/microCurencySpent')
@@ -677,7 +677,7 @@ $json = {
   endMonthNumber => $dateTimePlusOneMonthMinusOneDay->month(),
   endYear => $dateTimePlusOneMonthMinusOneDay->year(),
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_has('/microCurencySpent')
@@ -699,7 +699,7 @@ $json = {
   endMonthNumber => $dateTimePlusOneMonthMinusOneDay->month(),
   endYear => $dateTimePlusOneMonthMinusOneDay->year(),
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_has('/microCurencySpent')
@@ -722,7 +722,7 @@ $json = {
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_has('/microCurencySpent')
@@ -748,7 +748,7 @@ $json = {
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
 };
-$t->post_ok('/user-history' => json => $json)
+$t->post_ok('/api/user-history' => json => $json)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_has('/microCurencySpent')

@@ -71,7 +71,7 @@ my $testJson = {
   'password' => $passwordRufus, 
   'age' => '20-35'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -88,7 +88,7 @@ my $testJson = {
   'password' => $passwordBilly, 
   'fulladdress' => 'Market St, Lancaster'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(200) 
   ->json_is('/success', Mojo::JSON->true);
 
@@ -97,7 +97,7 @@ sub login_rufus {
     'email' => $emailRufus,
     'password' => $passwordRufus,
   };
-  $t->post_ok('/login' => json => $testJson)
+  $t->post_ok('/api/login' => json => $testJson)
     ->status_is(200)
     ->json_is('/success', Mojo::JSON->true);
 };
@@ -107,13 +107,13 @@ sub login_billy {
     'email' => $emailBilly,
     'password' => $passwordBilly,
   };
-  $t->post_ok('/login' => json => $testJson)
+  $t->post_ok('/api/login' => json => $testJson)
     ->status_is(200)
     ->json_is('/success', Mojo::JSON->true);
 };
 
 sub log_out{
-  $t->post_ok('/logout')
+  $t->post_ok('/api/logout')
     ->status_is(200)
     ->json_is('/success', Mojo::JSON->true);
 }
@@ -136,7 +136,7 @@ $json = {
   postcode => "LA1 1UP"
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload )
+$t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -162,7 +162,7 @@ $json = {
   postcode => "LA4 5BZ"
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload )
+$t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -176,7 +176,7 @@ $json = {
   postcode => "LA1 1ET"
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
-$t->post_ok('/upload' => form => $upload )
+$t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -193,7 +193,7 @@ print "test 10 - Login - Rufus (cookies, customer)\n";
 login_rufus();
 
 print "test 11 - search blank\n";
-$t->post_ok('/search' => json => {searchName => " "})
+$t->post_ok('/api/search' => json => {searchName => " "})
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/searchName is blank/i);
@@ -201,7 +201,7 @@ $t->post_ok('/search' => json => {searchName => " "})
 sub check_vars{
   my ($searchTerm, $numValidated, $numUnvalidated) = @_;
 
-  $t->post_ok('/search' => json => {searchName => $searchTerm})
+  $t->post_ok('/api/search' => json => {searchName => $searchTerm})
     ->status_is(200)
     ->json_is('/success', Mojo::JSON->true)
     ->json_has("unvalidated")

@@ -49,7 +49,7 @@ my $testJson = {
   'password' => $password, 
   'age' => '20-35'
 };
-$t->post_ok('/register' => json => $testJson)
+$t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -60,7 +60,7 @@ $testJson = {
   'email' => $email,
   'password' => $password,
 };
-$t->post_ok('/login' => json => $testJson)
+$t->post_ok('/api/login' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_has("/$sessionTokenJsonName")
@@ -68,7 +68,7 @@ $t->post_ok('/login' => json => $testJson)
 
 print "test 3 - Login, no redirect on login paths (cookies)\n";
 #No redirect, as you're logged in.
-$t->get_ok('/')
+$t->get_ok('/api/')
   ->status_is(200);
 
 my $location_is = sub {
@@ -80,14 +80,14 @@ my $location_is = sub {
 
 print "test 4 - Login, redirect to root as already logged in (cookies)\n";
 #Check for redirect to root when logged in.
-$t->get_ok('/login')
+$t->get_ok('/api/login')
   ->status_is(303)
-  ->$location_is('/');
+  ->$location_is('/api');
 
 
 #Does login/logout work with a cookie based session.
 print "test 5 - Logout (cookies)\n";
-$t->post_ok('/logout')
+$t->post_ok('/api/logout')
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->content_like(qr/you were successfully logged out/i);
@@ -100,7 +100,7 @@ $testJson = {
   'email' => $email,
   'password' => $password,
 };
-$t->post_ok('/login' => json => $testJson)
+$t->post_ok('/api/login' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_has("/$sessionTokenJsonName")
@@ -115,30 +115,30 @@ $t->reset_session;
 
 #Redirect, as no cookies are set
 print "test 7 - Login, no cookies or json redirect to login\n";
-$t->get_ok('/')
+$t->get_ok('/api/')
   ->status_is(303)
-  ->$location_is('/login');
+  ->$location_is('/api/login');
 
 print "test 8 - Login, no redirect on login paths (json)\n";
-$t->get_ok('/' => json => {$sessionTokenJsonName => $sessionToken})
+$t->get_ok('/api/' => json => {$sessionTokenJsonName => $sessionToken})
   ->status_is(200);
 
 #No token send so redirect
 print "test 9 - Logout, no cookies or json\n";
-$t->post_ok('/logout')
+$t->post_ok('/api/logout')
   ->status_is(303)
-  ->$location_is('/login');
+  ->$location_is('/api/login');
 
 #Token sent logout
 print "test 10 - Logout, (json)\n";
-$t->post_ok('/logout' => json => {$sessionTokenJsonName => $sessionToken})
+$t->post_ok('/api/logout' => json => {$sessionTokenJsonName => $sessionToken})
   ->status_is(200);
 
 #Send logged out expired token, 
 print "test 11 - Logout,expired session redirect (json)\n";
-$t->post_ok('/logout' => json => {$sessionTokenJsonName => $sessionToken})
+$t->post_ok('/api/logout' => json => {$sessionTokenJsonName => $sessionToken})
   ->status_is(303)
-  ->$location_is('/login');
+  ->$location_is('/api/login');
 
 $t->reset_session;
 
@@ -150,7 +150,7 @@ $testJson = {
   'email' => $email,
   'password' => $password,
 };
-$t->post_ok('/login' => json => $testJson)
+$t->post_ok('/api/login' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_has("/$sessionTokenJsonName")
@@ -168,9 +168,9 @@ Time::Fake->offset("+".($sessionTimeSeconds * 2)."s");
 
 #Send time expired token, 
 print "test 13 - Fake time expired session redirect (json)\n";
-$t->post_ok('/logout' => json => {$sessionTokenJsonName => $sessionToken})
+$t->post_ok('/api/logout' => json => {$sessionTokenJsonName => $sessionToken})
   ->status_is(303)
-  ->$location_is('/login');
+  ->$location_is('/api/login');
 
 Time::Fake->reset();
 
@@ -179,25 +179,25 @@ $t->reset_session;
 #Attempt to logout without any session
 # This is different from the one above as it's has no state.
 print "test 14 - Logout, no session\n";
-$t->post_ok('/logout')
+$t->post_ok('/api/logout')
   ->status_is(303)
-  ->$location_is('/login');
+  ->$location_is('/api/login');
 
 #Clear the session state
 $t->reset_session;
 
 #Not logged in, redirect to login.
 print "test 15 - Not logged in, get request redirect to login\n";
-$t->get_ok('/')
+$t->get_ok('/api/')
   ->status_is(303)
-  ->$location_is('/login');
+  ->$location_is('/api/login');
 
 $t->reset_session;
 
 #Not logged in, redirect to login.
 print "test 16 - Not logged in, get request one redirection is ok.\n";
 $t->ua->max_redirects(1);
-$t->get_ok('/')
+$t->get_ok('/api/')
   ->status_is(200);
 $t->ua->max_redirects(0);
 
@@ -205,16 +205,16 @@ $t->reset_session;
 
 #Not logged in, redirect to login.
 print "test 17 - Not logged in, post request redirect to login\n";
-$t->post_ok('/')
+$t->post_ok('/api/')
   ->status_is(303)
-  ->$location_is('/login');
+  ->$location_is('/api/login');
 
 $t->reset_session;
 
 #Not logged in, redirect to login.
 print "test 18 - Not logged in, post request one redirection is ok.\n";
 $t->ua->max_redirects(1);
-$t->post_ok('/')
+$t->post_ok('/api/')
   ->status_is(200);
 $t->ua->max_redirects(0);
 
@@ -224,7 +224,7 @@ $t->reset_session;
 
 #Test no JSON sent.
 print "test 19 - No JSON sent.\n";
-$t->post_ok('/login')
+$t->post_ok('/api/login')
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/No json sent/i);
@@ -236,7 +236,7 @@ print "test 20 - Email missing\n";
 $testJson = {
   'password' => $password,
 };
-$t->post_ok('/login' => json => $testJson)
+$t->post_ok('/api/login' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/No email sent/i);
@@ -249,7 +249,7 @@ $testJson = {
   'email' => ($email . '@'),
   'password' => $password,
 };
-$t->post_ok('/login' => json => $testJson)
+$t->post_ok('/api/login' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/email is invalid/i);
@@ -261,7 +261,7 @@ print "test 22 - No password sent.\n";
 $testJson = {
   'email' => $email,
 };
-$t->post_ok('/login' => json => $testJson)
+$t->post_ok('/api/login' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/No password sent/i);
@@ -274,7 +274,7 @@ $testJson = {
   'email' => 'heidegger@shinra.energy',
   'password' => $password,
 };
-$t->post_ok('/login' => json => $testJson)
+$t->post_ok('/api/login' => json => $testJson)
   ->status_is(401)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/Email or password is invalid/i);
@@ -287,7 +287,7 @@ $testJson = {
   'email' => $email,
   'password' => ($password . 'MoreText'),
 };
-$t->post_ok('/login' => json => $testJson)
+$t->post_ok('/api/login' => json => $testJson)
   ->status_is(401)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/Email or password is invalid/i);
@@ -300,7 +300,7 @@ $t->reset_session;
 #  'email' => $email,
 #  'password' => $password,
 #};
-#$t->post_ok('/login' => json => $testJson)
+#$t->post_ok('/api/login' => json => $testJson)
 #  ->status_is(200)
 #  ->json_is('/success', Mojo::JSON->true);
 

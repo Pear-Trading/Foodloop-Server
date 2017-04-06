@@ -1,4 +1,4 @@
-package Pear::LocalLoop::Controller::Auth;
+package Pear::LocalLoop::Controller::Api::Auth;
 use Mojo::Base 'Mojolicious::Controller';
 use Data::Dumper;
 use Mojo::JSON;
