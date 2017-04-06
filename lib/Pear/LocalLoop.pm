@@ -49,7 +49,8 @@ sub startup {
 
   my $r = $self->routes;
   $r->any('/')->to('root#index');
-  $r->any('/admin')->to('admin#index');
+  $r->get('/admin')->to('admin#index');
+  $r->post('/admin')->to('admin#login');
   my $api = $r->under('/api' => sub {
     my $c = shift;
 
@@ -98,6 +99,8 @@ sub startup {
   });
 
   my $admin_routes = $r->under('/admin')->to('admin#under');
+
+  $admin_routes->get('/home')->to('admin#home');
 
 $self->hook( before_dispatch => sub {
   my $self = shift;
@@ -324,6 +327,7 @@ $self->helper(expire_current_session => sub {
   $self->helper(check_password_email => sub {
     my ( $c, $email, $password ) = @_;
     my $user = $c->schema->resultset('User')->find({ email => $email });
+    return undef unless defined $user;
     my $ppr = Authen::Passphrase::BlowfishCrypt->from_crypt($user->hashedpassword);
     return $ppr->match($password);
   });

@@ -1,0 +1,28 @@
+% layout 'default';
+% title 'LocalLoop Admin - Login';
+% content_for css => begin
+<style>
+body {
+  background: whitesmoke;
+  padding-top: 54px;
+}
+
+.panel {
+  background: white;
+  padding: 16px;
+  -webkit-box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.2);
+  -moz-box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.2);
+}
+
+.login-form {
+  margin-top: 20%;
+}
+</style>
+% end
+% content_for javascript => begin
+% end
+<nav class="navbar fixed-top navbar-inverse bg-primary">
+  <a class="navbar-brand" href="#"><%= title %></a>
+</nav>
+<div>Admin Pages</div>

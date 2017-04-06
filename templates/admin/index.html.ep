@@ -1,0 +1,49 @@
+% layout 'default';
+% title 'LocalLoop Admin - Login';
+% content_for css => begin
+<style>
+body {
+  background: whitesmoke;
+  padding-top: 54px;
+}
+
+.panel {
+  background: white;
+  padding: 16px;
+  -webkit-box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.2);
+  -moz-box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.2);
+}
+
+.login-form {
+  margin-top: 20%;
+}
+</style>
+% end
+% content_for javascript => begin
+% end
+<nav class="navbar fixed-top navbar-inverse bg-primary">
+  <a class="navbar-brand" href="#"><%= title %></a>
+</nav>
+<div class="container-fluid">
+  <div class="row justify-content-center">
+      <!-- Fluid Gird, this login box stay in the middle of screen -->
+    <div class="col-5">
+
+      <div class="login-form panel">
+        <form action="<%= url_for %>" method="post">
+          <div class="form-group">
+            <label for="login-email">Email Address</label>
+            <input type="email" id="login-email" class="form-control" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" class="form-control" name="password" required>
+          </div>
+          <input type="submit" class="btn btn-block btn-primary" value="Sign In">
+       </form>
+      </div>
+    </div>
+  </div>
+</div><!-- Container fluid-->
+

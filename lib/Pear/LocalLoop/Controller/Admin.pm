@@ -15,4 +15,18 @@ sub under {
   return undef;
 }
 
+sub login {
+  my $c = shift;
+
+  if ( $c->authenticate($c->param('email'), $c->param('password')) ) {
+    $c->redirect_to('/admin/home');
+  } else {
+    $c->redirect_to('/admin');
+  }
+}
+
+sub home {
+  my $c = shift;
+}
+
 1;
