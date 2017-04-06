@@ -36,21 +36,22 @@ sub startup {
 
 
   my $r = $self->routes;
-  $r = $r->any('/api') if $self->app->mode ne 'testing';
+  $r->any('/')->to('root#index');
+  my $api = $r->any('/api');
 
-  $r->post("/register")->to('register#post_register');
-  $r->post("/upload")->to('upload#post_upload');
-  $r->post("/search")->to('upload#post_search');
-  $r->post("/admin-approve")->to('admin#post_admin_approve');
-  $r->post("/admin-merge")->to('admin#post_admin_merge');
-  $r->get("/login")->to('auth#get_login');
-  $r->post("/login")->to('auth#post_login');
-  $r->post("/logout")->to('auth#post_logout');
-  $r->post("/edit")->to('api#post_edit');
-  $r->post("/fetchuser")->to('api#post_fetchuser');
-  $r->post("/user-history")->to('user#post_user_history');
+  $api->post("/register")->to('register#post_register');
+  $api->post("/upload")->to('upload#post_upload');
+  $api->post("/search")->to('upload#post_search');
+  $api->post("/admin-approve")->to('admin#post_admin_approve');
+  $api->post("/admin-merge")->to('admin#post_admin_merge');
+  $api->get("/login")->to('auth#get_login');
+  $api->post("/login")->to('auth#post_login');
+  $api->post("/logout")->to('auth#post_logout');
+  $api->post("/edit")->to('api#post_edit');
+  $api->post("/fetchuser")->to('api#post_fetchuser');
+  $api->post("/user-history")->to('user#post_user_history');
 
-  $r->any( '/' => sub {
+  $api->any( '/' => sub {
     my $self = shift;
     return $self->render(json => { success => Mojo::JSON->true });
   });
