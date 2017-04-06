@@ -1,4 +1,5 @@
-requires 'Mojolicious::Lite';
+requires 'Mojolicious';
+requires 'Mojolicious::Plugin::Authentication';
 requires 'Data::UUID';
 requires 'Devel::Dwarn';
 requires 'Mojo::JSON';

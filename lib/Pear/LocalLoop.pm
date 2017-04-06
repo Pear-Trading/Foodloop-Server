@@ -30,6 +30,18 @@ sub startup {
   });
   my $config = $self->config;
 
+  $self->plugin('Authentication' => {
+    'load_user' => sub {
+      my ( $c, $user_id ) = @_;
+      return $c->schema->resultset('User')->find($user_id);
+    },
+    'validate_user' => sub {
+      my ( $c, $email, $password, $args) = @_;
+      my $user = $c->schema->resultset('User')->find({email => $email});
+      return $c->check_password_email($email, $password) ? $user->userid : undef;
+    },
+  });
+
   # shortcut for use in template
   $self->helper( db => sub { $self->app->schema->storage->dbh });
   $self->helper( schema => sub { $self->app->schema });
@@ -37,7 +49,36 @@ sub startup {
 
   my $r = $self->routes;
   $r->any('/')->to('root#index');
-  my $api = $r->any('/api');
+  $r->any('/admin')->to('admin#index');
+  my $api = $r->under('/api' => sub {
+    my $c = shift;
+
+    #See if logged in.
+    my $sessionToken = $c->get_session_token();
+
+    #0 = no session, npn-0 is has updated session
+    my $hasBeenExtended = $c->extend_session($sessionToken);
+
+    my $path = $c->req->url->to_abs->path;
+
+    #Has valid session
+    if ($hasBeenExtended) {
+      #If logged in and requestine the login page redirect to the main page.
+      if ($path eq '/api/login') {
+        #Force expire and redirect.
+        $c->res->code(303);
+        $c->redirect_to('/api');
+        return undef;
+      }
+    }
+    #Has expired or did not exist in the first place and the path is not login
+    elsif ($path ne '/api/login' &&  $path ne '/api/register') {
+      $c->res->code(303);
+      $c->redirect_to('/api/login');
+      return undef;
+    }
+    return 1;
+  });
 
   $api->post("/register")->to('api-register#post_register');
   $api->post("/upload")->to('api-upload#post_upload');
@@ -56,44 +97,14 @@ sub startup {
     return $self->render(json => { success => Mojo::JSON->true });
   });
 
+  my $admin_routes = $r->under('/admin')->to('admin#under');
+
 $self->hook( before_dispatch => sub {
   my $self = shift;
 
-  $self->app->log->debug('Before Dispatch');
   $self->res->headers->header('Access-Control-Allow-Origin' => '*') if $self->app->mode eq 'development';
 
   $self->remove_all_expired_sessions();
-
-  #See if logged in.
-  my $sessionToken = $self->get_session_token();
-  #$self->app->log->debug( "sessionToken: " . $sessionToken);
-  
-  #0 = no session, npn-0 is has updated session
-  my $hasBeenExtended = $self->extend_session($sessionToken);
-  #$self->app->log->debug( "hasBeenExtended: " . $hasBeenExtended);
-
-  my $path = $self->req->url->to_abs->path;
-
-  $self->app->log->debug('Path: file:' . __FILE__ . ', line: ' . __LINE__);
-
-  #Has valid session
-  if ($hasBeenExtended) {
-    $self->app->log->debug('Path: file:' . __FILE__ . ', line: ' . __LINE__);
-    #If logged in and requestine the login page redirect to the main page.
-    if ($path eq '/api/login') {
-      $self->app->log->debug('Path: file:' . __FILE__ . ', line: ' . __LINE__);
-      #Force expire and redirect.
-      $self->res->code(303);
-      $self->redirect_to('/api');
-    }
-  }
-  #Has expired or did not exist in the first place and the path is not login
-  elsif ($path ne '/api/login' &&  $path ne '/api/register') {
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    $self->res->code(303);
-    $self->redirect_to('/api/login');
-  }
-  $self->app->log->debug('Path: file:' . __FILE__ . ', line: ' . __LINE__);
 });
 
 
