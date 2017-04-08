@@ -1,5 +1,5 @@
-% layout 'default';
-% title 'LocalLoop Admin - Login';
+% layout 'admin';
+% title 'Home';
 % content_for css => begin
 <style>
 body {
@@ -22,24 +22,4 @@ body {
 % end
 % content_for javascript => begin
 % end
-<nav class="navbar navbar-toggleable-md fixed-top navbar-inverse bg-primary">
-  <button class="navbar-toggler navbar-toggler-right"
-          type="button"
-          data-toggle="collapse"
-          data-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <a class="navbar-brand" href="<%= url_for '/admin/home' %>"><%= title %></a>
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <div class="navbar-nav">
-      <a class="nav-item nav-link" href="<%= url_for '/admin/tokens' %>">Tokens</a>
-      <a class="nav-item nav-link" href="#">Users</a>
-    </div>
-  </div>
-
-</nav>
 <div>Admin Pages</div>

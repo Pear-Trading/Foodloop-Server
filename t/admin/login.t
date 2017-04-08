@@ -49,38 +49,36 @@ my $location_is = sub {
 };
 
 $t->get_ok('/admin')
-  ->status_is(200)
-  ->content_like(qr/Login/);
-
-$t->ua->max_redirects(10);
-$t->post_ok('/admin', form => {
-  email => 'user@example.com',
-  password => 'abc123',
-})->status_is(200)
-  ->content_like(qr/Hello!/, 'Redirected to root as not an admin');
-
-$t->ua->max_redirects(0);
-$t->get_ok('/admin/home')
   ->status_is(302)
   ->$location_is('/');
+
+$t->ua->max_redirects(10);
+$t->post_ok('/', form => {
+  email => 'user@example.com',
+  password => 'abc123',
+})->status_is(200);
+
+$t->ua->max_redirects(0);
+$t->get_ok('/admin')
+  ->status_is(302)
+  ->$location_is('/home');
 
 $t->get_ok('/logout')
   ->status_is(302)
   ->$location_is('/');
 
-$t->get_ok('/admin/home')
+$t->get_ok('/admin')
   ->status_is(302)
   ->$location_is('/', 'Logged out');
 
 $t->ua->max_redirects(10);
-$t->post_ok('/admin', form => {
+$t->post_ok('/', form => {
   email => 'admin@example.com',
   password => 'abc123',
-})->status_is(200)
-  ->content_like(qr/Admin/);
+})->status_is(200);
 
 $t->ua->max_redirects(0);
-$t->get_ok('/admin/home')
+$t->get_ok('/admin')
   ->status_is(200)
   ->content_like(qr/Admin/);
 
@@ -88,7 +86,7 @@ $t->get_ok('/logout')
   ->status_is(302)
   ->$location_is('/');
 
-$t->get_ok('/admin/home')
+$t->get_ok('/admin')
   ->status_is(302)
   ->$location_is('/', 'Logged out');
 

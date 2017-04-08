@@ -48,10 +48,9 @@ sub startup {
 
 
   my $r = $self->routes;
-  $r->any('/')->to('root#index');
+  $r->get('/')->to('root#index');
+  $r->post('/')->to('root#auth_login');
   $r->any('/logout')->to('root#auth_logout');
-  $r->get('/admin')->to('admin#index');
-  $r->post('/admin')->to('admin#login');
   my $api = $r->under('/api' => sub {
     my $c = shift;
 
@@ -101,12 +100,16 @@ sub startup {
 
   my $admin_routes = $r->under('/admin')->to('admin#under');
 
-  $admin_routes->get('/home')->to('admin#home');
+  $admin_routes->get('/')->to('admin#home');
   $admin_routes->get('/tokens')->to('admin-tokens#index');
   $admin_routes->post('/tokens')->to('admin-tokens#create');
   $admin_routes->get('/tokens/:id')->to('admin-tokens#read');
   $admin_routes->post('/tokens/:id')->to('admin-tokens#update');
   $admin_routes->post('/tokens/:id/delete')->to('admin-tokens#delete');
+
+  my $user_routes = $r->under('/')->to('root#under');
+
+  $user_routes->get('/home')->to('root#home');
 
 $self->hook( before_dispatch => sub {
   my $self = shift;
