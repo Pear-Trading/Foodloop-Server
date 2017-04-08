@@ -1,5 +1,5 @@
 % layout 'default';
-% title 'LocalLoop Admin - Login';
+% title 'Login';
 % content_for css => begin
 <style>
 body {
@@ -22,9 +22,6 @@ body {
 % end
 % content_for javascript => begin
 % end
-<nav class="navbar fixed-top navbar-inverse bg-primary">
-  <a class="navbar-brand" href="#"><%= title %></a>
-</nav>
 <div class="container-fluid">
   <div class="row justify-content-center">
       <!-- Fluid Gird, this login box stay in the middle of screen -->

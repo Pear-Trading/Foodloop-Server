@@ -30,6 +30,8 @@ sub startup {
   });
   my $config = $self->config;
 
+  $self->plugin('Pear::LocalLoop::Plugin::Validators');
+
   $self->plugin('Authentication' => {
     'load_user' => sub {
       my ( $c, $user_id ) = @_;
@@ -50,6 +52,8 @@ sub startup {
   my $r = $self->routes;
   $r->get('/')->to('root#index');
   $r->post('/')->to('root#auth_login');
+  $r->get('/register')->to('register#index');
+  $r->post('/register')->to('register#register');
   $r->any('/logout')->to('root#auth_logout');
   my $api = $r->under('/api' => sub {
     my $c = shift;
