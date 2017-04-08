@@ -101,6 +101,11 @@ sub startup {
   my $admin_routes = $r->under('/admin')->to('admin#under');
 
   $admin_routes->get('/home')->to('admin#home');
+  $admin_routes->get('/tokens')->to('admin-tokens#index');
+  $admin_routes->post('/tokens')->to('admin-tokens#create');
+  $admin_routes->get('/tokens/:id')->to('admin-tokens#read');
+  $admin_routes->post('/tokens/:id')->to('admin-tokens#update');
+  $admin_routes->post('/tokens/:id/delete')->to('admin-tokens#delete');
 
 $self->hook( before_dispatch => sub {
   my $self = shift;

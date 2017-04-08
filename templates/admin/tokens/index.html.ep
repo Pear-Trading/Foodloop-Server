@@ -1,0 +1,77 @@
+% layout 'default';
+% title 'LocalLoop Admin - Login';
+% content_for css => begin
+<style>
+body {
+  background: whitesmoke;
+  padding-top: 70px;
+}
+
+.panel {
+  background: white;
+  padding: 16px;
+  -webkit-box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.2);
+  -moz-box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.2);
+}
+
+.login-form {
+  margin-top: 20%;
+}
+</style>
+% end
+% content_for javascript => begin
+% end
+<nav class="navbar navbar-toggleable-md fixed-top navbar-inverse bg-primary">
+  <button class="navbar-toggler navbar-toggler-right"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  
+  <a class="navbar-brand" href="<%= url_for '/admin/home' %>"><%= title %></a>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <div class="navbar-nav">
+      <a class="nav-item nav-link active" href="<%= url_for '/admin/tokens' %>">Tokens</a>
+      <a class="nav-item nav-link" href="#">Users</a>
+    </div>
+  </div>
+
+</nav>
+<div class="container">
+  % if ( my $error = flash 'error' ) {
+    <div class="alert alert-danger" role="alert">
+      <strong>Error!</strong> <%= $error %>
+    </div>
+  % } elsif ( my $success = flash 'success' ) {
+    <div class="alert alert-success" role="alert">
+      <strong>Success!</strong> <%= $success %>
+    </div>
+  % }
+  <form action="<%= url_for %>" method="post">
+    <div class="form-group">
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Token Text" name="token-name">
+        <span class="input-group-btn">
+          <button class="btn btn-primary" type="submit">Add</button>
+        </span>
+      </div>
+    </div>
+  </form>
+  <div class="list-group">
+    % for my $token (@$tokens) {
+    <a href="<%= url_for . '/' . $token->{accounttokenid} %>" class="list-group-item list-group-item-action">
+      <div>
+        %= $token->{accounttokenname}
+      </div>
+      <div class="ml-auto">
+        <%= $token->{used} == 1 ? 'Used' : 'Available' %>
+      </div>
+    </a>
+    % }
+  </div>
+</div>
