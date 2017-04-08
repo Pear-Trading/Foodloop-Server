@@ -3,6 +3,10 @@ use Mojo::Base 'Mojolicious::Controller';
 
 sub index {
   my $c = shift;
+
+  if ( $c->is_user_authenticated ) {
+    $c->redirect_to('/home');
+  }
 }
 
 sub under {
@@ -34,7 +38,6 @@ sub auth_logout {
 
 sub home {
   my $c = shift;
-  $c->render(text => 'Root Home');
 }
 
 1;

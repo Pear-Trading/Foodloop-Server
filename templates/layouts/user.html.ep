@@ -2,7 +2,7 @@
 <html>
   <head>  
     <meta charset="UTF-8">
-    <title>LocalLoop Admin - <%= title %></title>
+    <title>LocalLoop - <%= title %></title>
 
     <!-- Bootstrap and jQuery js -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
@@ -14,7 +14,7 @@
     %= content_for 'css';
   </head>
   <body>
-    <nav class="navbar navbar-toggleable-md fixed-top navbar-inverse bg-danger">
+    <nav class="navbar navbar-toggleable-md fixed-top navbar-inverse bg-primary">
       <button class="navbar-toggler navbar-toggler-right"
               type="button"
               data-toggle="collapse"
@@ -25,12 +25,14 @@
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <a class="navbar-brand" href="<%= url_for '/admin' %>">LocalLoop Admin</a>
+      <a class="navbar-brand" href="<%= url_for '/home' %>">LocalLoop</a>
       <div class="collapse navbar-collapse" id="navbarNav">
         <div class="navbar-nav ml-auto">
-          <a class="nav-item nav-link" href="<%= url_for '/home' %>">User Section</a>
-          <a class="nav-item nav-link<%= title eq 'Tokens' ? ' active' : '' %>" href="<%= url_for '/admin/tokens' %>">Tokens</a>
-          <a class="nav-item nav-link<%= title eq 'Users' ? ' active' : '' %>" href="#">Users</a>
+          % if ( defined $c->current_user->administrator ) {
+          <a class="nav-item nav-link" href="<%= url_for '/admin' %>">Admin Section</a>
+          % }
+          <a class="nav-item nav-link<%= title eq 'Receipts' ? ' active' : '' %>" href="#">Receipts</a>
+          <a class="nav-item nav-link<%= title eq 'Settings' ? ' active' : '' %>" href="#">Settings</a>
           <a class="nav-item nav-link" href="<%= url_for '/logout' %>">Logout</a>
         </div>
       </div>
