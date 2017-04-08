@@ -12,4 +12,5 @@ requires 'DBIx::Class';
 requires 'DBIx::Class::Schema::Loader';
 requires 'SQL::Translator';
 requires 'DateTime';
+requires 'DateTime::Format::SQLite';
 requires 'TryCatch';

@@ -6,4 +6,12 @@ sub index {
 
 }
 
+sub auth_logout {
+  my $c = shift;
+
+  $c->logout;
+  $c->redirect_to('/');
+}
+
+
 1;

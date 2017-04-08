@@ -49,6 +49,7 @@ sub startup {
 
   my $r = $self->routes;
   $r->any('/')->to('root#index');
+  $r->any('/logout')->to('root#auth_logout');
   $r->get('/admin')->to('admin#index');
   $r->post('/admin')->to('admin#login');
   my $api = $r->under('/api' => sub {
