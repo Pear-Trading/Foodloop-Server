@@ -17,6 +17,11 @@ sub register {
     return $rs->search({ $key => $value })->count ? undef : 1;
   });
 
+  $app->validator->add_check( not_in_resultset => sub {
+    my ( $validation, $name, $value, $key, $rs ) = @_;
+    return $rs->search({ $key => $value })->count ? 1 : undef;
+  });
+
   $app->validator->add_check( postcode => sub {
     my ( $validation, $name, $value ) = @_;
     return Geo::UK::Postcode->new( $value )->valid ? undef : 1;

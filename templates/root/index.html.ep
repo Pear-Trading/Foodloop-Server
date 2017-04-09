@@ -22,7 +22,16 @@ body {
 % end
 % content_for javascript => begin
 % end
-<div class="container-fluid">
+<div class="container">
+  % if ( my $error = flash 'error' ) {
+    <div class="alert alert-danger" role="alert">
+      <strong>Error!</strong> <%= $error %>
+    </div>
+  % } elsif ( my $success = flash 'success' ) {
+    <div class="alert alert-success" role="alert">
+      <strong>Success!</strong> <%= $success %>
+    </div>
+  % }
   <div class="row justify-content-center">
       <!-- Fluid Gird, this login box stay in the middle of screen -->
     <div class="col-5">
