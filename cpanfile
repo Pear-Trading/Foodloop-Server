@@ -4,6 +4,7 @@ requires 'Data::UUID';
 requires 'Devel::Dwarn';
 requires 'Mojo::JSON';
 requires 'Email::Valid';
+requires 'Geo::UK::Postcode';
 requires 'ORM::Date';
 requires 'Authen::Passphrase::BlowfishCrypt';
 requires 'Time::Fake';

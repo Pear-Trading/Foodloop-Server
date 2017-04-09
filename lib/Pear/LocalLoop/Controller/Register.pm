@@ -12,16 +12,17 @@ sub index {
 sub register {
   my $c = shift;
   my $validation = $c->validation;
-  $validation->required('token')->in_resultset(
-    'accounttokenname',
-    $c->schema->resultset('AccountToken')->search_rs({used => 0}),
-  );
+
   $validation->required('name', 'trim');
   $validation->required('email')->email;
-  $validation->required('agerange')->in_resultset(
-    'agerangeid',
-    $c->schema->resultset('AgeRange'),
-  );
+  $validation->required('password')->equal_to('password2');
+  $validation->required('postcode')->postcode;
+
+  my $token_rs = $c->schema->resultset('AccountToken')->search_rs({used => 0});
+  $validation->required('token')->in_resultset('accounttokenname', $token_rs);
+
+  my $age_rs = $c->schema->resultset('AgeRange');
+  $validation->required('agerange')->in_resultset('agerangeid', $age_rs);
 
   use Devel::Dwarn;
   Dwarn $validation;
