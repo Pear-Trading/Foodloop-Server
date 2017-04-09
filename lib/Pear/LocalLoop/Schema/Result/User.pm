@@ -161,7 +161,7 @@ Related object: L<Pear::LocalLoop::Schema::Result::Customer>
 =cut
 
 __PACKAGE__->belongs_to(
-  "customerid_fk",
+  "customer",
   "Pear::LocalLoop::Schema::Result::Customer",
   { customerid => "customerid_fk" },
   {

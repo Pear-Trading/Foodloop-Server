@@ -11,7 +11,7 @@ has error_messages => sub {
     postcode => 'Postcode is required, and must be a valid UK Postcode',
     token => 'Token is required, and must be a valid, unused token',
     agerange => 'Age Range is required, and must be a selection from the drop-down',
-    unknown => 'Sorry, there was a problem registering!',
+    unknown => 'Sorry, there was a problem registering! Have you already registered?',
   };
 };
 
@@ -44,8 +44,6 @@ sub register {
   if ( $validation->has_error ) {
     my $failed_vals = $validation->failed;
     @error_messages = map {$c->error_messages->{ $_ } } @$failed_vals;
-
-    $c->render( template => 'register/index' );
   } else {
     my $new_user = $c->schema->resultset('User')->find_or_new({
       email => $validation->param('email'),
@@ -77,6 +75,7 @@ sub register {
         agerange => $validation->param('agerange'),
       }
     );
+    $c->render( template => 'register/index' );
   } else {
     $c->flash( success => 'Registered Successfully, please log in' );
     $c->redirect_to('/');
