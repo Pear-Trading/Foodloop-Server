@@ -105,9 +105,6 @@ sub post_register{
   my $postcode = $validation->param('postcode');
   my $password = $validation->param('password');
 
-  # TODO Replace with Password Column encoding
-  my $hashedPassword = $c->generate_hashed_password($password);
-
   if ($usertype eq 'customer'){
     # TODO replace with actually using the value on the post request
     my $ageForeignKey = $c->get_age_foreign_key( $validation->param('age') );
@@ -124,7 +121,7 @@ sub post_register{
           postcode => $postcode,
         },
         email => $email,
-        hashedpassword => $hashedPassword,
+        hashedpassword => $password,
         joindate => DateTime->now,
       });
     });
@@ -145,7 +142,7 @@ sub post_register{
           postcode => $postcode,
         },
         email => $email,
-        hashedpassword => $hashedPassword,
+        hashedpassword => $password,
         joindate => DateTime->now,
       });
     });

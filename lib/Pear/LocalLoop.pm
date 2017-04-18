@@ -7,6 +7,7 @@ use Email::Valid;
 use Authen::Passphrase::BlowfishCrypt;
 use Scalar::Util qw(looks_like_number);
 use Pear::LocalLoop::Schema;
+use DateTime;
 
 has schema => sub {
   my $c = shift;
@@ -23,7 +24,7 @@ sub startup {
   $self->plugin('Config', {
     default => {
       sessionTimeSeconds => 60 * 60 * 24 * 7,
-      sessionTokenJsonName => 'sessionToken',
+      sessionTokenJsonName => 'session_key',
       sessionExpiresJsonName => 'sessionExpires',
     },
   });
@@ -54,52 +55,27 @@ sub startup {
   $r->get('/register')->to('register#index');
   $r->post('/register')->to('register#register');
   $r->any('/logout')->to('root#auth_logout');
-  my $api = $r->under('/api' => sub {
-    my $c = shift;
 
-    #See if logged in.
-    my $sessionToken = $c->get_session_token();
+  # Always available api routes
+  $r->post('api/login')->to('api-auth#post_login');
+  $r->post('api/register')->to('api-register#post_register');
+  $r->post('api/logout')->to('api-auth#post_logout');
 
-    #0 = no session, npn-0 is has updated session
-    my $hasBeenExtended = $c->extend_session($sessionToken);
+  my $api = $r->under('/api')->to('api-auth#auth');
 
-    my $path = $c->req->url->to_abs->path;
-
-    #Has valid session
-    if ($hasBeenExtended) {
-      #If logged in and requestine the login page redirect to the main page.
-      if ($path eq '/api/login') {
-        #Force expire and redirect.
-        $c->res->code(303);
-        $c->redirect_to('/api');
-        return undef;
-      }
-    }
-    #Has expired or did not exist in the first place and the path is not login
-    elsif ($path ne '/api/login' &&  $path ne '/api/register') {
-      $c->res->code(303);
-      $c->redirect_to('/api/login');
-      return undef;
-    }
-    return 1;
+  $api->post('/' => sub {
+    return shift->render( json => {
+      success => Mojo::JSON->true,
+      message => 'Successful Auth',
+    });
   });
-
-  $api->post("/register")->to('api-register#post_register');
-  $api->post("/upload")->to('api-upload#post_upload');
-  $api->post("/search")->to('api-upload#post_search');
-  $api->post("/admin-approve")->to('api-admin#post_admin_approve');
-  $api->post("/admin-merge")->to('api-admin#post_admin_merge');
-  $api->get("/login")->to('api-auth#get_login');
-  $api->post("/login")->to('api-auth#post_login');
-  $api->post("/logout")->to('api-auth#post_logout');
-  $api->post("/edit")->to('api-api#post_edit');
-  $api->post("/fetchuser")->to('api-api#post_fetchuser');
-  $api->post("/user-history")->to('api-user#post_user_history');
-
-  $api->any( '/' => sub {
-    my $self = shift;
-    return $self->render(json => { success => Mojo::JSON->true });
-  });
+  $api->post('/upload')->to('api-upload#post_upload');
+  $api->post('/search')->to('api-upload#post_search');
+  $api->post('/admin-approve')->to('api-admin#post_admin_approve');
+  $api->post('/admin-merge')->to('api-admin#post_admin_merge');
+  $api->post('/edit')->to('api-api#post_edit');
+  $api->post('/fetchuser')->to('api-api#post_fetchuser');
+  $api->post('/user-history')->to('api-user#post_user_history');
 
   my $admin_routes = $r->under('/admin')->to('admin#under');
 
@@ -200,15 +176,11 @@ $self->helper(generate_session => sub {
   my ($self, $userId) = @_;
 
   my $sessionToken = $self->generate_session_token();
-  my $expireDateTime = $self->session_token_expiry_date_time();
 
   my $insertStatement = $self->db->prepare('INSERT INTO SessionTokens (SessionTokenName, UserIdAssignedTo_FK, ExpireDateTime) VALUES (?, ?, ?)');
-  my $rowsAdded = $insertStatement->execute($sessionToken, $userId, $expireDateTime);
-
-  $self->session(expires => $expireDateTime);
-  $self->session->{$self->app->config->{sessionTokenJsonName}} = $sessionToken;
+  my $rowsAdded = $insertStatement->execute($sessionToken, $userId, DateTime->now()->add( years => 1 ));
   
-  return {$self->app->config->{sessionTokenJsonName} => $sessionToken, $self->app->config->{sessionExpiresJsonName} => $expireDateTime};
+  return $sessionToken;
 });
 
 $self->helper(generate_session_token => sub {
@@ -282,6 +254,7 @@ $self->helper(get_session_expiry => sub {
       sessiontokenname => $sessionToken,
     })->delete_all;
 
+    ## TODO Does this need a seperate session cookie?
     $self->session(expires => 1);
     $self->session->{$self->app->config->{sessionTokenJsonName}} = $sessionToken;
 

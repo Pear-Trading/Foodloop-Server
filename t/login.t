@@ -1,43 +1,55 @@
+use Mojo::Base -strict;
+
+use File::Temp;
 use Test::More;
 use Test::Mojo;
 use Mojo::JSON;
 use Time::Fake;
 
-use FindBin;
+my $file = File::Temp->new;
 
-BEGIN {
-  $ENV{MOJO_MODE} = 'testing';
-  $ENV{MOJO_LOG_LEVEL} = 'debug';
+print $file <<'END';
+{
+  dsn => "dbi:SQLite::memory:",
+  user => undef,
+  pass => undef,
 }
+END
+$file->seek( 0, SEEK_END );
 
-my $t = Test::Mojo->new("Pear::LocalLoop");
+$ENV{MOJO_CONFIG} = $file->filename;
 
-my $dbh = $t->app->db;
+my $t = Test::Mojo->new('Pear::LocalLoop');
+my $schema = $t->app->schema;
+$schema->deploy;
 
-#Dump all pf the test tables and start again.
-my $sqlDeployment = Mojo::File->new("$FindBin::Bin/../dropschema.sql")->slurp;
-for (split ';', $sqlDeployment){
-  $dbh->do($_) or die $dbh->errstr;
-}
+$schema->resultset('AgeRange')->populate([
+  [ qw/ agerangestring / ],
+  [ '20-35' ],
+  [ '35-50' ],
+  [ '50+' ],
+]);
 
-my $sqlDeployment = Mojo::File->new("$FindBin::Bin/../schema.sql")->slurp;
-for (split ';', $sqlDeployment){
-  $dbh->do($_) or die $dbh->errstr;
-}
+$schema->resultset('AccountToken')->create({
+  accounttokenname => 'a',
+});
 
 my $accountToken = 'a';
-my $tokenStatement = $dbh->prepare('INSERT INTO AccountTokens (AccountTokenName) VALUES (?)');
-$tokenStatement->execute($accountToken);
 
 my $sessionTimeSeconds = 60 * 60 * 24 * 7; #1 week.
-my $sessionTokenJsonName = 'sessionToken';
+my $sessionTokenJsonName = 'session_key';
 my $sessionExpiresJsonName = 'sessionExpires';
 
+my $location_is = sub {
+  my ($t, $value, $desc) = @_;
+  $desc ||= "Location: $value";
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  return $t->success(is($t->tx->res->headers->location, $value, $desc));
+};
 
 #This depends on "register.t" working
 
 #Valid customer, this also tests that redirects are disabled for register.
-print "test 1 - Initial create user account\n";
 my $email = 'rufus@shinra.energy';
 my $password = 'MakoGold';
 my $testJson = {
@@ -53,9 +65,7 @@ $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
-
 #Test login, this also checks that redirects are disabled for login when logged out.
-print "test 2 - Login (cookies)\n";
 $testJson = {
   'email' => $email,
   'password' => $password,
@@ -63,26 +73,7 @@ $testJson = {
 $t->post_ok('/api/login' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
-  ->json_has("/$sessionTokenJsonName")
-  ->json_has("/$sessionExpiresJsonName");
-
-print "test 3 - Login, no redirect on login paths (cookies)\n";
-#No redirect, as you're logged in.
-$t->get_ok('/api/')
-  ->status_is(200);
-
-my $location_is = sub {
-  my ($t, $value, $desc) = @_;
-  $desc ||= "Location: $value";
-  local $Test::Builder::Level = $Test::Builder::Level + 1;
-  return $t->success(is($t->tx->res->headers->location, $value, $desc));
-};
-
-print "test 4 - Login, redirect to root as already logged in (cookies)\n";
-#Check for redirect to root when logged in.
-$t->get_ok('/api/login')
-  ->status_is(303)
-  ->$location_is('/api');
+  ->json_has("/$sessionTokenJsonName");
 
 
 #Does login/logout work with a cookie based session.

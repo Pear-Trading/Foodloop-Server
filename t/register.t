@@ -1,33 +1,12 @@
 use Mojo::Base -strict;
 
-use File::Temp;
 use Test::More;
-use Test::Mojo;
 use Mojo::JSON;
+use Test::Pear::LocalLoop;
 
-my $file = File::Temp->new;
-
-print $file <<'END';
-{
-  dsn => "dbi:SQLite::memory:",
-  user => undef,
-  pass => undef,
-}
-END
-$file->seek( 0, SEEK_END );
-
-$ENV{MOJO_CONFIG} = $file->filename;
-
-my $t = Test::Mojo->new('Pear::LocalLoop');
+my $framework = Test::Pear::LocalLoop->new;
+my $t = $framework->framework;
 my $schema = $t->app->schema;
-$schema->deploy;
-
-$schema->resultset('AgeRange')->populate([
-  [ qw/ agerangestring / ],
-  [ '20-35' ],
-  [ '35-50' ],
-  [ '50+' ],
-]);
 
 #Variables to be used for uniqueness when testing.
 my @names = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');

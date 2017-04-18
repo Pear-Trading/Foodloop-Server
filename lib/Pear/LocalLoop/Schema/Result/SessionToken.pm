@@ -107,7 +107,7 @@ Related object: L<Pear::LocalLoop::Schema::Result::User>
 =cut
 
 __PACKAGE__->belongs_to(
-  "useridassignedto_fk",
+  "user",
   "Pear::LocalLoop::Schema::Result::User",
   { userid => "useridassignedto_fk" },
   { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },

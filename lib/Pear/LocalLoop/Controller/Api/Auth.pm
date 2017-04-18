@@ -3,121 +3,113 @@ use Mojo::Base 'Mojolicious::Controller';
 use Data::Dumper;
 use Mojo::JSON;
 
+has error_messages => sub {
+  return {
+    email => {
+      required => { message => 'No email sent.', status => 400 },
+      email => { message => 'Email is invalid.', status => 400 },
+    },
+    password => {
+      required => { message => 'No password sent.', status => 400 },
+    },
+  };
+};
 
-#FIXME placeholders
-#Because of "before_dispatch" this will never be accessed unless the user is not logged in.
-sub get_login {
-  my $self = shift;
-  return $self->render( success => Mojo::JSON->true, text => 'This will be the login page.', status => 200 );
+sub auth {
+  my $c = shift;
+
+  my $session_key = $c->req->json( '/session_key' );
+
+  my $session_result = $c->schema->resultset('SessionToken')->find({ sessiontokenname => $session_key });
+
+  if ( defined $session_result ) {
+    $c->stash( api_user => $session_result->user );
+    return 1;
+  }
+
+  $c->render(
+    json => {
+      success => Mojo::JSON->false,
+      message => 'Invalid Session',
+    },
+    status => 401,
+  );
+  return 0;
 }
 
-#TODO set session cookie and add it to the database.
-#FIXME This suffers from replay attacks, consider a challenge response. Would TLS solve this, most likely.
-#SessionToken
-#Because of "before_dispatch" this will never be accessed unless the user is not logged in.
 sub post_login {
-  my $self = shift;
+  my $c = shift;
 
-  my $json = $self->req->json;
-  $self->app->log->debug( "\n\nStart of login");
-  $self->app->log->debug( "JSON: " . Dumper $json );
+  my $validation = $c->validation;
+
+  my $json = $c->req->json;
 
   if ( ! defined $json ){
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
+    return $c->render( json => {
       success => Mojo::JSON->false,
       message => 'No json sent.',
     },
-    status => 400,); #Malformed request   
+    status => 400); #Malformed request   
   }
 
-  my $email = $json->{email};
-  if ( ! defined $email ){
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'No email sent.',
-    },
-    status => 400,); #Malformed request   
-  }
-  elsif ( ! $self->valid_email($email) ) {  
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'email is invalid.',
-    },
-    status => 400,); #Malformed request
-  }
+  $validation->input( $json );
+  $validation->required('email')->email;
+  $validation->required('password');
 
-  my $password = $json->{password};
-  if ( ! defined $password ){
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'No password sent.',
-    },
-    status => 400,); #Malformed request   
+  my $email = $validation->param('email');
+  my $password = $validation->param('password');
+
+  if ( $validation->has_error ) {
+    my $failed_vals = $validation->failed;
+    for my $val ( @$failed_vals ) {
+      my $check = shift @{ $validation->error($val) };
+      return $c->render(
+        json => {
+          success => Mojo::JSON->false,
+          message => $c->error_messages->{$val}->{$check}->{message},
+        },
+        status => $c->error_messages->{$val}->{$check}->{status},
+      );
+    }
   }
 
+  my $user_result = $c->schema->resultset('User')->find({ email => $email });
+  
+  if ( defined $user_result ) {
+    if ( $user_result->check_password($password) ) {
+      my $session_key = $c->generate_session( $user_result->userid );
 
-  #FIXME There is a timing attack here determining if an email exists or not.
-  if ($self->does_email_exist($email) && $self->check_password_email($email, $password)) {
-    #Match.
-    $self->app->log->debug('Path Success: file:' . __FILE__ . ', line: ' . __LINE__);
-
-    my $userId = $self->get_userid_foreign_key($email);
-
-    #Generates and stores
-    my $hash = $self->generate_session($userId);
-
-    $self->app->log->debug('session dump:' . Dumper ($hash));
-
-    return $self->render( json => { 
-      success => Mojo::JSON->true,
-      $self->config->{sessionTokenJsonName} => $hash->{$self->config->{sessionTokenJsonName}},
-      $self->config->{sessionExpiresJsonName} => $hash->{$self->config->{sessionExpiresJsonName}},
-    });
-  }
-  else{
-    #Mismatch
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'Email or password is invalid.',
-    },
-    status => 401,); #Unauthorized request 
+      return $c->render( json => {
+        success => Mojo::JSON->true,
+        session_key => $session_key,
+      });
+    }
+  } else {
+    return $c->render(
+      json => {
+        success => Mojo::JSON->false,
+        message => 'Email or password is invalid.',
+      },
+      status => 401
+    );
   }
 }
 
 sub post_logout {
-  my $self = shift;
+  my $c = shift;
 
-  my $json = $self->req->json;
-  $self->app->log->debug( "\n\nStart of logout");
-  $self->app->log->debug( "JSON: " . Dumper $json );
+  my $session_key = $c->req->json( '/session_key' );
 
-  #If the session token exists.
-  if ($self->expire_current_session()) {
-    $self->app->log->debug('Path Success: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->true,
-      message => 'you were successfully logged out.',
-    }); 
-  }
-  #Due to the "before_dispatch" hook, this most likely will not be called. i.e. race conditions.
-  #FIXME untested.
-  #An invalid token was presented, most likely because it has expired.
-  else {
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'the session has expired or did not exist in the first place.',
-    },
-    status => 401,); #Unauthorized request
+  my $session_result = $c->schema->resultset('SessionToken')->find({ sessiontokenname => $session_key });
+
+  if ( defined $session_result ) {
+    $session_result->delete;
   }
 
+  $c->render( json => {
+    success => Mojo::JSON->true,
+    message => 'Logged Out',
+  }); 
 }
-
-
 
 1;

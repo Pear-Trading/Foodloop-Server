@@ -25,7 +25,7 @@ use base 'DBIx::Class::Core';
 
 =cut
 
-__PACKAGE__->load_components("InflateColumn::DateTime");
+__PACKAGE__->load_components("InflateColumn::DateTime", "PassphraseColumn");
 
 =head1 TABLE: C<Users>
 
@@ -82,7 +82,18 @@ __PACKAGE__->add_columns(
   "joindate",
   { data_type => "datetime", is_nullable => 0 },
   "hashedpassword",
-  { data_type => "text", is_nullable => 0 },
+  {
+    data_type => "varchar",
+    is_nullable => 0,
+    size => 100,
+    passphrase => 'crypt',
+    passphrase_class => 'BlowfishCrypt',
+    passphrase_args => {
+      salt_random => 1,
+      cost => 8,
+    },
+    passphrase_check_method => 'check_password',
+  },
 );
 
 =head1 PRIMARY KEY
