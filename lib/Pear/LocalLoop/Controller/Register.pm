@@ -47,7 +47,7 @@ sub register {
   } else {
     my $new_user = $c->schema->resultset('User')->find_or_new({
       email => $validation->param('email'),
-      hashedpassword => $c->generate_hashed_password( $validation->param('password') ),
+      hashedpassword => $validation->param('password'),
       joindate => DateTime->now(),
       customer => {
         username => $validation->param('name'),

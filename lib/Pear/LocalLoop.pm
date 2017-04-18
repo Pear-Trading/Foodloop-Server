@@ -3,8 +3,6 @@ package Pear::LocalLoop;
 use Mojo::Base 'Mojolicious';
 use Data::UUID;
 use Mojo::JSON;
-use Email::Valid;
-use Authen::Passphrase::BlowfishCrypt;
 use Scalar::Util qw(looks_like_number);
 use Pear::LocalLoop::Schema;
 use DateTime;
@@ -40,7 +38,12 @@ sub startup {
     'validate_user' => sub {
       my ( $c, $email, $password, $args) = @_;
       my $user = $c->schema->resultset('User')->find({email => $email});
-      return $c->check_password_email($email, $password) ? $user->userid : undef;
+      if ( defined $user ) {
+        if ( $user->check_password( $password ) ) {
+            return $user->userid;
+        }
+      }
+      return undef;
     },
   });
 
@@ -94,14 +97,11 @@ sub startup {
 
   $user_routes->get('/home')->to('root#home');
 
-$self->hook( before_dispatch => sub {
-  my $self = shift;
+  $self->hook( before_dispatch => sub {
+    my $self = shift;
 
-  $self->res->headers->header('Access-Control-Allow-Origin' => '*') if $self->app->mode eq 'development';
-
-  $self->remove_all_expired_sessions();
-});
-
+    $self->res->headers->header('Access-Control-Allow-Origin' => '*') if $self->app->mode eq 'development';
+  });
 
   $self->helper( is_admin => sub {
     my ($c, $user_id) = @_;
@@ -119,154 +119,61 @@ $self->hook( before_dispatch => sub {
     }
   });
 
+  $self->helper(get_active_user_id => sub {
+    my $self = shift;
 
+    my $token = $self->get_session_token(); 
+    if (! defined $token){
+      return undef;
+    }
 
-$self->helper( valid_username => sub {
-  my ($self, $username) = @_;
-  return ($username =~ m/^[A-Za-z0-9]+$/);
-});
-
-$self->helper(valid_email => sub {
-  my ($self, $email) = @_;
-  return (Email::Valid->address($email));
-});
-
-$self->helper(get_active_user_id => sub {
-  my $self = shift;
-
-  my $token = $self->get_session_token(); 
-  if (! defined $token){
-    return undef;
-  }
-
-  my @out = $self->db->selectrow_array("SELECT UserIdAssignedTo_FK FROM SessionTokens WHERE SessionTokenName = ?",undef,($token));
-  if (! @out){
-    return undef;
-  }
-  else{
-    return $out[0];
-  }
-});
-
-$self->helper(get_session_token => sub {
-  my $self = shift;
-
-  #See if logged in.
-  my $sessionToken = undef;
-
-  my $json = $self->req->json;
-  if (defined $json) {
-    $sessionToken = $json->{$self->app->config->{sessionTokenJsonName}};
-  }
-
-  if ( ! defined $sessionToken || $sessionToken eq "" ) {
-    $sessionToken = $self->session->{$self->app->config->{sessionTokenJsonName}};
-  }
-
-  if (defined $sessionToken && $sessionToken eq "" ) {
-    $sessionToken = undef;
-  }
-
-  return $sessionToken;
-});
-
-
-#This assumes the user has no current session on that device.
-$self->helper(generate_session => sub {
-  my ($self, $userId) = @_;
-
-  my $sessionToken = $self->generate_session_token();
-
-  my $insertStatement = $self->db->prepare('INSERT INTO SessionTokens (SessionTokenName, UserIdAssignedTo_FK, ExpireDateTime) VALUES (?, ?, ?)');
-  my $rowsAdded = $insertStatement->execute($sessionToken, $userId, DateTime->now()->add( years => 1 ));
-  
-  return $sessionToken;
-});
-
-$self->helper(generate_session_token => sub {
-  my $self = shift;
-  return Data::UUID->new->create_str();
-});
-
-$self->helper(expire_all_sessions => sub {
-  my $self = shift;
-  
-  my $rowsDeleted = $self->db->prepare("DELETE FROM SessionTokens")->execute();
-  
-  return $rowsDeleted;
-});
-
-$self->helper(session_token_expiry_date_time => sub {
-  my $c = shift; 
-  return time() + $c->app->config->{sessionTimeSeconds};
-});
-
-$self->helper(remove_all_expired_sessions => sub {
-  my $self = shift;
-
-  my $timeDateNow = time();
-
-  my $removeStatement = $self->db->prepare('DELETE FROM SessionTokens WHERE ExpireDateTime < ?');
-  my $rowsRemoved = $removeStatement->execute($timeDateNow);  
-
-  return $rowsRemoved;
-});
-
-
-#1 = session update, 0 = there was no session or it expired.
-#We assume the token has a valid structure.
-$self->helper(extend_session => sub {
-  my ( $self, $sessionToken ) = @_;
-
-  my $timeDateExpire = $self->session_token_expiry_date_time();
-
-  my $updateStatement = $self->db->prepare('UPDATE SessionTokens SET ExpireDateTime = ? WHERE SessionTokenName = ?');
-  my $rowsChanges = $updateStatement->execute($timeDateExpire, $sessionToken);  
-
-  #Has been updated.
-  if ($rowsChanges != 0) {
-    $self->session(expires => $timeDateExpire);
-    return 1;
-  } 
-  else {
-    $self->session(expires => 1);
-    return 0;
-  }
-});
-
-$self->helper(get_session_expiry => sub {
-  my ( $self, $sessionToken ) = @_;
-
-  my ( $expireTime ) = $self->db->selectrow_array("SELECT ExpireDateTime FROM SessionTokens WHERE SessionTokenName = ?", undef, ($sessionToken));
-
-  return $expireTime;
-
-});
-
-  #True for session was expire, false there was no session to expire.
-  $self->helper(expire_current_session => sub {
-    my $c = shift;
-    my $self = $c;
-
-    my $sessionToken = $self->get_session_token();
-
-    $c->schema->resultset('SessionToken')->search({
-      sessiontokenname => $sessionToken,
-    })->delete_all;
-
-    ## TODO Does this need a seperate session cookie?
-    $self->session(expires => 1);
-    $self->session->{$self->app->config->{sessionTokenJsonName}} = $sessionToken;
-
-    return 1;
+    my @out = $self->db->selectrow_array("SELECT UserIdAssignedTo_FK FROM SessionTokens WHERE SessionTokenName = ?",undef,($token));
+    if (! @out){
+      return undef;
+    }
+    else{
+      return $out[0];
+    }
   });
 
-  $self->helper(is_token_unused => sub {
-    my ( $c, $token ) = @_;
-    return defined $c->schema->resultset('AccountToken')->find({
-      accounttokenname => $token,
-      used => 0,
-    });
+  $self->helper(get_session_token => sub {
+    my $self = shift;
+
+    #See if logged in.
+    my $sessionToken = undef;
+
+    my $json = $self->req->json;
+    if (defined $json) {
+      $sessionToken = $json->{$self->app->config->{sessionTokenJsonName}};
+    }
+
+    if ( ! defined $sessionToken || $sessionToken eq "" ) {
+      $sessionToken = $self->session->{$self->app->config->{sessionTokenJsonName}};
+    }
+
+    if (defined $sessionToken && $sessionToken eq "" ) {
+      $sessionToken = undef;
+    }
+
+    return $sessionToken;
+  });
+
+
+  #This assumes the user has no current session on that device.
+  $self->helper(generate_session => sub {
+    my ($self, $userId) = @_;
+
+    my $sessionToken = $self->generate_session_token();
+
+    my $insertStatement = $self->db->prepare('INSERT INTO SessionTokens (SessionTokenName, UserIdAssignedTo_FK, ExpireDateTime) VALUES (?, ?, ?)');
+    my $rowsAdded = $insertStatement->execute($sessionToken, $userId, DateTime->now()->add( years => 1 ));
+    
+    return $sessionToken;
+  });
+
+  $self->helper(generate_session_token => sub {
+    my $self = shift;
+    return Data::UUID->new->create_str();
   });
 
   $self->helper(does_organisational_id_exist => sub {
@@ -279,50 +186,6 @@ $self->helper(get_session_expiry => sub {
     my $age_range = $c->schema->resultset('AgeRange')->find({ agerangestring => $age_string });
     return defined $age_range ? $age_range->agerangeid : undef;
   });
-
-  $self->helper(get_userid_foreign_key => sub {
-    my ( $c, $email ) = @_;
-    my $user = $c->schema->resultset('User')->find({ email => $email });
-    return defined $user ? $user->userid : undef;
-  });
-
-  $self->helper(does_username_exist => sub {
-    my ( $c, $username ) = @_;
-    return defined $c->schema->resultset('Customer')->find({ username => $username });
-  });
-
-  $self->helper(does_email_exist => sub {
-    my ( $c, $email ) = @_;
-    return defined $c->schema->resultset('User')->find({ email => $email });
-  });
-
-  $self->helper(set_token_as_used => sub {
-    my ( $c, $token ) = @_;
-    return defined $c->schema->resultset('AccountToken')->find({
-      accounttokenname => $token,
-      used => 0,
-    })->update({ used => 1 });
-  });
-
-  $self->helper(generate_hashed_password => sub {
-    my ( $c, $password ) = @_;
-    my $ppr = Authen::Passphrase::BlowfishCrypt->new(
-      cost => 8,
-      salt_random => 1,
-      passphrase => $password,
-    );
-    return $ppr->as_crypt;
-  });
- 
-  # We assume the user already exists.
-  $self->helper(check_password_email => sub {
-    my ( $c, $email, $password ) = @_;
-    my $user = $c->schema->resultset('User')->find({ email => $email });
-    return undef unless defined $user;
-    my $ppr = Authen::Passphrase::BlowfishCrypt->from_crypt($user->hashedpassword);
-    return $ppr->match($password);
-  });
-
 }
 
 1;
