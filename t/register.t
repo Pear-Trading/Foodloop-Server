@@ -1,39 +1,43 @@
 use Mojo::Base -strict;
 
+use File::Temp;
 use Test::More;
 use Test::Mojo;
 use Mojo::JSON;
 
-use FindBin;
+my $file = File::Temp->new;
 
-BEGIN {
-  $ENV{MOJO_MODE} = 'testing';
-  $ENV{MOJO_LOG_LEVEL} = 'debug';
+print $file <<'END';
+{
+  dsn => "dbi:SQLite::memory:",
+  user => undef,
+  pass => undef,
 }
+END
+$file->seek( 0, SEEK_END );
 
-my $t = Test::Mojo->new("Pear::LocalLoop");
+$ENV{MOJO_CONFIG} = $file->filename;
 
-my $dbh = $t->app->db;
+my $t = Test::Mojo->new('Pear::LocalLoop');
+my $schema = $t->app->schema;
+$schema->deploy;
 
-#Dump all pf the test tables and start again.
-my $sqlDeployment = Mojo::File->new("$FindBin::Bin/../dropschema.sql")->slurp;
-for (split ';', $sqlDeployment){
-  $dbh->do($_) or die $dbh->errstr;
-}
-
-$sqlDeployment = Mojo::File->new("$FindBin::Bin/../schema.sql")->slurp;
-for (split ';', $sqlDeployment){
-  $dbh->do($_) or die $dbh->errstr;
-}
+$schema->resultset('AgeRange')->populate([
+  [ qw/ agerangestring / ],
+  [ '20-35' ],
+  [ '35-50' ],
+  [ '50+' ],
+]);
 
 #Variables to be used for uniqueness when testing.
 my @names = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
 my @emails = ('a@a.com', 'b@a.com', 'c@a.com', 'd@a.com', 'e@a.com', 'f@a.com', 'g@a.com', 'h@a.com', 'i@a.com', 'j@a.com', 'k@a.com', 'l@a.com', 'm@a.com', 'n@a.com', 'o@a.com', 'p@a.com', 'q@a.com', 'r@a.com', 's@a.com', 't@a.com', 'u@a.com', 'v@a.com', 'w@a.com', 'x@a.com', 'y@a.com', 'z@a.com');
 my @tokens =  ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
-my $tokenStatement = $dbh->prepare('INSERT INTO AccountTokens (AccountTokenName) VALUES (?)');
-foreach (@tokens){
-  my $rowsAdded = $tokenStatement->execute($_);
-}
+
+$schema->resultset('AccountToken')->populate([
+  [ qw/ accounttokenname / ],
+  map { [ $_ ] } @tokens,
+]);
 
 #No JSON sent
 $t->post_ok('/api/register')
