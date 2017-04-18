@@ -27,14 +27,14 @@ $schema->deploy;
 
 $schema->resultset('User')->create({
   email => 'admin@example.com',
-  hashedpassword => $t->app->generate_hashed_password('abc123'),
+  hashedpassword => 'abc123',
   administrator => {},
   joindate => DateTime->now,
 });
 
 $schema->resultset('User')->create({
   email => 'user@example.com',
-  hashedpassword => $t->app->generate_hashed_password('abc123'),
+  hashedpassword => 'abc123',
   joindate => DateTime->now,
 });
 
