@@ -1,56 +1,34 @@
 % layout 'admin';
 % title 'Tokens';
-% content_for css => begin
-<style>
-body {
-  background: whitesmoke;
-  padding-top: 70px;
-}
-
-.panel {
-  background: white;
-  padding: 16px;
-  -webkit-box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.2);
-  -moz-box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.2);
-  box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.2);
-}
-
-.login-form {
-  margin-top: 20%;
-}
-</style>
-% end
 % content_for javascript => begin
 % end
-<div class="container">
-  % if ( my $error = flash 'error' ) {
-    <div class="alert alert-danger" role="alert">
-      <strong>Error!</strong> <%= $error %>
-    </div>
-  % } elsif ( my $success = flash 'success' ) {
-    <div class="alert alert-success" role="alert">
-      <strong>Success!</strong> <%= $success %>
-    </div>
-  % }
-  <form action="<%= url_for %>" method="post">
-    <div class="form-group">
-      <label for="token-name">Token Name</label>
-      <input id="token-name" type="text" class="form-control" placeholder="Token Text" name="token-name" value="<%= $token->accounttokenname %>">
-    </div>
-    <div class="form-group">
-      <label for="token-used">Token Used?</label>
-      <select id="token-used" class="form-control" name="token-used">
-        <option value="0"<%= $token->used == 0 ? ' selected' : '' %>>Available</option>
-        <option value="1"<%= $token->used == 1 ? ' selected' : '' %>>Used</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <button class="btn btn-primary form-control" type="submit">Update</button>
-    </div>
-  </form>
-  <form action="<%= url_for . '/delete' %>" method="post">
-    <div class="form-group">
-      <button class="btn btn-danger form-control" type="submit">Delete</button>
-    </div>
-  </form>
-</div>
+% if ( my $error = flash 'error' ) {
+  <div class="alert alert-danger" role="alert">
+    <strong>Error!</strong> <%= $error %>
+  </div>
+% } elsif ( my $success = flash 'success' ) {
+  <div class="alert alert-success" role="alert">
+    <strong>Success!</strong> <%= $success %>
+  </div>
+% }
+<form action="<%= url_for %>" method="post">
+  <div class="form-group">
+    <label for="token-name">Token Name</label>
+    <input id="token-name" type="text" class="form-control" placeholder="Token Text" name="token-name" value="<%= $token->accounttokenname %>">
+  </div>
+  <div class="form-group">
+    <label for="token-used">Token Used?</label>
+    <select id="token-used" class="form-control" name="token-used">
+      <option value="0"<%= $token->used == 0 ? ' selected' : '' %>>Available</option>
+      <option value="1"<%= $token->used == 1 ? ' selected' : '' %>>Used</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <button class="btn btn-primary form-control" type="submit">Update</button>
+  </div>
+</form>
+<form action="<%= url_for . '/delete' %>" method="post">
+  <div class="form-group">
+    <button class="btn btn-danger form-control" type="submit">Delete</button>
+  </div>
+</form>

@@ -15,6 +15,16 @@ sub under {
 
 sub home {
   my $c = shift;
+
+  my $user_rs = $c->schema->resultset('User');
+  my $token_rs = $c->schema->resultset('AccountToken');
+  $c->stash(
+    user_count => $user_rs->count,
+    tokens => {
+      total => $token_rs->count,
+      unused => $token_rs->search({used => 0 })->count,
+    },
+  );
 }
 
 1;

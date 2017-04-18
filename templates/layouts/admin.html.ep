@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
 
-    %= content_for 'css';
+    %= stylesheet '/static/admin/css/main.css';
   </head>
   <body>
     <nav class="navbar navbar-toggleable-md fixed-top navbar-inverse bg-danger">
@@ -30,13 +30,14 @@
         <div class="navbar-nav ml-auto">
           <a class="nav-item nav-link" href="<%= url_for '/home' %>">User Section</a>
           <a class="nav-item nav-link<%= title eq 'Tokens' ? ' active' : '' %>" href="<%= url_for '/admin/tokens' %>">Tokens</a>
-          <a class="nav-item nav-link<%= title eq 'Users' ? ' active' : '' %>" href="#">Users</a>
+          <a class="nav-item nav-link<%= title eq 'Users' ? ' active' : '' %>" href="<%= url_for '/admin/users' %>">Users</a>
           <a class="nav-item nav-link" href="<%= url_for '/logout' %>">Logout</a>
         </div>
       </div>
     </nav>
-
-    <%= content %> 
+    <div class="container">
+      <%= content %>
+    </div>
     %= content_for 'javascript';
   </body> 
 </html>
