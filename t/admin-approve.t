@@ -103,6 +103,8 @@ $t->post_ok('/api/login' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
+my $session_key = $t->tx->res->json('/session_key');
+
 print "test 6 - add valid transaction (type 3: new organisation)\n";
 my ($test1) = $t->app->db->selectrow_array("SELECT COUNT(*) FROM PendingOrganisations", undef, ());
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],0,"No unverified organisations.";
@@ -116,7 +118,8 @@ $json = {
   organisationName => $nameToTestTurtle,
   streetName => "Town centre",
   town => " Wutai",
-  postcode => "NW1 W01"
+  postcode => "NW1 W01",
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -134,6 +137,7 @@ my $newPendingTurtleOrgId = $t->tx->res->json->{unvalidatedOrganisationId};;
 print "test 7 - Non-admin (customer) tries to approve their organisation and fails.\n";
 $json = {
   unvalidatedOrganisationId => $newPendingTurtleOrgId,
+  session_key => $session_key,
 };
 $t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(403)
@@ -160,7 +164,7 @@ $testJson = {
 $t->post_ok('/api/login' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
-
+$session_key => $t->tx->res->json('/session_key');
 
 print "test 10 - add valid transaction (type 3: new organisation)\n";
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],1,"1 unverified organisations." ;
@@ -174,7 +178,8 @@ $json = {
   organisationName => $nameToTestKalm,
   streetName => "Town centre",
   town => "Kalm",
-  postcode => "E2 M02"
+  postcode => "E2 M02",
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -195,6 +200,7 @@ $json = {
   microCurrencyValue => 10,
   transactionAdditionType => 2,
   addUnvalidatedId => $newPendingKalmOrgId,
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -214,7 +220,8 @@ $json = {
   organisationName => $nameToTestJunon,
   streetName => "Main street",
   town => "Under Junon",
-  postcode => "E6 M02"
+  postcode => "E6 M02",
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload)
@@ -236,6 +243,7 @@ $json = {
   microCurrencyValue => 20,
   transactionAdditionType => 2,
   addUnvalidatedId => $newPendingJunonOrgId,
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -253,6 +261,7 @@ $json = {
   microCurrencyValue => 30,
   transactionAdditionType => 2,
   addUnvalidatedId => $newPendingJunonOrgId,
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -267,6 +276,7 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef,
 print "test 15 - Non-admin (organisation) tries to approve their organisation and fails.\n";
 $json = {
   unvalidatedOrganisationId => $newPendingKalmOrgId,
+  session_key => $session_key,
 };
 $t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(403)
@@ -292,16 +302,17 @@ $testJson = {
 $t->post_ok('/api/login' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
-
+$session_key = $t->tx->res->json('/session_key');
 
 print "test 18 - JSON is missing.\n";
 $t->post_ok('/api/admin-approve' => json)
-  ->status_is(400)
+  ->status_is(401)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/JSON is missing/i);
+  ->json_like('/message', qr/Invalid Session/i);
 
 print "test 19 - unvalidatedOrganisationId missing (non-modify).\n";
 $json = {
+  session_key => $session_key,
 };
 $t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(400)
@@ -311,6 +322,7 @@ $t->post_ok('/api/admin-approve' => json => $json)
 print "test 20 - unvalidatedOrganisationId not number (non-modify).\n";
 $json = {
   unvalidatedOrganisationId => 'Abc',
+  session_key => $session_key,
 };
 $t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(400)
@@ -322,6 +334,7 @@ print "test 21 - unvalidatedOrganisationId does not exist (non-modify).\n";
 my ($maxPendingId) = $t->app->db->selectrow_array("SELECT MAX(PendingOrganisationId) FROM PendingOrganisations", undef,());
 $json = {
   unvalidatedOrganisationId => ($maxPendingId + 1),
+  session_key => $session_key,
 };
 $t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(400)
@@ -337,6 +350,7 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef, ())}[0],0,"No verified organisations.";  
 $json = {
   unvalidatedOrganisationId => $newPendingKalmOrgId,
+  session_key => $session_key,
 };
 $t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(200)
@@ -358,6 +372,7 @@ $json = {
   name => $testName,
   fullAddress => $testFullAddress,
   postCode => $testPostCode,
+  session_key => $session_key,
 };
 $t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(200)
@@ -376,6 +391,7 @@ my $testName = "Change testing junon name";
 $json = {
   unvalidatedOrganisationId => $newPendingJunonOrgId,
   name => $testName,
+  session_key => $session_key,
 };
 $t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(200)
