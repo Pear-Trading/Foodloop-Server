@@ -5,3 +5,5 @@ hypnotoad.pid
 *~
 /images
 *.swp
+
+cover_db/
