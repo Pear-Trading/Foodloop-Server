@@ -117,6 +117,8 @@ sub logout {
     ->json_is('/success', Mojo::JSON->true);
 }
 
+my $session_key;
+
 sub login_reno {
   $testJson = {
     'email' => $emailReno,
@@ -125,6 +127,7 @@ sub login_reno {
   $t->post_ok('/api/login' => json => $testJson)
     ->status_is(200)
     ->json_is('/success', Mojo::JSON->true);
+  $session_key = $t->tx->res->json('/session_key');
 }
 
 sub login_chocobilly {
@@ -135,6 +138,7 @@ sub login_chocobilly {
   $t->post_ok('/api/login' => json => $testJson)
     ->status_is(200)
     ->json_is('/success', Mojo::JSON->true);
+  $session_key = $t->tx->res->json('/session_key');
 }
 
 sub login_admin {
@@ -145,6 +149,7 @@ sub login_admin {
   $t->post_ok('/api/login' => json => $testJson)
     ->status_is(200)
     ->json_is('/success', Mojo::JSON->true);
+  $session_key = $t->tx->res->json('/session_key');
 }
 
 print "test 5 - Login non-admin Reno\n";
@@ -159,7 +164,8 @@ $json = {
   organisationName => $nameToTestTurtle,
   streetName => "Town centre",
   town => " Wutai",
-  postcode => "NW1 W01"
+  postcode => "NW1 W01",
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -175,6 +181,7 @@ $json = {
   microCurrencyValue => 20,
   transactionAdditionType => 2,
   addUnvalidatedId => $unvalidatedOrganisationId,
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -186,6 +193,7 @@ $json = {
   microCurrencyValue => 40,
   transactionAdditionType => 2,
   addUnvalidatedId => $unvalidatedOrganisationId,
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -206,6 +214,7 @@ $json = {
   microCurrencyValue => 80,
   transactionAdditionType => 2,
   addUnvalidatedId => $unvalidatedOrganisationId,
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -226,6 +235,7 @@ $json = {
   microCurrencyValue => 160,
   transactionAdditionType => 2,
   addUnvalidatedId => $unvalidatedOrganisationId,
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -244,6 +254,7 @@ login_admin();
 print "test 17 - Admin approves Turtle\'s Paradise.\n";
 $json = {
   unvalidatedOrganisationId => $unvalidatedOrganisationId,
+  session_key => $session_key,
 };
 $t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(200)
@@ -263,6 +274,7 @@ $json = {
   microCurrencyValue => 320,
   transactionAdditionType => 1,
   addValidatedId => $validatedOrganisationId,
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -283,15 +295,16 @@ login_reno();
 
 print "test 23 - No JSON\n";
 $t->post_ok('/api/user-history')
-  ->status_is(400)
+  ->status_is(401)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/JSON is missing/i);
+  ->json_like('/message', qr/Invalid Session/);
 
 print "test 24 - retrieveType is missing\n";
 $json = {
   dayNumber => $dateTimePlusThreeDays->day(), 
   monthNumber => $dateTimePlusThreeDays->month(), 
   year => $dateTimePlusThreeDays->year(), 
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -304,6 +317,7 @@ $json = {
   dayNumber => $dateTimePlusThreeDays->day(), 
   monthNumber => $dateTimePlusThreeDays->month(), 
   year => $dateTimePlusThreeDays->year(), 
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -316,6 +330,7 @@ $json = {
   dayNumber => $dateTimePlusThreeDays->day(), 
   monthNumber => $dateTimePlusThreeDays->month(), 
   year => $dateTimePlusThreeDays->year(), 
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -329,6 +344,7 @@ $json = {
   retrieveType => 1,
   monthNumber => $dateTimePlusThreeDays->month(), 
   year => $dateTimePlusThreeDays->year(), 
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -341,6 +357,7 @@ $json = {
   dayNumber => "A", 
   monthNumber => $dateTimePlusThreeDays->month(), 
   year => $dateTimePlusThreeDays->year(), 
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -352,6 +369,7 @@ $json = {
   retrieveType => 1,
   dayNumber => $dateTimePlusThreeDays->day(), 
   year => $dateTimePlusThreeDays->year(), 
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -364,6 +382,7 @@ $json = {
   dayNumber => $dateTimePlusThreeDays->day(), 
   monthNumber => "ABC", 
   year => $dateTimePlusThreeDays->year(), 
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -375,6 +394,7 @@ $json = {
   retrieveType => 1,
   dayNumber => $dateTimePlusThreeDays->day(), 
   monthNumber => $dateTimePlusThreeDays->month(), 
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -387,6 +407,7 @@ $json = {
   dayNumber => $dateTimePlusThreeDays->day(), 
   monthNumber => $dateTimePlusThreeDays->month(), 
   year => "I1", 
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -399,6 +420,7 @@ $json = {
   dayNumber => $dateTimePlusThreeDays->day(), 
   monthNumber => ($dateTimePlusThreeDays->month() + 13), 
   year => $dateTimePlusThreeDays->year(), 
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -415,6 +437,7 @@ $json = {
   endDayNumber => $dateTimePlusOneYear->day(),
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -430,6 +453,7 @@ $json = {
   endDayNumber => $dateTimePlusOneYear->day(),
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(), 
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -445,6 +469,7 @@ $json = {
   endDayNumber => $dateTimePlusOneYear->day(),
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -460,6 +485,7 @@ $json = {
   endDayNumber => $dateTimePlusOneYear->day(),
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -474,6 +500,7 @@ $json = {
   endDayNumber => $dateTimePlusOneYear->day(),
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -489,6 +516,7 @@ $json = {
   endDayNumber => $dateTimePlusOneYear->day(),
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -504,6 +532,7 @@ $json = {
   endDayNumber => $dateTimePlusOneYear->day(),
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -520,6 +549,7 @@ $json = {
   startYear => $dateTimeInitial->year(),
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -535,6 +565,7 @@ $json = {
   endDayNumber => "2EF",
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -549,6 +580,7 @@ $json = {
   startYear => $dateTimeInitial->year(),
   endDayNumber => $dateTimePlusOneYear->day(),
   endYear => $dateTimePlusOneYear->year(),
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -564,6 +596,7 @@ $json = {
   endDayNumber => $dateTimePlusOneYear->day(),
   endMonthNumber => "A5G",
   endYear => $dateTimePlusOneYear->year(),
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -578,6 +611,7 @@ $json = {
   startYear => $dateTimeInitial->year(),
   endDayNumber => $dateTimePlusOneYear->day(),
   endMonthNumber => $dateTimePlusOneYear->month(),
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -593,6 +627,7 @@ $json = {
   endDayNumber => $dateTimePlusOneYear->day(),
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => "ABC",
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -608,6 +643,7 @@ $json = {
   endDayNumber => ($dateTimePlusOneYear->day() - 60),
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(400)
@@ -622,6 +658,7 @@ $json = {
   dayNumber => $dateTimePlusThreeDays->day(), 
   monthNumber => $dateTimePlusThreeDays->month(), 
   year => $dateTimePlusThreeDays->year(), 
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(200)
@@ -639,6 +676,7 @@ $json = {
   dayNumber => $dateTimeInitial->day(), 
   monthNumber => $dateTimeInitial->month(), 
   year => $dateTimeInitial->year(), 
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(200)
@@ -656,6 +694,7 @@ $json = {
   dayNumber => $dateTimePlusTwoDays->day(), 
   monthNumber => $dateTimePlusTwoDays->month(), 
   year => $dateTimePlusTwoDays->year(), 
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(200)
@@ -676,6 +715,7 @@ $json = {
   endDayNumber => $dateTimePlusOneMonthMinusOneDay->day(),
   endMonthNumber => $dateTimePlusOneMonthMinusOneDay->month(),
   endYear => $dateTimePlusOneMonthMinusOneDay->year(),
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(200)
@@ -698,6 +738,7 @@ $json = {
   endDayNumber => $dateTimePlusOneMonthMinusOneDay->day(),
   endMonthNumber => $dateTimePlusOneMonthMinusOneDay->month(),
   endYear => $dateTimePlusOneMonthMinusOneDay->year(),
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(200)
@@ -721,6 +762,7 @@ $json = {
   endDayNumber => $dateTimePlusOneYear->day(),
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(200)
@@ -747,6 +789,7 @@ $json = {
   endDayNumber => $dateTimePlusOneYear->day(),
   endMonthNumber => $dateTimePlusOneYear->month(),
   endYear => $dateTimePlusOneYear->year(),
+  session_key => $session_key,
 };
 $t->post_ok('/api/user-history' => json => $json)
   ->status_is(200)
