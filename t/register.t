@@ -1,3 +1,5 @@
+use Mojo::Base -strict;
+
 use Test::More;
 use Test::Mojo;
 use Mojo::JSON;
@@ -19,7 +21,7 @@ for (split ';', $sqlDeployment){
   $dbh->do($_) or die $dbh->errstr;
 }
 
-my $sqlDeployment = Mojo::File->new("$FindBin::Bin/../schema.sql")->slurp;
+$sqlDeployment = Mojo::File->new("$FindBin::Bin/../schema.sql")->slurp;
 for (split ';', $sqlDeployment){
   $dbh->do($_) or die $dbh->errstr;
 }
@@ -34,21 +36,18 @@ foreach (@tokens){
 }
 
 #No JSON sent
-print "test1\n\n";
 $t->post_ok('/api/register')
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/no json sent/i);
 
 #Empty JSON
-print "test2\n\n";
 my $testJson = {};
 $t->post_ok('/api/register' => json => $testJson)
   ->json_is('/success', Mojo::JSON->false);
 
 #token missing JSON
-print "test3\n\n";
-my $testJson = {
+$testJson = {
   'usertype' => 'customer',
   'username' => shift(@names),
   'email' => shift(@emails),
@@ -63,8 +62,7 @@ $t->post_ok('/api/register' => json => $testJson)
 
 
 #Not valid token.
-print "test4\n\n";
-my $testJson = {
+$testJson = {
   'usertype' => 'customer',
   'token' => ' ',
   'username' => shift(@names),
@@ -80,8 +78,7 @@ $t->post_ok('/api/register' => json => $testJson)
   ->content_like(qr/invalid/i);
 
 #username missing JSON
-print "test5\n\n";
-my $testJson = {
+$testJson = {
   'usertype' => 'customer',
   'token' => shift(@tokens),
   'email' => shift(@emails),
@@ -96,8 +93,7 @@ $t->post_ok('/api/register' => json => $testJson)
 
 
 #Blank username
-print "test6\n\n";
-my $testJson = {
+$testJson = {
   'usertype' => 'customer',
   'token' => shift(@tokens), 
   'username' => '', 
@@ -113,8 +109,7 @@ $t->post_ok('/api/register' => json => $testJson)
   ->content_like(qr/username/i);
 
 #Not alpha numeric chars e.g. !
-print "test7\n\n";
-my $testJson = {
+$testJson = {
   'usertype' => 'customer',
   'token' => shift(@tokens), 
   'username' =>  'asa!', 
@@ -132,8 +127,7 @@ my $usernameToReuse =  shift(@names);
 my $emailToReuse =  shift(@emails);
 
 #Valid customer
-print "test8\n\n";
-my $testJson = {
+$testJson = {
   'usertype' => 'customer', 
   'token' => shift(@tokens), 
   'username' =>  $usernameToReuse, 
@@ -147,8 +141,7 @@ $t->post_ok('/api/register' => json => $testJson)
   ->json_is('/success', Mojo::JSON->true);
 
 #Valid customer2
-print "test9\n\n";
-my $testJson = {
+$testJson = {
   'usertype' => 'customer', 
   'token' => shift(@tokens), 
   'username' =>  shift(@names), 
@@ -162,8 +155,7 @@ $t->post_ok('/api/register' => json => $testJson)
   ->json_is('/success', Mojo::JSON->true);
 
 #Valid customer3
-print "test10\n\n";
-my $testJson = {
+$testJson = {
   'usertype' => 'customer', 
   'token' => shift(@tokens), 
   'username' =>  shift(@names), 
@@ -177,8 +169,7 @@ $t->post_ok('/api/register' => json => $testJson)
   ->json_is('/success', Mojo::JSON->true);
 
 #Username exists
-print "test11\n\n";
-my $testJson = {
+$testJson = {
   'usertype' => 'customer', 
   'token' => shift(@tokens), 
   'username' => $usernameToReuse, 
@@ -193,8 +184,7 @@ $t->post_ok('/api/register' => json => $testJson)
   ->content_like(qr/exists/i);
 
 #email missing JSON
-print "test12\n\n";
-my $testJson = {
+$testJson = {
   'usertype' => 'customer',
   'token' => shift(@tokens),
   'username' => shift(@names),
@@ -208,8 +198,7 @@ $t->post_ok('/api/register' => json => $testJson)
   ->content_like(qr/no email sent/i);
 
 #invalid email 1 
-print "test13\n\n";
-my $testJson = {
+$testJson = {
   'usertype' => 'customer',
   'token' => shift(@tokens), 
   'username' =>  shift(@names), 
@@ -225,8 +214,7 @@ $t->post_ok('/api/register' => json => $testJson)
   ->content_like(qr/invalid/i);
 
 #invalid email 2
-print "test14\n\n";
-my $testJson = {
+$testJson = {
   'usertype' => 'customer', 
   'token' => shift(@tokens), 
   'username' =>  shift(@names), 
@@ -242,8 +230,7 @@ $t->post_ok('/api/register' => json => $testJson)
   ->content_like(qr/invalid/i);
 
 #Email exists
-print "test15\n\n";
-my $testJson = {
+$testJson = {
   'usertype' => 'customer', 
   'token' => shift(@tokens), 
   'username' =>  shift(@names), 
@@ -259,8 +246,7 @@ $t->post_ok('/api/register' => json => $testJson)
   ->content_like(qr/exists/i);
 
 #postcode missing JSON
-print "test16\n\n";
-my $testJson = {
+$testJson = {
   'usertype' => 'customer',
   'token' => shift(@tokens),
   'username' => shift(@names),
@@ -276,8 +262,7 @@ $t->post_ok('/api/register' => json => $testJson)
 #TODO validate postcode
 
 #password missing JSON
-print "test17\n\n";
-my $testJson = {
+$testJson = {
   'usertype' => 'customer',
   'token' => shift(@tokens),
   'username' => shift(@names),
@@ -293,8 +278,7 @@ $t->post_ok('/api/register' => json => $testJson)
 #TODO enforce password complexity requirements.
 
 #usertype missing JSON
-print "test18\n\n";
-my $testJson = {
+$testJson = {
   'token' => shift(@tokens),
   'username' => shift(@names),
   'email' => shift(@emails),
@@ -308,8 +292,7 @@ $t->post_ok('/api/register' => json => $testJson)
   ->content_like(qr/no usertype sent/i);
 
 #Invalid user type
-print "test19\n\n";
-my $testJson = {
+$testJson = {
   'usertype' => 'organisation1', 
   'token' => shift(@tokens), 
   'username' =>  shift(@names), 
@@ -326,8 +309,7 @@ $t->post_ok('/api/register' => json => $testJson)
 
 
 #age missing JSON
-print "test20\n\n";
-my $testJson = {
+$testJson = {
   'usertype' => 'customer',
   'token' => shift(@tokens),
   'username' => shift(@names),
@@ -341,8 +323,7 @@ $t->post_ok('/api/register' => json => $testJson)
   ->content_like(qr/no age sent/i);
 
 #Age is invalid
-print "test21\n\n";
-my $testJson = {
+$testJson = {
   'usertype' => 'customer', 
   'token' => shift(@tokens), 
   'username' =>  shift(@names), 
@@ -358,8 +339,7 @@ $t->post_ok('/api/register' => json => $testJson)
   ->content_like(qr/invalid/i);
 
 #full address missing JSON
-print "test22\n\n";
-my $testJson = {
+$testJson = {
   'usertype' => 'organisation', 
   'token' => shift(@tokens), 
   'username' =>  shift(@names), 
@@ -375,8 +355,7 @@ $t->post_ok('/api/register' => json => $testJson)
 #TODO Validation of full address
 
 #Organisation valid
-print "test23\n\n";
-my $testJson = {
+$testJson = {
   'usertype' => 'organisation', 
   'token' => shift(@tokens), 
   'username' =>  shift(@names), 
@@ -389,22 +368,8 @@ $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200) 
   ->json_is('/success', Mojo::JSON->true);
 
-
-#No JSON sent
-#print "test14\n\n";
-#my $testJson = {
-#  'usertype' => 'customer',
-#  'token' => shift(@tokens),
-#  'username' => shift(@names),
-#  'email' => shift(@emails),
-#  'postcode' => 'LA1 1AA',
-#  'password' => 'Meh',
-#  'age' => '50+'
-#};
-#$t->post_ok('/api/register' => json => $testJson)
-#  ->status_is(401)->or(sub{ diag $t->tx->res->body})
-#  ->json_is('/success', Mojo::JSON->false)
-#  ->content_like(qr/token/i);
-
+is $t->app->schema->resultset('User')->count, 4, 'Correct user count';
+is $t->app->schema->resultset('Customer')->count, 3, 'Correct customer count';
+is $t->app->schema->resultset('Organisation')->count, 1, 'Correct organisation count';
 
 done_testing();
