@@ -1,7 +1,6 @@
 package Pear::LocalLoop::Controller::Api::Register;
 use Mojo::Base 'Mojolicious::Controller';
-use ORM::Date;
-use Data::Dumper;
+use DateTime;
 
 has error_messages => sub {
   return {
@@ -46,8 +45,6 @@ sub post_register{
   my $validation = $c->validation;
 
   my $json = $self->req->json;
-  $self->app->log->debug( "\n\nStart of register");
-  $self->app->log->debug( "JSON: " . Dumper $json );
 
   if ( ! defined $json ){
     $self->app->log->debug('Path: file:' . __FILE__ . ', line: ' . __LINE__);
@@ -85,6 +82,7 @@ sub post_register{
 
   } elsif ( $usertype eq 'organisation' ) {
 
+    #TODO validation on the address. Or perhaps add the organisation to a "to be inspected" list then manually check them.
     $validation->required('fulladdress');
 
   }
@@ -111,75 +109,49 @@ sub post_register{
 
   my $hashedPassword = $self->generate_hashed_password($password);
 
-  my $secondsTime = time();
-  my $date = ORM::Date->new_epoch($secondsTime)->mysql_date;
-
   if ($usertype eq 'customer'){
     my $ageForeignKey = $self->get_age_foreign_key( $validation->param('age') );
 
-    #TODO this will go away with a transaction, when we move this bit to dbic schema code
-    #TODO UNTESTED as it's hard to simulate.
-    #Token is no longer valid race condition.
-    if ( ! $self->set_token_as_used($token) ){
-      $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-      return $self->render( json => {
-        success => Mojo::JSON->false,
-        message => 'Token no longer is accepted.',
-      },
-      status => 500,); #Internal server error. Racecondition
-    }
-  
+    $c->schema->txn_do( sub {
+      $c->schema->resultset('AccountToken')->find({
+        accounttokenname => $token,
+        used => 0,
+      })->update({ used => 1 });
+      $c->schema->resultset('User')->create({
+        customer => {
+          username => $username,
+          agerange_fk => $ageForeignKey,
+          postcode => $postcode,
+        },
+        email => $email,
+        hashedpassword => $hashedPassword,
+        joindate => DateTime->now,
+      });
+    });
 
-    my ($idToUse) = $self->db->selectrow_array("SELECT MAX(CustomerId) FROM Customers");
-    if (defined $idToUse){
-      $idToUse++;
-    }
-    else{
-      $idToUse = 1;
-    }
-
-    #TODO Race condition here.
-    my $insertCustomer = $self->db->prepare("INSERT INTO Customers (CustomerId, UserName, AgeRange_FK, PostCode) VALUES (?, ?, ?, ?)");
-    my $rowsInsertedCustomer = $insertCustomer->execute($idToUse, $username, $ageForeignKey, $postcode);
-    my $insertUser = $self->db->prepare("INSERT INTO Users (CustomerId_FK, Email, JoinDate, HashedPassword) VALUES (?, ?, ?, ?)");
-    my $rowsInsertedUser = $insertUser->execute($idToUse, $email, $date, $hashedPassword);
-
-    return $self->render( json => { success => Mojo::JSON->true } );
   }
   elsif ($usertype eq 'organisation') {
-    #TODO validation on the address. Or perhaps add the organisation to a "to be inspected" list then manually check them.
     my $fullAddress = $validation->param('fulladdress');
 
-    # TODO This will go away with transactioning
-    #TODO UNTESTED as it's hard to simulate. 
-    #Token is no longer valid race condition.
-    if ( ! $self->set_token_as_used($token) ){
-      $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-      return $self->render( json => {
-        success => Mojo::JSON->false,
-        message => 'Token no longer is accepted.',
-      },
-      status => 500,); #Internal server error. Racecondition
-    }
-
-    my $idToUse = $self->db->selectrow_array("SELECT MAX(OrganisationalId) FROM Organisations");
-    if (defined $idToUse){
-      $idToUse++;
-    }
-    else{
-      $idToUse = 1;
-    }
-
-
-    #TODO Race condition here.
-    my $insertOrganisation = $self->db->prepare("INSERT INTO Organisations (OrganisationalId, Name, FullAddress, PostCode) VALUES (?, ?, ?, ?)");
-    my $rowsInsertedOrganisation = $insertOrganisation->execute($idToUse, $username, $fullAddress, $postcode);
-    my $insertUser = $self->db->prepare("INSERT INTO Users (OrganisationalId_FK, Email, JoinDate, HashedPassword) VALUES (?, ?, ?, ?)");
-    my $rowsInsertedUser = $insertUser->execute($idToUse, $email, $date, $hashedPassword);
-
-    return $self->render( json => { success => Mojo::JSON->true } );
+    $c->schema->txn_do( sub {
+      $c->schema->resultset('AccountToken')->find({
+        accounttokenname => $token,
+        used => 0,
+      })->update({ used => 1 });
+      $c->schema->resultset('User')->create({
+        organisation => {
+          name => $username,
+          fulladdress => $fullAddress,
+          postcode => $postcode,
+        },
+        email => $email,
+        hashedpassword => $hashedPassword,
+        joindate => DateTime->now,
+      });
+    });
   }
+
+  return $self->render( json => { success => Mojo::JSON->true } );
 }
 
 1;
-
