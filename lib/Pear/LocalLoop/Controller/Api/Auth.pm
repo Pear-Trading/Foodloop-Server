@@ -1,7 +1,7 @@
 package Pear::LocalLoop::Controller::Api::Auth;
 use Mojo::Base 'Mojolicious::Controller';
 use Data::Dumper;
-use Mojo::JSON;
+use Mojo::JSON qw/ decode_json /;
 
 has error_messages => sub {
   return {
@@ -19,6 +19,15 @@ sub auth {
   my $c = shift;
 
   my $session_key = $c->req->json( '/session_key' );
+
+  unless ( defined $session_key ) {
+    # Upload doesnt quite use json correctly....
+    my $json = $c->param('json');
+    if ( defined $json ) {
+      $json = decode_json( $json );
+      $session_key = $json->{session_key};
+    }
+  }
 
   my $session_result = $c->schema->resultset('SessionToken')->find({ sessiontokenname => $session_key });
 

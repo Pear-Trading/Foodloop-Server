@@ -38,7 +38,7 @@ The name of an organisation. Used when transactionAdditionType is 3.
 sub post_upload {
   my $self = shift;
 
-  my $userId = $self->get_active_user_id();
+  my $userId = $self->stash->{api_user}->id;
 
   my $json = $self->param('json');
   if ( ! defined $json ) {
