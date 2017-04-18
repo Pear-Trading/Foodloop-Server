@@ -40,15 +40,13 @@ has error_messages => sub {
 
 sub post_register{
   my $c = shift;
-  my $self = $c;
 
   my $validation = $c->validation;
 
-  my $json = $self->req->json;
+  my $json = $c->req->json;
 
   if ( ! defined $json ){
-    $self->app->log->debug('Path: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
+    return $c->render( json => {
       success => Mojo::JSON->false,
       message => 'No json sent.',
     },
@@ -107,10 +105,12 @@ sub post_register{
   my $postcode = $validation->param('postcode');
   my $password = $validation->param('password');
 
-  my $hashedPassword = $self->generate_hashed_password($password);
+  # TODO Replace with Password Column encoding
+  my $hashedPassword = $c->generate_hashed_password($password);
 
   if ($usertype eq 'customer'){
-    my $ageForeignKey = $self->get_age_foreign_key( $validation->param('age') );
+    # TODO replace with actually using the value on the post request
+    my $ageForeignKey = $c->get_age_foreign_key( $validation->param('age') );
 
     $c->schema->txn_do( sub {
       $c->schema->resultset('AccountToken')->find({
@@ -151,7 +151,7 @@ sub post_register{
     });
   }
 
-  return $self->render( json => { success => Mojo::JSON->true } );
+  return $c->render( json => { success => Mojo::JSON->true } );
 }
 
 1;
