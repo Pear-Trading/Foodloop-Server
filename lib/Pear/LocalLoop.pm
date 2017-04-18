@@ -272,20 +272,22 @@ $self->helper(get_session_expiry => sub {
 
 });
 
-#True for session was expire, false there was no session to expire.
-$self->helper(expire_current_session => sub {
-  my $self = shift;
+  #True for session was expire, false there was no session to expire.
+  $self->helper(expire_current_session => sub {
+    my $c = shift;
+    my $self = $c;
 
-  my $sessionToken = $self->get_session_token();
+    my $sessionToken = $self->get_session_token();
 
-  my $removeStatement = $self->db->prepare('DELETE FROM SessionTokens WHERE SessionTokenName = ?');
-  my $rowsRemoved = $removeStatement->execute($sessionToken);  
+    $c->schema->resultset('SessionToken')->search({
+      sessiontokenname => $sessionToken,
+    })->delete_all;
 
-  $self->session(expires => 1);
-  $self->session->{$self->app->config->{sessionTokenJsonName}} = $sessionToken;
+    $self->session(expires => 1);
+    $self->session->{$self->app->config->{sessionTokenJsonName}} = $sessionToken;
 
-  return $rowsRemoved != 0;
-});
+    return 1;
+  });
 
   $self->helper(is_token_unused => sub {
     my ( $c, $token ) = @_;
