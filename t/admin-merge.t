@@ -102,6 +102,7 @@ $testJson = {
 $t->post_ok('/api/login' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
+my $session_key = $t->tx->res->json('/session_key');
 
 print "test 6 - add valid transaction (type 3: new organisation)\n";
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],0,"No unverified organisations.";
@@ -115,7 +116,8 @@ $json = {
   organisationName => $nameToTestTurtle,
   streetName => "Town centre",
   town => " Wutai",
-  postcode => "NW1 W01"
+  postcode => "NW1 W01",
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -149,7 +151,7 @@ $testJson = {
 $t->post_ok('/api/login' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
-
+$session_key = $t->tx->res->json('/session_key');
 
 print "test 9 - add valid transaction (type 3: new organisation)\n";
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],1,"1 unverified organisations." ;
@@ -164,7 +166,8 @@ $json = {
   organisationName => $nameToTestTurtlePartial,
   streetName => "",
   town => "",
-  postcode => ""
+  postcode => "",
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -187,6 +190,7 @@ $json = {
   microCurrencyValue => 10,
   transactionAdditionType => 2,
   addUnvalidatedId => $newPendingTurtleOrgIdPartial,
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -206,7 +210,8 @@ $json = {
   organisationName => $nameToTestJunon,
   streetName => "Main street",
   town => "Under Junon",
-  postcode => "E6 M02"
+  postcode => "E6 M02",
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload)
@@ -227,6 +232,7 @@ $json = {
   microCurrencyValue => 20,
   transactionAdditionType => 2,
   addUnvalidatedId => $newPendingJunonOrgId,
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -243,6 +249,7 @@ $json = {
   microCurrencyValue => 30,
   transactionAdditionType => 2,
   addUnvalidatedId => $newPendingJunonOrgId,
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -273,6 +280,7 @@ $testJson = {
 $t->post_ok('/api/login' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
+$session_key = $t->tx->res->json('/session_key');
 
 print "test 16 - Admin - Approve the correctly filled out organisation.\n";
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],3,"3 unverified organisations."; 
@@ -281,6 +289,7 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef, ())}[0],0,"No verified transactions.";  
 my $json = {
   unvalidatedOrganisationId => $newPendingTurtleOrgId,
+  session_key => $session_key,
 };
 $t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(200)
@@ -310,12 +319,13 @@ $testJson = {
 $t->post_ok('/api/login' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
-
+$session_key = $t->tx->res->json('/session_key');
 
 print "test 19 - Attempt to merge own unvalidated organisation with validated one and fails.\n";
 $json = {
   unvalidatedOrganisationId => $newPendingTurtleOrgIdPartial,
   validatedOrganisationId => $turtleValidatedId,
+  session_key => $session_key,
 };
 $t->post_ok('/api/admin-merge' => json => $json)
   ->status_is(403)
@@ -341,18 +351,19 @@ $testJson = {
 $t->post_ok('/api/login' => json => $testJson)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
-
+$session_key = $t->tx->res->json('/session_key');
 
 print "test 22 - JSON is missing.\n";
 $t->post_ok('/api/admin-merge' => json)
-  ->status_is(400)
+  ->status_is(401)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/JSON is missing/i);
+  ->json_like('/message', qr/Invalid Session/);
 
 
 print "test 23 - unvalidatedOrganisationId missing.\n";
 $json = {
   validatedOrganisationId => $turtleValidatedId,
+  session_key => $session_key,
 };
 $t->post_ok('/api/admin-merge' => json => $json)
   ->status_is(400)
@@ -364,6 +375,7 @@ print "test 24 - unvalidatedOrganisationId not number.\n";
 $json = {
   unvalidatedOrganisationId => "ABC",
   validatedOrganisationId => $turtleValidatedId,
+  session_key => $session_key,
 };
 $t->post_ok('/api/admin-merge' => json => $json)
   ->status_is(400)
@@ -374,6 +386,7 @@ $t->post_ok('/api/admin-merge' => json => $json)
 print "test 25 - validatedOrganisationId missing.\n";
 $json = {
   unvalidatedOrganisationId => $newPendingTurtleOrgIdPartial,
+  session_key => $session_key,
 };
 $t->post_ok('/api/admin-merge' => json => $json)
   ->status_is(400)
@@ -385,6 +398,7 @@ print "test 26 - validatedOrganisationId not number.\n";
 $json = {
   unvalidatedOrganisationId => $newPendingTurtleOrgIdPartial,
   validatedOrganisationId => "ABC",
+  session_key => $session_key,
 };
 $t->post_ok('/api/admin-merge' => json => $json)
   ->status_is(400)
@@ -397,6 +411,7 @@ my ($maxPendingId) = $t->app->db->selectrow_array("SELECT MAX(PendingOrganisatio
 $json = {
   unvalidatedOrganisationId => ($maxPendingId + 1),
   validatedOrganisationId => $turtleValidatedId,
+  session_key => $session_key,
 };
 $t->post_ok('/api/admin-merge' => json => $json)
   ->status_is(400)
@@ -409,6 +424,7 @@ my ($maxId) = $t->app->db->selectrow_array("SELECT MAX(OrganisationalId) FROM Or
 $json = {
   unvalidatedOrganisationId => $newPendingTurtleOrgIdPartial,
   validatedOrganisationId => ($maxId + 1),
+  session_key => $session_key,
 };
 $t->post_ok('/api/admin-merge' => json => $json)
   ->status_is(400)
@@ -426,6 +442,7 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef,
 $json = {
   unvalidatedOrganisationId => $newPendingTurtleOrgIdPartial,
   validatedOrganisationId => $turtleValidatedId,
+  session_key => $session_key,
 };
 $t->post_ok('/api/admin-merge' => json => $json)
   ->status_is(200)
