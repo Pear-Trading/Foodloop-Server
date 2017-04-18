@@ -92,6 +92,8 @@ $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200) 
   ->json_is('/success', Mojo::JSON->true);
 
+my $session_key;
+
 sub login_rufus {
   $testJson = {
     'email' => $emailRufus,
@@ -100,6 +102,7 @@ sub login_rufus {
   $t->post_ok('/api/login' => json => $testJson)
     ->status_is(200)
     ->json_is('/success', Mojo::JSON->true);
+  $session_key = $t->tx->res->json('/session_key');
 };
 
 sub login_billy {
@@ -110,6 +113,7 @@ sub login_billy {
   $t->post_ok('/api/login' => json => $testJson)
     ->status_is(200)
     ->json_is('/success', Mojo::JSON->true);
+  $session_key = $t->tx->res->json('/session_key');
 };
 
 sub log_out{
@@ -133,7 +137,8 @@ $json = {
   organisationName => 'Shoreway Fisheries',
   streetName => "2 James St",
   town => "Lancaster",
-  postcode => "LA1 1UP"
+  postcode => "LA1 1UP",
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -159,7 +164,8 @@ $json = {
   organisationName => 'The Palatine Bar',
   streetName => "The Crescent",
   town => "Morecambe",
-  postcode => "LA4 5BZ"
+  postcode => "LA4 5BZ",
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -173,7 +179,8 @@ $json = {
   organisationName => 'The Sun Hotel & Bar',
   streetName => "63-65 Church Street",
   town => "Lancaster",
-  postcode => "LA1 1ET"
+  postcode => "LA1 1ET",
+  session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -193,7 +200,10 @@ print "test 10 - Login - Rufus (cookies, customer)\n";
 login_rufus();
 
 print "test 11 - search blank\n";
-$t->post_ok('/api/search' => json => {searchName => " "})
+$t->post_ok('/api/search' => json => {
+    searchName => " ",
+    session_key => $session_key,
+  })
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/searchName is blank/i);
@@ -201,7 +211,10 @@ $t->post_ok('/api/search' => json => {searchName => " "})
 sub check_vars{
   my ($searchTerm, $numValidated, $numUnvalidated) = @_;
 
-  $t->post_ok('/api/search' => json => {searchName => $searchTerm})
+  $t->post_ok('/api/search' => json => {
+      searchName => $searchTerm,
+      session_key => $session_key,
+    })
     ->status_is(200)
     ->json_is('/success', Mojo::JSON->true)
     ->json_has("unvalidated")
