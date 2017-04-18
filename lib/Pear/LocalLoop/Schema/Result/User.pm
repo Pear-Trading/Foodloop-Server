@@ -181,7 +181,7 @@ Related object: L<Pear::LocalLoop::Schema::Result::Organisation>
 =cut
 
 __PACKAGE__->belongs_to(
-  "organisationalid_fk",
+  "organisation",
   "Pear::LocalLoop::Schema::Result::Organisation",
   { organisationalid => "organisationalid_fk" },
   {
