@@ -14,20 +14,22 @@ sub index {
   $c->stash( users => [ $user_rs->all ] );
 }
 
-sub create {
-  my $c = shift;
-}
-
 sub read {
   my $c = shift;
+
+  my $id = $c->param('id');
+
+  if ( my $user = $c->result_set->find($id) ) {
+    $c->stash( user => $user );
+  } else {
+    $c->flash( error => 'No User found' );
+    $c->redirect_to( '/admin/users' );
+  }
 }
 
 sub update {
   my $c = shift;
-}
-
-sub delete {
-  my $c = shift;
+  $c->redirect_to( '/admin/users' );
 }
 
 1;

@@ -110,7 +110,6 @@ sub startup {
   $admin_routes->post('/tokens/:id')->to('admin-tokens#update');
   $admin_routes->post('/tokens/:id/delete')->to('admin-tokens#delete');
   $admin_routes->get('/users')->to('admin-users#index');
-  $admin_routes->post('/users')->to('admin-users#create');
   $admin_routes->get('/users/:id')->to('admin-users#read');
   $admin_routes->post('/users/:id')->to('admin-users#update');
   $admin_routes->post('/users/:id/delete')->to('admin-users#delete');
