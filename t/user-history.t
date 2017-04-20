@@ -159,15 +159,15 @@ login_reno();
 print "test 6 - Reno spends at Turtle\'s Paradise\n";
 my $nameToTestTurtle = 'Turtle\'s Paradise';
 $json = {
-  microCurrencyValue => 10,
-  transactionAdditionType => 3,
-  organisationName => $nameToTestTurtle,
-  streetName => "Town centre",
+  transaction_value => 10,
+  transaction_type => 3,
+  organisation_name => $nameToTestTurtle,
+  street_name => "Town centre",
   town => " Wutai",
   postcode => "NW11 8AD",
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
@@ -178,24 +178,24 @@ Time::Fake->offset("+" . $dateTimePlusTwoDaysSecondsDiff . "s");
 
 print "test 7 - Reno spends at Turtle\'s Paradise, 2 days later, transaction 1/2\n";
 $json = {
-  microCurrencyValue => 20,
-  transactionAdditionType => 2,
-  addUnvalidatedId => $unvalidatedOrganisationId,
+  transaction_value => 20,
+  transaction_type => 2,
+  organisation_id => $unvalidatedOrganisationId,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
 print "test 8 - Reno spends at Turtle\'s Paradise, 2 days later, transaction 2/2\n";
 $json = {
-  microCurrencyValue => 40,
-  transactionAdditionType => 2,
-  addUnvalidatedId => $unvalidatedOrganisationId,
+  transaction_value => 40,
+  transaction_type => 2,
+  organisation_id => $unvalidatedOrganisationId,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
@@ -211,12 +211,12 @@ login_reno();
 
 print "test 11 - Reno spends at Turtle\'s Paradise, 1 month later\n";
 $json = {
-  microCurrencyValue => 80,
-  transactionAdditionType => 2,
-  addUnvalidatedId => $unvalidatedOrganisationId,
+  transaction_value => 80,
+  transaction_type => 2,
+  organisation_id => $unvalidatedOrganisationId,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
@@ -232,12 +232,12 @@ login_reno();
 
 print "test 14 - Reno spends at Turtle\'s Paradise, 1 year later\n";
 $json = {
-  microCurrencyValue => 160,
-  transactionAdditionType => 2,
-  addUnvalidatedId => $unvalidatedOrganisationId,
+  transaction_value => 160,
+  transaction_type => 2,
+  organisation_id => $unvalidatedOrganisationId,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
@@ -271,12 +271,12 @@ login_chocobilly();
 print "test 20 - Chocobilly spends at Turtle\'s Paradise, 2 days later\n";
 #Added to test and see if the later values from different users merge together. They shouldn't
 $json = {
-  microCurrencyValue => 320,
-  transactionAdditionType => 1,
-  addValidatedId => $validatedOrganisationId,
+  transaction_value => 320,
+  transaction_type => 1,
+  organisation_id => $validatedOrganisationId,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);

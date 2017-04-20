@@ -4,7 +4,7 @@ use Data::Dumper;
 
 =head2 post_upload
 
-Takes a file upload, with a file key of 'file2', and a json string under the
+Takes a file upload, with a file key of 'file', and a json string under the
 'json' key.
 
 The json string should be an object, with the following keys:
@@ -45,30 +45,25 @@ The postcode of an organisation, optional key. Used when transaction_Type is 3.
 
 has error_messages => sub {
   return {
-    transactionAdditionType => {
-      required => { message => 'transactionAdditionType is missing.', status => 400 },
-      in => { message => 'transactionAdditionType is not a valid value.', status => 400 },
+    transaction_type => {
+      required => { message => 'transaction_type is missing.', status => 400 },
+      in => { message => 'transaction_type is not a valid value.', status => 400 },
     },
-    microCurrencyValue => {
-      required => { message => 'microCurrencyValue is missing', status => 400 },
-      number => { message => 'microCurrencyValue does not look like a number', status => 400 },
-      gt_num => { message => 'microCurrencyValue cannot be equal to or less than zero', status => 400 },
+    transaction_value => {
+      required => { message => 'transaction_value is missing', status => 400 },
+      number => { message => 'transaction_value does not look like a number', status => 400 },
+      gt_num => { message => 'transaction_value cannot be equal to or less than zero', status => 400 },
     },
-    file2 => {
+    file => {
       required => { message => 'No file uploaded', status => 400 },
     },
-    addValidatedId => {
-      required => { message => 'addValidatedId is missing', status => 400 },
+    organisation_id => {
+      required => { message => 'organisation_id is missing', status => 400 },
       number => { message => 'organisation_id is not a number', status => 400 },
-      in_resultset => { message => 'addValidatedId does not exist in the database', status => 400 },
+      in_resultset => { message => 'organisation_id does not exist in the database', status => 400 },
     },
-    addUnvalidatedId => {
-      required => { message => 'addUnvalidatedId is missing', status => 400 },
-      number => { message => 'addUnvalidatedId does not look like a number', status => 400 },
-      in_resultset => { message => 'addUnvalidatedId does not exist in the database for the user', status => 400 },
-    },
-    organisationName => {
-      required => { message => 'organisationName is missing', status => 400 },
+    organisation_name => {
+      required => { message => 'organisation_name is missing', status => 400 },
     },
   };
 };
@@ -82,44 +77,43 @@ sub post_upload {
   my $validation = $c->validation;
 
   # Test for file before loading the JSON in to the validator
-  $validation->required('file2');
+  $validation->required('file');
 
   $validation->input( $c->stash->{api_json} );
 
-  $validation->required('microCurrencyValue')->number->gt_num(0);
-  $validation->required('transactionAdditionType')->in( 1, 2, 3 );
+  $validation->required('transaction_value')->number->gt_num(0);
+  $validation->required('transaction_type')->in( 1, 2, 3 );
 
   # First pass of required items
   return $c->api_validation_error if $validation->has_error;
 
-  my $type = $validation->param('transactionAdditionType');
+  my $type = $validation->param('transaction_type');
 
   if ( $type == 1 ) {
     # Validated Organisation
     my $valid_org_rs = $c->schema->resultset('Organisation');
-    $validation->required('addValidatedId')->number->in_resultset( 'organisationalid', $valid_org_rs );
+    $validation->required('organisation_id')->number->in_resultset( 'organisationalid', $valid_org_rs );
   } elsif ( $type == 2 ) {
     # Unvalidated Organisation
     my $valid_org_rs = $c->schema->resultset('PendingOrganisation')->search({ usersubmitted_fk => $user->id });
-    $validation->required('addUnvalidatedId')->number->in_resultset( 'pendingorganisationid', $valid_org_rs );
+    $validation->required('organisation_id')->number->in_resultset( 'pendingorganisationid', $valid_org_rs );
   } elsif ( $type == 3 ) {
     # Unknown Organisation
-    $validation->required('organisationName');
-    $validation->optional('streetName');
+    $validation->required('organisation_name');
+    $validation->optional('street_name');
     $validation->optional('town');
     $validation->optional('postcode')->postcode;
   }
 
   return $c->api_validation_error if $validation->has_error;
 
-  my $transactionAdditionType = $type;
-  my $microCurrencyValue = $validation->param('microCurrencyValue');
+  my $transaction_value = $validation->param('transaction_value');
 
   my $json = $c->stash->{api_json};
 
   my $userId = $user->id;
  
-  my $file = $self->req->upload('file2');
+  my $file = $self->req->upload('file');
 
   my $ext = '.jpg';
   my $uuid = Data::UUID->new->create_str;
@@ -140,8 +134,8 @@ sub post_upload {
     # Validated organisation
     $c->schema->resultset('Transaction')->create({
       buyeruserid_fk => $user->id,
-      sellerorganisationid_fk => $validation->param('addValidatedId'),
-      valuemicrocurrency => $microCurrencyValue,
+      sellerorganisationid_fk => $validation->param('organisation_id'),
+      valuemicrocurrency => $transaction_value,
       proofimage => $filename,
       timedatesubmitted => DateTime->now,
     });
@@ -151,23 +145,23 @@ sub post_upload {
     # Unvalidated Organisation
     $c->schema->resultset('PendingTransaction')->create({
       buyeruserid_fk => $user->id,
-      pendingsellerorganisationid_fk => $validation->param('addUnvalidatedId'),
-      valuemicrocurrency => $microCurrencyValue,
+      pendingsellerorganisationid_fk => $validation->param('organisation_id'),
+      valuemicrocurrency => $transaction_value,
       proofimage => $filename,
       timedatesubmitted => DateTime->now,
     });
 
     $file->move_to('images/' . $filename);
   } elsif ( $type == 3 ) {
-    my $organisationName = $validation->param('organisationName');
-    my $streetName = $validation->param('streetName');
+    my $organisation_name = $validation->param('organisation_name');
+    my $street_name = $validation->param('street_name');
     my $town = $validation->param('town');
     my $postcode = $validation->param('postcode');
 
     my $fullAddress = "";
 
-    if ( defined $streetName && ! ($streetName =~ m/^\s*$/) ){
-      $fullAddress = $streetName;
+    if ( defined $street_name && ! ($street_name =~ m/^\s*$/) ){
+      $fullAddress = $street_name;
     }
 
     if ( defined $town && ! ($town =~ m/^\s*$/) ){
@@ -183,7 +177,7 @@ sub post_upload {
     my $pending_org = $c->schema->resultset('PendingOrganisation')->create({
       usersubmitted_fk => $user->id,
       timedatesubmitted => DateTime->now,
-      name => $organisationName,
+      name => $organisation_name,
       fulladdress => $fullAddress,
       postcode => $postcode,
     });
@@ -191,7 +185,7 @@ sub post_upload {
     $c->schema->resultset('PendingTransaction')->create({
       buyeruserid_fk => $user->id,
       pendingsellerorganisationid_fk => $pending_org->pendingorganisationid,
-      valuemicrocurrency => $microCurrencyValue,
+      valuemicrocurrency => $transaction_value,
       proofimage => $filename,
       timedatesubmitted => DateTime->now,
     });

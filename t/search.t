@@ -132,15 +132,15 @@ login_rufus();
 
 print "test 4 - Added something containing 'fish'\n";
 $json = {
-  microCurrencyValue => 10,
-  transactionAdditionType => 3,
-  organisationName => 'Shoreway Fisheries',
-  streetName => "2 James St",
+  transaction_value => 10,
+  transaction_type => 3,
+  organisation_name => 'Shoreway Fisheries',
+  street_name => "2 James St",
   town => "Lancaster",
   postcode => "LA1 1UP",
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
@@ -159,30 +159,30 @@ login_billy();
 
 print "test 7 - Added something containing 'bar'\n";
 $json = {
-  microCurrencyValue => 10,
-  transactionAdditionType => 3,
-  organisationName => 'The Palatine Bar',
-  streetName => "The Crescent",
+  transaction_value => 10,
+  transaction_type => 3,
+  organisation_name => 'The Palatine Bar',
+  street_name => "The Crescent",
   town => "Morecambe",
   postcode => "LA4 5BZ",
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
 print "test 8 - Added another thing containing 'bar'\n";
 $json = {
-  microCurrencyValue => 10,
-  transactionAdditionType => 3,
-  organisationName => 'The Sun Hotel & Bar',
-  streetName => "63-65 Church Street",
+  transaction_value => 10,
+  transaction_type => 3,
+  organisation_name => 'The Sun Hotel & Bar',
+  street_name => "63-65 Church Street",
   town => "Lancaster",
   postcode => "LA1 1ET",
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);

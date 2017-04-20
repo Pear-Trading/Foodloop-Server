@@ -113,15 +113,15 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef, ())}[0],0,"No verified transactions." ;
 my $nameToTestTurtle = 'Turtle\'s Paradise';
 $json = {
-  microCurrencyValue => 20,
-  transactionAdditionType => 3,
-  organisationName => $nameToTestTurtle,
-  streetName => "Town centre",
+  transaction_value => 20,
+  transaction_type => 3,
+  organisation_name => $nameToTestTurtle,
+  street_name => "Town centre",
   town => " Wutai",
   postcode => "NW1 5RU",
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
@@ -172,15 +172,15 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef, ())}[0],0,"No verified transactions." ;
 my $nameToTestKalm = 'Kalm Inn';
 $json = {
-  microCurrencyValue => 10,
-  transactionAdditionType => 3,
-  organisationName => $nameToTestKalm,
-  streetName => "Town centre",
+  transaction_value => 10,
+  transaction_type => 3,
+  organisation_name => $nameToTestKalm,
+  street_name => "Town centre",
   town => "Kalm",
   postcode => "NW11 7GZ",
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
@@ -195,12 +195,12 @@ my $newPendingKalmOrgId = $t->app->schema->resultset('PendingOrganisation')->fin
 
 print "test 11 - add valid transaction (type 2: unvalidated organisation)\n";
 $json = {
-  microCurrencyValue => 10,
-  transactionAdditionType => 2,
-  addUnvalidatedId => $newPendingKalmOrgId,
+  transaction_value => 10,
+  transaction_type => 2,
+  organisation_id => $newPendingKalmOrgId,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
@@ -212,15 +212,15 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef,
 print "test 12 - add valid transaction (type 3: new organisation)\n";
 my $nameToTestJunon = 'Store';
 $json = {
-  microCurrencyValue => 10,
-  transactionAdditionType => 3,
-  organisationName => $nameToTestJunon,
-  streetName => "Main street",
+  transaction_value => 10,
+  transaction_type => 3,
+  organisation_name => $nameToTestJunon,
+  street_name => "Main street",
   town => "Under Junon",
   postcode => "NW1W 7GF",
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
@@ -236,12 +236,12 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef,
 
 print "test 13 - add valid transaction (type 2: unvalidated organisation)\n";
 $json = {
-  microCurrencyValue => 20,
-  transactionAdditionType => 2,
-  addUnvalidatedId => $newPendingJunonOrgId,
+  transaction_value => 20,
+  transaction_type => 2,
+  organisation_id => $newPendingJunonOrgId,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
@@ -254,12 +254,12 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef,
 
 print "test 14 - add valid transaction (type 2: unvalidated organisation)\n";
 $json = {
-  microCurrencyValue => 30,
-  transactionAdditionType => 2,
-  addUnvalidatedId => $newPendingJunonOrgId,
+  transaction_value => 30,
+  transaction_type => 2,
+  organisation_id => $newPendingJunonOrgId,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
