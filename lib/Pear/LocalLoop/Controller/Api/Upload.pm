@@ -56,6 +56,8 @@ has error_messages => sub {
     },
     file => {
       required => { message => 'No file uploaded', status => 400 },
+      upload => { message => 'No file uploaded', status => 400 },
+      filetype => { message => 'File must be of type image/jpeg', status => 400 },
     },
     organisation_id => {
       required => { message => 'organisation_id is missing', status => 400 },
@@ -77,7 +79,7 @@ sub post_upload {
   my $validation = $c->validation;
 
   # Test for file before loading the JSON in to the validator
-  $validation->required('file');
+  $validation->required('file')->upload->filetype('image/jpeg');
 
   $validation->input( $c->stash->{api_json} );
 
@@ -109,27 +111,12 @@ sub post_upload {
 
   my $transaction_value = $validation->param('transaction_value');
 
-  my $json = $c->stash->{api_json};
-
-  my $userId = $user->id;
- 
-  my $file = $self->req->upload('file');
+  my $file = $validation->param('file');
 
   my $ext = '.jpg';
   my $uuid = Data::UUID->new->create_str;
   my $filename = $uuid . $ext;
 
-  #TODO Check for valid image file.
-#  my $headers = $file->headers->content_type;
-#  $self->app->log->debug( "content type: " . Dumper $headers );
-  #Is content type wrong?
-#  if ($headers ne 'image/jpeg') {
-#    return $self->render( json => {
-#    success => Mojo::JSON->false,
-#      message => 'Wrong image extension!',
-#    }, status => 400);
-#  };
-  
   if ( $type == 1 ) {
     # Validated organisation
     $c->schema->resultset('Transaction')->create({

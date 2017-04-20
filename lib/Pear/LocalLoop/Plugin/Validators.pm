@@ -4,6 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Email::Valid;
 use Geo::UK::Postcode;
 use Scalar::Util qw/ looks_like_number /;
+use File::Basename;
 
 sub register {
   my ( $plugin, $app, $conf ) = @_;
@@ -36,6 +37,13 @@ sub register {
   $app->validator->add_check( gt_num => sub {
     my ( $validation, $name, $value, $check ) = @_;
     return $value > $check ? undef : 1;
+  });
+
+  $app->validator->add_check( filetype => sub {
+    my ( $validation, $name, $value, $filetype ) = @_;
+    my ( undef, undef, $extension ) = fileparse $value->filename, qr/\.[^.]*/;
+    $extension =~ s/^\.//;
+    return $app->types->type($extension) eq $filetype ? undef : 1;
   });
 }
 
