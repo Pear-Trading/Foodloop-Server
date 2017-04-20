@@ -15,25 +15,39 @@ has error_messages => sub {
   };
 };
 
+sub check_json {
+  my $c = shift;
+
+  # JSON object is either the whole request, or under a json param for upload
+  my $json = $c->req->json || decode_json( $c->param('json') || '{}' );
+
+  unless ( defined $json && ref $json eq 'HASH' && scalar( keys %$json ) > 0 ) {
+    $c->render(
+      json => {
+        success => Mojo::JSON->false,
+        message => 'JSON is missing.',
+      },
+      status => 400,
+    );
+    return 0;
+  }
+
+  $c->stash( api_json => $json );
+  return 1;
+}
+
 sub auth {
   my $c = shift;
 
-  my $session_key = $c->req->json( '/session_key' );
+  my $session_key = $c->stash->{api_json}->{session_key};
 
-  unless ( defined $session_key ) {
-    # Upload doesnt quite use json correctly....
-    my $json = $c->param('json');
-    if ( defined $json ) {
-      $json = decode_json( $json );
-      $session_key = $json->{session_key};
+  if ( defined $session_key ) {
+    my $session_result = $c->schema->resultset('SessionToken')->find({ sessiontokenname => $session_key });
+
+    if ( defined $session_result ) {
+      $c->stash( api_user => $session_result->user );
+      return 1;
     }
-  }
-
-  my $session_result = $c->schema->resultset('SessionToken')->find({ sessiontokenname => $session_key });
-
-  if ( defined $session_result ) {
-    $c->stash( api_user => $session_result->user );
-    return 1;
   }
 
   $c->render(
@@ -51,36 +65,14 @@ sub post_login {
 
   my $validation = $c->validation;
 
-  my $json = $c->req->json;
-
-  if ( ! defined $json ){
-    return $c->render( json => {
-      success => Mojo::JSON->false,
-      message => 'No json sent.',
-    },
-    status => 400); #Malformed request   
-  }
-
-  $validation->input( $json );
+  $validation->input( $c->stash->{api_json} );
   $validation->required('email')->email;
   $validation->required('password');
 
+  return $c->api_validation_error if $validation->has_error;
+
   my $email = $validation->param('email');
   my $password = $validation->param('password');
-
-  if ( $validation->has_error ) {
-    my $failed_vals = $validation->failed;
-    for my $val ( @$failed_vals ) {
-      my $check = shift @{ $validation->error($val) };
-      return $c->render(
-        json => {
-          success => Mojo::JSON->false,
-          message => $c->error_messages->{$val}->{$check}->{message},
-        },
-        status => $c->error_messages->{$val}->{$check}->{status},
-      );
-    }
-  }
 
   my $user_result = $c->schema->resultset('User')->find({ email => $email });
   

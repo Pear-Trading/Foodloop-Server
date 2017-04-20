@@ -3,6 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Email::Valid;
 use Geo::UK::Postcode;
+use Scalar::Util qw/ looks_like_number /;
 
 sub register {
   my ( $plugin, $app, $conf ) = @_;
@@ -25,6 +26,16 @@ sub register {
   $app->validator->add_check( postcode => sub {
     my ( $validation, $name, $value ) = @_;
     return Geo::UK::Postcode->new( $value )->valid ? undef : 1;
+  });
+
+  $app->validator->add_check( number => sub {
+    my ( $validation, $name, $value ) = @_;
+    return looks_like_number( $value ) ? undef : 1;
+  });
+
+  $app->validator->add_check( gt_num => sub {
+    my ( $validation, $name, $value, $check ) = @_;
+    return $value > $check ? undef : 1;
   });
 }
 

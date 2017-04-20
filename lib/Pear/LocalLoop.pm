@@ -51,6 +51,20 @@ sub startup {
   $self->helper( db => sub { $self->app->schema->storage->dbh });
   $self->helper( schema => sub { $self->app->schema });
 
+  $self->helper( api_validation_error => sub {
+    my $c = shift;
+    my $failed_vals = $c->validation->failed;
+    for my $val ( @$failed_vals ) {
+      my $check = shift @{ $c->validation->error($val) };
+      return $c->render(
+        json => {
+          success => Mojo::JSON->false,
+          message => $c->error_messages->{$val}->{$check}->{message},
+        },
+        status => $c->error_messages->{$val}->{$check}->{status},
+      );
+    }
+  });
 
   my $r = $self->routes;
   $r->get('/')->to('root#index');
@@ -60,11 +74,14 @@ sub startup {
   $r->any('/logout')->to('root#auth_logout');
 
   # Always available api routes
-  $r->post('api/login')->to('api-auth#post_login');
-  $r->post('api/register')->to('api-register#post_register');
-  $r->post('api/logout')->to('api-auth#post_logout');
+  my $api_public = $r->under('/api')->to('api-auth#check_json');
 
-  my $api = $r->under('/api')->to('api-auth#auth');
+  $api_public->post('/login')->to('api-auth#post_login');
+  $api_public->post('/register')->to('api-register#post_register');
+  $api_public->post('/logout')->to('api-auth#post_logout');
+
+  # Private, must be authenticated api routes
+  my $api = $api_public->under('/')->to('api-auth#auth');
 
   $api->post('/' => sub {
     return shift->render( json => {

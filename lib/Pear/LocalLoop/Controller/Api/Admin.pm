@@ -2,9 +2,28 @@ package Pear::LocalLoop::Controller::Api::Admin;
 use Mojo::Base 'Mojolicious::Controller';
 use Data::Dumper;
 
+sub auth {
+  my $c = shift;
+
+  if ( defined $c->stash->{ api_user }->administrator ) {
+    return 1;
+  }
+
+  $c->render(
+    json => {
+      success => Mojo::JSON->false,
+      message => 'Not Authorised',
+    },
+    status => 403,
+  );
+  return 0;
+}
 
 sub post_admin_approve {
-  my $self = shift;
+  my $c = shift;
+  my $self = $c;
+
+  my $user = $c->stash->{ api_user };
 
   my $userId = $self->get_active_user_id();
   if ( ! $self->is_admin($userId) ) {

@@ -11,97 +11,115 @@ The json string should be an object, with the following keys:
 
 =over
 
-=item * microCurrencyValue
+=item * transaction_value
 
 The value of the transaction
 
-=item * transactionAdditionType
+=item * transaction_type
 
 Is a value of 1, 2, or 3 - depending on the type of transaction.
 
-=item * addValidatedId
+=item * organisation_id
 
-An ID of a valid organisation. used when transactionAdditionType is 1.
+An ID of a valid organisation. used when transaction_type is 1 or 2.
 
-=item * addUnvalidatedId
+=item * organisation_name
 
-An ID of an unvalidated organisation. Used when transactionAdditionType is 2.
+The name of an organisation. Used when transaction_type is 3.
 
-=item * organisationName
+=item * street_name
 
-The name of an organisation. Used when transactionAdditionType is 3.
+The street of an organisation, optional key. Used when transaction_type is 3.
+
+=item * town
+
+The village/town/city of an organisation. Used when transaction_type is 3.
+
+=item * postcode
+
+The postcode of an organisation, optional key. Used when transaction_Type is 3.
 
 =back
 
 =cut
 
+has error_messages => sub {
+  return {
+    transactionAdditionType => {
+      required => { message => 'transactionAdditionType is missing.', status => 400 },
+      in => { message => 'transactionAdditionType is not a valid value.', status => 400 },
+    },
+    microCurrencyValue => {
+      required => { message => 'microCurrencyValue is missing', status => 400 },
+      number => { message => 'microCurrencyValue does not look like a number', status => 400 },
+      gt_num => { message => 'microCurrencyValue cannot be equal to or less than zero', status => 400 },
+    },
+    file2 => {
+      required => { message => 'No file uploaded', status => 400 },
+    },
+    addValidatedId => {
+      required => { message => 'addValidatedId is missing', status => 400 },
+      number => { message => 'organisation_id is not a number', status => 400 },
+      in_resultset => { message => 'addValidatedId does not exist in the database', status => 400 },
+    },
+    addUnvalidatedId => {
+      required => { message => 'addUnvalidatedId is missing', status => 400 },
+      number => { message => 'addUnvalidatedId does not look like a number', status => 400 },
+      in_resultset => { message => 'addUnvalidatedId does not exist in the database for the user', status => 400 },
+    },
+    organisationName => {
+      required => { message => 'organisationName is missing', status => 400 },
+    },
+  };
+};
+
 sub post_upload {
-  my $self = shift;
+  my $c = shift;
+  my $self = $c;
 
-  my $userId = $self->stash->{api_user}->id;
+  my $user = $c->stash->{api_user};
 
-  my $json = $self->param('json');
-  if ( ! defined $json ) {
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'JSON is missing.',
-    },
-    status => 400,); #Malformed request   
+  my $validation = $c->validation;
+
+  # Test for file before loading the JSON in to the validator
+  $validation->required('file2');
+
+  $validation->input( $c->stash->{api_json} );
+
+  $validation->required('microCurrencyValue')->number->gt_num(0);
+  $validation->required('transactionAdditionType')->in( 1, 2, 3 );
+
+  # First pass of required items
+  return $c->api_validation_error if $validation->has_error;
+
+  my $type = $validation->param('transactionAdditionType');
+
+  if ( $type == 1 ) {
+    # Validated Organisation
+    my $valid_org_rs = $c->schema->resultset('Organisation');
+    $validation->required('addValidatedId')->number->in_resultset( 'organisationalid', $valid_org_rs );
+  } elsif ( $type == 2 ) {
+    # Unvalidated Organisation
+    my $valid_org_rs = $c->schema->resultset('PendingOrganisation')->search({ usersubmitted_fk => $user->id });
+    $validation->required('addUnvalidatedId')->number->in_resultset( 'pendingorganisationid', $valid_org_rs );
+  } elsif ( $type == 3 ) {
+    # Unknown Organisation
+    $validation->required('organisationName');
+    $validation->optional('streetName');
+    $validation->optional('town');
+    $validation->optional('postcode')->postcode;
   }
 
-  $json = Mojo::JSON::decode_json($json);
-  $self->app->log->debug( "JSON: " . Dumper $json );
-  
-  my $microCurrencyValue = $json->{microCurrencyValue};
-  if ( ! defined $microCurrencyValue ) {
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'microCurrencyValue is missing.',
-    },
-    status => 400,); #Malformed request   
-  }
-  #Is valid number
-  elsif (! Scalar::Util::looks_like_number($microCurrencyValue)){
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'microCurrencyValue does not look like a number.',
-    },
-    status => 400,); #Malformed request   
-  }
-  #Is the number range valid.
-  elsif ($microCurrencyValue <= 0){
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'microCurrencyValue cannot be equal to or less than zero.',
-    },
-    status => 400,); #Malformed request   
-  }
+  return $c->api_validation_error if $validation->has_error;
 
-  my $transactionAdditionType = $json->{transactionAdditionType};
-  if ( ! defined $transactionAdditionType ) {
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'transactionAdditionType is missing.',
-    },
-    status => 400,); #Malformed request   
-  }
+  my $transactionAdditionType = $type;
+  my $microCurrencyValue = $validation->param('microCurrencyValue');
 
+  my $json = $c->stash->{api_json};
+
+  my $userId = $user->id;
+ 
   my $file = $self->req->upload('file2');
-  $self->app->log->debug( "file: " . Dumper $file );
-
-  if (! defined $file) {
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'no file uploaded.',
-    },
-    status => 400,); #Malformed request   
-  }
 
   my $ext = '.jpg';
   my $uuid = Data::UUID->new->create_str;
@@ -118,185 +136,72 @@ sub post_upload {
 #    }, status => 400);
 #  };
   
-  #Add validated organisation.
-  if ($transactionAdditionType == 1){
+  if ( $type == 1 ) {
+    # Validated organisation
+    $c->schema->resultset('Transaction')->create({
+      buyeruserid_fk => $user->id,
+      sellerorganisationid_fk => $validation->param('addValidatedId'),
+      valuemicrocurrency => $microCurrencyValue,
+      proofimage => $filename,
+      timedatesubmitted => DateTime->now,
+    });
 
-    my $addValidatedId = $json->{addValidatedId};
-    if (! defined $addValidatedId){
-      $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-      return $self->render( json => {
-        success => Mojo::JSON->false,
-        message => 'addValidatedId is missing.',
-      },
-      status => 400,); #Malformed request   
+    $file->move_to('images/' . $filename);
+  } elsif ( $type == 2 ) {
+    # Unvalidated Organisation
+    $c->schema->resultset('PendingTransaction')->create({
+      buyeruserid_fk => $user->id,
+      pendingsellerorganisationid_fk => $validation->param('addUnvalidatedId'),
+      valuemicrocurrency => $microCurrencyValue,
+      proofimage => $filename,
+      timedatesubmitted => DateTime->now,
+    });
+
+    $file->move_to('images/' . $filename);
+  } elsif ( $type == 3 ) {
+    my $organisationName = $validation->param('organisationName');
+    my $streetName = $validation->param('streetName');
+    my $town = $validation->param('town');
+    my $postcode = $validation->param('postcode');
+
+    my $fullAddress = "";
+
+    if ( defined $streetName && ! ($streetName =~ m/^\s*$/) ){
+      $fullAddress = $streetName;
     }
 
-    if (! $self->does_organisational_id_exist($addValidatedId)){
-      $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-      return $self->render( json => {
-        success => Mojo::JSON->false,
-        message => 'addValidatedId does not exist in the database.',
-      },
-      status => 400,); #Malformed request   
-    }
-  
-    my $time = time();
-    my $statement = $self->db->prepare("INSERT INTO Transactions (BuyerUserId_FK, SellerOrganisationId_FK, ValueMicroCurrency, ProofImage, TimeDateSubmitted) VALUES (?, ?, ?, ?, ?)");
-    my $rowsAdded = $statement->execute($userId, $addValidatedId, $microCurrencyValue, $filename, $time);
-    
-    #It was successful.
-    if ($rowsAdded != 0) {
-      $file->move_to('images/' . $filename);
-      $self->app->log->debug('Path Success: file:' . __FILE__ . ', line: ' . __LINE__);
-      return $self->render( json => {
-        success => Mojo::JSON->true,
-        message => 'Added transaction for validated organisation.',
-      },
-      status => 200,);
-    }
-    #TODO Untested, not quite sure how to test it.
-    else {
-      $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-      return $self->render( json => {
-        success => Mojo::JSON->false,
-        message => 'An unknown error occurred when adding the transaction.',
-      },
-      status => 500,);   
-    } 
-  }
-  #2 and 3 are similar by the adding of a transaction at the end.
-  elsif ($transactionAdditionType == 2 || $transactionAdditionType == 3){
-
-    my $unvalidatedOrganisationId = undef;
-
-    if ($transactionAdditionType == 2){
-      $self->app->log->debug('Path: file:' . __FILE__ . ', line: ' . __LINE__);
-
-      $unvalidatedOrganisationId = $json->{addUnvalidatedId};
-      if (! defined $unvalidatedOrganisationId){
-        $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-        return $self->render( json => {
-          success => Mojo::JSON->false,
-          message => 'addUnvalidatedId is missing.',
-        },
-        status => 400,); #Malformed request   
-      } 
-      elsif (! Scalar::Util::looks_like_number($unvalidatedOrganisationId)){
-        $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-        return $self->render( json => {
-          success => Mojo::JSON->false,
-          message => 'addUnvalidatedId does not look like a number.',
-        },
-        status => 400,); #Malformed request   
-      }
-
-      my ($existsRef) = $self->db->selectrow_array("SELECT COUNT(PendingOrganisationId) FROM PendingOrganisations WHERE PendingOrganisationId = ? AND UserSubmitted_FK = ?",undef,($unvalidatedOrganisationId, $userId));
-      if ($existsRef == 0) {
-        $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-        return $self->render( json => {
-          success => Mojo::JSON->false,
-          message => 'addUnvalidatedId does not exist in the database for the user.',
-        },
-        status => 400,); #Malformed request 
-      }
-
-    }
-    #type need to add a organisation for type 3.
-    else{ # ($transactionAdditionType == 3)
-      $self->app->log->debug('Path: file:' . __FILE__ . ', line: ' . __LINE__);
-
-      #TODO more validation.
-      my $organisationName = $json->{organisationName};
-      if (! defined $organisationName){
-        $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-        return $self->render( json => {
-          success => Mojo::JSON->false,
-          message => 'organisationName is missing.',
-        },
-        status => 400,); #Malformed request   
-      }      
-
-      #TODO validation.
-      #TODO check which ones are present.
-      my $streetName = $json->{streetName};
-      my $town = $json->{town};
-      my $postcode = $json->{postcode};
-
-      ($unvalidatedOrganisationId) = $self->db->selectrow_array("SELECT MAX(PendingOrganisationId) FROM PendingOrganisations",undef,());
-      if (defined $unvalidatedOrganisationId){
-        $unvalidatedOrganisationId++;
+    if ( defined $town && ! ($town =~ m/^\s*$/) ){
+      if ($fullAddress eq ""){
+        $fullAddress = $town;
       }
       else{
-        $unvalidatedOrganisationId = 1;
+        $fullAddress = $fullAddress . ", " . $town;          
       }
 
-      my $fullAddress = "";
-      
-      if ( defined $streetName && ! ($streetName =~ m/^\s*$/) ){
-        $fullAddress = $streetName;
-      }
-
-      if ( defined $town && ! ($town =~ m/^\s*$/) ){
-        if ($fullAddress eq ""){
-          $fullAddress = $town;
-        }
-        else{
-          $fullAddress = $fullAddress . ", " . $town;          
-        }
-
-      }
-
-      my $statement = $self->db->prepare("INSERT INTO PendingOrganisations (PendingOrganisationId, UserSubmitted_FK, TimeDateSubmitted, Name, FullAddress, Postcode) VALUES (?, ?, ?, ?, ?, ?)");
-      my $rowsAdded = $statement->execute($unvalidatedOrganisationId,$userId,time(),$organisationName,$fullAddress,$postcode);
-
-      #TODO, untested. It could not be added for some reason. Most likely race conditions.
-      if ($rowsAdded == 0) {
-        $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-        return $self->render( json => {
-          success => Mojo::JSON->false,
-          message => 'An unknown error occurred when adding the transaction.',
-        },
-        status => 500,);   
-      } 
     }
 
+    my $pending_org = $c->schema->resultset('PendingOrganisation')->create({
+      usersubmitted_fk => $user->id,
+      timedatesubmitted => DateTime->now,
+      name => $organisationName,
+      fulladdress => $fullAddress,
+      postcode => $postcode,
+    });
 
-    my $statement2 = $self->db->prepare("INSERT INTO PendingTransactions (BuyerUserId_FK, PendingSellerOrganisationId_FK, ValueMicroCurrency, ProofImage, TimeDateSubmitted) VALUES (?, ?, ?, ?, ?)");
-    my $rowsAdded2 = $statement2->execute($userId, $unvalidatedOrganisationId, $microCurrencyValue, $filename, time());
+    $c->schema->resultset('PendingTransaction')->create({
+      buyeruserid_fk => $user->id,
+      pendingsellerorganisationid_fk => $pending_org->pendingorganisationid,
+      valuemicrocurrency => $microCurrencyValue,
+      proofimage => $filename,
+      timedatesubmitted => DateTime->now,
+    });
 
-    if ($rowsAdded2 != 0) {
-      $file->move_to('images/' . $filename);
-      $self->app->log->debug('Path Success: file:' . __FILE__ . ', line: ' . __LINE__);
-    
-      my $returnedJson = {
-        success => Mojo::JSON->true,
-        message => 'Added transaction for unvalidated organisation.',
-      };
-
-      if ($transactionAdditionType == 3){
-        $returnedJson->{unvalidatedOrganisationId} = $unvalidatedOrganisationId;
-      }
-
-      return $self->render( json => $returnedJson,
-      status => 200,);    
-    }
-    else {
-      $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-      return $self->render( json => {
-        success => Mojo::JSON->false,
-        message => 'An unknown error occurred when adding the transaction.',
-      },
-      status => 500,);   
-    } 
+    $file->move_to('images/' . $filename);
   }
-  else{
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'transactionAdditionType is not a valid value.',
-    },
-    status => 400,); #Malformed request   
-  }
+  return $self->render( json => {
+    success => Mojo::JSON->true,
+    message => 'Upload Successful',
+  });
 
 }
 

@@ -146,7 +146,7 @@ $t->post_ok('/api/admin-approve' => json => $json)
 
 
 print "test 8 - Logout Reno\n";
-$t->post_ok('/api/logout')
+$t->post_ok('/api/logout', json => { session_key => $session_key } )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -284,7 +284,7 @@ $t->post_ok('/api/admin-approve' => json => $json)
   ->content_like(qr/You are not an admin/i);
 
 print "test 16 - Logout Choco Billy\n";
-$t->post_ok('/api/logout')
+$t->post_ok('/api/logout', json => { session_key => $session_key } )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -306,9 +306,9 @@ $session_key = $t->tx->res->json('/session_key');
 
 print "test 18 - JSON is missing.\n";
 $t->post_ok('/api/admin-approve' => json)
-  ->status_is(401)
+  ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->json_like('/message', qr/Invalid Session/i);
+  ->json_like('/message', qr/JSON is missing/i);
 
 print "test 19 - unvalidatedOrganisationId missing (non-modify).\n";
 $json = {

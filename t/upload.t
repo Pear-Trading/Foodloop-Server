@@ -1,47 +1,36 @@
+use Mojo::Base -strict;
+
 use Test::More;
-use Test::Mojo;
 use Mojo::JSON;
+use Test::Pear::LocalLoop;
 
-use FindBin;
-
-BEGIN {
-  $ENV{MOJO_MODE} = 'testing';
-  $ENV{MOJO_LOG_LEVEL} = 'debug';
-}
-
-my $t = Test::Mojo->new("Pear::LocalLoop");
-
-my $dbh = $t->app->db;
-
-#Dump all pf the test tables and start again.
-my $sqlDeployment = Mojo::File->new("$FindBin::Bin/../dropschema.sql")->slurp;
-for (split ';', $sqlDeployment){
-  $dbh->do($_) or die $dbh->errstr;
-}
-
-my $sqlDeployment = Mojo::File->new("$FindBin::Bin/../schema.sql")->slurp;
-for (split ';', $sqlDeployment){
-  $dbh->do($_) or die $dbh->errstr;
-}
+my $framework = Test::Pear::LocalLoop->new;
+my $t = $framework->framework;
+my $schema = $t->app->schema;
 
 my @accountTokens = ('a', 'b', 'c');
-my $tokenStatement = $dbh->prepare('INSERT INTO AccountTokens (AccountTokenName) VALUES (?)');
-foreach (@accountTokens){
-  my $rowsAdded = $tokenStatement->execute($_);
-}
+
+$schema->resultset('AccountToken')->populate([
+  [ 'accounttokenname' ],
+  map { [ $_ ] } @accountTokens,
+]);
 
 #Add one company that we've apparently authenticated but does not have an account.
 my $companyIdNumShinra = 1;
 my $name = "Shinra Electric Power Company";
 my $fullAddress = "Sector 0, Midgar, Eastern Continent, Gaia";
 my $postcode = "E1 M00";
-my $statementOrgIns = $t->app->db->prepare("INSERT INTO Organisations (OrganisationalId, Name, FullAddress, PostCode) VALUES (?, ?, ?, ?)");
 
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations")}[0],0,"No organisations";
-$statementOrgIns->execute($companyIdNumShinra, $name, $fullAddress, $postcode);
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations")}[0],1,"1 testing organisation";
+my $org_rs = $schema->resultset('Organisation');
 
-
+is $org_rs->count, 0, "No organisations";
+$org_rs->create({
+  organisationalid => $companyIdNumShinra,
+  name => $name,
+  fulladdress => $fullAddress,
+  postcode => $postcode,
+});
+is $org_rs->count, 1, "1 testing organisation";
 
 #This depends on "register.t" and "login.t" working.
 
@@ -65,7 +54,7 @@ $t->post_ok('/api/register' => json => $testJson)
 print "test 2 - Create customer user account (Hojo)\n";
 my $emailHojo = 'hojo@shinra.energy';
 my $passwordHojo = 'Mako';
-my $testJson = {
+$testJson = {
   'usertype' => 'customer', 
   'token' => shift(@accountTokens), 
   'username' =>  'ProfessorHojo', 
@@ -81,7 +70,7 @@ $t->post_ok('/api/register' => json => $testJson)
 print "test 3 - Create organisation user account (Choco Billy)\n";
 my $emailBilly = 'choco.billy@chocofarm.org';
 my $passwordBilly = 'Choco';
-my $testJson = {
+$testJson = {
   'usertype' => 'organisation', 
   'token' => shift(@accountTokens), 
   'username' =>  'ChocoBillysGreens', 
@@ -111,9 +100,9 @@ my $session_key = $t->tx->res->json('/session_key');
 print "test 5 - JSON missing\n";
 my $upload = {file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
-  ->status_is(401)
+  ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->json_like('/message', qr/Invalid Session/);
+  ->json_like('/message', qr/JSON is missing/);
 
 #TODO Check for malformed JSON.
 
@@ -123,46 +112,46 @@ my $json = {
   addValidatedId => $companyIdNumShinra,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/microCurrencyValue is missing/i);
 
 print "test 7 - microCurrencyValue non-numbers\n";
-my $json = {
+$json = {
   microCurrencyValue => 'Abc',
   transactionAdditionType => 1,
   addValidatedId => $companyIdNumShinra,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/microCurrencyValue does not look like a number/i);
 
 print "test 8 - microCurrencyValue equal to zero\n";
-my $json = {
+$json = {
   microCurrencyValue => 0,
   transactionAdditionType => 1,
   addValidatedId => $companyIdNumShinra,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/microCurrencyValue cannot be equal to or less than zero/i);
 
 print "test 9 - microCurrencyValue less than zero\n";
-my $json = {
+$json = {
   microCurrencyValue => -1,
   transactionAdditionType => 1,
   addValidatedId => $companyIdNumShinra,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
@@ -173,7 +162,7 @@ $json = {
   microCurrencyValue => 10,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
@@ -186,7 +175,7 @@ $json = {
   session_key => $session_key,
 #  addValidatedId => $companyIdNumShinra
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
@@ -199,7 +188,7 @@ $json = {
   addValidatedId => 1,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json)};
+$upload = {json => Mojo::JSON::encode_json($json)};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
@@ -212,7 +201,7 @@ $json = {
   session_key => $session_key,
 #  addValidatedId => $companyIdNumShinra
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
@@ -225,7 +214,7 @@ $json = {
   addValidatedId => ($companyIdNumShinra + 100),
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
@@ -239,11 +228,11 @@ $json = {
   addValidatedId => $companyIdNumShinra,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
-  ->content_like(qr/Added transaction for validated organisation/i);
+  ->json_like('/message', qr/Upload Successful/);
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions")}[0],1,"1 transaction";
 
 # Add type 3 (new organisation) checking.
@@ -254,10 +243,10 @@ $json = {
   transactionAdditionType => 3,
   streetName => "Slums, Sector 7",
   town => "Midgar",
-  postcode => "E1 MS07",
+  postcode => "E1 0AA",
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
@@ -273,17 +262,14 @@ $json = {
   organisationName => '7th Heaven',
   streetName => "Slums, Sector 7",
   town => "Midgar",
-  postcode => "E1 MS07",
+  postcode => "E1 0AA",
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
-  ->json_has('/unvalidatedOrganisationId')
-  ->content_like(qr/Added transaction for unvalidated organisation/i);
-my $unvalidatedOrganisationId = $t->tx->res->json->{unvalidatedOrganisationId};
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations WHERE PendingOrganisationId = ?", undef, ($unvalidatedOrganisationId))}[0],1,"unvalidatedOrganisationId exists";
+  ->json_like('/message', qr/Upload Successful/);
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations")}[0],1,"1 pending organisation";
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions")}[0],1,"1 pending transaction";
 
@@ -295,7 +281,7 @@ $json = {
   transactionAdditionType => 2,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
@@ -308,7 +294,7 @@ $json = {
   addUnvalidatedId => "Abc",
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
@@ -321,14 +307,14 @@ $json = {
   addUnvalidatedId => 1000, #Id that does not exist
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/addUnvalidatedId does not exist in the database for the user/i);
 
 print "test 21 - Logout Rufus (type 2: existing organisation)\n";
-$t->post_ok('/api/logout')
+$t->post_ok('/api/logout', json => { session_key => $session_key } )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -349,6 +335,8 @@ $t->post_ok('/api/login' => json => $testJson)
 $session_key = $t->tx->res->json('/session_key');
 
 print "test 23 - add valid transaction but for with account (type 2: existing organisation)\n";
+my $org_result = $schema->resultset('PendingOrganisation')->find({ name => '7th Heaven' });
+my $unvalidatedOrganisationId = $org_result->pendingorganisationid;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions")}[0],1,"1 pending transaction";
 $json = {
   microCurrencyValue => 10,
@@ -356,7 +344,7 @@ $json = {
   addUnvalidatedId => $unvalidatedOrganisationId,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400) 
   ->json_is('/success', Mojo::JSON->false)
@@ -364,7 +352,7 @@ $t->post_ok('/api/upload' => form => $upload )
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions")}[0],1,"1 pending transaction";
 
 print "test 24 - Logout Hojo\n";
-$t->post_ok('/api/logout')
+$t->post_ok('/api/logout', json => { session_key => $session_key } )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -392,16 +380,16 @@ $json = {
   addUnvalidatedId => $unvalidatedOrganisationId,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
-  ->content_like(qr/Added transaction for unvalidated organisation./i);
+  ->json_like('/message', qr/Upload Successful/);
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions")}[0],2,"2 pending transaction";
 
 
 print "test 27 - Logout Rufus\n";
-$t->post_ok('/api/logout')
+$t->post_ok('/api/logout' => json => { session_key => $session_key } )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -429,11 +417,11 @@ $json = {
   addValidatedId => $companyIdNumShinra,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
-  ->content_like(qr/Added transaction for validated organisation/i);
+  ->json_like('/message', qr/Upload Successful/);
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions")}[0],2,"2 transactions";
 
 done_testing();

@@ -22,7 +22,7 @@ $schema->resultset('AccountToken')->populate([
 $t->post_ok('/api/register')
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/no json sent/i);
+  ->json_like('/message', qr/JSON is missing/i);
 
 #Empty JSON
 my $testJson = {};
