@@ -116,7 +116,7 @@ $json = {
   organisationName => $nameToTestTurtle,
   streetName => "Town centre",
   town => " Wutai",
-  postcode => "NW1 W01",
+  postcode => "NW10 8HH",
   session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
@@ -128,12 +128,12 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions",
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef, ())}[0],1,"1 verified organisations (choco billy)" ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef, ())}[0],0,"No verified transactions." ;
 
-my $newPendingTurtleOrgId = $t->tx->res->json->{unvalidatedOrganisationId};
+my $newPendingTurtleOrgId = $t->app->schema->resultset('PendingOrganisation')->find({ name => $nameToTestTurtle })->pendingorganisationid;
 print "Turtle Id: " . $newPendingTurtleOrgId . "\n";
 
 
 print "test 7 - Logout Reno\n";
-$t->post_ok('/api/logout')
+$t->post_ok('/api/logout', json => { session_key => $session_key } )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -159,7 +159,7 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions",
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef, ())}[0],1,"1 verified organisations (choco billy)" ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef, ())}[0],0,"No verified transactions." ;
 
-my $nameToTestTurtlePartial = 'Turtle\'s Paradise';
+my $nameToTestTurtlePartial = 'Turtle\'s Paradise2';
 $json = {
   microCurrencyValue => 20,
   transactionAdditionType => 3,
@@ -178,7 +178,7 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions",
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef, ())}[0],1,"1 verified organisations (choco billy)" ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef, ())}[0],0,"No verified transactions." ;
 
-my $newPendingTurtleOrgIdPartial = $t->tx->res->json->{unvalidatedOrganisationId};;
+my $newPendingTurtleOrgIdPartial = $t->app->schema->resultset('PendingOrganisation')->find({ name => $nameToTestTurtlePartial })->pendingorganisationid;
 print "Turtle Id 2: " . $newPendingTurtleOrgIdPartial . "\n";
 
 #done_testing();
@@ -210,7 +210,7 @@ $json = {
   organisationName => $nameToTestJunon,
   streetName => "Main street",
   town => "Under Junon",
-  postcode => "E6 M02",
+  postcode => "NW9 5EB",
   session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
@@ -218,7 +218,7 @@ $t->post_ok('/api/upload' => form => $upload)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
-my $newPendingJunonOrgId = $t->tx->res->json->{unvalidatedOrganisationId};;
+my $newPendingJunonOrgId = $t->app->schema->resultset('PendingOrganisation')->find({ name => $nameToTestJunon })->pendingorganisationid;
 print "Junon Id: " . $newPendingJunonOrgId . "\n";
 
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],3,"3 unverified organisations." ;
@@ -262,7 +262,7 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef,
 
 
 print "test 14 - Logout Choco Billy\n";
-$t->post_ok('/api/logout')
+$t->post_ok('/api/logout', json => { session_key => $session_key } )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -294,14 +294,15 @@ my $json = {
 $t->post_ok('/api/admin-approve' => json => $json)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
-my $turtleValidatedId = $t->tx->res->json->{validatedOrganisationId};
+
+my $turtleValidatedId = $t->app->schema->resultset('Organisation')->find({ name => $nameToTestTurtle })->organisationalid;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],2,"2 unverified organisations."; 
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions", undef, ())}[0],5,"5 unverified transactions." ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef, ())}[0],2,"2 verified organisations (choco billy and turtle)" ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef, ())}[0],1,"1 verified transaction.";  
 
 print "test 17 - Logout Admin\n";
-$t->post_ok('/api/logout')
+$t->post_ok('/api/logout', json => { session_key => $session_key } )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -333,7 +334,7 @@ $t->post_ok('/api/admin-merge' => json => $json)
   ->content_like(qr/You are not an admin/i);
 
 print "test 20 - Logout Choco Billy\n";
-$t->post_ok('/api/logout')
+$t->post_ok('/api/logout', json => { session_key => $session_key })
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
@@ -355,9 +356,9 @@ $session_key = $t->tx->res->json('/session_key');
 
 print "test 22 - JSON is missing.\n";
 $t->post_ok('/api/admin-merge' => json)
-  ->status_is(401)
+  ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->json_like('/message', qr/Invalid Session/);
+  ->json_like('/message', qr/JSON is missing/);
 
 
 print "test 23 - unvalidatedOrganisationId missing.\n";
