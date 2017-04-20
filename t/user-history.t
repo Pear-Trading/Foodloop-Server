@@ -1,3 +1,4 @@
+use Mojo::Base -strict;
 use Test::More skip_all => 'User History needs reworking';
 use Test::Mojo;
 use Mojo::JSON qw(encode_json);;
