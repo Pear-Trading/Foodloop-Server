@@ -23,4 +23,24 @@
       </h2>
     </div>
   </div>
+  <div class="card text-center">
+    <div class="card-header card-inverse card-danger">
+      Pending Organisations
+    </div>
+    <div class="card-block">
+      <h2 class="card-title">
+        %= $pending_orgs
+      </h2>
+    </div>
+  </div>
+  <div class="card text-center">
+    <div class="card-header card-inverse card-danger">
+      Pending Transactions
+    </div>
+    <div class="card-block">
+      <h2 class="card-title">
+        %= $pending_trans
+      </h2>
+    </div>
+  </div>
 </div>
