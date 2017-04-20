@@ -7,32 +7,29 @@ use Test::Pear::LocalLoop;
 my $framework = Test::Pear::LocalLoop->new;
 my $t = $framework->framework;
 my $schema = $t->app->schema;
+my $dump_error = sub { diag $t->tx->res->dom->at('pre[id="error"]')->text };
 
-my @accountTokens = ('a', 'b', 'c');
+my @account_tokens = ('a', 'b', 'c');
 
 $schema->resultset('AccountToken')->populate([
   [ 'accounttokenname' ],
-  map { [ $_ ] } @accountTokens,
+  map { [ $_ ] } @account_tokens,
 ]);
 
 #Add one company that we've apparently authenticated but does not have an account.
-my $companyIdNumShinra = 1;
-my $name = "Shinra Electric Power Company";
-my $fullAddress = "Sector 0, Midgar, Eastern Continent, Gaia";
-my $postcode = "E1 M00";
+my $org_id_shinra = 1;
 
 my $org_rs = $schema->resultset('Organisation');
 
 is $org_rs->count, 0, "No organisations";
 $org_rs->create({
-  organisationalid => $companyIdNumShinra,
-  name => $name,
-  fulladdress => $fullAddress,
-  postcode => $postcode,
+  id => $org_id_shinra,
+  name => 'Shinra Electric Power Company',
+  street_address => 'Sector 0, Midgar, Eastern Continent',
+  town => 'Gaia',
+  postcode => 'E1 M00',
 });
 is $org_rs->count, 1, "1 testing organisation";
-
-#This depends on "register.t" and "login.t" working.
 
 #Valid customer, this also tests that redirects are disabled for register.
 print "test 1 - Create customer user account (Rufus)\n";
@@ -40,7 +37,7 @@ my $emailRufus = 'rufus@shinra.energy';
 my $passwordRufus = 'MakoGold';
 my $testJson = {
   'usertype' => 'customer', 
-  'token' => shift(@accountTokens), 
+  'token' => shift(@account_tokens), 
   'username' =>  'RufusShinra', 
   'email' => $emailRufus, 
   'postcode' => 'E1 MP01', 
@@ -56,7 +53,7 @@ my $emailHojo = 'hojo@shinra.energy';
 my $passwordHojo = 'Mako';
 $testJson = {
   'usertype' => 'customer', 
-  'token' => shift(@accountTokens), 
+  'token' => shift(@account_tokens), 
   'username' =>  'ProfessorHojo', 
   'email' => $emailHojo, 
   'postcode' => 'E1 MP01', 
@@ -72,16 +69,18 @@ my $emailBilly = 'choco.billy@chocofarm.org';
 my $passwordBilly = 'Choco';
 $testJson = {
   'usertype' => 'organisation', 
-  'token' => shift(@accountTokens), 
+  'token' => shift(@account_tokens), 
   'username' =>  'ChocoBillysGreens', 
   'email' => $emailBilly, 
   'postcode' => 'E4 C12', 
   'password' => $passwordBilly, 
-  'fulladdress' => 'Chocobo Farm, Eastern Continent, Gaia'
+  'street_address' => 'Chocobo Farm, Eastern Continent',
+  'town' => 'Gaia',
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200) 
-  ->json_is('/success', Mojo::JSON->true);
+  ->json_is('/success', Mojo::JSON->true)
+  ->json_like('/message', qr/Registered Successfully/);
 
 ######################################################
 
@@ -109,7 +108,7 @@ $t->post_ok('/api/upload' => form => $upload )
 print "test 6 - transaction_value missing\n";
 my $json = {
   transaction_type => 1,
-  organisation_id => $companyIdNumShinra,
+  organisation_id => $org_id_shinra,
   session_key => $session_key,
 };
 $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
@@ -122,7 +121,7 @@ print "test 7 - transaction_value non-numbers\n";
 $json = {
   transaction_value => 'Abc',
   transaction_type => 1,
-  organisation_id => $companyIdNumShinra,
+  organisation_id => $org_id_shinra,
   session_key => $session_key,
 };
 $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
@@ -135,7 +134,7 @@ print "test 8 - transaction_value equal to zero\n";
 $json = {
   transaction_value => 0,
   transaction_type => 1,
-  organisation_id => $companyIdNumShinra,
+  organisation_id => $org_id_shinra,
   session_key => $session_key,
 };
 $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
@@ -148,7 +147,7 @@ print "test 9 - transaction_value less than zero\n";
 $json = {
   transaction_value => -1,
   transaction_type => 1,
-  organisation_id => $companyIdNumShinra,
+  organisation_id => $org_id_shinra,
   session_key => $session_key,
 };
 $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
@@ -173,7 +172,7 @@ $json = {
   transaction_value => 10,
   transaction_type => 4,
   session_key => $session_key,
-#  organisation_id => $companyIdNumShinra
+#  organisation_id => $org_id_shinra
 };
 $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -199,7 +198,7 @@ $json = {
   transaction_value => 10,
   transaction_type => 1,
   session_key => $session_key,
-#  organisation_id => $companyIdNumShinra
+#  organisation_id => $org_id_shinra
 };
 $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -211,7 +210,7 @@ print "test 14 - organisation_id for non-existent id. (type 1: already validated
 $json = {
   transaction_value => 10,
   transaction_type => 1,
-  organisation_id => ($companyIdNumShinra + 100),
+  organisation_id => ($org_id_shinra + 100),
   session_key => $session_key,
 };
 $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
@@ -221,11 +220,11 @@ $t->post_ok('/api/upload' => form => $upload )
   ->content_like(qr/organisation_id does not exist in the database/i);
 
 print "test 15 - valid addition. (type 1: already validated)\n";
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions")}[0],0,"no transactions";
+is $schema->resultset('Transaction')->count, 0, "no transactions";
 $json = {
   transaction_value => 10,
   transaction_type => 1,
-  organisation_id => $companyIdNumShinra,
+  organisation_id => $org_id_shinra,
   session_key => $session_key,
 };
 $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
@@ -233,7 +232,7 @@ $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_like('/message', qr/Upload Successful/);
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions")}[0],1,"1 transaction";
+is $schema->resultset('Transaction')->count, 1, "1 transaction";
 
 # Add type 3 (new organisation) checking.
 
@@ -253,8 +252,8 @@ $t->post_ok('/api/upload' => form => $upload )
   ->content_like(qr/organisation_name is missing/i);
 
 print "test 17 - add valid transaction (type 3: new organisation)\n";
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations")}[0],0,"No pending organisations";
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions")}[0],0,"No pending transactions";
+is $schema->resultset('PendingOrganisation')->count, 0, "No pending organisations";
+is $schema->resultset('PendingTransaction')->count, 0, "No pending transactions";
 
 $json = {
   transaction_value => 10,
@@ -270,8 +269,8 @@ $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_like('/message', qr/Upload Successful/);
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations")}[0],1,"1 pending organisation";
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions")}[0],1,"1 pending transaction";
+is $schema->resultset('PendingOrganisation')->count, 1, "1 pending organisations";
+is $schema->resultset('PendingTransaction')->count, 1, "1 pending transactions";
 
 # Add type 2 (unverified organisation) checking.
 
@@ -337,7 +336,7 @@ $session_key = $t->tx->res->json('/session_key');
 print "test 23 - add valid transaction but for with account (type 2: existing organisation)\n";
 my $org_result = $schema->resultset('PendingOrganisation')->find({ name => '7th Heaven' });
 my $unvalidatedOrganisationId = $org_result->pendingorganisationid;
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions")}[0],1,"1 pending transaction";
+is $schema->resultset('PendingTransaction')->count, 1, "1 pending transactions";
 $json = {
   transaction_value => 10,
   transaction_type => 2,
@@ -349,7 +348,7 @@ $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400) 
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/organisation_id does not exist in the database/i);
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions")}[0],1,"1 pending transaction";
+is $schema->resultset('PendingTransaction')->count, 1, "1 pending transactions";
 
 print "test 24 - Logout Hojo\n";
 $t->post_ok('/api/logout', json => { session_key => $session_key } )
@@ -373,7 +372,7 @@ $t->post_ok('/api/login' => json => $testJson)
 $session_key = $t->tx->res->json('/session_key');
 
 print "test 26 - add valid transaction (type 2: existing organisation)\n";
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions")}[0],1,"1 pending transaction";
+is $schema->resultset('PendingTransaction')->count, 1, "1 pending transactions";
 $json = {
   transaction_value => 10,
   transaction_type => 2,
@@ -385,7 +384,7 @@ $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_like('/message', qr/Upload Successful/);
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions")}[0],2,"2 pending transaction";
+is $schema->resultset('PendingTransaction')->count, 2, "2 pending transactions";
 
 
 print "test 27 - Logout Rufus\n";
@@ -410,11 +409,11 @@ $t->post_ok('/api/login' => json => $testJson)
 $session_key = $t->tx->res->json('/session_key');
 
 print "test 29 - organisation buy from another organisation\n";
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions")}[0],1,"1 transaction";
+is $schema->resultset('Transaction')->count, 1, "1 transaction";
 $json = {
   transaction_value => 100000,
   transaction_type => 1,
-  organisation_id => $companyIdNumShinra,
+  organisation_id => $org_id_shinra,
   session_key => $session_key,
 };
 $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
@@ -422,7 +421,7 @@ $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_like('/message', qr/Upload Successful/);
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions")}[0],2,"2 transactions";
+is $schema->resultset('Transaction')->count, 2, "2 transaction";
 
 done_testing();
 

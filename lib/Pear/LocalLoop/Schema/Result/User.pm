@@ -194,7 +194,7 @@ Related object: L<Pear::LocalLoop::Schema::Result::Organisation>
 __PACKAGE__->belongs_to(
   "organisation",
   "Pear::LocalLoop::Schema::Result::Organisation",
-  { organisationalid => "organisationalid_fk" },
+  { id => "organisationalid_fk" },
   {
     is_deferrable => 0,
     join_type     => "LEFT",

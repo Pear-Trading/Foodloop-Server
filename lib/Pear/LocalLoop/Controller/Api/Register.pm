@@ -32,8 +32,11 @@ has error_messages => sub {
       required => { message => 'No age sent.', status => 400 },
       in_resultset => { message => 'Age range is invalid.', status => 400 },
     },
-    fulladdress => {
-      required => { message => 'No fulladdress sent.', status => 400 },
+    street_address => {
+      required => { message => 'No street_address sent.', status => 400 },
+    },
+    town => {
+      required => { message => 'No town sent.', status => 400 },
     },
   };
 };
@@ -80,8 +83,8 @@ sub post_register{
 
   } elsif ( $usertype eq 'organisation' ) {
 
-    #TODO validation on the address. Or perhaps add the organisation to a "to be inspected" list then manually check them.
-    $validation->required('fulladdress');
+    $validation->required('street_address');
+    $validation->required('town');
 
   }
 
@@ -99,30 +102,24 @@ sub post_register{
     }
   }
 
-  my $token = $validation->param('token');
-  my $username = $validation->param('username');
-  my $email = $validation->param('email');
-  my $postcode = $validation->param('postcode');
-  my $password = $validation->param('password');
-
   if ($usertype eq 'customer'){
     # TODO replace with actually using the value on the post request
     my $ageForeignKey = $c->get_age_foreign_key( $validation->param('age') );
 
     $c->schema->txn_do( sub {
       $c->schema->resultset('AccountToken')->find({
-        accounttokenname => $token,
+        accounttokenname => $validation->param('token'),
         used => 0,
       })->update({ used => 1 });
       $c->schema->resultset('User')->create({
         customer => {
-          username => $username,
+          username => $validation->param('username'),
           agerange_fk => $ageForeignKey,
-          postcode => $postcode,
+          postcode => $validation->param('postcode'),
         },
-        email => $email,
-        hashedpassword => $password,
-        joindate => DateTime->now,
+        email           => $validation->param('email'),
+        hashedpassword  => $validation->param('password'),
+        joindate        => DateTime->now,
       });
     });
 
@@ -132,23 +129,27 @@ sub post_register{
 
     $c->schema->txn_do( sub {
       $c->schema->resultset('AccountToken')->find({
-        accounttokenname => $token,
+        accounttokenname => $validation->param('token'),
         used => 0,
       })->update({ used => 1 });
       $c->schema->resultset('User')->create({
         organisation => {
-          name => $username,
-          fulladdress => $fullAddress,
-          postcode => $postcode,
+          name           => $validation->param('username'),
+          street_address => $validation->param('street_address'),
+          town           => $validation->param('town'),
+          postcode       => $validation->param('postcode'),
         },
-        email => $email,
-        hashedpassword => $password,
-        joindate => DateTime->now,
+        email           => $validation->param('email'),
+        hashedpassword  => $validation->param('password'),
+        joindate        => DateTime->now,
       });
     });
   }
 
-  return $c->render( json => { success => Mojo::JSON->true } );
+  return $c->render( json => {
+    success => Mojo::JSON->true,
+    message => 'Registered Successfully',
+  });
 }
 
 1;

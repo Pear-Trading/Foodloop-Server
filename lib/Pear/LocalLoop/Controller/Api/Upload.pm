@@ -94,7 +94,7 @@ sub post_upload {
   if ( $type == 1 ) {
     # Validated Organisation
     my $valid_org_rs = $c->schema->resultset('Organisation');
-    $validation->required('organisation_id')->number->in_resultset( 'organisationalid', $valid_org_rs );
+    $validation->required('organisation_id')->number->in_resultset( 'id', $valid_org_rs );
   } elsif ( $type == 2 ) {
     # Unvalidated Organisation
     my $valid_org_rs = $c->schema->resultset('PendingOrganisation')->search({ usersubmitted_fk => $user->id });
