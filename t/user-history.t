@@ -1,4 +1,4 @@
-use Test::More;
+use Test::More skip_all => 'User History needs reworking';
 use Test::Mojo;
 use Mojo::JSON qw(encode_json);;
 use Time::Fake;
@@ -112,7 +112,7 @@ $t->app->db->prepare("INSERT INTO Administrators (UserId) VALUES (?)")->execute(
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Administrators")}[0],1,"1 admin";
 
 sub logout {
-  $t->post_ok('/api/logout')
+  $t->post_ok('/api/logout', json => { session_key => $session_key })
     ->status_is(200)
     ->json_is('/success', Mojo::JSON->true);
 }
@@ -164,14 +164,14 @@ $json = {
   organisationName => $nameToTestTurtle,
   streetName => "Town centre",
   town => " Wutai",
-  postcode => "NW1 W01",
+  postcode => "NW11 8AD",
   session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file2 => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
-my $unvalidatedOrganisationId = $t->tx->res->json->{unvalidatedOrganisationId};
+my $unvalidatedOrganisationId = $t->app->schema->resultset('PendingOrganisation')->find({ name => $nameToTestTurtle })->pendingorganisationid;
 
 #Change to 2 days later
 Time::Fake->offset("+" . $dateTimePlusTwoDaysSecondsDiff . "s");
@@ -295,9 +295,9 @@ login_reno();
 
 print "test 23 - No JSON\n";
 $t->post_ok('/api/user-history')
-  ->status_is(401)
+  ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->json_like('/message', qr/Invalid Session/);
+  ->json_like('/message', qr/JSON is missing/);
 
 print "test 24 - retrieveType is missing\n";
 $json = {
@@ -682,7 +682,7 @@ $t->post_ok('/api/user-history' => json => $json)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_has('/microCurencySpent')
-  ->json_is('/microCurencySpent',$expectedReturnedStats);
+  ->json_is('/microCurencySpent',$expectedReturnedStats)->or(sub { use Data::Dumper; diag Dumper $t->tx->res });
 my $spend = $t->tx->res->json->{microCurencySpent};
 print Dumper($spend) . "\n";
 
