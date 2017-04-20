@@ -1,3 +1,4 @@
+use Mojo::Base -strict;
 use Test::More;
 use Test::Mojo;
 use Mojo::JSON;
@@ -19,7 +20,7 @@ for (split ';', $sqlDeployment){
   $dbh->do($_) or die $dbh->errstr;
 }
 
-my $sqlDeployment = Mojo::File->new("$FindBin::Bin/../schema.sql")->slurp;
+$sqlDeployment = Mojo::File->new("$FindBin::Bin/../schema.sql")->slurp;
 for (split ';', $sqlDeployment){
   $dbh->do($_) or die $dbh->errstr;
 }
@@ -53,7 +54,7 @@ $t->post_ok('/api/register' => json => $testJson)
 print "test 2 - Create organisation user account (Choco Billy)\n";
 my $emailBilly = 'choco.billy@chocofarm.org';
 my $passwordBilly = 'Choco';
-my $testJson = {
+$testJson = {
   'usertype' => 'organisation', 
   'token' => shift(@accountTokens), 
   'username' =>  'ChocoBillysGreens', 
@@ -70,7 +71,7 @@ $t->post_ok('/api/register' => json => $testJson)
 print "test 3 - Create admin account\n";
 my $emailAdmin = 'admin@foodloop.net';
 my $passwordAdmin = 'ethics';
-my $testJson = {
+$testJson = {
   'usertype' => 'customer', 
   'token' => shift(@accountTokens), 
   'username' =>  'admin', 
@@ -110,7 +111,7 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions",
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef, ())}[0],1,"1 verified organisation (choco billy)" ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef, ())}[0],0,"No verified transactions." ;
 my $nameToTestTurtle = 'Turtle\'s Paradise';
-$json = {
+my $json = {
   transaction_value => 20,
   transaction_type => 3,
   organisation_name => $nameToTestTurtle,
@@ -169,7 +170,7 @@ $json = {
   postcode => "",
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
@@ -192,7 +193,7 @@ $json = {
   organisation_id => $newPendingTurtleOrgIdPartial,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
@@ -213,7 +214,7 @@ $json = {
   postcode => "NW9 5EB",
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
@@ -234,7 +235,7 @@ $json = {
   organisation_id => $newPendingJunonOrgId,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
@@ -251,7 +252,7 @@ $json = {
   organisation_id => $newPendingJunonOrgId,
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
@@ -287,7 +288,7 @@ is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations"
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions", undef, ())}[0],6,"6 unverified transactions." ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Organisations", undef, ())}[0],1,"1 verified organisation (choco billy)" ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Transactions", undef, ())}[0],0,"No verified transactions.";  
-my $json = {
+$json = {
   unvalidatedOrganisationId => $newPendingTurtleOrgId,
   session_key => $session_key,
 };
@@ -355,7 +356,7 @@ $t->post_ok('/api/login' => json => $testJson)
 $session_key = $t->tx->res->json('/session_key');
 
 print "test 22 - JSON is missing.\n";
-$t->post_ok('/api/admin-merge' => json)
+$t->post_ok('/api/admin-merge' => json => {})
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->json_like('/message', qr/JSON is missing/);

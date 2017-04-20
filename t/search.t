@@ -1,3 +1,4 @@
+use Mojo::Base -strict;
 use Test::More;
 use Test::Mojo;
 use Mojo::JSON;
@@ -21,7 +22,7 @@ for (split ';', $sqlDeployment){
   $dbh->do($_) or die $dbh->errstr;
 }
 
-my $sqlDeployment = Mojo::File->new("$FindBin::Bin/../schema.sql")->slurp;
+$sqlDeployment = Mojo::File->new("$FindBin::Bin/../schema.sql")->slurp;
 for (split ';', $sqlDeployment){
   $dbh->do($_) or die $dbh->errstr;
 }
@@ -40,19 +41,19 @@ my ($name, $address, $postcode) = ("Avanti Bar & Restaurant","57 Main St, Kirkby
 $statement->execute($value, $name, $address, $postcode);
 
 $value++;
-my ($name, $address, $postcode) = ("Full House Noodle Bar","21 Common Garden St, Lancaster, Lancashire","LA1 1XD");
+($name, $address, $postcode) = ("Full House Noodle Bar","21 Common Garden St, Lancaster, Lancashire","LA1 1XD");
 $statement->execute($value, $name, $address, $postcode);
 
 $value++;
-my ($name, $address, $postcode) = ("The Quay's Fishbar","1 Adcliffe Rd, Lancaster","LA1 1SS");
+($name, $address, $postcode) = ("The Quay's Fishbar","1 Adcliffe Rd, Lancaster","LA1 1SS");
 $statement->execute($value, $name, $address, $postcode);
 
 $value++;
-my ($name, $address, $postcode) = ("Dan's Fishop","56 North Rd, Lancaster","LA1 1LT");
+($name, $address, $postcode) = ("Dan's Fishop","56 North Rd, Lancaster","LA1 1LT");
 $statement->execute($value, $name, $address, $postcode);
 
 $value++;
-my ($name, $address, $postcode) = ("Hodgeson's Chippy","96 Prospect St, Lancaster","LA1 3BH");
+($name, $address, $postcode) = ("Hodgeson's Chippy","96 Prospect St, Lancaster","LA1 3BH");
 $statement->execute($value, $name, $address, $postcode);
 
 
@@ -79,7 +80,7 @@ $t->post_ok('/api/register' => json => $testJson)
 print "test 2 - Create organisation user account (Choco Billy)\n";
 my $emailBilly = 'choco.billy@chocofarm.org';
 my $passwordBilly = 'Choco';
-my $testJson = {
+$testJson = {
   'usertype' => 'organisation', 
   'token' => shift(@accountTokens), 
   'username' =>  'ChocoBillysGreens', 
@@ -131,7 +132,7 @@ print "test 3 - Login - Rufus (cookies, customer)\n";
 login_rufus();
 
 print "test 4 - Added something containing 'fish'\n";
-$json = {
+my $json = {
   transaction_value => 10,
   transaction_type => 3,
   organisation_name => 'Shoreway Fisheries',
@@ -167,7 +168,7 @@ $json = {
   postcode => "LA4 5BZ",
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
@@ -182,7 +183,7 @@ $json = {
   postcode => "LA1 1ET",
   session_key => $session_key,
 };
-my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
+$upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
