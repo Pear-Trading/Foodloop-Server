@@ -117,7 +117,7 @@ sub login_billy {
 };
 
 sub log_out{
-  $t->post_ok('/api/logout')
+  $t->post_ok('/api/logout', json => { session_key => $session_key })
     ->status_is(200)
     ->json_is('/success', Mojo::JSON->true);
 }
