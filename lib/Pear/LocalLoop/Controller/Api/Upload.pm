@@ -56,7 +56,7 @@ has error_messages => sub {
     },
     file => {
       required => { message => 'No file uploaded', status => 400 },
-      upload => { message => 'No file uploaded', status => 400 },
+      upload => { message => 'file key does not contain a file', status => 400 },
       filetype => { message => 'File must be of type image/jpeg', status => 400 },
     },
     organisation_id => {
