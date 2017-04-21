@@ -50,7 +50,7 @@ sub startup {
   });
 
   # shortcut for use in template
-  $self->helper( db => sub { $self->app->schema->storage->dbh });
+  $self->helper( db => sub { warn "DEPRECATED db helper"; return $self->app->schema->storage->dbh });
   $self->helper( schema => sub { $self->app->schema });
 
   $self->helper( api_validation_error => sub {
@@ -150,22 +150,6 @@ sub startup {
     $self->res->headers->header('Access-Control-Allow-Origin' => '*') if $self->app->mode eq 'development';
   });
 
-  $self->helper( is_admin => sub {
-    my ($c, $user_id) = @_;
-    my $admin = $c->schema->resultset('Administrator')->find($user_id);
-    return defined $admin;
-  });
-
-  $self->helper( create_hash => sub{
-    my ($self, $id, $name, $fullAddress, $postcode) = @_;
-
-    return {
-      id => $id,
-      name => $name,
-      fullAddress => $fullAddress . ", " . $postcode,
-    }
-  });
-
   $self->helper(get_active_user_id => sub {
     my $self = shift;
 
@@ -223,12 +207,7 @@ sub startup {
     return Data::UUID->new->create_str();
   });
 
-  $self->helper(does_organisational_id_exist => sub {
-    my ( $c, $org_id ) = @_;
-    return defined $c->schema->resultset('Organisation')->find({ organisationalid => $org_id });
-  });
-
-  $self->helper(get_age_foreign_key => sub {
+   $self->helper(get_age_foreign_key => sub {
     my ( $c, $age_string ) = @_;
     my $age_range = $c->schema->resultset('AgeRange')->find({ agerangestring => $age_string });
     return defined $age_range ? $age_range->agerangeid : undef;
