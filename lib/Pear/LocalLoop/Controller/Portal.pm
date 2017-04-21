@@ -97,33 +97,18 @@ sub post_upload {
     my $town = $validation->param('town');
     my $postcode = $validation->param('postcode');
 
-    my $fullAddress = "";
-
-    if ( defined $street_name && ! ($street_name =~ m/^\s*$/) ){
-      $fullAddress = $street_name;
-    }
-
-    if ( defined $town && ! ($town =~ m/^\s*$/) ){
-      if ($fullAddress eq ""){
-        $fullAddress = $town;
-      }
-      else{
-        $fullAddress = $fullAddress . ", " . $town;          
-      }
-
-    }
-
     my $pending_org = $c->schema->resultset('PendingOrganisation')->create({
-      usersubmitted_fk => $user->id,
-      timedatesubmitted => DateTime->now,
-      name => $organisation_name,
-      fulladdress => $fullAddress,
-      postcode => $postcode,
+      submitted_by => $user,
+      submitted_at => DateTime->now,
+      name         => $organisation_name,
+      street_name  => $street_name,
+      town         => $town,
+      postcode     => $postcode,
     });
 
     $c->schema->resultset('PendingTransaction')->create({
       buyeruserid_fk => $user->id,
-      pendingsellerorganisationid_fk => $pending_org->pendingorganisationid,
+      pendingsellerorganisationid_fk => $pending_org->id,
       valuemicrocurrency => $transaction_value,
       proofimage => $filename,
       timedatesubmitted => DateTime->now,
