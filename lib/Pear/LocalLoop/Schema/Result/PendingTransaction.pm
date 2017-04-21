@@ -139,7 +139,7 @@ Related object: L<Pear::LocalLoop::Schema::Result::PendingOrganisation>
 __PACKAGE__->belongs_to(
   "pendingsellerorganisationid_fk",
   "Pear::LocalLoop::Schema::Result::PendingOrganisation",
-  { pendingorganisationid => "pendingsellerorganisationid_fk" },
+  { id => "pendingsellerorganisationid_fk" },
   { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },
 );
 

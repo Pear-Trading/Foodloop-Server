@@ -214,7 +214,7 @@ Related object: L<Pear::LocalLoop::Schema::Result::PendingOrganisation>
 __PACKAGE__->has_many(
   "pending_organisations",
   "Pear::LocalLoop::Schema::Result::PendingOrganisation",
-  { "foreign.usersubmitted_fk" => "self.userid" },
+  { "foreign.submitted_by_id" => "self.userid" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 

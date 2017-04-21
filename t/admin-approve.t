@@ -1,36 +1,20 @@
 use Mojo::Base -strict;
+
 use Test::More;
-use Test::Mojo;
 use Mojo::JSON;
+use Test::Pear::LocalLoop;
 
-use FindBin;
+my $framework = Test::Pear::LocalLoop->new;
+my $t = $framework->framework;
+my $schema = $t->app->schema;
+my $dump_error = sub { diag $t->tx->res->dom->at('pre[id="error"]')->text };
 
-BEGIN {
-  $ENV{MOJO_MODE} = 'testing';
-  $ENV{MOJO_LOG_LEVEL} = 'debug';
-}
+my @account_tokens = ('a', 'b', 'c');
 
-my $t = Test::Mojo->new("Pear::LocalLoop");
-
-my $dbh = $t->app->db;
-
-#Dump all pf the test tables and start again.
-my $sqlDeployment = Mojo::File->new("$FindBin::Bin/../dropschema.sql")->slurp;
-for (split ';', $sqlDeployment){
-  $dbh->do($_) or die $dbh->errstr;
-}
-
-$sqlDeployment = Mojo::File->new("$FindBin::Bin/../schema.sql")->slurp;
-for (split ';', $sqlDeployment){
-  $dbh->do($_) or die $dbh->errstr;
-}
-
-my @accountTokens = ('a', 'b', 'c');
-my $tokenStatement = $dbh->prepare('INSERT INTO AccountTokens (AccountTokenName) VALUES (?)');
-foreach (@accountTokens){
-  my $rowsAdded = $tokenStatement->execute($_);
-}
-
+$schema->resultset('AccountToken')->populate([
+  [ 'accounttokenname' ],
+  map { [ $_ ] } @account_tokens,
+]);
 
 #This depends on "register.t", "login.t" and "upload.t" working.
 
@@ -40,7 +24,7 @@ my $emailReno = 'reno@shinra.energy';
 my $passwordReno = 'turks';
 my $testJson = {
   'usertype' => 'customer', 
-  'token' => shift(@accountTokens), 
+  'token' => shift(@account_tokens), 
   'username' =>  'Reno', 
   'email' => $emailReno, 
   'postcode' => 'E1 MP01', 
@@ -56,24 +40,24 @@ my $emailBilly = 'choco.billy@chocofarm.org';
 my $passwordBilly = 'Choco';
 $testJson = {
   'usertype' => 'organisation', 
-  'token' => shift(@accountTokens), 
+  'token' => shift(@account_tokens), 
   'username' =>  'ChocoBillysGreens', 
   'email' => $emailBilly, 
   'postcode' => 'E4 C12', 
   'password' => $passwordBilly, 
-  'fulladdress' => 'Chocobo Farm, Eastern Continent, Gaia'
+  'street_address' => 'Chocobo Farm, Eastern Continent',
+  'town' => 'Gaia',
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200) 
   ->json_is('/success', Mojo::JSON->true);
-
 
 print "test 3 - Create admin account\n";
 my $emailAdmin = 'admin@foodloop.net';
 my $passwordAdmin = 'ethics';
 $testJson = {
   'usertype' => 'customer', 
-  'token' => shift(@accountTokens), 
+  'token' => shift(@account_tokens), 
   'username' =>  'admin', 
   'email' => $emailAdmin, 
   'postcode' => 'NW1 W01', 
@@ -85,11 +69,10 @@ $t->post_ok('/api/register' => json => $testJson)
   ->json_is('/success', Mojo::JSON->true);
 
 print "test 4 - Making 'admin' an Admin\n";
-my $rufusUserId = $t->app->db->selectrow_array("SELECT UserId FROM Users WHERE Email = ?", undef, ($emailAdmin));
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Administrators")}[0],0,"No admins";
-$t->app->db->prepare("INSERT INTO Administrators (UserId) VALUES (?)")->execute($rufusUserId);
-is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM Administrators")}[0],1,"1 admin";
-
+my $rufus_user = $schema->resultset('User')->find({ email => $emailAdmin });
+is $schema->resultset('Administrator')->count, 0, "No admins";
+$rufus_user->find_or_create_related('administrator', {});
+is $schema->resultset('Administrator')->count, 1, "1 admin";
 
 ######################################################
 
@@ -350,7 +333,7 @@ $json = {
   session_key => $session_key,
 };
 $t->post_ok('/api/admin-approve' => json => $json)
-  ->status_is(200)
+  ->status_is(200)->or($dump_error)
   ->json_is('/success', Mojo::JSON->true);
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingOrganisations", undef, ())}[0],2,"2 unverified organisation." ;
 is @{$t->app->db->selectrow_arrayref("SELECT COUNT(*) FROM PendingTransactions", undef, ())}[0],4,"4 unverified transaction." ;
