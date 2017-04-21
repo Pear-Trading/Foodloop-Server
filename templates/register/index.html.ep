@@ -73,8 +73,8 @@ body {
             <label for="register-age">Age Range</label>
             <select id="register-age" class="form-control" name="agerange" required>
               % for my $agerange ( @$ageranges ) {
-              <option value="<%= $agerange->{agerangeid} %>"<%= defined $form_data->{agerange} && $form_data->{agerange} eq $agerange->{agerangeid} ? ' selected' : '' %>>
-                <%= $agerange->{agerangestring} %>
+              <option value="<%= $agerange->{id} %>"<%= defined $form_data->{agerange} && $form_data->{agerange} eq $agerange->{id} ? ' selected' : '' %>>
+                <%= $agerange->{string} %>
               </option>
               % }
             </select>

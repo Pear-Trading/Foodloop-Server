@@ -79,7 +79,7 @@ sub post_register{
   if ( $usertype eq 'customer' ) {
 
     my $age_rs = $c->schema->resultset('AgeRange');
-    $validation->required('age')->in_resultset('agerangestring', $age_rs);
+    $validation->required('age')->in_resultset('id', $age_rs);
 
   } elsif ( $usertype eq 'organisation' ) {
 
@@ -103,8 +103,6 @@ sub post_register{
   }
 
   if ($usertype eq 'customer'){
-    # TODO replace with actually using the value on the post request
-    my $ageForeignKey = $c->get_age_foreign_key( $validation->param('age') );
 
     $c->schema->txn_do( sub {
       $c->schema->resultset('AccountToken')->find({
@@ -113,9 +111,9 @@ sub post_register{
       })->update({ used => 1 });
       $c->schema->resultset('User')->create({
         customer => {
-          username    => $validation->param('username'),
-          agerange_fk => $ageForeignKey,
-          postcode    => $validation->param('postcode'),
+          username     => $validation->param('username'),
+          age_range_id => $validation->param('age'),
+          postcode     => $validation->param('postcode'),
         },
         email    => $validation->param('email'),
         password => $validation->param('password'),

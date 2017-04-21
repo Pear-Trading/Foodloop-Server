@@ -29,7 +29,7 @@ has framework => sub {
   $schema->deploy;
 
   $schema->resultset('AgeRange')->populate([
-    [ qw/ agerangestring / ],
+    [ qw/ string / ],
     [ '20-35' ],
     [ '35-50' ],
     [ '50+' ],

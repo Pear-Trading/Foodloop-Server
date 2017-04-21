@@ -36,7 +36,7 @@ $testJson = {
   'email' => shift(@emails),
   'postcode' => 'LA1 1AA',
   'password' => 'Meh',
-  'age' => '50+'
+  'age' => 3
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -52,7 +52,7 @@ $testJson = {
   'email' => shift(@emails),
   'postcode' => 'LA1 1AA',
   'password' => 'Meh',
-  'age' => '50+'
+  'age' => 3
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(401)
@@ -67,7 +67,7 @@ $testJson = {
   'email' => shift(@emails),
   'postcode' => 'LA1 1AA',
   'password' => 'Meh',
-  'age' => '50+'
+  'age' => 3
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -83,7 +83,7 @@ $testJson = {
   'email' => shift(@emails), 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age' => '50+'
+  'age' => 3
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -99,7 +99,7 @@ $testJson = {
   'email' => shift(@emails), 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age' => '50+'
+  'age' => 3
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400) 
@@ -117,7 +117,7 @@ $testJson = {
   'email' => $emailToReuse, 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age' => '50+'
+  'age' => 3
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)
@@ -131,7 +131,7 @@ $testJson = {
   'email' => shift(@emails), 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age' => '35-50'
+  'age' => 2
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200) 
@@ -145,7 +145,7 @@ $testJson = {
   'email' => shift(@emails), 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age' => '20-35'
+  'age' => 1
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200) 
@@ -159,7 +159,7 @@ $testJson = {
   'email' => shift(@emails), 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age' => '50+'
+  'age' => 3
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(403) 
@@ -173,7 +173,7 @@ $testJson = {
   'username' => shift(@names),
   'postcode' => 'LA1 1AA',
   'password' => 'Meh',
-  'age' => '50+'
+  'age' => 3
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -188,7 +188,7 @@ $testJson = {
   'email' => 'dfsd@.com', 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age' => '35-50'
+  'age' => 2
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400) 
@@ -204,7 +204,7 @@ $testJson = {
   'email' => 'dfsd@com', 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age' => '35-50'
+  'age' => 2
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400) 
@@ -220,7 +220,7 @@ $testJson = {
   'email' => $emailToReuse, 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age' => '35-50'
+  'age' => 2
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(403) 
@@ -235,7 +235,7 @@ $testJson = {
   'username' => shift(@names),
   'email' => shift(@emails),
   'password' => 'Meh',
-  'age' => '50+'
+  'age' => 3
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -251,7 +251,7 @@ $testJson = {
   'username' => shift(@names),
   'email' => shift(@emails),
   'postcode' => 'LA1 1AA',
-  'age' => '50+'
+  'age' => 3
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -267,7 +267,7 @@ $testJson = {
   'email' => shift(@emails),
   'postcode' => 'LA1 1AA',
   'password' => 'Meh',
-  'age' => '50+'
+  'age' => 3
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)

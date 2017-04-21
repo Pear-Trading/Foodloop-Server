@@ -70,7 +70,7 @@ __PACKAGE__->might_have(
 __PACKAGE__->belongs_to(
   "customer",
   "Pear::LocalLoop::Schema::Result::Customer",
-  { customerid => "customer_id" },
+  { id => "customer_id" },
   {
     is_deferrable => 0,
     join_type     => "LEFT",

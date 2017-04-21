@@ -38,7 +38,7 @@ sub register {
   $validation->required('token')->in_resultset('accounttokenname', $token_rs);
 
   my $age_rs = $c->schema->resultset('AgeRange');
-  $validation->required('agerange')->in_resultset('agerangeid', $age_rs);
+  $validation->required('agerange')->in_resultset('id', $age_rs);
 
   my @error_messages;
   if ( $validation->has_error ) {
@@ -51,7 +51,7 @@ sub register {
       customer => {
         username => $validation->param('name'),
         postcode => $validation->param('postcode'),
-        agerange_fk => $validation->param('agerange'),
+        age_range_id => $validation->param('agerange'),
       },
     });
     if ( $new_user->in_storage ) {

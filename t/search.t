@@ -34,7 +34,7 @@ my $testJson = {
   'email' => $emailRufus, 
   'postcode' => 'LA1 1CF', 
   'password' => $passwordRufus, 
-  'age' => '20-35'
+  'age' => 1
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)
