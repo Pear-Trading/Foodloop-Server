@@ -25,7 +25,7 @@ is $org_rs->count, 0, "No organisations";
 $org_rs->create({
   id => $org_id_shinra,
   name => 'Shinra Electric Power Company',
-  street_address => 'Sector 0, Midgar, Eastern Continent',
+  street_name => 'Sector 0, Midgar, Eastern Continent',
   town => 'Gaia',
   postcode => 'E1 M00',
 });
@@ -74,7 +74,7 @@ $testJson = {
   'email' => $emailBilly, 
   'postcode' => 'E4 C12', 
   'password' => $passwordBilly, 
-  'street_address' => 'Chocobo Farm, Eastern Continent',
+  'street_name' => 'Chocobo Farm, Eastern Continent',
   'town' => 'Gaia',
 };
 $t->post_ok('/api/register' => json => $testJson)
@@ -335,7 +335,7 @@ $session_key = $t->tx->res->json('/session_key');
 
 print "test 23 - add valid transaction but for with account (type 2: existing organisation)\n";
 my $org_result = $schema->resultset('PendingOrganisation')->find({ name => '7th Heaven' });
-my $unvalidatedOrganisationId = $org_result->pendingorganisationid;
+my $unvalidatedOrganisationId = $org_result->id;
 is $schema->resultset('PendingTransaction')->count, 1, "1 pending transactions";
 $json = {
   transaction_value => 10,
