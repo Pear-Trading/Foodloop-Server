@@ -14,11 +14,11 @@
 <form action="<%= url_for %>" method="post">
   <div class="form-group">
     <label for="token-name">Token Name</label>
-    <input id="token-name" type="text" class="form-control" placeholder="Token Text" name="token-name" value="<%= $token->accounttokenname %>">
+    <input id="token-name" type="text" class="form-control" placeholder="Token Text" name="token" value="<%= $token->name %>">
   </div>
   <div class="form-group">
     <label for="token-used">Token Used?</label>
-    <select id="token-used" class="form-control" name="token-used">
+    <select id="token-used" class="form-control" name="used">
       <option value="0"<%= $token->used == 0 ? ' selected' : '' %>>Available</option>
       <option value="1"<%= $token->used == 1 ? ' selected' : '' %>>Used</option>
     </select>
