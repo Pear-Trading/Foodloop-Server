@@ -42,7 +42,7 @@ sub auth {
   my $session_key = $c->stash->{api_json}->{session_key};
 
   if ( defined $session_key ) {
-    my $session_result = $c->schema->resultset('SessionToken')->find({ sessiontokenname => $session_key });
+    my $session_result = $c->schema->resultset('SessionToken')->find({ token => $session_key });
 
     if ( defined $session_result ) {
       $c->stash( api_user => $session_result->user );
@@ -78,7 +78,7 @@ sub post_login {
   
   if ( defined $user_result ) {
     if ( $user_result->check_password($password) ) {
-      my $session_key = $c->generate_session( $user_result->id );
+      my $session_key = $user_result->generate_session;
 
       return $c->render( json => {
         success => Mojo::JSON->true,
@@ -101,7 +101,7 @@ sub post_logout {
 
   my $session_key = $c->req->json( '/session_key' );
 
-  my $session_result = $c->schema->resultset('SessionToken')->find({ sessiontokenname => $session_key });
+  my $session_result = $c->schema->resultset('SessionToken')->find({ token => $session_key });
 
   if ( defined $session_result ) {
     $session_result->delete;

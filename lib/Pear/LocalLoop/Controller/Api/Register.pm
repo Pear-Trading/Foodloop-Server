@@ -30,6 +30,7 @@ has error_messages => sub {
     },
     age => {
       required => { message => 'No age sent.', status => 400 },
+      number => { message => 'Age range is invalid', status => 400 },
       in_resultset => { message => 'Age range is invalid.', status => 400 },
     },
     street_name => {
@@ -79,7 +80,7 @@ sub post_register{
   if ( $usertype eq 'customer' ) {
 
     my $age_rs = $c->schema->resultset('AgeRange');
-    $validation->required('age')->in_resultset('id', $age_rs);
+    $validation->required('age')->number->in_resultset('id', $age_rs);
 
   } elsif ( $usertype eq 'organisation' ) {
 

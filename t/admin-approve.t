@@ -84,7 +84,7 @@ $testJson = {
   'password' => $passwordReno,
 };
 $t->post_ok('/api/login' => json => $testJson)
-  ->status_is(200)
+  ->status_is(200)->or($dump_error)
   ->json_is('/success', Mojo::JSON->true);
 
 my $session_key = $t->tx->res->json('/session_key');
@@ -129,7 +129,7 @@ $t->post_ok('/api/admin-approve' => json => $json)
 
 print "test 8 - Logout Reno\n";
 $t->post_ok('/api/logout', json => { session_key => $session_key } )
-  ->status_is(200)
+  ->status_is(200)->or($dump_error)
   ->json_is('/success', Mojo::JSON->true);
 
 #End of non-admin Reno

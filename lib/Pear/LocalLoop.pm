@@ -150,18 +150,6 @@ sub startup {
     $self->res->headers->header('Access-Control-Allow-Origin' => '*') if $self->app->mode eq 'development';
   });
 
-  #This assumes the user has no current session on that device.
-  $self->helper(generate_session => sub {
-    my ($self, $user) = @_;
-
-    my $sessionToken = Data::UUID->new->create_str();
-
-    my $insertStatement = $self->db->prepare('INSERT INTO SessionTokens (SessionTokenName, UserIdAssignedTo_FK, ExpireDateTime) VALUES (?, ?, ?)');
-    my $rowsAdded = $insertStatement->execute($sessionToken, $user, DateTime->now()->add( years => 1 ));
-    
-    return $sessionToken;
-  });
-
   $self->helper(get_age_foreign_key => sub {
     my ( $c, $age_string ) = @_;
     my $age_range = $c->schema->resultset('AgeRange')->find({ agerangestring => $age_string });

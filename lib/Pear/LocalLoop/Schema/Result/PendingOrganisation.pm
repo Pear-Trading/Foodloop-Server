@@ -5,7 +5,10 @@ use warnings;
 
 use base 'DBIx::Class::Core';
 
-__PACKAGE__->load_components("InflateColumn::DateTime");
+__PACKAGE__->load_components( qw/
+  InflateColumn::DateTime
+  TimeStamp
+/);
 
 __PACKAGE__->table("pending_organisations");
 
@@ -42,16 +45,17 @@ __PACKAGE__->add_columns(
   submitted_at => {
     data_type => "datetime",
     is_nullable => 0,
+    set_on_create => 1,
   },
 );
 
 __PACKAGE__->set_primary_key('id');
 
 __PACKAGE__->has_many(
-  "pending_transactions",
+  "transactions",
   "Pear::LocalLoop::Schema::Result::PendingTransaction",
   {
-    "foreign.pendingsellerorganisationid_fk" => "self.id",
+    "foreign.seller_id" => "self.id",
   },
   { cascade_copy => 0, cascade_delete => 1 },
 );

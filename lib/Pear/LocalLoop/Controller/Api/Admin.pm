@@ -105,15 +105,15 @@ sub post_admin_merge {
 sub copy_transactions_and_delete {
   my ( $c, $from_org, $to_org ) = @_;
 
-  my $from_org_transaction_rs = $from_org->pending_transactions;
+  my $from_org_transaction_rs = $from_org->transactions;
 
   while ( my $from_org_transaction = $from_org_transaction_rs->next ) {
     $to_org->create_related(
       'transactions', {
-        buyeruserid_fk     => $from_org_transaction->buyeruserid_fk,
-        valuemicrocurrency => $from_org_transaction->valuemicrocurrency,
-        proof_image         => $from_org_transaction->proof_image,
-        timedatesubmitted  => $from_org_transaction->timedatesubmitted,
+        buyer_id     => $from_org_transaction->buyer_id,
+        value        => $from_org_transaction->value,
+        proof_image  => $from_org_transaction->proof_image,
+        submitted_at => $from_org_transaction->submitted_at,
       }
     );
   }

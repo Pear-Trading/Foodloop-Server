@@ -1,4 +1,3 @@
-use utf8;
 package Pear::LocalLoop::Schema::Result::Customer;
 
 use strict;

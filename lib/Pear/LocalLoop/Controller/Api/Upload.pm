@@ -75,7 +75,6 @@ has error_messages => sub {
 
 sub post_upload {
   my $c = shift;
-  my $self = $c;
 
   my $user = $c->stash->{api_user};
 
@@ -94,75 +93,62 @@ sub post_upload {
 
   my $type = $validation->param('transaction_type');
 
+  my $organisation;
+
   if ( $type == 1 ) {
     # Validated Organisation
     my $valid_org_rs = $c->schema->resultset('Organisation');
     $validation->required('organisation_id')->number->in_resultset( 'id', $valid_org_rs );
+
+    return $c->api_validation_error if $validation->has_error;
+
+    $organisation = $valid_org_rs->find( $validation->param('organisation_id') );
+
   } elsif ( $type == 2 ) {
     # Unvalidated Organisation
     my $valid_org_rs = $c->schema->resultset('PendingOrganisation')->search({ submitted_by_id => $user->id });
     $validation->required('organisation_id')->number->in_resultset( 'id', $valid_org_rs );
+    
+    return $c->api_validation_error if $validation->has_error;
+
+    $organisation = $valid_org_rs->find( $validation->param('organisation_id') );
+
   } elsif ( $type == 3 ) {
     # Unknown Organisation
     $validation->required('organisation_name');
     $validation->optional('street_name');
     $validation->optional('town');
     $validation->optional('postcode')->postcode;
-  }
+    
+    return $c->api_validation_error if $validation->has_error;
 
-  return $c->api_validation_error if $validation->has_error;
+    $organisation = $c->schema->resultset('PendingOrganisation')->create({
+      submitted_by => $user,
+      submitted_at => DateTime->now,
+      name         => $validation->param('organisation_name'),
+      street_name  => $validation->param('street_name'),
+      town         => $validation->param('town'),
+      postcode     => $validation->param('postcode'),
+    });
+  }
 
   my $transaction_value = $validation->param('transaction_value');
   my $upload = $validation->param('file');
-
   my $file = $c->store_file_from_upload( $upload );
 
-  if ( $type == 1 ) {
-    # Validated organisation
-    $c->schema->resultset('Transaction')->create({
-      buyeruserid_fk => $user->id,
-      sellerorganisationid_fk => $validation->param('organisation_id'),
-      valuemicrocurrency => $transaction_value,
+  $organisation->create_related(
+    'transactions',
+    {
+      buyer => $user,
+      value => $transaction_value,
       proof_image => $file,
-      timedatesubmitted => DateTime->now,
-    });
-  } elsif ( $type == 2 ) {
-    # Unvalidated Organisation
-    $c->schema->resultset('PendingTransaction')->create({
-      buyeruserid_fk => $user->id,
-      pendingsellerorganisationid_fk => $validation->param('organisation_id'),
-      valuemicrocurrency => $transaction_value,
-      proof_image => $file,
-      timedatesubmitted => DateTime->now,
-    });
-  } elsif ( $type == 3 ) {
-    my $organisation_name = $validation->param('organisation_name');
-    my $street_name = $validation->param('street_name');
-    my $town = $validation->param('town');
-    my $postcode = $validation->param('postcode');
+    }
+  );
 
-    my $pending_org = $c->schema->resultset('PendingOrganisation')->create({
-      submitted_by => $user,
-      submitted_at => DateTime->now,
-      name         => $organisation_name,
-      street_name  => $street_name,
-      town         => $town,
-      postcode     => $postcode,
-    });
-
-    $c->schema->resultset('PendingTransaction')->create({
-      buyeruserid_fk => $user->id,
-      pendingsellerorganisationid_fk => $pending_org->id,
-      valuemicrocurrency => $transaction_value,
-      proof_image => $file,
-      timedatesubmitted => DateTime->now,
-    });
-  }
-  return $self->render( json => {
+  return $c->render( json => {
     success => Mojo::JSON->true,
     message => 'Upload Successful',
   });
-
 }
 
 

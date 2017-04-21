@@ -1,4 +1,3 @@
-use utf8;
 package Pear::LocalLoop::Schema::Result::AgeRange;
 
 use strict;

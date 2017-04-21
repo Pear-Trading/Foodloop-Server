@@ -1,10 +1,11 @@
-use utf8;
 package Pear::LocalLoop::Schema::Result::User;
 
 use strict;
 use warnings;
 
 use base 'DBIx::Class::Core';
+
+use Data::UUID;
 
 __PACKAGE__->load_components( qw/
   InflateColumn::DateTime
@@ -70,7 +71,7 @@ __PACKAGE__->might_have(
 __PACKAGE__->belongs_to(
   "customer",
   "Pear::LocalLoop::Schema::Result::Customer",
-  { id => "customer_id" },
+  { "foreign.id" => "self.customer_id" },
   {
     is_deferrable => 0,
     join_type     => "LEFT",
@@ -82,7 +83,7 @@ __PACKAGE__->belongs_to(
 __PACKAGE__->belongs_to(
   "organisation",
   "Pear::LocalLoop::Schema::Result::Organisation",
-  { id => "organisation_id" },
+  { "foreign.id" => "self.organisation_id" },
   {
     is_deferrable => 0,
     join_type     => "LEFT",
@@ -101,22 +102,36 @@ __PACKAGE__->has_many(
 __PACKAGE__->has_many(
   "pending_transactions",
   "Pear::LocalLoop::Schema::Result::PendingTransaction",
-  { "foreign.buyeruserid_fk" => "self.id" },
+  { "foreign.buyer_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
 __PACKAGE__->has_many(
   "session_tokens",
   "Pear::LocalLoop::Schema::Result::SessionToken",
-  { "foreign.useridassignedto_fk" => "self.id" },
+  { "foreign.user_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
 __PACKAGE__->has_many(
   "transactions",
   "Pear::LocalLoop::Schema::Result::Transaction",
-  { "foreign.buyeruserid_fk" => "self.id" },
+  { "foreign.buyer_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
+
+sub generate_session {
+  my $self = shift;
+
+  my $token = Data::UUID->new->create_str();
+  $self->create_related(
+    'session_tokens',
+    {
+      token => $token,
+    },
+  );
+
+  return $token;
+}
 
 1;
