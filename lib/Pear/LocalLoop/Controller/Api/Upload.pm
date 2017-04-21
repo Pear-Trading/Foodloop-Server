@@ -97,8 +97,8 @@ sub post_upload {
     $validation->required('organisation_id')->number->in_resultset( 'id', $valid_org_rs );
   } elsif ( $type == 2 ) {
     # Unvalidated Organisation
-    my $valid_org_rs = $c->schema->resultset('PendingOrganisation')->search({ usersubmitted_fk => $user->id });
-    $validation->required('organisation_id')->number->in_resultset( 'pendingorganisationid', $valid_org_rs );
+    my $valid_org_rs = $c->schema->resultset('PendingOrganisation')->search({ submitted_by_id => $user->id });
+    $validation->required('organisation_id')->number->in_resultset( 'id', $valid_org_rs );
   } elsif ( $type == 3 ) {
     # Unknown Organisation
     $validation->required('organisation_name');
@@ -162,16 +162,17 @@ sub post_upload {
     }
 
     my $pending_org = $c->schema->resultset('PendingOrganisation')->create({
-      usersubmitted_fk => $user->id,
-      timedatesubmitted => DateTime->now,
-      name => $organisation_name,
-      fulladdress => $fullAddress,
-      postcode => $postcode,
+      submitted_by => $user,
+      submitted_at => DateTime->now,
+      name         => $organisation_name,
+      street_name  => $street_name,
+      town         => $town,
+      postcode     => $postcode,
     });
 
     $c->schema->resultset('PendingTransaction')->create({
       buyeruserid_fk => $user->id,
-      pendingsellerorganisationid_fk => $pending_org->pendingorganisationid,
+      pendingsellerorganisationid_fk => $pending_org->id,
       valuemicrocurrency => $transaction_value,
       proofimage => $filename,
       timedatesubmitted => DateTime->now,

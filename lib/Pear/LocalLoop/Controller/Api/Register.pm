@@ -32,8 +32,8 @@ has error_messages => sub {
       required => { message => 'No age sent.', status => 400 },
       in_resultset => { message => 'Age range is invalid.', status => 400 },
     },
-    street_address => {
-      required => { message => 'No street_address sent.', status => 400 },
+    street_name => {
+      required => { message => 'No street_name sent.', status => 400 },
     },
     town => {
       required => { message => 'No town sent.', status => 400 },
@@ -83,7 +83,7 @@ sub post_register{
 
   } elsif ( $usertype eq 'organisation' ) {
 
-    $validation->required('street_address');
+    $validation->required('street_name');
     $validation->required('town');
 
   }
@@ -135,7 +135,7 @@ sub post_register{
       $c->schema->resultset('User')->create({
         organisation => {
           name           => $validation->param('username'),
-          street_address => $validation->param('street_address'),
+          street_name => $validation->param('street_name'),
           town           => $validation->param('town'),
           postcode       => $validation->param('postcode'),
         },

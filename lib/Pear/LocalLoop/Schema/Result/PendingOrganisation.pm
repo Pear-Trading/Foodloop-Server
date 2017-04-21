@@ -21,7 +21,7 @@ __PACKAGE__->add_columns(
     size => 255,
     is_nullable => 0,
   },
-  street_address => {
+  street_name => {
     data_type => 'text',
     is_nullable => 1,
   },
@@ -64,7 +64,7 @@ __PACKAGE__->has_many(
   {
     "foreign.pendingsellerorganisationid_fk" => "self.id",
   },
-  { cascade_copy => 0, cascade_delete => 0 },
+  { cascade_copy => 0, cascade_delete => 1 },
 );
 
 =head2 usersubmitted_fk

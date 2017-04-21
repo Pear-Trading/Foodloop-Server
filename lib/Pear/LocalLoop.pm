@@ -91,11 +91,14 @@ sub startup {
   });
   $api->post('/upload')->to('api-upload#post_upload');
   $api->post('/search')->to('api-upload#post_search');
-  $api->post('/admin-approve')->to('api-admin#post_admin_approve');
-  $api->post('/admin-merge')->to('api-admin#post_admin_merge');
   $api->post('/edit')->to('api-api#post_edit');
   $api->post('/fetchuser')->to('api-api#post_fetchuser');
   $api->post('/user-history')->to('api-user#post_user_history');
+
+  my $api_admin = $api->under('/')->to('api-admin#auth');
+
+  $api_admin->post('/admin-approve')->to('api-admin#post_admin_approve');
+  $api_admin->post('/admin-merge')->to('api-admin#post_admin_merge');
 
   my $admin_routes = $r->under('/admin')->to('admin#under');
 
