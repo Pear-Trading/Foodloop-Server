@@ -7,7 +7,7 @@
   <h3 class="card-header">Submit Receipt</h3>
   <div class="card-block">
     <form id="receipt-form" action="<%= url_for '/portal/upload' %>">
-      <input type="hidden" name="transaction_type" value="3" hidden>
+      <input id="tran-type" type="hidden" name="transaction_type" value="3" hidden>
       <div class="form-group">
         <label for="org-name">Organisation Name</label>
         <input id="org-name" type="text" class="form-control" name="organisation_name" placeholder="Organisation Name" required>

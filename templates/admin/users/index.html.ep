@@ -13,7 +13,7 @@
 % }
 <div class="list-group">
   % for my $user (@$users) {
-  <a href="<%= url_for . '/' . $user->{userid} %>" class="list-group-item list-group-item-action">
+  <a href="<%= url_for . '/' . $user->{id} %>" class="list-group-item list-group-item-action">
     <div>
       %= $user->{email}
     </div>

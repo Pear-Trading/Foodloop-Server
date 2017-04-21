@@ -142,7 +142,9 @@ sub startup {
 
   $user_routes->get('/home')->to('root#home');
 
-  $user_routes->post('/portal/upload')->to('portal#post_upload');
+  my $portal_api = $r->under('/portal')->to('api-auth#check_json')->under('/')->to('portal#under');
+
+  $portal_api->post('/upload')->to('api-upload#post_upload');
 
   $self->hook( before_dispatch => sub {
     my $self = shift;
