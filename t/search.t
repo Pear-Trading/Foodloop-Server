@@ -1,63 +1,27 @@
 use Mojo::Base -strict;
+
 use Test::More;
-use Test::Mojo;
 use Mojo::JSON;
-use Text::ParseWords;
+use Test::Pear::LocalLoop;
 
+my $framework = Test::Pear::LocalLoop->new;
+my $t = $framework->framework;
+my $schema = $t->app->schema;
 
-use FindBin;
+my @account_tokens = ('a', 'b');
+$schema->resultset('AccountToken')->populate([
+  [ qw/ accounttokenname / ],
+  map { [ $_ ] } @account_tokens,
+]);
 
-BEGIN {
-  $ENV{MOJO_MODE} = 'testing';
-  $ENV{MOJO_LOG_LEVEL} = 'debug';
-}
-
-my $t = Test::Mojo->new("Pear::LocalLoop");
-
-my $dbh = $t->app->db;
-
-#Dump all pf the test tables and start again.
-my $sqlDeployment = Mojo::File->new("$FindBin::Bin/../dropschema.sql")->slurp;
-for (split ';', $sqlDeployment){
-  $dbh->do($_) or die $dbh->errstr;
-}
-
-$sqlDeployment = Mojo::File->new("$FindBin::Bin/../schema.sql")->slurp;
-for (split ';', $sqlDeployment){
-  $dbh->do($_) or die $dbh->errstr;
-}
-
-my @accountTokens = ('a', 'b');
-my $tokenStatement = $dbh->prepare('INSERT INTO AccountTokens (AccountTokenName) VALUES (?)');
-foreach (@accountTokens){
-  my $rowsAdded = $tokenStatement->execute($_);
-}
-
-#TODO this should be done via the API but as that does not exist at the moment, just add them manually.
-my $statement = $dbh->prepare("INSERT INTO Organisations (OrganisationalId, Name, FullAddress, PostCode) VALUES (?, ?, ?, ?)");
-
-my $value = 1;
-my ($name, $address, $postcode) = ("Avanti Bar & Restaurant","57 Main St, Kirkby Lonsdale, Cumbria","LA6 2AH");
-$statement->execute($value, $name, $address, $postcode);
-
-$value++;
-($name, $address, $postcode) = ("Full House Noodle Bar","21 Common Garden St, Lancaster, Lancashire","LA1 1XD");
-$statement->execute($value, $name, $address, $postcode);
-
-$value++;
-($name, $address, $postcode) = ("The Quay's Fishbar","1 Adcliffe Rd, Lancaster","LA1 1SS");
-$statement->execute($value, $name, $address, $postcode);
-
-$value++;
-($name, $address, $postcode) = ("Dan's Fishop","56 North Rd, Lancaster","LA1 1LT");
-$statement->execute($value, $name, $address, $postcode);
-
-$value++;
-($name, $address, $postcode) = ("Hodgeson's Chippy","96 Prospect St, Lancaster","LA1 3BH");
-$statement->execute($value, $name, $address, $postcode);
-
-
-#This depends on "register.t", "login.t" and "upload.t" working.
+$schema->resultset('Organisation')->populate([
+  [ qw/ name street_name town postcode / ],
+  [ "Avanti Bar & Restaurant", "57 Main St", "Kirkby Lonsdale", "LA6 2AH" ],
+  [ "Full House Noodle Bar", "21 Common Garden St", "Lancaster", "LA1 1XD" ],
+  [ "The Quay's Fishbar", "1 Adcliffe Rd", "Lancaster", "LA1 1SS" ],
+  [ "Dan's Fishop", "56 North Rd", "Lancaster", "LA1 1LT" ],
+  [ "Hodgeson's Chippy", "96 Prospect St", "Lancaster", "LA1 3BH" ],
+]);
 
 #test with a customer.
 print "test 1 - Create customer user account (Rufus)\n";
@@ -65,7 +29,7 @@ my $emailRufus = 'rufus@shinra.energy';
 my $passwordRufus = 'MakoGold';
 my $testJson = {
   'usertype' => 'customer', 
-  'token' => shift(@accountTokens), 
+  'token' => shift(@account_tokens), 
   'username' =>  'RufusShinra', 
   'email' => $emailRufus, 
   'postcode' => 'LA1 1CF', 
@@ -82,12 +46,13 @@ my $emailBilly = 'choco.billy@chocofarm.org';
 my $passwordBilly = 'Choco';
 $testJson = {
   'usertype' => 'organisation', 
-  'token' => shift(@accountTokens), 
+  'token' => shift(@account_tokens), 
   'username' =>  'ChocoBillysGreens', 
   'email' => $emailBilly, 
   'postcode' => 'LA1 1HT', 
   'password' => $passwordBilly, 
-  'fulladdress' => 'Market St, Lancaster'
+  'street_name' => 'Market St',
+  'town' => 'Lancaster',
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200) 
@@ -200,20 +165,11 @@ log_out();
 print "test 10 - Login - Rufus (cookies, customer)\n";
 login_rufus();
 
-print "test 11 - search blank\n";
-$t->post_ok('/api/search' => json => {
-    searchName => " ",
-    session_key => $session_key,
-  })
-  ->status_is(400)
-  ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/searchName is blank/i);
-
 sub check_vars{
   my ($searchTerm, $numValidated, $numUnvalidated) = @_;
 
   $t->post_ok('/api/search' => json => {
-      searchName => $searchTerm,
+      search_name => $searchTerm,
       session_key => $session_key,
     })
     ->status_is(200)
@@ -232,6 +188,9 @@ sub check_vars{
   is $unvalidSize,$numUnvalidated,"unvalidated returned - " . $searchTerm;
   
 };
+
+print "test 11 - search blank\n";
+check_vars(" ", 5, 1);
 
 print "test 12 - Testing expected values with 'booths'\n";
 #Expect 0 validated and 0 unvalidated with "booths".

@@ -67,6 +67,9 @@ has error_messages => sub {
     organisation_name => {
       required => { message => 'organisation_name is missing', status => 400 },
     },
+    search_name => {
+      required => { message => 'search_name is missing', status => 400 },
+    },
   };
 };
 
@@ -188,75 +191,55 @@ sub post_upload {
 }
 
 
-#TODO this should limit the number of responses returned, when location is implemented that would be the main way of filtering.
+# TODO Limit search results, possibly paginate them?
+# TODO Search by location as well
 sub post_search {
-  my $self = shift;
-  my $userId = $self->get_active_user_id();
+  my $c = shift;
+  my $self = $c;
 
-  my $json = $self->req->json;
-  if ( ! defined $json ) {
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'JSON is missing.',
-    },
-    status => 400,); #Malformed request   
-  }
+  my $validation = $c->validation;
 
-  my $searchName = $json->{searchName};
-  if ( ! defined $searchName ) {
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'searchName is missing.',
-    },
-    status => 400,); #Malformed request   
-  }
-  #Is blank
-  elsif  ( $searchName =~ m/^\s*$/) {
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'searchName is blank.',
-    },
-    status => 400,); #Malformed request   
-  }
+  $validation->input( $c->stash->{api_json} );
 
-  #Currently ignored
-  #TODO implement further. 
-  my $searchLocation = $json->{searchLocation};
+  $validation->required('search_name');
 
-  my @validatedOrgs = ();
-  {
-    my $statementValidated = $self->db->prepare("SELECT OrganisationalId, Name, FullAddress, PostCode FROM Organisations WHERE UPPER( Name ) LIKE ?");
-    $statementValidated->execute('%'. uc $searchName.'%');
+  return $c->api_validation_error if $validation->has_error;
 
-    while (my ($id, $name, $address, $postcode) = $statementValidated->fetchrow_array()) {
-      push(@validatedOrgs, $self->create_hash($id,$name,$address,$postcode));
-    }
-  }
+  my $search_name = $validation->param('search_name');
 
-  $self->app->log->debug( "Orgs: " . Dumper @validatedOrgs );
+  my $valid_orgs_rs = $c->schema->resultset('Organisation')->search(
+    { 'LOWER(name)' => { -like => '%' . lc $search_name . '%' } },
+  );
 
-  my @unvalidatedOrgs = ();
-  {
-    my $statementUnvalidated = $self->db->prepare("SELECT PendingOrganisationId, Name, FullAddress, Postcode FROM PendingOrganisations WHERE UPPER( Name ) LIKE ? AND UserSubmitted_FK = ?");
-    $statementUnvalidated->execute('%'. uc $searchName.'%', $userId);
+  my $pending_orgs_rs = $c->stash->{api_user}->pending_organisations->search(
+    { 'LOWER(name)' => { -like => '%' . lc $search_name . '%' } },
+  );
 
-    while (my ($id, $name, $fullAddress, $postcode) = $statementUnvalidated->fetchrow_array()) {
-      push(@unvalidatedOrgs, $self->create_hash($id, $name, $fullAddress, $postcode));
-    }
-  }
-  
-  $self->app->log->debug( "Non Validated Orgs: " . Dumper @unvalidatedOrgs );
-  $self->app->log->debug('Path Success: file:' . __FILE__ . ', line: ' . __LINE__);
+  my @valid_orgs = (
+    map {{
+        id => $_->id,
+        name => $_->name,
+        street_name => $_->street_name,
+        town => $_->town,
+        postcode => $_->postcode,
+    }} $valid_orgs_rs->all
+  );
+
+  my @pending_orgs = (
+    map {{
+        id => $_->id,
+        name => $_->name,
+        street_name => $_->street_name,
+        town => $_->town,
+        postcode => $_->postcode,
+    }} $pending_orgs_rs->all
+  );
+
   return $self->render( json => {
     success => Mojo::JSON->true,
-    unvalidated => \@unvalidatedOrgs,
-    validated => \@validatedOrgs,
-  },
-  status => 200,);    
-
+    validated => \@valid_orgs,
+    unvalidated => \@pending_orgs,
+  });
 }
 
 1;
