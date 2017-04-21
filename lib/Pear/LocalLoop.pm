@@ -149,12 +149,6 @@ sub startup {
 
     $self->res->headers->header('Access-Control-Allow-Origin' => '*') if $self->app->mode eq 'development';
   });
-
-  $self->helper(get_age_foreign_key => sub {
-    my ( $c, $age_string ) = @_;
-    my $age_range = $c->schema->resultset('AgeRange')->find({ agerangestring => $age_string });
-    return defined $age_range ? $age_range->agerangeid : undef;
-  });
 }
 
 1;
