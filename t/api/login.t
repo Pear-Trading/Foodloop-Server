@@ -13,7 +13,7 @@ my $email = 'rufus@shinra.energy';
 my $password = 'MakoGold';
 
 $schema->resultset('AccountToken')->create({
-  accounttokenname => $account_token
+  name => $account_token
 });
 
 my $test_json = {

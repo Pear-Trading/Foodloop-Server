@@ -35,7 +35,7 @@ sub register {
   $validation->required('email')->email->not_in_resultset('email', $user_rs);
 
   my $token_rs = $c->schema->resultset('AccountToken')->search_rs({used => 0});
-  $validation->required('token')->in_resultset('accounttokenname', $token_rs);
+  $validation->required('token')->in_resultset('name', $token_rs);
 
   my $age_rs = $c->schema->resultset('AgeRange');
   $validation->required('agerange')->in_resultset('id', $age_rs);

@@ -58,7 +58,7 @@ sub post_register{
   $validation->input( $json );
 
   my $token_rs = $c->schema->resultset('AccountToken')->search_rs({used => 0});
-  $validation->required('token')->in_resultset('accounttokenname', $token_rs);
+  $validation->required('token')->in_resultset('name', $token_rs);
 
   my $customer_rs = $c->schema->resultset('Customer');
   $validation->required('username')->like(qr/^[A-Za-z0-9]+$/)->not_in_resultset('username', $customer_rs);
@@ -106,7 +106,7 @@ sub post_register{
 
     $c->schema->txn_do( sub {
       $c->schema->resultset('AccountToken')->find({
-        accounttokenname => $validation->param('token'),
+        name => $validation->param('token'),
         used => 0,
       })->update({ used => 1 });
       $c->schema->resultset('User')->create({
@@ -126,7 +126,7 @@ sub post_register{
 
     $c->schema->txn_do( sub {
       $c->schema->resultset('AccountToken')->find({
-        accounttokenname => $validation->param('token'),
+        name => $validation->param('token'),
         used => 0,
       })->update({ used => 1 });
       $c->schema->resultset('User')->create({

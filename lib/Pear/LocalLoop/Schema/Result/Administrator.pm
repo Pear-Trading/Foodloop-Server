@@ -5,7 +5,7 @@ use warnings;
 
 use base 'DBIx::Class::Core';
 
-__PACKAGE__->table("Administrators");
+__PACKAGE__->table("administrators");
 
 __PACKAGE__->add_columns(
   "user_id",

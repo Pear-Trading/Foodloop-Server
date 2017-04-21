@@ -12,7 +12,7 @@ my $dump_error = sub { diag $t->tx->res->dom->at('pre[id="error"]')->text };
 my @account_tokens = ('a', 'b', 'c');
 
 $schema->resultset('AccountToken')->populate([
-  [ 'accounttokenname' ],
+  [ 'name' ],
   map { [ $_ ] } @account_tokens,
 ]);
 

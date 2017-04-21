@@ -14,7 +14,7 @@ my @emails = ('a@a.com', 'b@a.com', 'c@a.com', 'd@a.com', 'e@a.com', 'f@a.com', 
 my @tokens =  ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
 
 $schema->resultset('AccountToken')->populate([
-  [ qw/ accounttokenname / ],
+  [ qw/ name / ],
   map { [ $_ ] } @tokens,
 ]);
 

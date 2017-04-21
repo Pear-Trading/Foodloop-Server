@@ -10,7 +10,7 @@ my $schema = $t->app->schema;
 
 my @account_tokens = ('a', 'b');
 $schema->resultset('AccountToken')->populate([
-  [ qw/ accounttokenname / ],
+  [ qw/ name / ],
   map { [ $_ ] } @account_tokens,
 ]);
 
