@@ -1,0 +1,13 @@
+sudo: false
+
+language: perl
+perl:
+  - "5.20"
+env:
+  - HARNESS_PERL_SWITCHES="-MDevel::Cover"
+install:
+  - cpanm --quiet --notest --installdeps .
+  - cpanm Devel::Cover
+script:
+  - prove -lr
+  - cover
