@@ -333,7 +333,7 @@ $testJson = {
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/no fulladdress sent/i);
+  ->content_like(qr/no street_name sent/i);
 
 #TODO Validation of full address
 
@@ -345,7 +345,8 @@ $testJson = {
   'email' => shift(@emails), 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'fulladdress' => 'mary lane testing....'
+  'street_name' => 'mary lane testing....',
+  'town' => 'Lancaster',
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200) 
