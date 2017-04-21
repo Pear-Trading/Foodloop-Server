@@ -10,6 +10,7 @@ requires 'Time::Fake';
 requires 'Scalar::Util';
 requires 'DBIx::Class';
 requires 'DBIx::Class::PassphraseColumn';
+requires 'DBIx::Class::TimeStamp';
 requires 'DBIx::Class::Schema::Loader';
 requires 'SQL::Translator';
 requires 'DateTime';

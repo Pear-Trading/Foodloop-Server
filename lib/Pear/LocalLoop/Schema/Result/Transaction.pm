@@ -116,7 +116,7 @@ Related object: L<Pear::LocalLoop::Schema::Result::User>
 __PACKAGE__->belongs_to(
   "buyeruserid_fk",
   "Pear::LocalLoop::Schema::Result::User",
-  { userid => "buyeruserid_fk" },
+  { id => "buyeruserid_fk" },
   { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },
 );
 

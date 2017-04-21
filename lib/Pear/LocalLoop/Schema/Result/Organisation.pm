@@ -38,16 +38,6 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id');
 
-=head1 RELATIONS
-
-=head2 transactions
-
-Type: has_many
-
-Related object: L<Pear::LocalLoop::Schema::Result::Transaction>
-
-=cut
-
 __PACKAGE__->has_many(
   "transactions",
   "Pear::LocalLoop::Schema::Result::Transaction",
@@ -55,18 +45,10 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-=head2 user
-
-Type: might_have
-
-Related object: L<Pear::LocalLoop::Schema::Result::User>
-
-=cut
-
 __PACKAGE__->might_have(
   "user",
   "Pear::LocalLoop::Schema::Result::User",
-  { "foreign.organisationalid_fk" => 'self.id' },
+  { "foreign.organisation_id" => 'self.id' },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 

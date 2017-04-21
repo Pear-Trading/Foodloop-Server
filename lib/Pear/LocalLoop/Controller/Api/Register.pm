@@ -113,13 +113,12 @@ sub post_register{
       })->update({ used => 1 });
       $c->schema->resultset('User')->create({
         customer => {
-          username => $validation->param('username'),
+          username    => $validation->param('username'),
           agerange_fk => $ageForeignKey,
-          postcode => $validation->param('postcode'),
+          postcode    => $validation->param('postcode'),
         },
-        email           => $validation->param('email'),
-        hashedpassword  => $validation->param('password'),
-        joindate        => DateTime->now,
+        email    => $validation->param('email'),
+        password => $validation->param('password'),
       });
     });
 
@@ -134,14 +133,13 @@ sub post_register{
       })->update({ used => 1 });
       $c->schema->resultset('User')->create({
         organisation => {
-          name           => $validation->param('username'),
+          name        => $validation->param('username'),
           street_name => $validation->param('street_name'),
-          town           => $validation->param('town'),
-          postcode       => $validation->param('postcode'),
+          town        => $validation->param('town'),
+          postcode    => $validation->param('postcode'),
         },
-        email           => $validation->param('email'),
-        hashedpassword  => $validation->param('password'),
-        joindate        => DateTime->now,
+        email    => $validation->param('email'),
+        password => $validation->param('password'),
       });
     });
   }

@@ -9,7 +9,7 @@ use TryCatch;
 sub post_user_history {
   my $self = shift;
 
-  my $userId = $self->get_active_user_id();
+  my $userId = $self->stash->{api_user}->id;
   my $json = $self->req->json;
   if ( ! defined $json ) {
     $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);

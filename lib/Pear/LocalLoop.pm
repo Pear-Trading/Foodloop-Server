@@ -42,7 +42,7 @@ sub startup {
       my $user = $c->schema->resultset('User')->find({email => $email});
       if ( defined $user ) {
         if ( $user->check_password( $password ) ) {
-            return $user->userid;
+            return $user->id;
         }
       }
       return undef;
@@ -150,64 +150,19 @@ sub startup {
     $self->res->headers->header('Access-Control-Allow-Origin' => '*') if $self->app->mode eq 'development';
   });
 
-  $self->helper(get_active_user_id => sub {
-    my $self = shift;
-
-    my $token = $self->get_session_token(); 
-    if (! defined $token){
-      return undef;
-    }
-
-    my @out = $self->db->selectrow_array("SELECT UserIdAssignedTo_FK FROM SessionTokens WHERE SessionTokenName = ?",undef,($token));
-    if (! @out){
-      return undef;
-    }
-    else{
-      return $out[0];
-    }
-  });
-
-  $self->helper(get_session_token => sub {
-    my $self = shift;
-
-    #See if logged in.
-    my $sessionToken = undef;
-
-    my $json = $self->req->json;
-    if (defined $json) {
-      $sessionToken = $json->{$self->app->config->{sessionTokenJsonName}};
-    }
-
-    if ( ! defined $sessionToken || $sessionToken eq "" ) {
-      $sessionToken = $self->session->{$self->app->config->{sessionTokenJsonName}};
-    }
-
-    if (defined $sessionToken && $sessionToken eq "" ) {
-      $sessionToken = undef;
-    }
-
-    return $sessionToken;
-  });
-
-
   #This assumes the user has no current session on that device.
   $self->helper(generate_session => sub {
-    my ($self, $userId) = @_;
+    my ($self, $user) = @_;
 
-    my $sessionToken = $self->generate_session_token();
+    my $sessionToken = Data::UUID->new->create_str();
 
     my $insertStatement = $self->db->prepare('INSERT INTO SessionTokens (SessionTokenName, UserIdAssignedTo_FK, ExpireDateTime) VALUES (?, ?, ?)');
-    my $rowsAdded = $insertStatement->execute($sessionToken, $userId, DateTime->now()->add( years => 1 ));
+    my $rowsAdded = $insertStatement->execute($sessionToken, $user, DateTime->now()->add( years => 1 ));
     
     return $sessionToken;
   });
 
-  $self->helper(generate_session_token => sub {
-    my $self = shift;
-    return Data::UUID->new->create_str();
-  });
-
-   $self->helper(get_age_foreign_key => sub {
+  $self->helper(get_age_foreign_key => sub {
     my ( $c, $age_string ) = @_;
     my $age_range = $c->schema->resultset('AgeRange')->find({ agerangestring => $age_string });
     return defined $age_range ? $age_range->agerangeid : undef;

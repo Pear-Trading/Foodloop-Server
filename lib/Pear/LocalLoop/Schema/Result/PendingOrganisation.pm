@@ -1,4 +1,3 @@
-use utf8;
 package Pear::LocalLoop::Schema::Result::PendingOrganisation;
 
 use strict;
@@ -48,16 +47,6 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key('id');
 
-=head1 RELATIONS
-
-=head2 pending_transactions
-
-Type: has_many
-
-Related object: L<Pear::LocalLoop::Schema::Result::PendingTransaction>
-
-=cut
-
 __PACKAGE__->has_many(
   "pending_transactions",
   "Pear::LocalLoop::Schema::Result::PendingTransaction",
@@ -67,25 +56,11 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 1 },
 );
 
-=head2 usersubmitted_fk
-
-Type: belongs_to
-
-Related object: L<Pear::LocalLoop::Schema::Result::User>
-
-=cut
-
 __PACKAGE__->belongs_to(
   "submitted_by",
   "Pear::LocalLoop::Schema::Result::User",
-  { userid => "submitted_by_id" },
+  { id => "submitted_by_id" },
   { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },
 );
 
-
-# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-02-24 17:32:21
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ekEOt+ESCwQxrqqlMurehA
-
-
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
 1;

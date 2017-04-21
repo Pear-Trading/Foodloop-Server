@@ -78,7 +78,7 @@ sub post_login {
   
   if ( defined $user_result ) {
     if ( $user_result->check_password($password) ) {
-      my $session_key = $c->generate_session( $user_result->userid );
+      my $session_key = $c->generate_session( $user_result->id );
 
       return $c->render( json => {
         success => Mojo::JSON->true,

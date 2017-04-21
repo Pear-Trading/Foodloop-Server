@@ -124,7 +124,7 @@ Related object: L<Pear::LocalLoop::Schema::Result::User>
 __PACKAGE__->might_have(
   "user",
   "Pear::LocalLoop::Schema::Result::User",
-  { "foreign.customerid_fk" => "self.customerid" },
+  { "foreign.customer_id" => "self.customerid" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
