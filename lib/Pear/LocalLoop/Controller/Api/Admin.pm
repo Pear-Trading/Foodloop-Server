@@ -92,7 +92,6 @@ sub post_admin_merge {
   my $target_org = $valid_org_rs->find( $validation->param('target_organisation_id') );
  
   $c->copy_transactions_and_delete( $pending_org, $target_org );
-  #FIXME This requires mutual exclusion.
 
   return $c->render(
     json => {
@@ -113,7 +112,7 @@ sub copy_transactions_and_delete {
       'transactions', {
         buyeruserid_fk     => $from_org_transaction->buyeruserid_fk,
         valuemicrocurrency => $from_org_transaction->valuemicrocurrency,
-        proofimage         => $from_org_transaction->proofimage,
+        proof_image         => $from_org_transaction->proof_image,
         timedatesubmitted  => $from_org_transaction->timedatesubmitted,
       }
     );

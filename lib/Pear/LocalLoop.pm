@@ -3,9 +3,10 @@ package Pear::LocalLoop;
 use Mojo::Base 'Mojolicious';
 use Data::UUID;
 use Mojo::JSON;
-use Scalar::Util qw(looks_like_number);
 use Pear::LocalLoop::Schema;
 use DateTime;
+use Mojo::Asset::File;
+use Mojo::File qw/ path tempdir /;
 
 has schema => sub {
   my $c = shift;
@@ -21,6 +22,7 @@ sub startup {
 
   $self->plugin('Config', {
     default => {
+      storage_path => tempdir,
       sessionTimeSeconds => 60 * 60 * 24 * 7,
       sessionTokenJsonName => 'session_key',
       sessionExpiresJsonName => 'sessionExpires',
@@ -64,6 +66,29 @@ sub startup {
         status => $c->error_messages->{$val}->{$check}->{status},
       );
     }
+  });
+
+  $self->helper( get_path_from_uuid => sub {
+    my $c = shift;
+    my $uuid = shift;
+    my ( $folder ) = $uuid =~ /(..)/;
+    return path($c->app->config->{storage_path}, $folder, $uuid);
+  });
+
+  $self->helper( store_file_from_upload => sub {
+    my $c = shift;
+    my $upload = shift;
+    my $uuid = Data::UUID->new->create_str;
+    my $path = $c->get_path_from_uuid( $uuid );
+    $path->dirname->make_path;
+    $upload->move_to( $path );
+    return $uuid;
+  });
+
+  $self->helper( get_file_from_uuid => sub {
+    my $c = shift;
+    my $uuid = shift;
+    return Mojo::Asset::File->new( path => $c->get_path_from_uuid( $uuid ) );
   });
 
   my $r = $self->routes;

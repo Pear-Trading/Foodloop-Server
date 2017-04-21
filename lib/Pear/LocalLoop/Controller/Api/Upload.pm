@@ -113,12 +113,9 @@ sub post_upload {
   return $c->api_validation_error if $validation->has_error;
 
   my $transaction_value = $validation->param('transaction_value');
+  my $upload = $validation->param('file');
 
-  my $file = $validation->param('file');
-
-  my $ext = '.jpg';
-  my $uuid = Data::UUID->new->create_str;
-  my $filename = $uuid . $ext;
+  my $file = $c->store_file_from_upload( $upload );
 
   if ( $type == 1 ) {
     # Validated organisation
@@ -126,43 +123,23 @@ sub post_upload {
       buyeruserid_fk => $user->id,
       sellerorganisationid_fk => $validation->param('organisation_id'),
       valuemicrocurrency => $transaction_value,
-      proofimage => $filename,
+      proof_image => $file,
       timedatesubmitted => DateTime->now,
     });
-
-    $file->move_to('images/' . $filename);
   } elsif ( $type == 2 ) {
     # Unvalidated Organisation
     $c->schema->resultset('PendingTransaction')->create({
       buyeruserid_fk => $user->id,
       pendingsellerorganisationid_fk => $validation->param('organisation_id'),
       valuemicrocurrency => $transaction_value,
-      proofimage => $filename,
+      proof_image => $file,
       timedatesubmitted => DateTime->now,
     });
-
-    $file->move_to('images/' . $filename);
   } elsif ( $type == 3 ) {
     my $organisation_name = $validation->param('organisation_name');
     my $street_name = $validation->param('street_name');
     my $town = $validation->param('town');
     my $postcode = $validation->param('postcode');
-
-    my $fullAddress = "";
-
-    if ( defined $street_name && ! ($street_name =~ m/^\s*$/) ){
-      $fullAddress = $street_name;
-    }
-
-    if ( defined $town && ! ($town =~ m/^\s*$/) ){
-      if ($fullAddress eq ""){
-        $fullAddress = $town;
-      }
-      else{
-        $fullAddress = $fullAddress . ", " . $town;          
-      }
-
-    }
 
     my $pending_org = $c->schema->resultset('PendingOrganisation')->create({
       submitted_by => $user,
@@ -177,11 +154,9 @@ sub post_upload {
       buyeruserid_fk => $user->id,
       pendingsellerorganisationid_fk => $pending_org->id,
       valuemicrocurrency => $transaction_value,
-      proofimage => $filename,
+      proof_image => $file,
       timedatesubmitted => DateTime->now,
     });
-
-    $file->move_to('images/' . $filename);
   }
   return $self->render( json => {
     success => Mojo::JSON->true,

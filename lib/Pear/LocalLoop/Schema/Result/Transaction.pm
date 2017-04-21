@@ -25,7 +25,10 @@ use base 'DBIx::Class::Core';
 
 =cut
 
-__PACKAGE__->load_components("InflateColumn::DateTime");
+__PACKAGE__->load_components(qw/
+  InflateColumn::DateTime
+  InflateColumn::FS 
+/);
 
 =head1 TABLE: C<Transactions>
 
@@ -79,8 +82,11 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
   "valuemicrocurrency",
   { data_type => "integer", is_nullable => 0 },
-  "proofimage",
-  { data_type => "text", is_nullable => 0 },
+  "proof_image",
+  {
+    data_type => "text",
+    is_nullable => 0,
+  },
   "timedatesubmitted",
   { data_type => "datetime", is_nullable => 0 },
 );
@@ -96,20 +102,6 @@ __PACKAGE__->add_columns(
 =cut
 
 __PACKAGE__->set_primary_key("transactionid");
-
-=head1 UNIQUE CONSTRAINTS
-
-=head2 C<proofimage_unique>
-
-=over 4
-
-=item * L</proofimage>
-
-=back
-
-=cut
-
-__PACKAGE__->add_unique_constraint("proofimage_unique", ["proofimage"]);
 
 =head1 RELATIONS
 
