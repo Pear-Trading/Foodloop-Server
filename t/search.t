@@ -7,6 +7,7 @@ use Test::Pear::LocalLoop;
 my $framework = Test::Pear::LocalLoop->new;
 my $t = $framework->framework;
 my $schema = $t->app->schema;
+my $dump_error = sub { diag $t->tx->res->to_string };
 
 my @account_tokens = ('a', 'b');
 $schema->resultset('AccountToken')->populate([
@@ -30,14 +31,14 @@ my $passwordRufus = 'MakoGold';
 my $testJson = {
   'usertype' => 'customer', 
   'token' => shift(@account_tokens), 
-  'username' =>  'RufusShinra', 
+  'name' =>  'RufusShinra', 
   'email' => $emailRufus, 
-  'postcode' => 'LA1 1CF', 
+  'postcode' => 'RG26 5NU', 
   'password' => $passwordRufus, 
-  'age' => 1
+  'age_range' => 1
 };
 $t->post_ok('/api/register' => json => $testJson)
-  ->status_is(200)
+  ->status_is(200)->or($dump_error)
   ->json_is('/success', Mojo::JSON->true);
 
 #test with an organisation.
@@ -47,7 +48,7 @@ my $passwordBilly = 'Choco';
 $testJson = {
   'usertype' => 'organisation', 
   'token' => shift(@account_tokens), 
-  'username' =>  'ChocoBillysGreens', 
+  'name' =>  'ChocoBillysGreens', 
   'email' => $emailBilly, 
   'postcode' => 'LA1 1HT', 
   'password' => $passwordBilly, 

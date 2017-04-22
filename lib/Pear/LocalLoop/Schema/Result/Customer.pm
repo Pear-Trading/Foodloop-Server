@@ -13,7 +13,7 @@ __PACKAGE__->add_columns(
     is_auto_increment => 1,
     is_nullable => 0,
   },
-  "username" => {
+  "name" => {
     data_type => "varchar",
     size => 255,
     is_nullable => 0,
@@ -31,8 +31,6 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->set_primary_key("id");
-
-__PACKAGE__->add_unique_constraint(["username"]);
 
 __PACKAGE__->belongs_to(
   "age_range",

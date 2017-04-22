@@ -38,11 +38,11 @@ my $passwordRufus = 'MakoGold';
 my $testJson = {
   'usertype' => 'customer', 
   'token' => shift(@account_tokens), 
-  'username' =>  'RufusShinra', 
+  'name' =>  'RufusShinra', 
   'email' => $emailRufus, 
-  'postcode' => 'E1 MP01', 
+  'postcode' => 'GU10 5SA', 
   'password' => $passwordRufus, 
-  'age' => 1
+  'age_range' => 1
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)
@@ -54,11 +54,11 @@ my $passwordHojo = 'Mako';
 $testJson = {
   'usertype' => 'customer', 
   'token' => shift(@account_tokens), 
-  'username' =>  'ProfessorHojo', 
+  'name' =>  'ProfessorHojo', 
   'email' => $emailHojo, 
-  'postcode' => 'E1 MP01', 
+  'postcode' => 'DE15 9LT', 
   'password' => $passwordHojo, 
-  'age' => 1
+  'age_range' => 1
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)
@@ -70,9 +70,9 @@ my $passwordBilly = 'Choco';
 $testJson = {
   'usertype' => 'organisation', 
   'token' => shift(@account_tokens), 
-  'username' =>  'ChocoBillysGreens', 
+  'name' =>  'ChocoBillysGreens', 
   'email' => $emailBilly, 
-  'postcode' => 'E4 C12', 
+  'postcode' => 'SO50 7NJ', 
   'password' => $passwordBilly, 
   'street_name' => 'Chocobo Farm, Eastern Continent',
   'town' => 'Gaia',

@@ -25,11 +25,11 @@ my $passwordReno = 'turks';
 my $testJson = {
   'usertype' => 'customer', 
   'token' => shift(@account_tokens), 
-  'username' =>  'Reno', 
+  'name' =>  'Reno', 
   'email' => $emailReno, 
-  'postcode' => 'E1 MP01', 
+  'postcode' => 'SA4 3FA', 
   'password' => $passwordReno, 
-  'age' => 1
+  'age_range' => 1
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)->or($dump_error)
@@ -41,9 +41,9 @@ my $passwordBilly = 'Choco';
 $testJson = {
   'usertype' => 'organisation', 
   'token' => shift(@account_tokens), 
-  'username' =>  'ChocoBillysGreens', 
+  'name' =>  'ChocoBillysGreens', 
   'email' => $emailBilly, 
-  'postcode' => 'E4 C12', 
+  'postcode' => 'ST20 0LG', 
   'password' => $passwordBilly, 
   'street_name' => 'Chocobo Farm, Eastern Continent',
   'town' => 'Gaia',
@@ -58,11 +58,11 @@ my $passwordAdmin = 'ethics';
 $testJson = {
   'usertype' => 'customer', 
   'token' => shift(@account_tokens), 
-  'username' =>  'admin', 
+  'name' =>  'admin', 
   'email' => $emailAdmin, 
-  'postcode' => 'NW1 W01', 
+  'postcode' => 'HD5 9XU', 
   'password' => $passwordAdmin, 
-  'age' => 2
+  'age_range' => 2
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)

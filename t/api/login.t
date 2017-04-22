@@ -19,11 +19,11 @@ $schema->resultset('AccountToken')->create({
 my $test_json = {
   'usertype' => 'customer', 
   'token' => $account_token, 
-  'username' =>  'RufusShinra', 
+  'name' =>  'RufusShinra', 
   'email' => $email, 
   'postcode' => 'LA1 1AA', 
   'password' => $password, 
-  'age' => 1
+  'age_range' => 1
 };
 $t->post_ok('/api/register' => json => $test_json)
   ->status_is(200)
