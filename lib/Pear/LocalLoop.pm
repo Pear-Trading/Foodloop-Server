@@ -69,6 +69,16 @@ sub startup {
     }
   });
 
+  $self->helper( datetime_formatter => sub {
+    my $c = shift;
+
+    return DateTime::Format::Strptime->new(
+      pattern => '%FT%T%z',
+      strict => 1,
+      on_error => 'undef',
+    );
+  });
+
   $self->helper( get_path_from_uuid => sub {
     my $c = shift;
     my $uuid = shift;
@@ -120,6 +130,7 @@ sub startup {
   });
   $api->post('/upload')->to('api-upload#post_upload');
   $api->post('/search')->to('api-upload#post_search');
+  $api->post('/user/day')->to('api-user#post_day');
   $api->post('/edit')->to('api-api#post_edit');
   $api->post('/fetchuser')->to('api-api#post_fetchuser');
   $api->post('/user-history')->to('api-user#post_user_history');

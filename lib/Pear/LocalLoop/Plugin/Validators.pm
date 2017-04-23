@@ -5,6 +5,7 @@ use Email::Valid;
 use Geo::UK::Postcode;
 use Scalar::Util qw/ looks_like_number /;
 use File::Basename;
+use DateTime::Format::Strptime;
 
 sub register {
   my ( $plugin, $app, $conf ) = @_;
@@ -44,6 +45,12 @@ sub register {
     my ( undef, undef, $extension ) = fileparse $value->filename, qr/\.[^.]*/;
     $extension =~ s/^\.//;
     return $app->types->type($extension) eq $filetype ? undef : 1;
+  });
+
+  $app->validator->add_check( is_iso_datetime => sub {
+    my ( $validation, $name, $value ) = @_;
+    $value = $app->datetime_formatter->parse_datetime( $value );
+    return defined $value ? undef : 1;
   });
 }
 
