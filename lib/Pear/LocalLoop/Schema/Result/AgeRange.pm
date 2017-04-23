@@ -25,4 +25,13 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+sub TO_JSON {
+  my $self = shift;
+
+  return {
+    id => $self->id,
+    string => $self->string,
+  };
+}
+
 1;

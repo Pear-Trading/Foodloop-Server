@@ -62,6 +62,7 @@ sub startup {
         json => {
           success => Mojo::JSON->false,
           message => $c->error_messages->{$val}->{$check}->{message},
+          error => $check,
         },
         status => $c->error_messages->{$val}->{$check}->{status},
       );
@@ -97,6 +98,9 @@ sub startup {
   $r->get('/register')->to('register#index');
   $r->post('/register')->to('register#register');
   $r->any('/logout')->to('root#auth_logout');
+
+  my $api_public_get = $r->under('/api');
+  $api_public_get->get('/info/ages')->to('api-info#get_ages');
 
   # Always available api routes
   my $api_public = $r->under('/api')->to('api-auth#check_json');
