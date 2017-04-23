@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Email::Valid;
 use Geo::UK::Postcode;
 use Scalar::Util qw/ looks_like_number /;
-use File::Basename;
+use File::Basename qw/ fileparse /;
 use DateTime::Format::Strptime;
 
 sub register {
