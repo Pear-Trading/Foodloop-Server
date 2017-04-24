@@ -67,12 +67,14 @@ has error_messages => sub {
     organisation_name => {
       required => { message => 'organisation_name is missing', status => 400 },
     },
+    search_name => {
+      required => { message => 'search_name is missing', status => 400 },
+    },
   };
 };
 
 sub post_upload {
   my $c = shift;
-  my $self = $c;
 
   my $user = $c->stash->{api_user};
 
@@ -91,171 +93,114 @@ sub post_upload {
 
   my $type = $validation->param('transaction_type');
 
+  my $organisation;
+
   if ( $type == 1 ) {
     # Validated Organisation
     my $valid_org_rs = $c->schema->resultset('Organisation');
-    $validation->required('organisation_id')->number->in_resultset( 'organisationalid', $valid_org_rs );
+    $validation->required('organisation_id')->number->in_resultset( 'id', $valid_org_rs );
+
+    return $c->api_validation_error if $validation->has_error;
+
+    $organisation = $valid_org_rs->find( $validation->param('organisation_id') );
+
   } elsif ( $type == 2 ) {
     # Unvalidated Organisation
-    my $valid_org_rs = $c->schema->resultset('PendingOrganisation')->search({ usersubmitted_fk => $user->id });
-    $validation->required('organisation_id')->number->in_resultset( 'pendingorganisationid', $valid_org_rs );
+    my $valid_org_rs = $c->schema->resultset('PendingOrganisation')->search({ submitted_by_id => $user->id });
+    $validation->required('organisation_id')->number->in_resultset( 'id', $valid_org_rs );
+    
+    return $c->api_validation_error if $validation->has_error;
+
+    $organisation = $valid_org_rs->find( $validation->param('organisation_id') );
+
   } elsif ( $type == 3 ) {
     # Unknown Organisation
     $validation->required('organisation_name');
     $validation->optional('street_name');
     $validation->optional('town');
     $validation->optional('postcode')->postcode;
-  }
+    
+    return $c->api_validation_error if $validation->has_error;
 
-  return $c->api_validation_error if $validation->has_error;
+    $organisation = $c->schema->resultset('PendingOrganisation')->create({
+      submitted_by => $user,
+      submitted_at => DateTime->now,
+      name         => $validation->param('organisation_name'),
+      street_name  => $validation->param('street_name'),
+      town         => $validation->param('town'),
+      postcode     => $validation->param('postcode'),
+    });
+  }
 
   my $transaction_value = $validation->param('transaction_value');
+  my $upload = $validation->param('file');
+  my $file = $c->store_file_from_upload( $upload );
 
-  my $file = $validation->param('file');
-
-  my $ext = '.jpg';
-  my $uuid = Data::UUID->new->create_str;
-  my $filename = $uuid . $ext;
-
-  if ( $type == 1 ) {
-    # Validated organisation
-    $c->schema->resultset('Transaction')->create({
-      buyeruserid_fk => $user->id,
-      sellerorganisationid_fk => $validation->param('organisation_id'),
-      valuemicrocurrency => $transaction_value,
-      proofimage => $filename,
-      timedatesubmitted => DateTime->now,
-    });
-
-    $file->move_to('images/' . $filename);
-  } elsif ( $type == 2 ) {
-    # Unvalidated Organisation
-    $c->schema->resultset('PendingTransaction')->create({
-      buyeruserid_fk => $user->id,
-      pendingsellerorganisationid_fk => $validation->param('organisation_id'),
-      valuemicrocurrency => $transaction_value,
-      proofimage => $filename,
-      timedatesubmitted => DateTime->now,
-    });
-
-    $file->move_to('images/' . $filename);
-  } elsif ( $type == 3 ) {
-    my $organisation_name = $validation->param('organisation_name');
-    my $street_name = $validation->param('street_name');
-    my $town = $validation->param('town');
-    my $postcode = $validation->param('postcode');
-
-    my $fullAddress = "";
-
-    if ( defined $street_name && ! ($street_name =~ m/^\s*$/) ){
-      $fullAddress = $street_name;
+  $organisation->create_related(
+    'transactions',
+    {
+      buyer => $user,
+      value => $transaction_value,
+      proof_image => $file,
     }
+  );
 
-    if ( defined $town && ! ($town =~ m/^\s*$/) ){
-      if ($fullAddress eq ""){
-        $fullAddress = $town;
-      }
-      else{
-        $fullAddress = $fullAddress . ", " . $town;          
-      }
-
-    }
-
-    my $pending_org = $c->schema->resultset('PendingOrganisation')->create({
-      usersubmitted_fk => $user->id,
-      timedatesubmitted => DateTime->now,
-      name => $organisation_name,
-      fulladdress => $fullAddress,
-      postcode => $postcode,
-    });
-
-    $c->schema->resultset('PendingTransaction')->create({
-      buyeruserid_fk => $user->id,
-      pendingsellerorganisationid_fk => $pending_org->pendingorganisationid,
-      valuemicrocurrency => $transaction_value,
-      proofimage => $filename,
-      timedatesubmitted => DateTime->now,
-    });
-
-    $file->move_to('images/' . $filename);
-  }
-  return $self->render( json => {
+  return $c->render( json => {
     success => Mojo::JSON->true,
     message => 'Upload Successful',
   });
-
 }
 
 
-#TODO this should limit the number of responses returned, when location is implemented that would be the main way of filtering.
+# TODO Limit search results, possibly paginate them?
+# TODO Search by location as well
 sub post_search {
-  my $self = shift;
-  my $userId = $self->get_active_user_id();
+  my $c = shift;
+  my $self = $c;
 
-  my $json = $self->req->json;
-  if ( ! defined $json ) {
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'JSON is missing.',
-    },
-    status => 400,); #Malformed request   
-  }
+  my $validation = $c->validation;
 
-  my $searchName = $json->{searchName};
-  if ( ! defined $searchName ) {
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'searchName is missing.',
-    },
-    status => 400,); #Malformed request   
-  }
-  #Is blank
-  elsif  ( $searchName =~ m/^\s*$/) {
-    $self->app->log->debug('Path Error: file:' . __FILE__ . ', line: ' . __LINE__);
-    return $self->render( json => {
-      success => Mojo::JSON->false,
-      message => 'searchName is blank.',
-    },
-    status => 400,); #Malformed request   
-  }
+  $validation->input( $c->stash->{api_json} );
 
-  #Currently ignored
-  #TODO implement further. 
-  my $searchLocation = $json->{searchLocation};
+  $validation->required('search_name');
 
-  my @validatedOrgs = ();
-  {
-    my $statementValidated = $self->db->prepare("SELECT OrganisationalId, Name, FullAddress, PostCode FROM Organisations WHERE UPPER( Name ) LIKE ?");
-    $statementValidated->execute('%'. uc $searchName.'%');
+  return $c->api_validation_error if $validation->has_error;
 
-    while (my ($id, $name, $address, $postcode) = $statementValidated->fetchrow_array()) {
-      push(@validatedOrgs, $self->create_hash($id,$name,$address,$postcode));
-    }
-  }
+  my $search_name = $validation->param('search_name');
 
-  $self->app->log->debug( "Orgs: " . Dumper @validatedOrgs );
+  my $valid_orgs_rs = $c->schema->resultset('Organisation')->search(
+    { 'LOWER(name)' => { -like => '%' . lc $search_name . '%' } },
+  );
 
-  my @unvalidatedOrgs = ();
-  {
-    my $statementUnvalidated = $self->db->prepare("SELECT PendingOrganisationId, Name, FullAddress, Postcode FROM PendingOrganisations WHERE UPPER( Name ) LIKE ? AND UserSubmitted_FK = ?");
-    $statementUnvalidated->execute('%'. uc $searchName.'%', $userId);
+  my $pending_orgs_rs = $c->stash->{api_user}->pending_organisations->search(
+    { 'LOWER(name)' => { -like => '%' . lc $search_name . '%' } },
+  );
 
-    while (my ($id, $name, $fullAddress, $postcode) = $statementUnvalidated->fetchrow_array()) {
-      push(@unvalidatedOrgs, $self->create_hash($id, $name, $fullAddress, $postcode));
-    }
-  }
-  
-  $self->app->log->debug( "Non Validated Orgs: " . Dumper @unvalidatedOrgs );
-  $self->app->log->debug('Path Success: file:' . __FILE__ . ', line: ' . __LINE__);
+  my @valid_orgs = (
+    map {{
+        id => $_->id,
+        name => $_->name,
+        street_name => $_->street_name,
+        town => $_->town,
+        postcode => $_->postcode,
+    }} $valid_orgs_rs->all
+  );
+
+  my @pending_orgs = (
+    map {{
+        id => $_->id,
+        name => $_->name,
+        street_name => $_->street_name,
+        town => $_->town,
+        postcode => $_->postcode,
+    }} $pending_orgs_rs->all
+  );
+
   return $self->render( json => {
     success => Mojo::JSON->true,
-    unvalidated => \@unvalidatedOrgs,
-    validated => \@validatedOrgs,
-  },
-  status => 200,);    
-
+    validated => \@valid_orgs,
+    unvalidated => \@pending_orgs,
+  });
 }
 
 1;

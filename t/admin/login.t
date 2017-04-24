@@ -27,15 +27,13 @@ $schema->deploy;
 
 $schema->resultset('User')->create({
   email => 'admin@example.com',
-  hashedpassword => 'abc123',
+  password => 'abc123',
   administrator => {},
-  joindate => DateTime->now,
 });
 
 $schema->resultset('User')->create({
   email => 'user@example.com',
-  hashedpassword => 'abc123',
-  joindate => DateTime->now,
+  password => 'abc123',
 });
 
 is $schema->resultset('User')->count, 2, 'Users Created';

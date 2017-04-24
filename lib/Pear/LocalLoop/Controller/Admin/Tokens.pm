@@ -17,21 +17,24 @@ sub index {
 # POST
 sub create {
   my $c = shift;
+
   my $validation = $c->validation;
-  $validation->required('token-name', 'trim')->like(qr/^[\w]*$/);
+  $validation->required('token', 'trim')->like(qr/^[\w]*$/)->not_in_resultset('name', $c->result_set);
 
-  my $token_name = $validation->param('token-name');
+  my $token_name = $validation->param('token');
 
-  my $token_rs = $c->result_set;
-  
   if ( $validation->has_error ) {
-    # Only one validator, fairly obvious whats broke
-    $c->flash( error => 'Token name not valid - Alphanumeric characters and Underscore only' );
-  } elsif ( $token_rs->find({ accounttokenname => $token_name }) ) {
-    $c->flash( error => 'Token Already Exists' );
+    my $check = shift @{ $c->validation->error('token') };
+    if ( $check eq 'required' ) {
+      $c->flash( error => 'Token name is required' );
+    } elsif ( $check eq 'like' ) {
+      $c->flash( error => 'Token name not valid - Alphanumeric characters and Underscore only' );
+    } elsif ( $check eq 'not_in_resultset' ) {
+      $c->flash( error => 'Token Already Exists' );
+    } 
   } else {
     $c->flash( success => 'Token Created' );
-    $token_rs->create({ accounttokenname => $token_name });
+    $c->result_set->create({ name => $token_name });
   }
   $c->redirect_to( '/admin/tokens' );
 }
@@ -54,8 +57,8 @@ sub read {
 sub update {
   my $c = shift;
   my $validation = $c->validation;
-  $validation->required('token-name', 'trim')->like(qr/^[\w]*$/);
-  $validation->required('token-used')->in( qw/ 0 1 / );
+  $validation->required('token', 'trim')->like(qr/^[\w]*$/);
+  $validation->required('used')->in( qw/ 0 1 / );
 
   my $id = $c->param('id');
 
@@ -65,8 +68,8 @@ sub update {
     $c->redirect_to( '/admin/tokens/' . $id );
   } elsif ( my $token = $c->result_set->find($id) ) {
     $token->update({
-      accounttokenname => $validation->param('token-name'),
-      used => $validation->param('token-used'),
+      name => $validation->param('token'),
+      used => $validation->param('used'),
     });
     $c->flash( success => 'Token Updated' );
     $c->redirect_to( '/admin/tokens/' . $id );

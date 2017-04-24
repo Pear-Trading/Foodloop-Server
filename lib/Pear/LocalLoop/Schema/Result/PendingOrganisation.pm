@@ -1,139 +1,70 @@
-use utf8;
 package Pear::LocalLoop::Schema::Result::PendingOrganisation;
-
-# Created by DBIx::Class::Schema::Loader
-# DO NOT MODIFY THE FIRST PART OF THIS FILE
-
-=head1 NAME
-
-Pear::LocalLoop::Schema::Result::PendingOrganisation
-
-=cut
 
 use strict;
 use warnings;
 
 use base 'DBIx::Class::Core';
 
-=head1 COMPONENTS LOADED
+__PACKAGE__->load_components( qw/
+  InflateColumn::DateTime
+  TimeStamp
+/);
 
-=over 4
-
-=item * L<DBIx::Class::InflateColumn::DateTime>
-
-=back
-
-=cut
-
-__PACKAGE__->load_components("InflateColumn::DateTime");
-
-=head1 TABLE: C<PendingOrganisations>
-
-=cut
-
-__PACKAGE__->table("PendingOrganisations");
-
-=head1 ACCESSORS
-
-=head2 pendingorganisationid
-
-  data_type: 'integer'
-  is_auto_increment: 1
-  is_nullable: 0
-
-=head2 usersubmitted_fk
-
-  data_type: 'integer'
-  is_foreign_key: 1
-  is_nullable: 0
-
-=head2 timedatesubmitted
-
-  data_type: 'integer'
-  is_nullable: 0
-
-=head2 name
-
-  data_type: 'text'
-  is_nullable: 0
-
-=head2 fulladdress
-
-  data_type: 'text'
-  is_nullable: 1
-
-=head2 postcode
-
-  data_type: 'text'
-  is_nullable: 1
-
-=cut
+__PACKAGE__->table("pending_organisations");
 
 __PACKAGE__->add_columns(
-  "pendingorganisationid",
-  { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
-  "usersubmitted_fk",
-  { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
-  "timedatesubmitted",
-  { data_type => "datetime", is_nullable => 0 },
-  "name",
-  { data_type => "text", is_nullable => 0 },
-  "fulladdress",
-  { data_type => "text", is_nullable => 1 },
-  "postcode",
-  { data_type => "text", is_nullable => 1 },
+  id => {
+    data_type => 'integer',
+    is_auto_increment => 1,
+    is_nullable => 0,
+  },
+  name => {
+    data_type => 'varchar',
+    size => 255,
+    is_nullable => 0,
+  },
+  street_name => {
+    data_type => 'text',
+    is_nullable => 1,
+  },
+  town => {
+    data_type => 'varchar',
+    size => 255,
+    is_nullable => 0,
+  },
+  postcode => {
+    data_type => 'varchar',
+    size => 16,
+    is_nullable => 1,
+  },
+  submitted_by_id => {
+    data_type => "integer",
+    is_foreign_key => 1,
+    is_nullable => 0,
+  },
+  submitted_at => {
+    data_type => "datetime",
+    is_nullable => 0,
+    set_on_create => 1,
+  },
 );
 
-=head1 PRIMARY KEY
-
-=over 4
-
-=item * L</pendingorganisationid>
-
-=back
-
-=cut
-
-__PACKAGE__->set_primary_key("pendingorganisationid");
-
-=head1 RELATIONS
-
-=head2 pending_transactions
-
-Type: has_many
-
-Related object: L<Pear::LocalLoop::Schema::Result::PendingTransaction>
-
-=cut
+__PACKAGE__->set_primary_key('id');
 
 __PACKAGE__->has_many(
-  "pending_transactions",
+  "transactions",
   "Pear::LocalLoop::Schema::Result::PendingTransaction",
   {
-    "foreign.pendingsellerorganisationid_fk" => "self.pendingorganisationid",
+    "foreign.seller_id" => "self.id",
   },
-  { cascade_copy => 0, cascade_delete => 0 },
+  { cascade_copy => 0, cascade_delete => 1 },
 );
 
-=head2 usersubmitted_fk
-
-Type: belongs_to
-
-Related object: L<Pear::LocalLoop::Schema::Result::User>
-
-=cut
-
 __PACKAGE__->belongs_to(
-  "usersubmitted_fk",
+  "submitted_by",
   "Pear::LocalLoop::Schema::Result::User",
-  { userid => "usersubmitted_fk" },
+  { id => "submitted_by_id" },
   { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },
 );
 
-
-# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-02-24 17:32:21
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ekEOt+ESCwQxrqqlMurehA
-
-
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
 1;

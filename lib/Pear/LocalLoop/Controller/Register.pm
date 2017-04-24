@@ -35,10 +35,10 @@ sub register {
   $validation->required('email')->email->not_in_resultset('email', $user_rs);
 
   my $token_rs = $c->schema->resultset('AccountToken')->search_rs({used => 0});
-  $validation->required('token')->in_resultset('accounttokenname', $token_rs);
+  $validation->required('token')->in_resultset('name', $token_rs);
 
   my $age_rs = $c->schema->resultset('AgeRange');
-  $validation->required('agerange')->in_resultset('agerangeid', $age_rs);
+  $validation->required('agerange')->in_resultset('id', $age_rs);
 
   my @error_messages;
   if ( $validation->has_error ) {
@@ -47,12 +47,11 @@ sub register {
   } else {
     my $new_user = $c->schema->resultset('User')->find_or_new({
       email => $validation->param('email'),
-      hashedpassword => $validation->param('password'),
-      joindate => DateTime->now(),
+      password => $validation->param('password'),
       customer => {
         username => $validation->param('name'),
         postcode => $validation->param('postcode'),
-        agerange_fk => $validation->param('agerange'),
+        age_range_id => $validation->param('agerange'),
       },
     });
     if ( $new_user->in_storage ) {

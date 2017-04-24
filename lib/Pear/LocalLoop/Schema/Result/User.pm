@@ -1,88 +1,45 @@
-use utf8;
 package Pear::LocalLoop::Schema::Result::User;
-
-# Created by DBIx::Class::Schema::Loader
-# DO NOT MODIFY THE FIRST PART OF THIS FILE
-
-=head1 NAME
-
-Pear::LocalLoop::Schema::Result::User
-
-=cut
 
 use strict;
 use warnings;
 
 use base 'DBIx::Class::Core';
 
-=head1 COMPONENTS LOADED
+use Data::UUID;
 
-=over 4
+__PACKAGE__->load_components( qw/
+  InflateColumn::DateTime
+  PassphraseColumn
+  TimeStamp
+/);
 
-=item * L<DBIx::Class::InflateColumn::DateTime>
-
-=back
-
-=cut
-
-__PACKAGE__->load_components("InflateColumn::DateTime", "PassphraseColumn");
-
-=head1 TABLE: C<Users>
-
-=cut
-
-__PACKAGE__->table("Users");
-
-=head1 ACCESSORS
-
-=head2 userid
-
-  data_type: 'integer'
-  is_auto_increment: 1
-  is_nullable: 0
-
-=head2 customerid_fk
-
-  data_type: 'integer'
-  is_foreign_key: 1
-  is_nullable: 1
-
-=head2 organisationalid_fk
-
-  data_type: 'integer'
-  is_foreign_key: 1
-  is_nullable: 1
-
-=head2 email
-
-  data_type: 'text'
-  is_nullable: 0
-
-=head2 joindate
-
-  data_type: 'integer'
-  is_nullable: 0
-
-=head2 hashedpassword
-
-  data_type: 'text'
-  is_nullable: 0
-
-=cut
+__PACKAGE__->table("users");
 
 __PACKAGE__->add_columns(
-  "userid",
-  { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
-  "customerid_fk",
-  { data_type => "integer", is_foreign_key => 1, is_nullable => 1 },
-  "organisationalid_fk",
-  { data_type => "integer", is_foreign_key => 1, is_nullable => 1 },
-  "email",
-  { data_type => "text", is_nullable => 0 },
-  "joindate",
-  { data_type => "datetime", is_nullable => 0 },
-  "hashedpassword",
-  {
+  "id" => {
+    data_type => "integer",
+    is_auto_increment => 1,
+    is_nullable => 0,
+  },
+  "customer_id" => {
+    data_type => "integer",
+    is_foreign_key => 1,
+    is_nullable => 1,
+  },
+  "organisation_id" => {
+    data_type => "integer",
+    is_foreign_key => 1,
+    is_nullable => 1,
+  },
+  "email" => {
+    data_type => "text",
+    is_nullable => 0,
+  },
+  "join_date" => {
+    data_type => "datetime",
+    set_on_create => 1,
+  },
+  "password" => {
     data_type => "varchar",
     is_nullable => 0,
     size => 100,
@@ -96,85 +53,25 @@ __PACKAGE__->add_columns(
   },
 );
 
-=head1 PRIMARY KEY
+__PACKAGE__->set_primary_key("id");
 
-=over 4
+__PACKAGE__->add_unique_constraint(["customer_id"]);
 
-=item * L</userid>
+__PACKAGE__->add_unique_constraint(["email"]);
 
-=back
-
-=cut
-
-__PACKAGE__->set_primary_key("userid");
-
-=head1 UNIQUE CONSTRAINTS
-
-=head2 C<customerid_fk_unique>
-
-=over 4
-
-=item * L</customerid_fk>
-
-=back
-
-=cut
-
-__PACKAGE__->add_unique_constraint("customerid_fk_unique", ["customerid_fk"]);
-
-=head2 C<email_unique>
-
-=over 4
-
-=item * L</email>
-
-=back
-
-=cut
-
-__PACKAGE__->add_unique_constraint("email_unique", ["email"]);
-
-=head2 C<organisationalid_fk_unique>
-
-=over 4
-
-=item * L</organisationalid_fk>
-
-=back
-
-=cut
-
-__PACKAGE__->add_unique_constraint("organisationalid_fk_unique", ["organisationalid_fk"]);
-
-=head1 RELATIONS
-
-=head2 administrator
-
-Type: might_have
-
-Related object: L<Pear::LocalLoop::Schema::Result::Administrator>
-
-=cut
+__PACKAGE__->add_unique_constraint(["organisation_id"]);
 
 __PACKAGE__->might_have(
   "administrator",
   "Pear::LocalLoop::Schema::Result::Administrator",
-  { "foreign.userid" => "self.userid" },
+  { "foreign.user_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
-
-=head2 customerid_fk
-
-Type: belongs_to
-
-Related object: L<Pear::LocalLoop::Schema::Result::Customer>
-
-=cut
 
 __PACKAGE__->belongs_to(
   "customer",
   "Pear::LocalLoop::Schema::Result::Customer",
-  { customerid => "customerid_fk" },
+  { "foreign.id" => "self.customer_id" },
   {
     is_deferrable => 0,
     join_type     => "LEFT",
@@ -182,19 +79,11 @@ __PACKAGE__->belongs_to(
     on_update     => "NO ACTION",
   },
 );
-
-=head2 organisationalid_fk
-
-Type: belongs_to
-
-Related object: L<Pear::LocalLoop::Schema::Result::Organisation>
-
-=cut
 
 __PACKAGE__->belongs_to(
   "organisation",
   "Pear::LocalLoop::Schema::Result::Organisation",
-  { organisationalid => "organisationalid_fk" },
+  { "foreign.id" => "self.organisation_id" },
   {
     is_deferrable => 0,
     join_type     => "LEFT",
@@ -203,70 +92,58 @@ __PACKAGE__->belongs_to(
   },
 );
 
-=head2 pending_organisations
-
-Type: has_many
-
-Related object: L<Pear::LocalLoop::Schema::Result::PendingOrganisation>
-
-=cut
-
 __PACKAGE__->has_many(
   "pending_organisations",
   "Pear::LocalLoop::Schema::Result::PendingOrganisation",
-  { "foreign.usersubmitted_fk" => "self.userid" },
+  { "foreign.submitted_by_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
-
-=head2 pending_transactions
-
-Type: has_many
-
-Related object: L<Pear::LocalLoop::Schema::Result::PendingTransaction>
-
-=cut
 
 __PACKAGE__->has_many(
   "pending_transactions",
   "Pear::LocalLoop::Schema::Result::PendingTransaction",
-  { "foreign.buyeruserid_fk" => "self.userid" },
+  { "foreign.buyer_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
-
-=head2 session_tokens
-
-Type: has_many
-
-Related object: L<Pear::LocalLoop::Schema::Result::SessionToken>
-
-=cut
 
 __PACKAGE__->has_many(
   "session_tokens",
   "Pear::LocalLoop::Schema::Result::SessionToken",
-  { "foreign.useridassignedto_fk" => "self.userid" },
+  { "foreign.user_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
-
-=head2 transactions
-
-Type: has_many
-
-Related object: L<Pear::LocalLoop::Schema::Result::Transaction>
-
-=cut
 
 __PACKAGE__->has_many(
   "transactions",
   "Pear::LocalLoop::Schema::Result::Transaction",
-  { "foreign.buyeruserid_fk" => "self.userid" },
+  { "foreign.buyer_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+sub generate_session {
+  my $self = shift;
 
-# Created by DBIx::Class::Schema::Loader v0.07046 @ 2017-02-24 17:32:21
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:qjAgtJR1zaUr00HsiR1aPw
+  my $token = Data::UUID->new->create_str();
+  $self->create_related(
+    'session_tokens',
+    {
+      token => $token,
+    },
+  );
 
+  return $token;
+}
 
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
+sub name {
+  my $self = shift;
+
+  if ( defined $self->customer_id ) {
+    return $self->customer->name;
+  } elsif ( defined $self->organisation_id ) {
+    return $self->organisation->name;
+  } else {
+    return undef;
+  }
+}
+
 1;

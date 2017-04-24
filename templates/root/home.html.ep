@@ -1,25 +1,37 @@
 % layout 'user';
 % title 'Home';
-% content_for css => begin
-<style>
-body {
-  background: whitesmoke;
-  padding-top: 54px;
-}
-
-.panel {
-  background: white;
-  padding: 16px;
-  -webkit-box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.2);
-  -moz-box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.2);
-  box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.2);
-}
-
-.login-form {
-  margin-top: 20%;
-}
-</style>
-% end
 % content_for javascript => begin
+%= javascript '/static/user/js/home.js';
 % end
-<div>User Pages</div>
+<div class="card">
+  <h3 class="card-header">Submit Receipt</h3>
+  <div class="card-block">
+    <form id="receipt-form" action="<%= url_for '/portal/upload' %>">
+      <input id="tran-type" type="hidden" name="transaction_type" value="3" hidden>
+      <div class="form-group">
+        <label for="org-name">Organisation Name</label>
+        <input id="org-name" type="text" class="form-control" name="organisation_name" placeholder="Organisation Name" required>
+      </div>
+      <div class="form-group">
+        <label for="org-street">Street Address</label>
+        <input id="org-street" type="text" class="form-control" name="street_name" placeholder="eg. 7 High Street">
+      </div>
+      <div class="form-group">
+        <label for="org-town">Town</label>
+        <input id="org-town" type="text" class="form-control" name="town" placeholder="eg. Lancaster" required>
+      </div>
+      <div class="form-group">
+        <label for="org-postcode">Postcode</label>
+        <input id="org-postcode" type="text" class="form-control" name="postcode" placeholder="eg. LA1 1AA">
+      </div>
+      <div class="form-group">
+        <label for="tran-value">Receipt Value</label>
+        <input id="tran-value" type="number" step="any" class="form-control" name="transaction_value" placeholder="eg. 5.99">
+      </div>
+      <div class="form-group">
+        <label for="tran-file">Receipt Picture</label>
+        <input id="tran-file" type="file" class="form-control-file" name="file">
+      </div>
+      <button type="submit" class="btn btn-primary">Add Receipt</button>
+  </div>
+</div>

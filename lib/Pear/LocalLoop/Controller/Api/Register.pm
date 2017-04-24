@@ -8,10 +8,8 @@ has error_messages => sub {
       required => { message => 'No token sent.', status => 400 },
       in_resultset => { message => 'Token invalid or has been used.', status => 401 },
     },
-    username => {
-      required => { message => 'No username sent or was blank.', status => 400 },
-      like => { message => 'Username can only be A-Z, a-z and 0-9 characters.', status => 400 },
-      not_in_resultset => { message => 'Username exists.', status => 403 },
+    name => {
+      required => { message => 'No name sent or was blank.', status => 400 },
     },
     email => {
       required => { message => 'No email sent.', status => 400 },
@@ -20,6 +18,7 @@ has error_messages => sub {
     },
     postcode => {
       required => { message => 'No postcode sent.', status => 400 },
+      postcode => { message => 'Postcode is invalid', status => 400 },
     },
     password => {
       required => { message => 'No password sent.', status => 400 },
@@ -28,12 +27,16 @@ has error_messages => sub {
       required => { message => 'No usertype sent.', status => 400 },
       in => { message => '"usertype" is invalid.', status => 400 },
     },
-    age => {
-      required => { message => 'No age sent.', status => 400 },
-      in_resultset => { message => 'Age range is invalid.', status => 400 },
+    age_range => {
+      required => { message => 'No age_range sent.', status => 400 },
+      number => { message => 'age_range is invalid', status => 400 },
+      in_resultset => { message => 'age_range is invalid.', status => 400 },
     },
-    fulladdress => {
-      required => { message => 'No fulladdress sent.', status => 400 },
+    street_name => {
+      required => { message => 'No street_name sent.', status => 400 },
+    },
+    town => {
+      required => { message => 'No town sent.', status => 400 },
     },
   };
 };
@@ -42,87 +45,46 @@ sub post_register{
   my $c = shift;
 
   my $validation = $c->validation;
-
-  my $json = $c->req->json;
-
-  if ( ! defined $json ){
-    return $c->render( json => {
-      success => Mojo::JSON->false,
-      message => 'No json sent.',
-    },
-    status => 400,); #Malformed request   
-  }
-  $validation->input( $json );
+  $validation->input( $c->stash->{api_json} );
 
   my $token_rs = $c->schema->resultset('AccountToken')->search_rs({used => 0});
-  $validation->required('token')->in_resultset('accounttokenname', $token_rs);
-
-  my $customer_rs = $c->schema->resultset('Customer');
-  $validation->required('username')->like(qr/^[A-Za-z0-9]+$/)->not_in_resultset('username', $customer_rs);
+  $validation->required('token')->in_resultset('name', $token_rs);
 
   my $user_rs = $c->schema->resultset('User');
   $validation->required('email')->email->not_in_resultset('email', $user_rs);
-
-  #TODO test to see if post code is valid.
-  $validation->required('postcode');
-
-  #TODO should we enforce password requirements.
   $validation->required('password');
 
+  $validation->required('name');
+  $validation->required('postcode')->postcode;
   $validation->required('usertype')->in('customer', 'organisation');
 
   my $usertype = $validation->param('usertype') || '';
 
   if ( $usertype eq 'customer' ) {
-
     my $age_rs = $c->schema->resultset('AgeRange');
-    $validation->required('age')->in_resultset('agerangestring', $age_rs);
-
+    $validation->required('age_range')->number->in_resultset('id', $age_rs);
   } elsif ( $usertype eq 'organisation' ) {
-
-    #TODO validation on the address. Or perhaps add the organisation to a "to be inspected" list then manually check them.
-    $validation->required('fulladdress');
-
+    $validation->required('street_name');
+    $validation->required('town');
   }
 
-  if ( $validation->has_error ) {
-    my $failed_vals = $validation->failed;
-    for my $val ( @$failed_vals ) {
-      my $check = shift @{ $validation->error($val) };
-      return $c->render(
-        json => {
-          success => Mojo::JSON->false,
-          message => $c->error_messages->{$val}->{$check}->{message},
-        },
-        status => $c->error_messages->{$val}->{$check}->{status},
-      );
-    }
-  }
-
-  my $token = $validation->param('token');
-  my $username = $validation->param('username');
-  my $email = $validation->param('email');
-  my $postcode = $validation->param('postcode');
-  my $password = $validation->param('password');
+  return $c->api_validation_error if $validation->has_error;
 
   if ($usertype eq 'customer'){
-    # TODO replace with actually using the value on the post request
-    my $ageForeignKey = $c->get_age_foreign_key( $validation->param('age') );
 
     $c->schema->txn_do( sub {
       $c->schema->resultset('AccountToken')->find({
-        accounttokenname => $token,
+        name => $validation->param('token'),
         used => 0,
       })->update({ used => 1 });
       $c->schema->resultset('User')->create({
         customer => {
-          username => $username,
-          agerange_fk => $ageForeignKey,
-          postcode => $postcode,
+          name     => $validation->param('name'),
+          age_range_id => $validation->param('age_range'),
+          postcode     => $validation->param('postcode'),
         },
-        email => $email,
-        hashedpassword => $password,
-        joindate => DateTime->now,
+        email    => $validation->param('email'),
+        password => $validation->param('password'),
       });
     });
 
@@ -132,23 +94,26 @@ sub post_register{
 
     $c->schema->txn_do( sub {
       $c->schema->resultset('AccountToken')->find({
-        accounttokenname => $token,
+        name => $validation->param('token'),
         used => 0,
       })->update({ used => 1 });
       $c->schema->resultset('User')->create({
         organisation => {
-          name => $username,
-          fulladdress => $fullAddress,
-          postcode => $postcode,
+          name        => $validation->param('name'),
+          street_name => $validation->param('street_name'),
+          town        => $validation->param('town'),
+          postcode    => $validation->param('postcode'),
         },
-        email => $email,
-        hashedpassword => $password,
-        joindate => DateTime->now,
+        email    => $validation->param('email'),
+        password => $validation->param('password'),
       });
     });
   }
 
-  return $c->render( json => { success => Mojo::JSON->true } );
+  return $c->render( json => {
+    success => Mojo::JSON->true,
+    message => 'Registered Successfully',
+  });
 }
 
 1;

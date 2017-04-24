@@ -3,6 +3,9 @@
 use strict;
 use warnings;
 
+use FindBin qw/ $Bin /;
+use lib "$Bin/../lib";
+
 use Pear::LocalLoop::Schema;
 
 my @con = @ARGV;
@@ -10,3 +13,25 @@ my @con = @ARGV;
 my $schema = Pear::LocalLoop::Schema->connect(@con);
 
 $schema->deploy;
+
+$schema->resultset('AgeRange')->populate([
+  [ qw/ string / ],
+  [ '20-35' ],
+  [ '35-50' ],
+  [ '50+' ],
+]);
+
+if ( $ENV{MOJO_MODE} eq 'development' ) {
+
+  $schema->resultset('User')->create({
+    email => 'test@example.com',
+    password => 'abc123',
+    customer => {
+      name => 'Test User',
+      age_range_id => 1,
+      postcode => 'LA1 1AA',
+    },
+    administrator => {},
+  });
+
+}

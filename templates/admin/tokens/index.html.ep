@@ -14,7 +14,7 @@
 <form action="<%= url_for %>" method="post">
   <div class="form-group">
     <div class="input-group">
-      <input type="text" class="form-control" placeholder="Token Text" name="token-name">
+      <input type="text" class="form-control" placeholder="Token Text" name="token">
       <span class="input-group-btn">
         <button class="btn btn-primary" type="submit">Add</button>
       </span>
@@ -23,9 +23,9 @@
 </form>
 <div class="list-group">
   % for my $token (@$tokens) {
-  <a href="<%= url_for . '/' . $token->{accounttokenid} %>" class="list-group-item list-group-item-action">
+  <a href="<%= url_for . '/' . $token->{id} %>" class="list-group-item list-group-item-action">
     <div>
-      %= $token->{accounttokenname}
+      %= $token->{name}
     </div>
     <div class="ml-auto">
       <%= $token->{used} == 1 ? 'Used' : 'Available' %>

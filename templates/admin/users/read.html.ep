@@ -18,11 +18,11 @@
   </div>
   <div class="form-group">
     <label for="joindate">Join Date</label>
-    <input id="joindate" type="datetime" class="form-control" placeholder="Date" name="joindate" value="<%= $user->joindate %>" disabled>
+    <input id="joindate" type="datetime" class="form-control" placeholder="Date" name="joindate" value="<%= $user->join_date %>" disabled>
   </div>
   <div class="form-group">
     <label for="type">Account Type</label>
-    <input id="type" type="text" class="form-control" value="<%= defined $user->customerid_fk ? 'Customer' : 'Organisation' %>" disabled>
+    <input id="type" type="text" class="form-control" value="<%= defined $user->customer_id ? 'Customer' : 'Organisation' %>" disabled>
   </div>
   <div class="form-group">
     <button class="btn btn-primary form-control" type="submit">Update</button>

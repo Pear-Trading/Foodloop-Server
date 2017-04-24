@@ -1,0 +1,42 @@
+% layout 'admin';
+% title 'Organisations';
+% content_for javascript => begin
+% end
+% if ( my $error = flash 'error' ) {
+  <div class="alert alert-danger" role="alert">
+    <strong>Error!</strong> <%= $error %>
+  </div>
+% } elsif ( my $success = flash 'success' ) {
+  <div class="alert alert-success" role="alert">
+    <strong>Success!</strong> <%= $success %>
+  </div>
+% }
+<div class="card mb-3">
+  <h3 class="card-header">
+    %= $pending_org->name
+  </h3>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Street Name: <%= $pending_org->street_name %></li>
+    <li class="list-group-item">Town: <%= $pending_org->town %></li>
+    <li class="list-group-item">Postcode: <%= $pending_org->postcode %></li>
+    <li class="list-group-item"><a href="<%= url_for . '/approve' %>" class="btn btn-success">Approve Organisation</a></li>
+  </ul>
+</div>
+<div class="card mb-3">
+  <h3 class="card-header">
+    Transactions
+  </h3>
+  <ul class="list-group list-group-flush">
+    % for my $transaction ( $pending_org->transactions->all ) {
+    <li class="list-group-item">
+      <div class="container">
+        <div class="row text-center">
+          <div class="col">From: <%= $transaction->buyer->name %></div>
+          <div class="col">To: <%= $transaction->seller->name %></div>
+          <div class="col">Value: <%= $transaction->value %></div>
+        </div>
+      </div>
+    </li>
+    % }
+  </ul>
+</div>

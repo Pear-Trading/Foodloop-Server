@@ -7,6 +7,7 @@ use Test::Pear::LocalLoop;
 my $framework = Test::Pear::LocalLoop->new;
 my $t = $framework->framework;
 my $schema = $t->app->schema;
+my $dump_error = sub { diag $t->tx->res->dom->at('pre[id="error"]')->text };
 
 #Variables to be used for uniqueness when testing.
 my @names = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
@@ -14,13 +15,13 @@ my @emails = ('a@a.com', 'b@a.com', 'c@a.com', 'd@a.com', 'e@a.com', 'f@a.com', 
 my @tokens =  ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
 
 $schema->resultset('AccountToken')->populate([
-  [ qw/ accounttokenname / ],
+  [ qw/ name / ],
   map { [ $_ ] } @tokens,
 ]);
 
 #No JSON sent
 $t->post_ok('/api/register')
-  ->status_is(400)
+  ->status_is(400)->or($dump_error)
   ->json_is('/success', Mojo::JSON->false)
   ->json_like('/message', qr/JSON is missing/i);
 
@@ -32,11 +33,11 @@ $t->post_ok('/api/register' => json => $testJson)
 #token missing JSON
 $testJson = {
   'usertype' => 'customer',
-  'username' => shift(@names),
+  'name' => shift(@names),
   'email' => shift(@emails),
   'postcode' => 'LA1 1AA',
   'password' => 'Meh',
-  'age' => '50+'
+  'age_range' => 3
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -48,11 +49,11 @@ $t->post_ok('/api/register' => json => $testJson)
 $testJson = {
   'usertype' => 'customer',
   'token' => ' ',
-  'username' => shift(@names),
+  'name' => shift(@names),
   'email' => shift(@emails),
   'postcode' => 'LA1 1AA',
   'password' => 'Meh',
-  'age' => '50+'
+  'age_range' => 3
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(401)
@@ -60,64 +61,49 @@ $t->post_ok('/api/register' => json => $testJson)
   ->content_like(qr/token/i)
   ->content_like(qr/invalid/i);
 
-#username missing JSON
+#name missing JSON
 $testJson = {
   'usertype' => 'customer',
   'token' => shift(@tokens),
   'email' => shift(@emails),
   'postcode' => 'LA1 1AA',
   'password' => 'Meh',
-  'age' => '50+'
+  'age_range' => 3
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/no username sent/i);
+  ->content_like(qr/no name sent/i);
 
 
-#Blank username
+#Blank name
 $testJson = {
   'usertype' => 'customer',
   'token' => shift(@tokens), 
-  'username' => '', 
+  'name' => '', 
   'email' => shift(@emails), 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age' => '50+'
+  'age_range' => 3
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/blank/i)
-  ->content_like(qr/username/i);
+  ->content_like(qr/name/i);
 
-#Not alpha numeric chars e.g. !
-$testJson = {
-  'usertype' => 'customer',
-  'token' => shift(@tokens), 
-  'username' =>  'asa!', 
-  'email' => shift(@emails), 
-  'postcode' => 'LA1 1AA', 
-  'password' => 'Meh', 
-  'age' => '50+'
-};
-$t->post_ok('/api/register' => json => $testJson)
-  ->status_is(400) 
-  ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/username/i);
-
-my $usernameToReuse =  shift(@names);
+my $nameToReuse =  shift(@names);
 my $emailToReuse =  shift(@emails);
 
 #Valid customer
 $testJson = {
   'usertype' => 'customer', 
   'token' => shift(@tokens), 
-  'username' =>  $usernameToReuse, 
+  'name' =>  $nameToReuse, 
   'email' => $emailToReuse, 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age' => '50+'
+  'age_range' => 3
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)
@@ -127,11 +113,11 @@ $t->post_ok('/api/register' => json => $testJson)
 $testJson = {
   'usertype' => 'customer', 
   'token' => shift(@tokens), 
-  'username' =>  shift(@names), 
+  'name' =>  shift(@names), 
   'email' => shift(@emails), 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age' => '35-50'
+  'age_range' => 2
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200) 
@@ -141,39 +127,24 @@ $t->post_ok('/api/register' => json => $testJson)
 $testJson = {
   'usertype' => 'customer', 
   'token' => shift(@tokens), 
-  'username' =>  shift(@names), 
+  'name' =>  shift(@names), 
   'email' => shift(@emails), 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age' => '20-35'
+  'age_range' => 1
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200) 
   ->json_is('/success', Mojo::JSON->true);
 
-#Username exists
-$testJson = {
-  'usertype' => 'customer', 
-  'token' => shift(@tokens), 
-  'username' => $usernameToReuse, 
-  'email' => shift(@emails), 
-  'postcode' => 'LA1 1AA', 
-  'password' => 'Meh', 
-  'age' => '50+'
-};
-$t->post_ok('/api/register' => json => $testJson)
-  ->status_is(403) 
-  ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/exists/i);
-
 #email missing JSON
 $testJson = {
   'usertype' => 'customer',
   'token' => shift(@tokens),
-  'username' => shift(@names),
+  'name' => shift(@names),
   'postcode' => 'LA1 1AA',
   'password' => 'Meh',
-  'age' => '50+'
+  'age_range' => 3
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -184,11 +155,11 @@ $t->post_ok('/api/register' => json => $testJson)
 $testJson = {
   'usertype' => 'customer',
   'token' => shift(@tokens), 
-  'username' =>  shift(@names), 
+  'name' =>  shift(@names), 
   'email' => 'dfsd@.com', 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age' => '35-50'
+  'age_range' => 2
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400) 
@@ -200,11 +171,11 @@ $t->post_ok('/api/register' => json => $testJson)
 $testJson = {
   'usertype' => 'customer', 
   'token' => shift(@tokens), 
-  'username' =>  shift(@names), 
+  'name' =>  shift(@names), 
   'email' => 'dfsd@com', 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age' => '35-50'
+  'age_range' => 2
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400) 
@@ -216,11 +187,11 @@ $t->post_ok('/api/register' => json => $testJson)
 $testJson = {
   'usertype' => 'customer', 
   'token' => shift(@tokens), 
-  'username' =>  shift(@names), 
+  'name' =>  shift(@names), 
   'email' => $emailToReuse, 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age' => '35-50'
+  'age_range' => 2
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(403) 
@@ -232,10 +203,10 @@ $t->post_ok('/api/register' => json => $testJson)
 $testJson = {
   'usertype' => 'customer',
   'token' => shift(@tokens),
-  'username' => shift(@names),
+  'name' => shift(@names),
   'email' => shift(@emails),
   'password' => 'Meh',
-  'age' => '50+'
+  'age_range' => 3
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -248,10 +219,10 @@ $t->post_ok('/api/register' => json => $testJson)
 $testJson = {
   'usertype' => 'customer',
   'token' => shift(@tokens),
-  'username' => shift(@names),
+  'name' => shift(@names),
   'email' => shift(@emails),
   'postcode' => 'LA1 1AA',
-  'age' => '50+'
+  'age_range' => 3
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -263,11 +234,11 @@ $t->post_ok('/api/register' => json => $testJson)
 #usertype missing JSON
 $testJson = {
   'token' => shift(@tokens),
-  'username' => shift(@names),
+  'name' => shift(@names),
   'email' => shift(@emails),
   'postcode' => 'LA1 1AA',
   'password' => 'Meh',
-  'age' => '50+'
+  'age_range' => 3
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -278,7 +249,7 @@ $t->post_ok('/api/register' => json => $testJson)
 $testJson = {
   'usertype' => 'organisation1', 
   'token' => shift(@tokens), 
-  'username' =>  shift(@names), 
+  'name' =>  shift(@names), 
   'email' => shift(@emails), 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
@@ -291,11 +262,11 @@ $t->post_ok('/api/register' => json => $testJson)
   ->content_like(qr/invalid/i);
 
 
-#age missing JSON
+#age_range missing JSON
 $testJson = {
   'usertype' => 'customer',
   'token' => shift(@tokens),
-  'username' => shift(@names),
+  'name' => shift(@names),
   'email' => shift(@emails),
   'postcode' => 'LA1 1AA',
   'password' => 'Meh',
@@ -303,29 +274,29 @@ $testJson = {
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/no age sent/i);
+  ->content_like(qr/no age_range sent/i);
 
 #Age is invalid
 $testJson = {
   'usertype' => 'customer', 
   'token' => shift(@tokens), 
-  'username' =>  shift(@names), 
+  'name' =>  shift(@names), 
   'email' => shift(@emails), 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age' => 'invalid'
+  'age_range' => 'invalid'
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400) 
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/age/i)
+  ->content_like(qr/age_range/i)
   ->content_like(qr/invalid/i);
 
 #full address missing JSON
 $testJson = {
   'usertype' => 'organisation', 
   'token' => shift(@tokens), 
-  'username' =>  shift(@names), 
+  'name' =>  shift(@names), 
   'email' => shift(@emails), 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
@@ -333,7 +304,7 @@ $testJson = {
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/no fulladdress sent/i);
+  ->content_like(qr/no street_name sent/i);
 
 #TODO Validation of full address
 
@@ -341,11 +312,12 @@ $t->post_ok('/api/register' => json => $testJson)
 $testJson = {
   'usertype' => 'organisation', 
   'token' => shift(@tokens), 
-  'username' =>  shift(@names), 
+  'name' =>  shift(@names), 
   'email' => shift(@emails), 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'fulladdress' => 'mary lane testing....'
+  'street_name' => 'mary lane testing....',
+  'town' => 'Lancaster',
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200) 
