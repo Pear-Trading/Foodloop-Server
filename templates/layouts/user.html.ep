@@ -28,9 +28,6 @@
       <a class="navbar-brand" href="<%= url_for '/home' %>">LocalLoop</a>
       <div class="collapse navbar-collapse" id="navbarNav">
         <div class="navbar-nav ml-auto">
-          % if ( defined $c->current_user->administrator ) {
-          <a class="nav-item nav-link" href="<%= url_for '/admin' %>">Admin Section</a>
-          % }
           <a class="nav-item nav-link<%= title eq 'Receipts' ? ' active' : '' %>" href="#">Receipts</a>
           <a class="nav-item nav-link<%= title eq 'Settings' ? ' active' : '' %>" href="#">Settings</a>
           <a class="nav-item nav-link" href="<%= url_for '/logout' %>">Logout</a>

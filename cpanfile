@@ -14,5 +14,5 @@ requires 'DBIx::Class::TimeStamp';
 requires 'DBIx::Class::Schema::Loader';
 requires 'SQL::Translator';
 requires 'DateTime';
-requires 'DateTime::Format::Strptime';
+requires 'DateTime::Format::Strptime', "1.73";
 requires 'DateTime::Format::SQLite';

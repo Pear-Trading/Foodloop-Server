@@ -4,9 +4,9 @@ use Mojo::Base 'Mojolicious::Controller';
 sub index {
   my $c = shift;
 
-  if ( $c->is_user_authenticated ) {
-    $c->redirect_to('/home');
-  }
+#  if ( $c->is_user_authenticated ) {
+#   $c->redirect_to('/home');
+#  }
 }
 
 sub under {

@@ -104,10 +104,11 @@ sub startup {
 
   my $r = $self->routes;
   $r->get('/')->to('root#index');
-  $r->post('/')->to('root#auth_login');
-  $r->get('/register')->to('register#index');
-  $r->post('/register')->to('register#register');
-  $r->any('/logout')->to('root#auth_logout');
+  $r->get('/admin')->to('admin#index');
+  $r->post('/admin')->to('admin#auth_login');
+#  $r->get('/register')->to('register#index');
+#  $r->post('/register')->to('register#register');
+  $r->any('/admin/logout')->to('admin#auth_logout');
 
   my $api_public_get = $r->under('/api');
   $api_public_get->get('/info/ages')->to('api-info#get_ages');
@@ -142,7 +143,7 @@ sub startup {
 
   my $admin_routes = $r->under('/admin')->to('admin#under');
 
-  $admin_routes->get('/')->to('admin#home');
+  $admin_routes->get('/home')->to('admin#home');
 
   $admin_routes->get('/tokens')->to('admin-tokens#index');
   $admin_routes->post('/tokens')->to('admin-tokens#create');
@@ -160,14 +161,14 @@ sub startup {
   $admin_routes->get('/organisations/pending/:id')->to('admin-organisations#pending_read');
   $admin_routes->get('/organisations/pending/:id/approve')->to('admin-organisations#pending_approve');
 
-  my $user_routes = $r->under('/')->to('root#under');
+#  my $user_routes = $r->under('/')->to('root#under');
 
-  $user_routes->get('/home')->to('root#home');
+# $user_routes->get('/home')->to('root#home');
 
-  my $portal_api = $r->under('/portal')->to('api-auth#check_json')->under('/')->to('portal#under');
+#  my $portal_api = $r->under('/portal')->to('api-auth#check_json')->under('/')->to('portal#under');
 
-  $portal_api->post('/upload')->to('api-upload#post_upload');
-  $portal_api->post('/search')->to('api-upload#post_search');
+#  $portal_api->post('/upload')->to('api-upload#post_upload');
+#  $portal_api->post('/search')->to('api-upload#post_search');
 
   $self->hook( before_dispatch => sub {
     my $self = shift;
