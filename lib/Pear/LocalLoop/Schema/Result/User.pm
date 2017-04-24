@@ -134,4 +134,16 @@ sub generate_session {
   return $token;
 }
 
+sub name {
+  my $self = shift;
+
+  if ( defined $self->customer_id ) {
+    return $self->customer->name;
+  } elsif ( defined $self->organisation_id ) {
+    return $self->organisation->name;
+  } else {
+    return undef;
+  }
+}
+
 1;

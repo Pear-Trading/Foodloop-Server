@@ -143,15 +143,22 @@ sub startup {
   my $admin_routes = $r->under('/admin')->to('admin#under');
 
   $admin_routes->get('/')->to('admin#home');
+
   $admin_routes->get('/tokens')->to('admin-tokens#index');
   $admin_routes->post('/tokens')->to('admin-tokens#create');
   $admin_routes->get('/tokens/:id')->to('admin-tokens#read');
   $admin_routes->post('/tokens/:id')->to('admin-tokens#update');
   $admin_routes->post('/tokens/:id/delete')->to('admin-tokens#delete');
+
   $admin_routes->get('/users')->to('admin-users#index');
   $admin_routes->get('/users/:id')->to('admin-users#read');
   $admin_routes->post('/users/:id')->to('admin-users#update');
   $admin_routes->post('/users/:id/delete')->to('admin-users#delete');
+
+  $admin_routes->get('/organisations')->to('admin-organisations#list');
+  $admin_routes->get('/organisations/valid/:id')->to('admin-organisations#valid_read');
+  $admin_routes->get('/organisations/pending/:id')->to('admin-organisations#pending_read');
+  $admin_routes->get('/organisations/pending/:id/approve')->to('admin-organisations#pending_approve');
 
   my $user_routes = $r->under('/')->to('root#under');
 
@@ -160,11 +167,31 @@ sub startup {
   my $portal_api = $r->under('/portal')->to('api-auth#check_json')->under('/')->to('portal#under');
 
   $portal_api->post('/upload')->to('api-upload#post_upload');
+  $portal_api->post('/search')->to('api-upload#post_search');
 
   $self->hook( before_dispatch => sub {
     my $self = shift;
 
     $self->res->headers->header('Access-Control-Allow-Origin' => '*') if $self->app->mode eq 'development';
+  });
+
+  $self->helper( copy_transactions_and_delete => sub {
+    my ( $c, $from_org, $to_org ) = @_;
+
+    my $from_org_transaction_rs = $from_org->transactions;
+
+    while ( my $from_org_transaction = $from_org_transaction_rs->next ) {
+      $to_org->create_related(
+        'transactions', {
+          buyer_id     => $from_org_transaction->buyer_id,
+          value        => $from_org_transaction->value,
+          proof_image  => $from_org_transaction->proof_image,
+          submitted_at => $from_org_transaction->submitted_at,
+        }
+      );
+    }
+
+    $from_org->delete;
   });
 }
 

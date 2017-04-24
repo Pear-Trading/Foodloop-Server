@@ -1,0 +1,52 @@
+% layout 'admin';
+% title 'Organisations';
+% content_for javascript => begin
+% end
+% if ( my $error = flash 'error' ) {
+  <div class="alert alert-danger" role="alert">
+    <strong>Error!</strong> <%= $error %>
+  </div>
+% } elsif ( my $success = flash 'success' ) {
+  <div class="alert alert-success" role="alert">
+    <strong>Success!</strong> <%= $success %>
+  </div>
+% }
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <h3 class="card-header">
+        Valid Organisations
+      </h3>
+      <div class="list-group list-group-flush">
+        % for my $valid_org ($valid_orgs_rs->all) {
+        <a href="<%= url_for . '/valid/' . $valid_org->id %>" class="list-group-item list-group-item-action">
+          <div>
+            %= $valid_org->name
+          </div>
+        </a>
+        % }
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card">
+      <h3 class="card-header">
+        Pending Organisations
+      </h3>
+      <div class="list-group list-group-flush">
+        % if ( $pending_orgs_rs->count == 0 ) {
+        <div class="list-group-item">
+          No Pending Organisations!
+        </div>
+        % } else {
+        % for my $pending_org ($pending_orgs_rs->all) {
+        <a href="<%= url_for . '/pending/' . $pending_org->id %>" class="list-group-item list-group-item-action">
+          <div>
+            %= $pending_org->name
+          </div>
+        </a>
+        % }}
+      </div>
+    </div>
+  </div>
+</div>
