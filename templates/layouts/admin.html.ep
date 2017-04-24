@@ -25,14 +25,14 @@
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <a class="navbar-brand" href="<%= url_for '/admin' %>">LocalLoop Admin</a>
+      <a class="navbar-brand" href="<%= url_for '/admin/home' %>">LocalLoop Admin</a>
       <div class="collapse navbar-collapse" id="navbarNav">
         <div class="navbar-nav ml-auto">
-          <a class="nav-item nav-link" href="<%= url_for '/home' %>">User Section</a>
+          <a class="nav-item nav-link" href="<%= url_for '/' %>">User Section</a>
           <a class="nav-item nav-link<%= title eq 'Tokens' ? ' active' : '' %>" href="<%= url_for '/admin/tokens' %>">Tokens</a>
           <a class="nav-item nav-link<%= title eq 'Users' ? ' active' : '' %>" href="<%= url_for '/admin/users' %>">Users</a>
           <a class="nav-item nav-link<%= title eq 'Organisations' ? ' active' : '' %>" href="<%= url_for '/admin/organisations' %>">Organisations</a>
-          <a class="nav-item nav-link" href="<%= url_for '/logout' %>">Logout</a>
+          <a class="nav-item nav-link" href="<%= url_for '/admin/logout' %>">Logout</a>
         </div>
       </div>
     </nav>

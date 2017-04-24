@@ -38,7 +38,7 @@ my $testJson = {
   'age_range' => 1
 };
 $t->post_ok('/api/register' => json => $testJson)
-  ->status_is(200)->or($dump_error)
+  ->status_is(200)->or($framework->dump_error)
   ->json_is('/success', Mojo::JSON->true);
 
 #test with an organisation.

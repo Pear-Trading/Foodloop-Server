@@ -21,7 +21,7 @@ $schema->resultset('AgeRange')->populate([
   [ '50+' ],
 ]);
 
-if ( $ENV{MOJO_MODE} eq 'development' ) {
+if (defined $ENV{MOJO_MODE} && $ENV{MOJO_MODE} eq 'development' ) {
 
   $schema->resultset('User')->create({
     email => 'test@example.com',
