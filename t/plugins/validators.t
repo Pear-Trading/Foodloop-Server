@@ -15,6 +15,7 @@ my $invalid_email = 'test.example.com';
 my $valid_postcode = 'WC1H 9EB';
 my $invalid_postcode = 'AB1 2CD';
 my $not_a_postcode = 'a';
+my $not_a_whole_postcode = 'LA1';
 
 $validation->input({
   valid_email => $valid_email,
@@ -22,6 +23,7 @@ $validation->input({
   valid_postcode => $valid_postcode,
   invalid_postcode => $invalid_postcode,
   not_a_postcode => $not_a_postcode,
+  not_a_whole_postcode => $not_a_whole_postcode,
 });
 
 $validation->required('valid_email')->email;
@@ -29,8 +31,9 @@ $validation->required('invalid_email')->email;
 $validation->required('valid_postcode')->postcode;
 $validation->required('invalid_postcode')->postcode;
 $validation->required('not_a_postcode')->postcode;
+$validation->required('not_a_whole_postcode')->postcode;
 
 ok $validation->has_error, 'Have Errors';
-is_deeply $validation->failed, [ qw/ invalid_email invalid_postcode not_a_postcode / ], 'Correct Errors';
+is_deeply $validation->failed, [ qw/ invalid_email invalid_postcode not_a_postcode not_a_whole_postcode / ], 'Correct Errors';
 
 done_testing;

@@ -32,7 +32,7 @@ sub register {
     try {
       $postcode = Geo::UK::Postcode->new( $value );
     };
-    return defined $postcode && $postcode->valid ? undef : 1;
+    return defined( $postcode ) && ( $postcode->valid ) && ! ( $postcode->partial ) ? undef : 1;
 
   });
 
