@@ -13,7 +13,12 @@ __PACKAGE__->add_columns(
     is_auto_increment => 1,
     is_nullable => 0,
   },
-  "name" => {
+  "display_name" => {
+    data_type => "varchar",
+    size => 255,
+    is_nullable => 0,
+  },
+  "full_name" => {
     data_type => "varchar",
     size => 255,
     is_nullable => 0,

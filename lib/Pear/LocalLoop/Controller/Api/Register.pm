@@ -11,6 +11,12 @@ has error_messages => sub {
     name => {
       required => { message => 'No name sent or was blank.', status => 400 },
     },
+    display_name => {
+      required => { message => 'No name sent or was blank.', status => 400 },
+    },
+    full_name => {
+      required => { message => 'No name sent or was blank.', status => 400 },
+    },
     email => {
       required => { message => 'No email sent.', status => 400 },
       email => { message => 'Email is invalid.', status => 400 },
@@ -54,16 +60,18 @@ sub post_register{
   $validation->required('email')->email->not_in_resultset('email', $user_rs);
   $validation->required('password');
 
-  $validation->required('name');
   $validation->required('postcode')->postcode;
   $validation->required('usertype')->in('customer', 'organisation');
 
   my $usertype = $validation->param('usertype') || '';
 
   if ( $usertype eq 'customer' ) {
+    $validation->required('display_name');
+    $validation->required('full_name');
     my $age_rs = $c->schema->resultset('AgeRange');
     $validation->required('age_range')->number->in_resultset('id', $age_rs);
   } elsif ( $usertype eq 'organisation' ) {
+    $validation->required('name');
     $validation->required('street_name');
     $validation->required('town');
   }
@@ -79,7 +87,8 @@ sub post_register{
       })->update({ used => 1 });
       $c->schema->resultset('User')->create({
         customer => {
-          name     => $validation->param('name'),
+          full_name    => $validation->param('full_name'),
+          display_name => $validation->param('display_name'),
           age_range_id => $validation->param('age_range'),
           postcode     => $validation->param('postcode'),
         },
