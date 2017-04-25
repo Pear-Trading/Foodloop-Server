@@ -115,7 +115,7 @@ sub startup {
   $api_public_get->options('*' => sub {
     my $self = shift;
 
-    $self->res->headers->header('Access-Control-Allow-Origin'=> 'http://localhost:7000');
+    $self->res->headers->header('Access-Control-Allow-Origin'=> '*');
     $self->res->headers->header('Access-Control-Allow-Credentials' => 'true');
     $self->res->headers->header('Access-Control-Allow-Methods' => 'GET, OPTIONS, POST, DELETE, PUT');
     $self->res->headers->header('Access-Control-Allow-Headers' => 'Content-Type, X-CSRF-Token');
