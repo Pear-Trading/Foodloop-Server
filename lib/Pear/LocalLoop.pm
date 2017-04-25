@@ -110,22 +110,22 @@ sub startup {
 #  $r->post('/register')->to('register#register');
   $r->any('/admin/logout')->to('admin#auth_logout');
 
-  my $api_public_get = $r->under('/api');
-  $api_public_get->get('/info/ages')->to('api-info#get_ages');
-  $api_public_get->options('*' => sub {
+  my $api_public_get = $r->under('/api' => sub {
     my $self = shift;
-
     $self->res->headers->header('Access-Control-Allow-Origin'=> '*');
     $self->res->headers->header('Access-Control-Allow-Credentials' => 'true');
     $self->res->headers->header('Access-Control-Allow-Methods' => 'GET, OPTIONS, POST, DELETE, PUT');
     $self->res->headers->header('Access-Control-Allow-Headers' => 'Content-Type, X-CSRF-Token');
     $self->res->headers->header('Access-Control-Max-Age' => '1728000');
-
-    $self->respond_to(any => { data => '', status => 200 });
   });
 
+  $api_public_get->options('*' => sub {
+    $self->respond_to(any => { data => '', status => 200 });
+  });
+  $api_public_get->get('/info/ages')->to('api-info#get_ages');
+
   # Always available api routes
-  my $api_public = $r->under('/api')->to('api-auth#check_json');
+  my $api_public = $api_public_get->under('/')->to('api-auth#check_json');
 
   $api_public->post('/login')->to('api-auth#post_login');
   $api_public->post('/register')->to('api-register#post_register');
