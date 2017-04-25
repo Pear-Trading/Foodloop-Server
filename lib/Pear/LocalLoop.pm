@@ -111,16 +111,17 @@ sub startup {
   $r->any('/admin/logout')->to('admin#auth_logout');
 
   my $api_public_get = $r->under('/api' => sub {
-    my $self = shift;
-    $self->res->headers->header('Access-Control-Allow-Origin'=> '*');
-    $self->res->headers->header('Access-Control-Allow-Credentials' => 'true');
-    $self->res->headers->header('Access-Control-Allow-Methods' => 'GET, OPTIONS, POST, DELETE, PUT');
-    $self->res->headers->header('Access-Control-Allow-Headers' => 'Content-Type, X-CSRF-Token');
-    $self->res->headers->header('Access-Control-Max-Age' => '1728000');
+    my $c = shift;
+    $c->res->headers->header('Access-Control-Allow-Origin'=> '*');
+    $c->res->headers->header('Access-Control-Allow-Credentials' => 'true');
+    $c->res->headers->header('Access-Control-Allow-Methods' => 'GET, OPTIONS, POST, DELETE, PUT');
+    $c->res->headers->header('Access-Control-Allow-Headers' => 'Content-Type, X-CSRF-Token');
+    $c->res->headers->header('Access-Control-Max-Age' => '1728000');
   });
 
   $api_public_get->options('*' => sub {
-    $self->respond_to(any => { data => '', status => 200 });
+    my $c = shift;
+    $c->respond_to(any => { data => '', status => 200 });
   });
   $api_public_get->get('/info/ages')->to('api-info#get_ages');
 
