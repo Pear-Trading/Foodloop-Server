@@ -32,8 +32,9 @@ sub register {
     try {
       $postcode = Geo::UK::Postcode->new( $value );
     };
-    return defined( $postcode ) && ( $postcode->valid ) && ! ( $postcode->partial ) ? undef : 1;
-
+    return 1 unless defined( $postcode );
+    return 1 if $postcode->partial;
+    return undef if $postcode->valid;
   });
 
   $app->validator->add_check( number => sub {
