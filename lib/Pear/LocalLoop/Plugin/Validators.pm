@@ -35,6 +35,7 @@ sub register {
     return 1 unless defined( $postcode );
     return 1 if $postcode->partial;
     return undef if $postcode->valid;
+    return 1;
   });
 
   $app->validator->add_check( number => sub {
