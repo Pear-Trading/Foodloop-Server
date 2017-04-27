@@ -19,7 +19,8 @@ $schema->resultset('AccountToken')->create({
 
 $framework->register_customer({
   'token' => $account_token,
-  'name' =>  'Test User',
+  'full_name' =>  'Test User',
+  'display_name' =>  'Test User',
   'email' => $email,
   'postcode' => 'LA1 1AA',
   'password' => $password,

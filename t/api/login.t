@@ -19,7 +19,8 @@ $schema->resultset('AccountToken')->create({
 my $test_json = {
   'usertype' => 'customer', 
   'token' => $account_token, 
-  'name' =>  'RufusShinra', 
+  'display_name' =>  'RufusShinra', 
+  'full_name' =>  'RufusShinra', 
   'email' => $email, 
   'postcode' => 'LA1 1AA', 
   'password' => $password, 

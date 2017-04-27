@@ -6,6 +6,7 @@ use Geo::UK::Postcode;
 use Scalar::Util qw/ looks_like_number /;
 use File::Basename qw/ fileparse /;
 use DateTime::Format::Strptime;
+use Try::Tiny;
 
 sub register {
   my ( $plugin, $app, $conf ) = @_;
@@ -27,7 +28,14 @@ sub register {
 
   $app->validator->add_check( postcode => sub {
     my ( $validation, $name, $value ) = @_;
-    return Geo::UK::Postcode->new( $value )->valid ? undef : 1;
+    my $postcode;
+    try {
+      $postcode = Geo::UK::Postcode->new( $value );
+    };
+    return 1 unless defined( $postcode );
+    return 1 if $postcode->partial;
+    return undef if $postcode->valid;
+    return 1;
   });
 
   $app->validator->add_check( number => sub {
