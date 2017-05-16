@@ -14,7 +14,6 @@ sub post_today {
     success => Mojo::JSON->true,
     today_sum => $today_sum,
     today_count => $today_count,
-    today_avg => $today_sum / $today_count,
   });
 
 }

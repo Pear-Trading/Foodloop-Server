@@ -67,7 +67,6 @@ $t->post_ok('/api/stats' => json => { session_key => $session_key } )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_is('/today_sum', 55)
-  ->json_is('/today_count', 10)
-  ->json_is('/today_avg', 5.5);
+  ->json_is('/today_count', 10);
 
 done_testing;
