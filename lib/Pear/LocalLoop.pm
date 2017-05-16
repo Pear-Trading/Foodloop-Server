@@ -147,7 +147,7 @@ sub startup {
   $api->post('/edit')->to('api-api#post_edit');
   $api->post('/fetchuser')->to('api-api#post_fetchuser');
   $api->post('/user-history')->to('api-user#post_user_history');
-  $api->post('/stats')->to('api-stats#post_today');
+  $api->post('/stats')->to('api-stats#post_index');
 
   my $api_admin = $api->under('/')->to('api-admin#auth');
 

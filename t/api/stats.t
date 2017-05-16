@@ -8,6 +8,7 @@ use DateTime;
 my $framework = Test::Pear::LocalLoop->new;
 my $t = $framework->framework;
 my $schema = $t->app->schema;
+my $dtf = $schema->storage->datetime_parser;
 
 my $user = {
   token        => 'a',
@@ -46,7 +47,42 @@ for ( 1 .. 10 ) {
   });
 }
 
-my $dtf = $schema->storage->datetime_parser;
+for ( 11 .. 20 ) {
+  $user_result->create_related( 'transactions', {
+    seller_id => $org_result->id,
+    value => $_,
+    proof_image => 'a',
+    submitted_at => $dtf->format_datetime(DateTime->today()->subtract( days => 5 )),
+  });
+}
+
+for ( 21 .. 30 ) {
+  $user_result->create_related( 'transactions', {
+    seller_id => $org_result->id,
+    value => $_,
+    proof_image => 'a',
+    submitted_at => $dtf->format_datetime(DateTime->today()->subtract( days => 25 )),
+  });
+}
+
+for ( 31 .. 40 ) {
+  $user_result->create_related( 'transactions', {
+    seller_id => $org_result->id,
+    value => $_,
+    proof_image => 'a',
+    submitted_at => $dtf->format_datetime(DateTime->today()->subtract( days => 50 )),
+  });
+}
+
+for ( 41 .. 50 ) {
+  $org_result->user->create_related( 'transactions', {
+    seller_id => $org_result->id,
+    value => $_,
+    proof_image => 'a',
+    submitted_at => $dtf->format_datetime(DateTime->today()->subtract( days => 50 )),
+  });
+}
+
 is $user_result->transactions->search({
   submitted_at => {
     -between => [
@@ -56,7 +92,6 @@ is $user_result->transactions->search({
   },
 })->get_column('value')->sum, 55, 'Got correct sum';
 is $user_result->transactions->today_rs->get_column('value')->sum, 55, 'Got correct sum through rs';
-is $schema->resultset('Transaction')->today_for_user($user_result)->get_column('value')->sum, 55, 'Got correct sum through rs';
 
 my $session_key = $framework->login({
   email    => $user->{email},
@@ -67,6 +102,14 @@ $t->post_ok('/api/stats' => json => { session_key => $session_key } )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_is('/today_sum', 55)
-  ->json_is('/today_count', 10);
+  ->json_is('/today_count', 10)
+  ->json_is('/week_sum', 155)
+  ->json_is('/week_count', 10)
+  ->json_is('/month_sum', 410)
+  ->json_is('/month_count', 20)
+  ->json_is('/user_sum', 820)
+  ->json_is('/user_count', 40)
+  ->json_is('/global_sum', 1275)
+  ->json_is('/global_count', 50);
 
 done_testing;
