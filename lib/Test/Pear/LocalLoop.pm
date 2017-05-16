@@ -65,6 +65,16 @@ sub register_customer {
     ->json_is('/success', Mojo::JSON->true)->or($self->dump_error);
 }
 
+sub register_organisation {
+  my ( $self, $args ) = @_;
+
+  $args->{usertype} = 'organisation';
+
+  $self->framework->post_ok('/api/register' => json => $args)
+    ->status_is(200)->or($self->dump_error)
+    ->json_is('/success', Mojo::JSON->true)->or($self->dump_error);
+}
+
 sub login {
   my $self = shift;
   my $args = shift;
@@ -74,6 +84,21 @@ sub login {
     ->json_is('/success', Mojo::JSON->true)->or($self->dump_error);
 
   return $self->framework->tx->res->json->{session_key};
+}
+
+sub gen_upload {
+  my ( $self, $args ) = @_;
+
+  my $file = {
+    content        => '',
+    filename       => 'text.jpg',
+    'Content-Type' => 'image/jpeg',
+  };
+
+  return {
+    json => Mojo::JSON::encode_json($args),
+    file => $file,
+  };
 }
 
 1;
