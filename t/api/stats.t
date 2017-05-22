@@ -39,6 +39,25 @@ $framework->register_organisation($org);
 my $org_result = $schema->resultset('Organisation')->find({ name => $org->{name} });
 my $user_result = $schema->resultset('User')->find({ email => $user->{email} });
 
+my $session_key = $framework->login({
+  email    => $user->{email},
+  password => $user->{password},
+});
+
+$t->post_ok('/api/stats' => json => { session_key => $session_key } )
+  ->status_is(200)
+  ->json_is('/success', Mojo::JSON->true)
+  ->json_is('/today_sum', 0)
+  ->json_is('/today_count', 0)
+  ->json_is('/week_sum', 0)
+  ->json_is('/week_count', 0)
+  ->json_is('/month_sum', 0)
+  ->json_is('/month_count', 0)
+  ->json_is('/user_sum', 0)
+  ->json_is('/user_count', 0)
+  ->json_is('/global_sum', 0)
+  ->json_is('/global_count', 0);
+
 for ( 1 .. 10 ) {
   $user_result->create_related( 'transactions', {
     seller_id => $org_result->id,
@@ -92,11 +111,6 @@ is $user_result->transactions->search({
   },
 })->get_column('value')->sum, 55, 'Got correct sum';
 is $user_result->transactions->today_rs->get_column('value')->sum, 55, 'Got correct sum through rs';
-
-my $session_key = $framework->login({
-  email    => $user->{email},
-  password => $user->{password},
-});
 
 $t->post_ok('/api/stats' => json => { session_key => $session_key } )
   ->status_is(200)

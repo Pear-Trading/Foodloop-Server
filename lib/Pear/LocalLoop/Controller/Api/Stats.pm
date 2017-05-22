@@ -28,15 +28,15 @@ sub post_index {
 
   return $c->render( json => {
     success => Mojo::JSON->true,
-    today_sum => $today_sum,
+    today_sum => $today_sum || 0,
     today_count => $today_count,
-    week_sum => $week_sum,
+    week_sum => $week_sum || 0,
     week_count => $week_count,
-    month_sum => $month_sum,
+    month_sum => $month_sum || 0,
     month_count => $month_count,
-    user_sum => $user_sum,
+    user_sum => $user_sum || 0,
     user_count => $user_count,
-    global_sum => $global_sum,
+    global_sum => $global_sum || 0,
     global_count => $global_count,
   });
 }
