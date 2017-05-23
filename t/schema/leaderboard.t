@@ -121,7 +121,7 @@ sub test_leaderboard {
 
     my $today_board = $leaderboard_rs->find({ type => $name })->create_new($date)->sets->first;
 
-    is $today_board->values->count, 5, 'correct value count for today';
+    is $today_board->values->count, 5, 'correct value count';
 
     my $today_values = $today_board->values->search(
       {},
@@ -132,7 +132,7 @@ sub test_leaderboard {
     );
     $today_values->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
 
-    is_deeply [ $today_values->all ], $expected, 'Today as expected';
+    is_deeply [ $today_values->all ], $expected, 'array as expected';
   };
 }
 
@@ -171,6 +171,71 @@ test_leaderboard(
     { user_id => 3, value => 185 },
     { user_id => 2, value => 175 },
     { user_id => 1, value => 165 },
+    { user_id => 5, value => 0 },
+  ]
+);
+
+test_leaderboard(
+  'Weekly Count',
+  'weekly_count',
+  DateTime->today->subtract( days => 7 ),
+  [
+    { user_id => 1, value => 10 },
+    { user_id => 2, value => 10 },
+    { user_id => 3, value => 10 },
+    { user_id => 4, value => 10 },
+    { user_id => 5, value => 0 },
+  ]
+);
+
+test_leaderboard(
+  'Monthly Total',
+  'monthly_total',
+  DateTime->today->subtract( months => 1 ),
+  [
+    { user_id => 4, value => 490 },
+    { user_id => 3, value => 470 },
+    { user_id => 2, value => 450 },
+    { user_id => 1, value => 430 },
+    { user_id => 5, value => 0 },
+  ]
+);
+
+test_leaderboard(
+  'Monthly Count',
+  'monthly_count',
+  DateTime->today->subtract( months => 1 ),
+  [
+    { user_id => 1, value => 20 },
+    { user_id => 2, value => 20 },
+    { user_id => 3, value => 20 },
+    { user_id => 4, value => 20 },
+    { user_id => 5, value => 0 },
+  ]
+);
+
+test_leaderboard(
+  'All Time Total',
+  'all_time_total',
+  DateTime->today,
+  [
+    { user_id => 4, value => 980 },
+    { user_id => 3, value => 940 },
+    { user_id => 2, value => 900 },
+    { user_id => 1, value => 860 },
+    { user_id => 5, value => 0 },
+  ]
+);
+
+test_leaderboard(
+  'All Time Count',
+  'all_time_count',
+  DateTime->today,
+  [
+    { user_id => 1, value => 40 },
+    { user_id => 2, value => 40 },
+    { user_id => 3, value => 40 },
+    { user_id => 4, value => 40 },
     { user_id => 5, value => 0 },
   ]
 );
