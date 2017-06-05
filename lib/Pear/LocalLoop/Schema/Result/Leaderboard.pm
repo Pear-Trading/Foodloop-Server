@@ -51,7 +51,7 @@ sub create_new {
   } elsif ( $type eq 'monthly_total' ) {
     return $self->_create_total_set( $start, $start->clone->add( months => 1 ) );
   } elsif ( $type eq 'all_time_total' ) {
-    return $self->_create_total_all_time;
+    return $self->_create_total_all_time( $start );
   } elsif ( $type eq 'daily_count' ) {
     return $self->_create_count_set( $start, $start->clone->add( days => 1 ) );
   } elsif ( $type eq 'weekly_count' ) {
@@ -59,18 +59,23 @@ sub create_new {
   } elsif ( $type eq 'monthly_count' ) {
     return $self->_create_count_set( $start, $start->clone->add( months => 1 ) );
   } elsif ( $type eq 'all_time_count' ) {
-    return $self->_create_count_all_time;
+    return $self->_create_count_all_time( $start );
   }
   warn "Unrecognised type";
   return $self;
 }
 
+sub _get_customer_rs {
+  my $self = shift;
+  return $self->result_source->schema->resultset('User')->search({
+    organisation_id => undef,
+  });
+}
+
 sub _create_total_set {
   my ( $self, $start, $end ) = @_;
 
-  my $schema = $self->result_source->schema;
-
-  my $user_rs = $schema->resultset('User');
+  my $user_rs = $self->_get_customer_rs;
 
   my @leaderboard;
 
@@ -99,9 +104,7 @@ sub _create_total_set {
 sub _create_count_set {
   my ( $self, $start, $end ) = @_;
 
-  my $schema = $self->result_source->schema;
-
-  my $user_rs = $schema->resultset('User');
+  my $user_rs = $self->_get_customer_rs;
 
   my @leaderboard;
 
@@ -128,14 +131,10 @@ sub _create_count_set {
 }
 
 sub _create_total_all_time {
-  my ( $self ) = @_;
+  my ( $self, $end ) = @_;
 
-  my $schema = $self->result_source->schema;
-
-  my $user_rs = $schema->resultset('User');
-  
-  my $end = DateTime->today;
-
+  my $user_rs = $self->_get_customer_rs;
+ 
   my @leaderboard;
 
   while ( my $user_result = $user_rs->next ) {
@@ -161,13 +160,9 @@ sub _create_total_all_time {
 }
 
 sub _create_count_all_time {
-  my ( $self ) = @_;
+  my ( $self, $end ) = @_;
 
-  my $schema = $self->result_source->schema;
-
-  my $user_rs = $schema->resultset('User');
-
-  my $end = DateTime->today;
+  my $user_rs = $self->_get_customer_rs;
 
   my @leaderboard;
 

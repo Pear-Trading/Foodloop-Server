@@ -123,7 +123,7 @@ sub test_leaderboard {
 
     my $today_board = $leaderboard_rs->find({ type => $name })->create_new($date)->get_latest;
 
-    is $today_board->values->count, 5, 'correct value count';
+    is $today_board->values->count, 4, 'correct value count';
 
     my $today_values = $today_board->values->search(
       {},
@@ -147,7 +147,6 @@ test_leaderboard(
     { user_id => 3, value => 85 },
     { user_id => 2, value => 75 },
     { user_id => 1, value => 65 },
-    { user_id => 5, value => 0 },
   ]
 );
 
@@ -160,7 +159,6 @@ test_leaderboard(
     { user_id => 2, value => 10 },
     { user_id => 3, value => 10 },
     { user_id => 4, value => 10 },
-    { user_id => 5, value => 0 },
   ]
 );
 
@@ -173,7 +171,6 @@ test_leaderboard(
     { user_id => 3, value => 185 },
     { user_id => 2, value => 175 },
     { user_id => 1, value => 165 },
-    { user_id => 5, value => 0 },
   ]
 );
 
@@ -186,7 +183,6 @@ test_leaderboard(
     { user_id => 2, value => 10 },
     { user_id => 3, value => 10 },
     { user_id => 4, value => 10 },
-    { user_id => 5, value => 0 },
   ]
 );
 
@@ -199,7 +195,6 @@ test_leaderboard(
     { user_id => 3, value => 470 },
     { user_id => 2, value => 450 },
     { user_id => 1, value => 430 },
-    { user_id => 5, value => 0 },
   ]
 );
 
@@ -212,7 +207,6 @@ test_leaderboard(
     { user_id => 2, value => 20 },
     { user_id => 3, value => 20 },
     { user_id => 4, value => 20 },
-    { user_id => 5, value => 0 },
   ]
 );
 
@@ -225,7 +219,6 @@ test_leaderboard(
     { user_id => 3, value => 940 },
     { user_id => 2, value => 900 },
     { user_id => 1, value => 860 },
-    { user_id => 5, value => 0 },
   ]
 );
 
@@ -238,7 +231,6 @@ test_leaderboard(
     { user_id => 2, value => 40 },
     { user_id => 3, value => 40 },
     { user_id => 4, value => 40 },
-    { user_id => 5, value => 0 },
   ]
 );
 
@@ -250,7 +242,7 @@ subtest 'get_latest' => sub {
 
   my $today_board = $leaderboard_rs->find({ type => 'daily_total' })->get_latest;
 
-  is $today_board->values->count, 5, 'correct value count';
+  is $today_board->values->count, 4, 'correct value count';
 
   my $today_values = $today_board->values->search(
     {},
@@ -266,7 +258,6 @@ subtest 'get_latest' => sub {
     { user_id => 3, value => 85 },
     { user_id => 2, value => 75 },
     { user_id => 1, value => 65 },
-    { user_id => 5, value => 0 },
   ];
 
   is_deeply [ $today_values->all ], $expected, 'array as expected';
