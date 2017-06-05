@@ -72,6 +72,8 @@ my $org_result = $schema->resultset('Organisation')->find({ name => $org->{name}
 
 my $tweak = 0;
 
+my $now = DateTime->today();
+
 for my $user ( $user1, $user2, $user3, $user4 ) {
   $tweak ++;
   my $user_result = $schema->resultset('User')->find({ email => $user->{email} });
@@ -88,7 +90,7 @@ for my $user ( $user1, $user2, $user3, $user4 ) {
       seller_id => $org_result->id,
       value => $_ + $tweak,
       proof_image => 'a',
-      submitted_at => $dtf->format_datetime(DateTime->today()->subtract( days => 5 )),
+      submitted_at => $dtf->format_datetime($now->clone->subtract( days => 5 )),
     });
   }
 
@@ -97,7 +99,7 @@ for my $user ( $user1, $user2, $user3, $user4 ) {
       seller_id => $org_result->id,
       value => $_ + $tweak,
       proof_image => 'a',
-      submitted_at => $dtf->format_datetime(DateTime->today()->subtract( days => 25 )),
+      submitted_at => $dtf->format_datetime($now->clone->subtract( days => 25 )),
     });
   }
 
@@ -106,7 +108,7 @@ for my $user ( $user1, $user2, $user3, $user4 ) {
       seller_id => $org_result->id,
       value => $_ + $tweak,
       proof_image => 'a',
-      submitted_at => $dtf->format_datetime(DateTime->today()->subtract( days => 50 )),
+      submitted_at => $dtf->format_datetime($now->clone->subtract( days => 50 )),
     });
   }
 
@@ -119,7 +121,7 @@ sub test_leaderboard {
   subtest $title => sub {
     my $leaderboard_rs = $schema->resultset('Leaderboard');
 
-    my $today_board = $leaderboard_rs->find({ type => $name })->create_new($date)->sets->first;
+    my $today_board = $leaderboard_rs->find({ type => $name })->create_new($date)->get_latest;
 
     is $today_board->values->count, 5, 'correct value count';
 
@@ -139,7 +141,7 @@ sub test_leaderboard {
 test_leaderboard(
   'Daily Total',
   'daily_total',
-  DateTime->today,
+  $now,
   [
     { user_id => 4, value => 95 },
     { user_id => 3, value => 85 },
@@ -152,7 +154,7 @@ test_leaderboard(
 test_leaderboard(
   'Daily Count',
   'daily_count',
-  DateTime->today,
+  $now,
   [
     { user_id => 1, value => 10 },
     { user_id => 2, value => 10 },
@@ -165,7 +167,7 @@ test_leaderboard(
 test_leaderboard(
   'Weekly Total',
   'weekly_total',
-  DateTime->today->subtract( days => 7 ),
+  $now->clone->subtract( days => 7 ),
   [
     { user_id => 4, value => 195 },
     { user_id => 3, value => 185 },
@@ -178,7 +180,7 @@ test_leaderboard(
 test_leaderboard(
   'Weekly Count',
   'weekly_count',
-  DateTime->today->subtract( days => 7 ),
+  $now->clone->subtract( days => 7 ),
   [
     { user_id => 1, value => 10 },
     { user_id => 2, value => 10 },
@@ -191,7 +193,7 @@ test_leaderboard(
 test_leaderboard(
   'Monthly Total',
   'monthly_total',
-  DateTime->today->subtract( months => 1 ),
+  $now->clone->subtract( months => 1 ),
   [
     { user_id => 4, value => 490 },
     { user_id => 3, value => 470 },
@@ -204,7 +206,7 @@ test_leaderboard(
 test_leaderboard(
   'Monthly Count',
   'monthly_count',
-  DateTime->today->subtract( months => 1 ),
+  $now->clone->subtract( months => 1 ),
   [
     { user_id => 1, value => 20 },
     { user_id => 2, value => 20 },
@@ -217,7 +219,7 @@ test_leaderboard(
 test_leaderboard(
   'All Time Total',
   'all_time_total',
-  DateTime->today,
+  $now,
   [
     { user_id => 4, value => 980 },
     { user_id => 3, value => 940 },
@@ -230,7 +232,7 @@ test_leaderboard(
 test_leaderboard(
   'All Time Count',
   'all_time_count',
-  DateTime->today,
+  $now,
   [
     { user_id => 1, value => 40 },
     { user_id => 2, value => 40 },
@@ -239,5 +241,35 @@ test_leaderboard(
     { user_id => 5, value => 0 },
   ]
 );
+
+subtest 'get_latest' => sub {
+  my $leaderboard_rs = $schema->resultset('Leaderboard');
+  $leaderboard_rs->find({ type => 'daily_total' })->create_new($now->clone->subtract(days => 5));
+  $leaderboard_rs->find({ type => 'daily_total' })->create_new($now->clone->subtract(days => 25));
+  $leaderboard_rs->find({ type => 'daily_total' })->create_new($now->clone->subtract(days => 50));
+
+  my $today_board = $leaderboard_rs->find({ type => 'daily_total' })->get_latest;
+
+  is $today_board->values->count, 5, 'correct value count';
+
+  my $today_values = $today_board->values->search(
+    {},
+    {
+      order_by => { -desc => 'value' },
+      columns => [ qw/ user_id value / ],
+    },
+  );
+  $today_values->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
+
+  my $expected = [
+    { user_id => 4, value => 95 },
+    { user_id => 3, value => 85 },
+    { user_id => 2, value => 75 },
+    { user_id => 1, value => 65 },
+    { user_id => 5, value => 0 },
+  ];
+
+  is_deeply [ $today_values->all ], $expected, 'array as expected';
+};
 
 done_testing;

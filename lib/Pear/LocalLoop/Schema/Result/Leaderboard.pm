@@ -196,7 +196,11 @@ sub _create_count_all_time {
 sub get_latest {
   my $self = shift;
 
-  return $self;
+  my $latest = $self->search_related('sets', {}, {
+    order_by => { -desc => 'date' },
+  })->first;
+
+  return $latest;
 }
 
 1;
