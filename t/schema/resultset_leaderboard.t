@@ -121,7 +121,9 @@ sub test_leaderboard {
   subtest $title => sub {
     my $leaderboard_rs = $schema->resultset('Leaderboard');
 
-    my $today_board = $leaderboard_rs->find({ type => $name })->create_new($date)->get_latest;
+    $leaderboard_rs->create_new( $name, $date );
+    
+    my $today_board = $leaderboard_rs->get_latest( $name );
 
     is $today_board->values->count, 5, 'correct value count';
 
@@ -244,11 +246,11 @@ test_leaderboard(
 
 subtest 'get_latest' => sub {
   my $leaderboard_rs = $schema->resultset('Leaderboard');
-  $leaderboard_rs->find({ type => 'daily_total' })->create_new($now->clone->subtract(days => 5));
-  $leaderboard_rs->find({ type => 'daily_total' })->create_new($now->clone->subtract(days => 25));
-  $leaderboard_rs->find({ type => 'daily_total' })->create_new($now->clone->subtract(days => 50));
+  $leaderboard_rs->create_new( 'daily_total', $now->clone->subtract(days => 5));
+  $leaderboard_rs->create_new( 'daily_total', $now->clone->subtract(days => 25));
+  $leaderboard_rs->create_new( 'daily_total', $now->clone->subtract(days => 50));
 
-  my $today_board = $leaderboard_rs->find({ type => 'daily_total' })->get_latest;
+  my $today_board = $leaderboard_rs->get_latest( 'daily_total' );
 
   is $today_board->values->count, 5, 'correct value count';
 
@@ -271,7 +273,7 @@ subtest 'get_latest' => sub {
 
   is_deeply [ $today_values->all ], $expected, 'array as expected';
 
-  is $leaderboard_rs->find({ type => 'daily_total' })->sets->count, 4, 'correct leaderboard count';
+  is $leaderboard_rs->find_by_type( 'daily_total' )->sets->count, 4, 'correct leaderboard count';
 };
 
 done_testing;
