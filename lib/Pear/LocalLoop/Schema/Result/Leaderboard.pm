@@ -79,14 +79,39 @@ sub _create_total_set {
 
   my @leaderboard;
 
+  my $previous_board = $self->get_latest;
+
+  if ( defined $previous_board ) {
+    $previous_board = $previous_board->values;
+  }
+  
   while ( my $user_result = $user_rs->next ) {
     my $transaction_rs = $user_result->transactions->search_between( $start, $end );
 
     my $transaction_sum = $transaction_rs->get_column('value')->sum;
 
+    my $previous_value;
+
+    if ( defined $previous_board ) {
+      $previous_value = $previous_board->find({ user_id => $user_result->id });
+    }
+
+    my $trend;
+
+    if ( ! defined $previous_value ) {
+      $trend = 0;
+    } elsif ( $previous_value->value > $transaction_sum ) {
+      $trend = -1;
+    } elsif ( $previous_value->value < $transaction_sum ) {
+      $trend = 1;
+    } else {
+      $trend = 0;
+    }
+
     push @leaderboard, {
       user_id => $user_result->id,
       value => $transaction_sum || 0,
+      trend => $trend,
     };
   }
 
@@ -108,14 +133,39 @@ sub _create_count_set {
 
   my @leaderboard;
 
+  my $previous_board = $self->get_latest;
+
+  if ( defined $previous_board ) {
+    $previous_board = $previous_board->values;
+  }
+
   while ( my $user_result = $user_rs->next ) {
     my $transaction_rs = $user_result->transactions->search_between( $start, $end );
 
     my $transaction_count = $transaction_rs->count;
 
+    my $previous_value;
+
+    if ( defined $previous_board ) {
+      $previous_value = $previous_board->find({ user_id => $user_result->id });
+    }
+
+    my $trend;
+
+    if ( ! defined $previous_value ) {
+      $trend = 0;
+    } elsif ( $previous_value->value > $transaction_count ) {
+      $trend = -1;
+    } elsif ( $previous_value->value < $transaction_count ) {
+      $trend = 1;
+    } else {
+      $trend = 0;
+    }
+
     push @leaderboard, {
       user_id => $user_result->id,
       value => $transaction_count || 0,
+      trend => $trend,
     };
   }
 
@@ -137,10 +187,34 @@ sub _create_total_all_time {
  
   my @leaderboard;
 
+  my $previous_board = $self->get_latest;
+
+  if ( defined $previous_board ) {
+    $previous_board = $previous_board->values;
+  }
+
   while ( my $user_result = $user_rs->next ) {
     my $transaction_rs = $user_result->transactions;
 
     my $transaction_sum = $transaction_rs->get_column('value')->sum;
+
+    my $previous_value;
+
+    if ( defined $previous_board ) {
+      $previous_value = $previous_board->find({ user_id => $user_result->id });
+    }
+
+    my $trend;
+
+    if ( ! defined $previous_value ) {
+      $trend = 0;
+    } elsif ( $previous_value->value > $transaction_sum ) {
+      $trend = -1;
+    } elsif ( $previous_value->value < $transaction_sum ) {
+      $trend = 1;
+    } else {
+      $trend = 0;
+    }
 
     push @leaderboard, {
       user_id => $user_result->id,
@@ -166,14 +240,39 @@ sub _create_count_all_time {
 
   my @leaderboard;
 
+  my $previous_board = $self->get_latest;
+
+  if ( defined $previous_board ) {
+    $previous_board = $previous_board->values;
+  }
+
   while ( my $user_result = $user_rs->next ) {
     my $transaction_rs = $user_result->transactions;
 
     my $transaction_count = $transaction_rs->count;
 
+    my $previous_value;
+
+    if ( defined $previous_board ) {
+      $previous_value = $previous_board->find({ user_id => $user_result->id });
+    }
+
+    my $trend;
+
+    if ( ! defined $previous_value ) {
+      $trend = 0;
+    } elsif ( $previous_value->value > $transaction_count ) {
+      $trend = -1;
+    } elsif ( $previous_value->value < $transaction_count ) {
+      $trend = 1;
+    } else {
+      $trend = 0;
+    }
+
     push @leaderboard, {
       user_id => $user_result->id,
       value => $transaction_count || 0,
+      trend => $trend,
     };
   }
 

@@ -28,6 +28,10 @@ __PACKAGE__->add_columns(
     size => [ 16, 2 ],
     is_nullable => 0,
   },
+  "trend" => {
+    data_type => "integer",
+    default_value => 0,
+  },
 );
 
 __PACKAGE__->set_primary_key("id");
