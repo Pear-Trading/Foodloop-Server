@@ -138,7 +138,7 @@ sub name {
   my $self = shift;
 
   if ( defined $self->customer_id ) {
-    return $self->customer->name;
+    return $self->customer->display_name;
   } elsif ( defined $self->organisation_id ) {
     return $self->organisation->name;
   } else {
