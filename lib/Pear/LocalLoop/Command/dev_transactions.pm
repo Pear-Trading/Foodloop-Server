@@ -24,7 +24,7 @@ sub run {
     return;
   }
 
-  if ( $ENV{MOJO_MODE} eq 'production' || $self->app->mode eq 'production' ) {
+  if ( ( defined( $ENV{MOJO_MODE} ) && $ENV{MOJO_MODE} eq 'production' ) || $self->app->mode eq 'production' ) {
     say "Will not run dev data fixtures in production!";
     return;
   }
@@ -61,8 +61,12 @@ sub run {
     $number = 1;
   }
 
+  unless ( defined $count ) {
+    $count = 0;
+  }
+
   for my $day_sub ( 0 .. $count ) {
-    $datetime->subtract( days => $day_sub );
+    $datetime->subtract( days => 1 );
     for ( 1 .. $number ) {
       for my $user_result ( $user_rs->all ) {
         $user_result->create_related( 'transactions', {

@@ -18,7 +18,7 @@ sub run {
     return;
   }
 
-  if ( $ENV{MOJO_MODE} eq 'production' || $self->app->mode eq 'production' ) {
+  if ( ( defined( $ENV{MOJO_MODE} ) && $ENV{MOJO_MODE} eq 'production' ) || $self->app->mode eq 'production' ) {
     say "Will not run dev data fixtures in production!";
     return;
   }
