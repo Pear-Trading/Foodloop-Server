@@ -39,7 +39,8 @@ if (defined $ENV{MOJO_MODE} && $ENV{MOJO_MODE} eq 'development' ) {
     email => 'test@example.com',
     password => 'abc123',
     customer => {
-      name => 'Test User',
+      full_name => 'Test User',
+      display_name => 'Test User',
       age_range_id => 1,
       postcode => 'LA1 1AA',
     },
