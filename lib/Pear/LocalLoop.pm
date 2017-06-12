@@ -30,6 +30,8 @@ sub startup {
   });
   my $config = $self->config;
 
+  push @{ $self->commands->namespaces }, __PACKAGE__ . '::Command';
+
   $self->plugin('Pear::LocalLoop::Plugin::Validators');
 
   $self->plugin('Authentication' => {
