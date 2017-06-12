@@ -44,6 +44,7 @@ sub run {
 
       unless ( defined $datetime ) {
         say "Unrecognised date format, please use 'YYYY-MM-DD' Format";
+        return;
       }
 
       $leaderboard->create_new($datetime);
