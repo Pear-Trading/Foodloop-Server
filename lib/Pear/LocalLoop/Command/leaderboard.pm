@@ -47,6 +47,16 @@ sub run {
         return;
       }
 
+      my $dtf = $self->app->schema->storage->datetime_parser;
+      my $existing_leaderboard_set = $leaderboard->search_related( 'sets', {
+        date => $dtf->format_datetime( $datetime ),
+      })->first;
+
+      if ( defined $existing_leaderboard_set ) {
+        $existing_leaderboard_set->values->delete_all;
+        $existing_leaderboard_set->delete;
+      }
+
       $leaderboard->create_new($datetime);
 
       say "Done";
