@@ -131,7 +131,7 @@ sub test_leaderboard {
       {},
       {
         order_by => { -desc => 'value' },
-        columns => [ qw/ user_id value / ],
+        columns => [ qw/ user_id value position / ],
       },
     );
     $today_values->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
@@ -145,10 +145,10 @@ test_leaderboard(
   'daily_total',
   $now,
   [
-    { user_id => 4, value => 95 },
-    { user_id => 3, value => 85 },
-    { user_id => 2, value => 75 },
-    { user_id => 1, value => 65 },
+    { user_id => 4, value => 95, position => 1 },
+    { user_id => 3, value => 85, position => 2 },
+    { user_id => 2, value => 75, position => 3 },
+    { user_id => 1, value => 65, position => 4 },
   ]
 );
 
@@ -157,10 +157,10 @@ test_leaderboard(
   'daily_count',
   $now,
   [
-    { user_id => 1, value => 10 },
-    { user_id => 2, value => 10 },
-    { user_id => 3, value => 10 },
-    { user_id => 4, value => 10 },
+    { user_id => 1, value => 10, position => 1 },
+    { user_id => 2, value => 10, position => 2 },
+    { user_id => 3, value => 10, position => 3 },
+    { user_id => 4, value => 10, position => 4 },
   ]
 );
 
@@ -169,10 +169,10 @@ test_leaderboard(
   'weekly_total',
   $now->clone->subtract( days => 7 ),
   [
-    { user_id => 4, value => 195 },
-    { user_id => 3, value => 185 },
-    { user_id => 2, value => 175 },
-    { user_id => 1, value => 165 },
+    { user_id => 4, value => 195, position => 1 },
+    { user_id => 3, value => 185, position => 2 },
+    { user_id => 2, value => 175, position => 3 },
+    { user_id => 1, value => 165, position => 4 },
   ]
 );
 
@@ -181,10 +181,10 @@ test_leaderboard(
   'weekly_count',
   $now->clone->subtract( days => 7 ),
   [
-    { user_id => 1, value => 10 },
-    { user_id => 2, value => 10 },
-    { user_id => 3, value => 10 },
-    { user_id => 4, value => 10 },
+    { user_id => 1, value => 10, position => 1 },
+    { user_id => 2, value => 10, position => 2 },
+    { user_id => 3, value => 10, position => 3 },
+    { user_id => 4, value => 10, position => 4 },
   ]
 );
 
@@ -193,10 +193,10 @@ test_leaderboard(
   'monthly_total',
   $now->clone->subtract( months => 1 ),
   [
-    { user_id => 4, value => 490 },
-    { user_id => 3, value => 470 },
-    { user_id => 2, value => 450 },
-    { user_id => 1, value => 430 },
+    { user_id => 4, value => 490, position => 1 },
+    { user_id => 3, value => 470, position => 2 },
+    { user_id => 2, value => 450, position => 3 },
+    { user_id => 1, value => 430, position => 4 },
   ]
 );
 
@@ -205,10 +205,10 @@ test_leaderboard(
   'monthly_count',
   $now->clone->subtract( months => 1 ),
   [
-    { user_id => 1, value => 20 },
-    { user_id => 2, value => 20 },
-    { user_id => 3, value => 20 },
-    { user_id => 4, value => 20 },
+    { user_id => 1, value => 20, position => 1 },
+    { user_id => 2, value => 20, position => 2 },
+    { user_id => 3, value => 20, position => 3 },
+    { user_id => 4, value => 20, position => 4 },
   ]
 );
 
@@ -217,10 +217,10 @@ test_leaderboard(
   'all_time_total',
   $now,
   [
-    { user_id => 4, value => 980 },
-    { user_id => 3, value => 940 },
-    { user_id => 2, value => 900 },
-    { user_id => 1, value => 860 },
+    { user_id => 4, value => 980, position => 1 },
+    { user_id => 3, value => 940, position => 2 },
+    { user_id => 2, value => 900, position => 3 },
+    { user_id => 1, value => 860, position => 4 },
   ]
 );
 
@@ -229,10 +229,10 @@ test_leaderboard(
   'all_time_count',
   $now,
   [
-    { user_id => 1, value => 40 },
-    { user_id => 2, value => 40 },
-    { user_id => 3, value => 40 },
-    { user_id => 4, value => 40 },
+    { user_id => 1, value => 40, position => 1 },
+    { user_id => 2, value => 40, position => 2 },
+    { user_id => 3, value => 40, position => 3 },
+    { user_id => 4, value => 40, position => 4 },
   ]
 );
 
@@ -250,16 +250,16 @@ subtest 'get_latest' => sub {
     {},
     {
       order_by => { -desc => 'value' },
-      columns => [ qw/ user_id value / ],
+      columns => [ qw/ user_id value position / ],
     },
   );
   $today_values->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
 
   my $expected = [
-    { user_id => 4, value => 95 },
-    { user_id => 3, value => 85 },
-    { user_id => 2, value => 75 },
-    { user_id => 1, value => 65 },
+    { user_id => 4, value => 95, position => 1 },
+    { user_id => 3, value => 85, position => 2 },
+    { user_id => 2, value => 75, position => 3 },
+    { user_id => 1, value => 65, position => 4 },
   ];
 
   is_deeply [ $today_values->all ], $expected, 'array as expected';

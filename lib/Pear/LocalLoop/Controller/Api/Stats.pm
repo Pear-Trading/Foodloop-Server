@@ -69,12 +69,12 @@ sub post_leaderboards {
   my $today_values = $today_board->values->search(
     {},
     {
-      order_by => { -desc => 'me.value' },
+      order_by => { -asc => 'me.position' },
       columns => [
         qw/
           me.value
           me.trend
-          me.user_id
+          me.position
         /,
         { display_name => 'customer.display_name' },
       ],
@@ -85,15 +85,12 @@ sub post_leaderboards {
 
   my @leaderboard_array = $today_values->all;
 
-  my $current_user_index = first { $leaderboard_array[$_]->{user_id} == $c->stash->{api_user}->id } 0..$#leaderboard_array;
-
-  # Dont leak user id's
-  map { delete $_->{user_id} } @leaderboard_array;
+  my $current_user_position = $today_values->find({ user_id => $c->stash->{api_user}->id });
 
   return $c->render( json => {
     success => Mojo::JSON->true,
     leaderboard => [ @leaderboard_array ],
-    user_position => $current_user_index,
+    user_position => defined $current_user_position ? $current_user_position->{position} : 0,
   });
 }
 
