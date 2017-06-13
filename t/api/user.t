@@ -24,7 +24,7 @@ $framework->register_customer({
   'email' => $email,
   'postcode' => 'LA1 1AA',
   'password' => $password,
-  'age_range' => 1
+  year_of_birth => 2006
 });
 
 my $session_key = $framework->login({

@@ -7,7 +7,7 @@ use Test::Pear::LocalLoop;
 my $framework = Test::Pear::LocalLoop->new;
 my $t = $framework->framework;
 my $schema = $t->app->schema;
-my $dump_error = sub { diag $t->tx->res->dom->at('pre[id="error"]')->text };
+my $dump_error = $framework->dump_error;
 
 #Variables to be used for uniqueness when testing.
 my @tokens =  ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
@@ -36,7 +36,7 @@ $testJson = {
   'email' => 'a@b.com',
   'postcode' => 'LA1 1AA',
   'password' => 'Meh',
-  'age_range' => 3
+  'year_of_birth' => 2005
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -52,7 +52,7 @@ $testJson = {
   'email' => 'a@b.com',
   'postcode' => 'LA1 1AA',
   'password' => 'Meh',
-  'age_range' => 3
+  'year_of_birth' => 2005
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(401)
@@ -68,7 +68,7 @@ $testJson = {
   'email' => 'a@b.com',
   'postcode' => 'LA1 1AA',
   'password' => 'Meh',
-  'age_range' => 3
+  'year_of_birth' => 2005
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -82,7 +82,7 @@ $testJson = {
   'email' => 'a@b.com',
   'postcode' => 'LA1 1AA',
   'password' => 'Meh',
-  'age_range' => 3
+  'year_of_birth' => 2005
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -98,7 +98,7 @@ $testJson = {
   'email' => 'a@b.com', 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age_range' => 3
+  'year_of_birth' => 2005
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -114,7 +114,7 @@ $testJson = {
   'email' => 'a@b.com', 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age_range' => 3
+  'year_of_birth' => 2005
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -132,7 +132,7 @@ $testJson = {
   'email' => 'a@b.com', 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age_range' => 3
+  'year_of_birth' => 2005
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)
@@ -147,11 +147,14 @@ $testJson = {
   'email' => 'b@c.com', 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age_range' => 2
+  'year_of_birth' => 2005
 };
 $t->post_ok('/api/register' => json => $testJson)
+  ->or($dump_error)
   ->status_is(200) 
-  ->json_is('/success', Mojo::JSON->true);
+  ->or($dump_error)
+  ->json_is('/success', Mojo::JSON->true)
+  ->or($dump_error);
 
 #Valid customer3
 $testJson = {
@@ -162,7 +165,7 @@ $testJson = {
   'email' => 'c@d.com', 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age_range' => 1
+  'year_of_birth' => 2005
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200) 
@@ -176,7 +179,7 @@ $testJson = {
   'display_name' => 'test name',
   'postcode' => 'LA1 1AA',
   'password' => 'Meh',
-  'age_range' => 3
+  'year_of_birth' => 2005
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -192,7 +195,7 @@ $testJson = {
   'email' => 'dfsd@.com', 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age_range' => 2
+  'year_of_birth' => 2006
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400) 
@@ -209,7 +212,7 @@ $testJson = {
   'email' => 'dfsd@com', 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age_range' => 2
+  'year_of_birth' => 2006
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400) 
@@ -226,7 +229,7 @@ $testJson = {
   'email' => 'a@b.com', 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age_range' => 2
+  'year_of_birth' => 2006
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(403) 
@@ -242,7 +245,7 @@ $testJson = {
   'display_name' => 'test name',
   'email' => 'd@e.com',
   'password' => 'Meh',
-  'age_range' => 3
+  'year_of_birth' => 2006
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -259,7 +262,7 @@ $testJson = {
   'display_name' => 'test name',
   'email' => 'd@e.com',
   'postcode' => 'LA1 1AA',
-  'age_range' => 3
+  'year_of_birth' => 2006
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -276,7 +279,7 @@ $testJson = {
   'email' => 'd@e.com',
   'postcode' => 'LA1 1AA',
   'password' => 'Meh',
-  'age_range' => 3
+  'year_of_birth' => 2006
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -300,7 +303,7 @@ $t->post_ok('/api/register' => json => $testJson)
   ->content_like(qr/invalid/i);
 
 
-#age_range missing JSON
+#year_of_birth missing JSON
 $testJson = {
   'usertype' => 'customer',
   'token' => 'f',
@@ -313,7 +316,7 @@ $testJson = {
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/no age_range sent/i);
+  ->content_like(qr/no year_of_birth sent/i);
 
 #Age is invalid
 $testJson = {
@@ -324,12 +327,12 @@ $testJson = {
   'email' => 'test@example.com', 
   'postcode' => 'LA1 1AA', 
   'password' => 'Meh', 
-  'age_range' => 'invalid'
+  'year_of_birth' => 'invalid'
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400) 
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/age_range/i)
+  ->content_like(qr/year_of_birth/i)
   ->content_like(qr/invalid/i);
 
 #full address missing JSON

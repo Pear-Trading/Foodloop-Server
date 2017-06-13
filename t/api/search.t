@@ -36,7 +36,7 @@ my $testJson = {
   'email' => $emailRufus, 
   'postcode' => 'RG26 5NU', 
   'password' => $passwordRufus, 
-  'age_range' => 1
+  'year_of_birth' => 2006
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)->or($framework->dump_error)

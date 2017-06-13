@@ -25,13 +25,6 @@ sub run {
 
   my $schema = $self->app->schema;
 
-  $schema->resultset('AgeRange')->populate([
-    [ qw/ string / ],
-    [ '20-35' ],
-    [ '35-50' ],
-    [ '50+' ],
-  ]);
-
   $schema->resultset('Leaderboard')->populate([
     [ qw/ name type / ],
     [ 'Daily Total', 'daily_total' ],
@@ -50,7 +43,7 @@ sub run {
     customer => {
       full_name => 'Test User',
       display_name => 'Test User',
-      age_range_id => 1,
+      year_of_birth => 2006,
       postcode => 'LA1 1AA',
     },
     administrator => {},
@@ -62,7 +55,7 @@ sub run {
     customer => {
       full_name => 'Test User 2',
       display_name => 'Test User 2',
-      age_range_id => 1,
+      year_of_birth => 2006,
       postcode => 'LA1 1AA',
     },
   });
@@ -73,7 +66,7 @@ sub run {
     customer => {
       full_name => 'Test User 3',
       display_name => 'Test User 3',
-      age_range_id => 1,
+      year_of_birth => 2006,
       postcode => 'LA1 1AA',
     },
   });

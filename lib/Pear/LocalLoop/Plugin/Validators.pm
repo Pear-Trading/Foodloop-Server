@@ -48,6 +48,11 @@ sub register {
     return $value > $check ? undef : 1;
   });
 
+  $app->validator->add_check( lt_num => sub {
+    my ( $validation, $name, $value, $check ) = @_;
+    return $value < $check ? undef : 1;
+  });
+
   $app->validator->add_check( filetype => sub {
     my ( $validation, $name, $value, $filetype ) = @_;
     my ( undef, undef, $extension ) = fileparse $value->filename, qr/\.[^.]*/;
