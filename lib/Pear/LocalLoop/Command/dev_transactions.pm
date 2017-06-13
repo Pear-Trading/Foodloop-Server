@@ -70,7 +70,7 @@ sub run {
     for ( 1 .. $number ) {
       for my $user_result ( $user_rs->all ) {
         $user_result->create_related( 'transactions', {
-          seller_id => $organisations[int(rand($#organisations))]->id,
+          seller_id => $organisations[int(rand($#organisations))]->organisation_id,
           value => int(rand(9999)) / 100,
           proof_image => 'a',
           submitted_at => $dtf->format_datetime($datetime->clone->add( minutes => int(rand(1440)) )),
