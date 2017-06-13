@@ -43,7 +43,7 @@ my $testJson = {
   'email' => $emailRufus, 
   'postcode' => 'GU10 5SA', 
   'password' => $passwordRufus, 
-  'age_range' => 1
+  'year_of_birth' => 2006
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)
@@ -60,7 +60,7 @@ $testJson = {
   'email' => $emailHojo, 
   'postcode' => 'DE15 9LT', 
   'password' => $passwordHojo, 
-  'age_range' => 1
+  'year_of_birth' => 2006
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)
