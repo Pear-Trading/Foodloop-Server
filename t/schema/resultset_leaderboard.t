@@ -17,7 +17,7 @@ my $user1 = {
   email        => 'test1@example.com',
   postcode     => 'LA1 1AA',
   password     => 'abc123',
-  age_range    => 1,
+  year_of_birth => 2006,
 };
 
 my $user2 = {
@@ -27,7 +27,7 @@ my $user2 = {
   email        => 'test2@example.com',
   postcode     => 'LA1 1AA',
   password     => 'abc123',
-  age_range    => 1,
+  year_of_birth => 2006,
 };
 
 my $user3 = {
@@ -37,7 +37,7 @@ my $user3 = {
   email        => 'test3@example.com',
   postcode     => 'LA1 1AA',
   password     => 'abc123',
-  age_range    => 1,
+  year_of_birth => 2006,
 };
 
 my $user4 = {
@@ -47,7 +47,7 @@ my $user4 = {
   email        => 'test4@example.com',
   postcode     => 'LA1 1AA',
   password     => 'abc123',
-  age_range    => 1,
+  year_of_birth => 2006,
 };
 
 my $org = {
