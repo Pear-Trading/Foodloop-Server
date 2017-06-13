@@ -125,7 +125,6 @@ sub startup {
     my $c = shift;
     $c->respond_to(any => { data => '', status => 200 });
   });
-  $api_public_get->get('/info/ages')->to('api-info#get_ages');
 
   # Always available api routes
   my $api_public = $api_public_get->under('/')->to('api-auth#check_json');
