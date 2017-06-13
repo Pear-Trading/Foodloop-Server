@@ -30,13 +30,6 @@ has framework => sub {
   my $schema = $t->app->schema;
   $schema->deploy;
 
-  $schema->resultset('AgeRange')->populate([
-    [ qw/ string / ],
-    [ '20-35' ],
-    [ '35-50' ],
-    [ '50+' ],
-  ]);
-
   $schema->resultset('Leaderboard')->populate([
     [ qw/ name type / ],
     [ 'Daily Total', 'daily_total' ],

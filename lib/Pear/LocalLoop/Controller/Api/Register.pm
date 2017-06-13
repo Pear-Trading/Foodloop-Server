@@ -33,10 +33,11 @@ has error_messages => sub {
       required => { message => 'No usertype sent.', status => 400 },
       in => { message => '"usertype" is invalid.', status => 400 },
     },
-    age_range => {
-      required => { message => 'No age_range sent.', status => 400 },
-      number => { message => 'age_range is invalid', status => 400 },
-      in_resultset => { message => 'age_range is invalid.', status => 400 },
+    year_of_birth => {
+      required => { message => 'No year_of_birth sent.', status => 400 },
+      number => { message => 'year_of_birth is invalid', status => 400 },
+      gt_num => { message => 'year_of_birth must be within last 150 years', status => 400 },
+      lt_num => { message => 'year_of_birth must be atleast 10 years ago', status => 400 },
     },
     street_name => {
       required => { message => 'No street_name sent.', status => 400 },
@@ -68,8 +69,8 @@ sub post_register{
   if ( $usertype eq 'customer' ) {
     $validation->required('display_name');
     $validation->required('full_name');
-    my $age_rs = $c->schema->resultset('AgeRange');
-    $validation->required('age_range')->number->in_resultset('id', $age_rs);
+    my $year = DateTime->now->year;
+    $validation->required('year_of_birth')->number->gt_num($year - 150)->lt_num($year - 10);
   } elsif ( $usertype eq 'organisation' ) {
     $validation->required('name');
     $validation->required('street_name');
@@ -85,13 +86,15 @@ sub post_register{
         name => $validation->param('token'),
         used => 0,
       })->update({ used => 1 });
+      # Create customer as a seperate step, so we dont leak data
+      my $customer = $c->schema->resultset('Customer')->create({
+        full_name     => $validation->param('full_name'),
+        display_name  => $validation->param('display_name'),
+        year_of_birth => $validation->param('year_of_birth'),
+        postcode      => $validation->param('postcode'),
+      });
       $c->schema->resultset('User')->create({
-        customer => {
-          full_name    => $validation->param('full_name'),
-          display_name => $validation->param('display_name'),
-          age_range_id => $validation->param('age_range'),
-          postcode     => $validation->param('postcode'),
-        },
+        customer => $customer,
         email    => $validation->param('email'),
         password => $validation->param('password'),
       });
@@ -106,15 +109,16 @@ sub post_register{
         name => $validation->param('token'),
         used => 0,
       })->update({ used => 1 });
+      my $organisation = $c->schema->resultset('Organisation')->create({
+        name        => $validation->param('name'),
+        street_name => $validation->param('street_name'),
+        town        => $validation->param('town'),
+        postcode    => $validation->param('postcode'),
+      });
       $c->schema->resultset('User')->create({
-        organisation => {
-          name        => $validation->param('name'),
-          street_name => $validation->param('street_name'),
-          town        => $validation->param('town'),
-          postcode    => $validation->param('postcode'),
-        },
-        email    => $validation->param('email'),
-        password => $validation->param('password'),
+        organisation => $organisation,
+        email        => $validation->param('email'),
+        password     => $validation->param('password'),
       });
     });
   }

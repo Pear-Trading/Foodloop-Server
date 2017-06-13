@@ -23,9 +23,8 @@ __PACKAGE__->add_columns(
     size => 255,
     is_nullable => 0,
   },
-  "age_range_id" => {
+  "year_of_birth" => {
     data_type => "integer",
-    is_foreign_key => 1,
     is_nullable => 0,
   },
   "postcode" => {
@@ -36,13 +35,6 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->set_primary_key("id");
-
-__PACKAGE__->belongs_to(
-  "age_range",
-  "Pear::LocalLoop::Schema::Result::AgeRange",
-  { id => "age_range_id" },
-  { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },
-);
 
 __PACKAGE__->might_have(
   "user",
