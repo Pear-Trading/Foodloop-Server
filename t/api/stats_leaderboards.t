@@ -174,12 +174,12 @@ test_leaderboard(
   'daily_total',
   $now,
   [
-    { display_name => 'Test User4', value => 9, trend => 1 },
-    { display_name => 'Test User3', value => 5, trend => 0 },
-    { display_name => 'Test User2', value => 3, trend => 1 },
-    { display_name => 'Test User1', value => 1, trend => -1},
+    { display_name => 'Test User4', value => 9, position => 1, trend => -1 },
+    { display_name => 'Test User3', value => 5, position => 2, trend => 0 },
+    { display_name => 'Test User2', value => 3, position => 3, trend => -1 },
+    { display_name => 'Test User1', value => 1, position => 4, trend => 1},
   ],
-  3
+  4
 );
 
 test_leaderboard(
@@ -187,12 +187,12 @@ test_leaderboard(
   'daily_count',
   $now,
   [
-    { display_name => 'Test User1', value => 1, trend => 0 },
-    { display_name => 'Test User2', value => 1, trend => 0 },
-    { display_name => 'Test User3', value => 1, trend => 0 },
-    { display_name => 'Test User4', value => 1, trend => 0 },
+    { display_name => 'Test User1', value => 1, position => 1, trend => 0 },
+    { display_name => 'Test User2', value => 1, position => 2, trend => 0 },
+    { display_name => 'Test User3', value => 1, position => 3, trend => 0 },
+    { display_name => 'Test User4', value => 1, position => 4, trend => 0 },
   ],
-  0
+  1
 );
 
 done_testing;

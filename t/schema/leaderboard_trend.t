@@ -161,7 +161,7 @@ sub test_leaderboard {
       {},
       {
         order_by => { -desc => 'value' },
-        columns => [ qw/ user_id value trend / ],
+        columns => [ qw/ user_id value trend position / ],
       },
     );
     $today_values->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
@@ -177,10 +177,10 @@ test_leaderboard(
   'daily_total',
   $now,
   [
-    { user_id => 4, value => 9, trend => 1 },
-    { user_id => 3, value => 5, trend => 0 },
-    { user_id => 2, value => 3, trend => 1 },
-    { user_id => 1, value => 1, trend => -1},
+    { user_id => 4, value => 9, trend => -1, position => 1},
+    { user_id => 3, value => 5, trend => 0,  position => 2},
+    { user_id => 2, value => 3, trend => -1, position => 3},
+    { user_id => 1, value => 1, trend => 1,  position => 4},
   ]
 );
 
@@ -189,10 +189,10 @@ test_leaderboard(
   'daily_count',
   $now,
   [
-    { user_id => 1, value => 1, trend => 0 },
-    { user_id => 2, value => 1, trend => 0 },
-    { user_id => 3, value => 1, trend => 0 },
-    { user_id => 4, value => 1, trend => 0 },
+    { user_id => 1, value => 1, trend => 0, position => 1 },
+    { user_id => 2, value => 1, trend => 0, position => 2 },
+    { user_id => 3, value => 1, trend => 0, position => 3 },
+    { user_id => 4, value => 1, trend => 0, position => 4 },
   ]
 );
 
