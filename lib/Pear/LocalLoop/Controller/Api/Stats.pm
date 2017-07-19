@@ -37,6 +37,10 @@ sub post_index {
   my $global_sum = $global_rs->get_column('value')->sum;
   my $global_count = $global_rs->count;
 
+  my $leaderboard_rs = $c->schema->resultset('Leaderboard');
+  my $monthly_board = $leaderboard_rs->get_latest( 'monthly_total' );
+  my $current_user_position = $monthly_board->values->find({ user_id => $c->stash->{api_user}->id });
+
   return $c->render( json => {
     success => Mojo::JSON->true,
     today_sum => $today_sum || 0,
@@ -49,6 +53,7 @@ sub post_index {
     user_count => $user_count,
     global_sum => $global_sum || 0,
     global_count => $global_count,
+    user_position => $current_user_position,
   });
 }
 
