@@ -6,10 +6,6 @@ use warnings;
 use FindBin qw/ $Bin /;
 use lib "$Bin/../lib";
 
-use Pear::LocalLoop::Schema;
+use Pear::LocalLoop::Schema::Script::DeploymentHandler;
 
-my @con = @ARGV;
-
-my $schema = Pear::LocalLoop::Schema->connect(@con);
-
-$schema->deploy;
+Pear::LocalLoop::Schema::Script::DeploymentHandler->new_with_actions(schema_class => 'Pear::LocalLoop::Schema');
