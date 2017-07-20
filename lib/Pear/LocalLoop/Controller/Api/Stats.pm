@@ -39,7 +39,8 @@ sub post_index {
 
   my $leaderboard_rs = $c->schema->resultset('Leaderboard');
   my $monthly_board = $leaderboard_rs->get_latest( 'monthly_total' );
-  my $current_user_position = $monthly_board->values->find({ user_id => $c->stash->{api_user}->id });
+  my $monthly_values = $monthly_board->values;
+  my $current_user_position = $monthly_values ? $monthly_values->find({ user_id => $c->stash->{api_user}->id }) : undef;
 
   return $c->render( json => {
     success => Mojo::JSON->true,
