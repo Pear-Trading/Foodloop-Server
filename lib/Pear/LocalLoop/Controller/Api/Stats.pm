@@ -53,7 +53,7 @@ sub post_index {
     user_count => $user_count,
     global_sum => $global_sum || 0,
     global_count => $global_count,
-    user_position => $current_user_position,
+    user_position => defined $current_user_position ? $current_user_position->position : 0,
   });
 }
 
