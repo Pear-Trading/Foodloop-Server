@@ -17,3 +17,6 @@ requires 'DateTime';
 requires 'DateTime::Format::Strptime', "1.73";
 requires 'DateTime::Format::SQLite';
 requires 'Try::Tiny';
+requires 'MooX::Options::Actions';
+requires 'Module::Runtime';
+requires 'DBIx::Class::DeploymentHandler';
