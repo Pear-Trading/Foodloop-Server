@@ -85,15 +85,14 @@ sub post_login {
         session_key => $session_key,
       });
     }
-  } else {
-    return $c->render(
-      json => {
-        success => Mojo::JSON->false,
-        message => 'Email or password is invalid.',
-      },
-      status => 401
-    );
   }
+  return $c->render(
+    json => {
+      success => Mojo::JSON->false,
+      message => 'Email or password is invalid.',
+    },
+    status => 401
+  );
 }
 
 sub post_logout {
