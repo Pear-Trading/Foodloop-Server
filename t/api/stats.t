@@ -44,6 +44,8 @@ my $session_key = $framework->login({
   password => $user->{password},
 });
 
+$t->app->schema->resultset('Leaderboard')->create_new( 'monthly_total', DateTime->now->truncate(to => 'month' )->subtract( months => 1) );
+
 $t->post_ok('/api/stats' => json => { session_key => $session_key } )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)

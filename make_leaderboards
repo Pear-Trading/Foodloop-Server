@@ -1,0 +1,54 @@
+./script/pear-local_loop leaderboard -t daily_total -d 2017-07-01
+./script/pear-local_loop leaderboard -t daily_total -d 2017-07-02
+./script/pear-local_loop leaderboard -t daily_total -d 2017-07-03
+./script/pear-local_loop leaderboard -t daily_total -d 2017-07-04
+./script/pear-local_loop leaderboard -t daily_total -d 2017-07-05
+./script/pear-local_loop leaderboard -t daily_total -d 2017-07-06
+./script/pear-local_loop leaderboard -t daily_total -d 2017-07-07
+./script/pear-local_loop leaderboard -t daily_total -d 2017-07-08
+./script/pear-local_loop leaderboard -t daily_total -d 2017-07-09
+./script/pear-local_loop leaderboard -t daily_total -d 2017-07-10
+./script/pear-local_loop leaderboard -t daily_total -d 2017-07-11
+./script/pear-local_loop leaderboard -t daily_total -d 2017-07-12
+./script/pear-local_loop leaderboard -t daily_total -d 2017-07-13
+./script/pear-local_loop leaderboard -t daily_total -d 2017-07-14
+./script/pear-local_loop leaderboard -t daily_total -d 2017-07-15
+./script/pear-local_loop leaderboard -t daily_total -d 2017-07-16
+./script/pear-local_loop leaderboard -t daily_total -d 2017-07-17
+./script/pear-local_loop leaderboard -t daily_total -d 2017-07-18
+./script/pear-local_loop leaderboard -t daily_total -d 2017-07-19
+./script/pear-local_loop leaderboard -t daily_total -d 2017-07-20
+
+./script/pear-local_loop leaderboard -t daily_count -d 2017-07-01
+./script/pear-local_loop leaderboard -t daily_count -d 2017-07-02
+./script/pear-local_loop leaderboard -t daily_count -d 2017-07-03
+./script/pear-local_loop leaderboard -t daily_count -d 2017-07-04
+./script/pear-local_loop leaderboard -t daily_count -d 2017-07-05
+./script/pear-local_loop leaderboard -t daily_count -d 2017-07-06
+./script/pear-local_loop leaderboard -t daily_count -d 2017-07-07
+./script/pear-local_loop leaderboard -t daily_count -d 2017-07-08
+./script/pear-local_loop leaderboard -t daily_count -d 2017-07-09
+./script/pear-local_loop leaderboard -t daily_count -d 2017-07-10
+./script/pear-local_loop leaderboard -t daily_count -d 2017-07-11
+./script/pear-local_loop leaderboard -t daily_count -d 2017-07-12
+./script/pear-local_loop leaderboard -t daily_count -d 2017-07-13
+./script/pear-local_loop leaderboard -t daily_count -d 2017-07-14
+./script/pear-local_loop leaderboard -t daily_count -d 2017-07-15
+./script/pear-local_loop leaderboard -t daily_count -d 2017-07-16
+./script/pear-local_loop leaderboard -t daily_count -d 2017-07-17
+./script/pear-local_loop leaderboard -t daily_count -d 2017-07-18
+./script/pear-local_loop leaderboard -t daily_count -d 2017-07-19
+./script/pear-local_loop leaderboard -t daily_count -d 2017-07-20
+
+./script/pear-local_loop leaderboard -t weekly_count -d 2017-07-03
+./script/pear-local_loop leaderboard -t weekly_count -d 2017-07-10
+./script/pear-local_loop leaderboard -t weekly_total -d 2017-07-03
+./script/pear-local_loop leaderboard -t weekly_total -d 2017-07-10
+
+./script/pear-local_loop leaderboard -t monthly_total -d 2017-05-01
+./script/pear-local_loop leaderboard -t monthly_total -d 2017-06-01
+./script/pear-local_loop leaderboard -t monthly_count -d 2017-05-01
+./script/pear-local_loop leaderboard -t monthly_count -d 2017-06-01
+
+./script/pear-local_loop leaderboard -t all_time_total -d 2017-07-13
+./script/pear-local_loop leaderboard -t all_time_count -d 2017-07-13
