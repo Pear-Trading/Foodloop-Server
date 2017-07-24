@@ -120,6 +120,13 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+__PACKAGE__->has_many(
+  "feedback",
+  "Pear::LocalLoop::Schema::Result::Feedback",
+  { "foreign.user_id" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 sub generate_session {
   my $self = shift;
 

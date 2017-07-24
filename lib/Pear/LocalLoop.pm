@@ -132,6 +132,7 @@ sub startup {
   $api_public->post('/login')->to('api-auth#post_login');
   $api_public->post('/register')->to('api-register#post_register');
   $api_public->post('/logout')->to('api-auth#post_logout');
+  $api_public->post('/feedback')->to('api-feedback#post_feedback');
 
   # Private, must be authenticated api routes
   my $api = $api_public->under('/')->to('api-auth#auth');
@@ -175,6 +176,9 @@ sub startup {
   $admin_routes->get('/organisations/valid/:id')->to('admin-organisations#valid_read');
   $admin_routes->get('/organisations/pending/:id')->to('admin-organisations#pending_read');
   $admin_routes->get('/organisations/pending/:id/approve')->to('admin-organisations#pending_approve');
+
+  $admin_routes->get('/feedback')->to('admin-feedback#index');
+  $admin_routes->get('/feedback/:id')->to('admin-feedback#read');
 
 #  my $user_routes = $r->under('/')->to('root#under');
 
