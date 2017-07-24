@@ -7,6 +7,9 @@ has error_messages => sub {
       required => { message => 'Email is required', status => 400 },
       in_resultset => { message => 'Change meeee', status => 400 },
     },
+    feedbacktext => {
+      required => { message => 'Feedback is required', status => 400 },
+    },
     app_name => {
       required => { message => 'App Name is required', status => 400 },
     },
@@ -30,13 +33,26 @@ sub post_feedback {
 
   my $user_rs = $c->schema->resultset('User');
 
-  $validation->required('email')->in_reusltset( 'email', $user_rs );
+  $validation->required('email')->in_resultset( 'email', $user_rs );
+  $validation->required('feedbacktext');
   $validation->required('app_name');
   $validation->required('package_name');
   $validation->required('version_code');
   $validation->required('version_number');
 
   return $c->api_validation_error if $validation->has_error;
+
+  my $user = $user_rs->find({'email' => $validation->param('email')});
+
+  $c->schema->resultset('Feedback')->create({
+    email          => $validation->param('email'),
+    user           => $user,
+    feedbacktext   => $validation->param('feedbacktext'),
+    app_name       => $validation->param('app_name'),
+    package_name   => $validation->param('package_name'),
+    version_code   => $validation->param('version_code'),
+    version_number => $validation->param('version_number'),
+  });
 
   return $c->render( json => {
     success => Mojo::JSON->true,
