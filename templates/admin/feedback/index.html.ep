@@ -15,10 +15,7 @@
   % for my $feedback (@$feedbacks) {
   <a href="<%= url_for . '/' . $feedback->id %>" class="list-group-item list-group-item-action">
     <div>
-      %= $feedback->user->email
-    </div>
-    <div>
-      %= $feedback->submitted_at
+      <%= $feedback->user->email %> <%= $feedback->submitted_at %>
     </div>
   </a>
   % }

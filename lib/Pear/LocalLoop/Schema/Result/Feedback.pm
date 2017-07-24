@@ -53,7 +53,7 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key("id");
 
-_PACKAGE__->belongs_to(
+__PACKAGE__->belongs_to(
   "user",
   "Pear::LocalLoop::Schema::Result::User",
   { id => "user_id" },
