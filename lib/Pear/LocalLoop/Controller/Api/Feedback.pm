@@ -45,7 +45,6 @@ sub post_feedback {
   my $user = $user_rs->find({'email' => $validation->param('email')});
 
   $c->schema->resultset('Feedback')->create({
-    email          => $validation->param('email'),
     user           => $user,
     feedbacktext   => $validation->param('feedbacktext'),
     app_name       => $validation->param('app_name'),

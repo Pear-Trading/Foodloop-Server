@@ -177,6 +177,9 @@ sub startup {
   $admin_routes->get('/organisations/pending/:id')->to('admin-organisations#pending_read');
   $admin_routes->get('/organisations/pending/:id/approve')->to('admin-organisations#pending_approve');
 
+  $admin_routes->get('/feedback')->to('admin-feedback#index');
+  $admin_routes->get('/feedback/:id')->to('admin-feedback#read');
+
 #  my $user_routes = $r->under('/')->to('root#under');
 
 # $user_routes->get('/home')->to('root#home');

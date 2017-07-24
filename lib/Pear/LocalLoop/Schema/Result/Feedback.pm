@@ -7,17 +7,23 @@ use base 'DBIx::Class::Core';
 
 __PACKAGE__->table("feedback");
 
+__PACKAGE__->load_components(qw/
+  InflateColumn::DateTime
+  TimeStamp
+/);
+
 __PACKAGE__->add_columns(
   "id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
-  "email" => {
-    data_type => "text",
-    is_nullable => 0,
-  },
   "user_id" => {
     data_type => "integer",
     is_foreign_key => 1,
     is_nullable => 0,
+  },
+  "submitted_at" => {
+    data_type => "datetime",
+    is_nullable => 0,
+    set_on_create => 1,
   },
   "feedbacktext" => {
     data_type => "text",
