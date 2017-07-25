@@ -26,7 +26,7 @@
     Transactions
   </h3>
   <ul class="list-group list-group-flush">
-    % for my $transaction ( $valid_org->transactions->all ) {
+    % for my $transaction ( $transactions->all ) {
     <li class="list-group-item">
       <div class="container">
         <div class="row text-center">
@@ -37,5 +37,10 @@
       </div>
     </li>
     % }
+    <li class="list-group-item">
+      <div class="container">
+        %= bootstrap_pagination( $c->param('page') || 1, $transactions->pager->last_page, { class => 'justify-content-center' } );
+      </div>
+    </li>
   </ul>
 </div>

@@ -18,13 +18,31 @@ sub list {
 sub valid_read {
   my $c = shift;
   my $valid_org = $c->schema->resultset('Organisation')->find( $c->param('id') );
-  $c->stash( valid_org => $valid_org );
+  my $transactions = $valid_org->transactions->search(
+    undef, {
+      page => $c->param('page') || 1,
+      rows => 10,
+    },
+  );
+  $c->stash(
+    valid_org => $valid_org,
+    transactions => $transactions,
+  );
 }
 
 sub pending_read {
   my $c = shift;
   my $pending_org = $c->schema->resultset('PendingOrganisation')->find( $c->param('id') );
-  $c->stash( pending_org => $pending_org );
+  my $transactions = $pending_org->transactions->search(
+    undef, {
+      page => $c->param('page') || 1,
+      rows => 10,
+    },
+  );
+  $c->stash(
+    pending_org => $pending_org,
+    transactions => $transactions,
+  );
 }
 
 sub pending_approve {

@@ -33,6 +33,7 @@ sub startup {
 
   push @{ $self->commands->namespaces }, __PACKAGE__ . '::Command';
 
+  $self->plugin('Pear::LocalLoop::Plugin::BootstrapPagination', { bootstrap4 => 1 } );
   $self->plugin('Pear::LocalLoop::Plugin::Validators');
 
   $self->plugin('Authentication' => {
