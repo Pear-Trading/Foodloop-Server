@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>LocalLoop - <%= title %></title>
+
+    <!-- Bootstrap and jQuery js -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+
+    %= stylesheet '/static/user/css/main.css';
+  </head>
+  <body>
+    <nav class="navbar navbar-toggleable-md fixed-top navbar-inverse bg-primary">
+      <button class="navbar-toggler navbar-toggler-right"
+              type="button"
+              data-toggle="collapse"
+              data-target="#navbarNav"
+              aria-controls="navbarNav"
+              aria-expanded="false"
+              aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <a class="navbar-brand" href="<%= url_for '/home' %>">LocalLoop</a>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="navbar-nav ml-auto">
+          <!-- Commented out until the routing for existent pages used is made -->
+          <!-- <a class="nav-item nav-link<%= title eq 'Receipts' ? ' active' : '' %>" href="#">Receipts</a>
+          <a class="nav-item nav-link<%= title eq 'Settings' ? ' active' : '' %>" href="#">Settings</a>
+          <a class="nav-item nav-link" href="<%= url_for '/logout' %>">Logout</a> -->
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <%= content %>
+    </div>
+    %= content_for 'javascript';
+  </body>
+</html>

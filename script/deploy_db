@@ -1,0 +1,11 @@
+#! /usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin qw/ $Bin /;
+use lib "$Bin/../lib";
+
+use Pear::LocalLoop::Schema::Script::DeploymentHandler;
+
+Pear::LocalLoop::Schema::Script::DeploymentHandler->new_with_actions(schema_class => 'Pear::LocalLoop::Schema');

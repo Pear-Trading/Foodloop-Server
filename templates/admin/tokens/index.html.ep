@@ -1,0 +1,35 @@
+% layout 'admin';
+% title 'Tokens';
+% content_for javascript => begin
+% end
+% if ( my $error = flash 'error' ) {
+  <div class="alert alert-danger" role="alert">
+    <strong>Error!</strong> <%= $error %>
+  </div>
+% } elsif ( my $success = flash 'success' ) {
+  <div class="alert alert-success" role="alert">
+    <strong>Success!</strong> <%= $success %>
+  </div>
+% }
+<form action="<%= url_for %>" method="post">
+  <div class="form-group">
+    <div class="input-group">
+      <input type="text" class="form-control" placeholder="Token Text" name="token">
+      <span class="input-group-btn">
+        <button class="btn btn-primary" type="submit">Add</button>
+      </span>
+    </div>
+  </div>
+</form>
+<div class="list-group">
+  % for my $token (@$tokens) {
+  <a href="<%= url_for . '/' . $token->{id} %>" class="list-group-item list-group-item-action">
+    <div>
+      %= $token->{name}
+    </div>
+    <div class="ml-auto">
+      <%= $token->{used} == 1 ? 'Used' : 'Available' %>
+    </div>
+  </a>
+  % }
+</div>

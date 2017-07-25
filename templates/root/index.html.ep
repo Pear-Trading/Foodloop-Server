@@ -1,0 +1,8 @@
+% layout 'user';
+% title 'Home';
+% content_for javascript => begin
+%= javascript '/static/user/js/home.js';
+% end
+<div>
+  <h1>App currently in development, please come back later!</h1>
+</div>

@@ -1,0 +1,1 @@
+Remove-Item Env:HARNESS_PERL_SWITCHES

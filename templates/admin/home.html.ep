@@ -1,0 +1,46 @@
+% layout 'admin';
+% title 'Home';
+% content_for javascript => begin
+% end
+<div class="card-deck">
+  <div class="card text-center">
+    <div class="card-header card-inverse card-primary">
+      User Count
+    </div>
+    <div class="card-block">
+      <h2 class="card-title">
+        %= $user_count
+      </h2>
+    </div>
+  </div>
+  <div class="card text-center">
+    <div class="card-header card-inverse card-success">
+      Unused Tokens
+    </div>
+    <div class="card-block">
+      <h2 class="card-title">
+        <%= $tokens->{unused} %> / <%= $tokens->{total} %>
+      </h2>
+    </div>
+  </div>
+  <div class="card text-center">
+    <div class="card-header card-inverse card-danger">
+      Pending Organisations
+    </div>
+    <div class="card-block">
+      <h2 class="card-title">
+        %= $pending_orgs
+      </h2>
+    </div>
+  </div>
+  <div class="card text-center">
+    <div class="card-header card-inverse card-danger">
+      Pending Transactions
+    </div>
+    <div class="card-block">
+      <h2 class="card-title">
+        %= $pending_trans
+      </h2>
+    </div>
+  </div>
+</div>

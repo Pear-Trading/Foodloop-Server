@@ -1,0 +1,83 @@
+#! /usr/bin/env perl
+
+use strict;
+use warnings;
+
+=head1 NAME
+
+make_schema - Make or update a schema from the database
+
+=cut
+
+use Getopt::Long;
+use Pod::Usage;
+use FindBin qw/ $Bin /;
+
+use DBIx::Class::Schema::Loader qw/ make_schema_at /;
+
+my $username   = '';
+my $password   = '';
+my $connection;
+my $schema     = 'public';
+my $dbic_schema = 'MyApp::Schema';
+my $help       = 0;
+my $man        = 0;
+my $overwrite  = 0;
+my $verbose    = 0;
+
+GetOptions (
+  "username|u=s"   => \$username,
+  "password|p=s"   => \$password,
+  "connection|c=s" => \$connection,
+  "schema|s=s"     => \$schema,
+  "dbic|d=s"       => \$dbic_schema,
+  "force"          => \$overwrite,
+  "verbose"        => \$verbose,
+  "help|?"         => \$help,
+  "man"            => \$man,
+) or pod2usage(2);
+
+pod2usage(0) if $help;
+pod2usage(-exitval => 0, -verbose => 2) if $man;
+
+pod2usage(
+  -message => "Must define a connection",
+  -exitval => 2,
+) unless defined $connection;
+
+=head1 SYNOPSIS
+
+make_schema [--help|?] [--man] --connection|-c <connection string> [--user|-u <username>] [--pass|-p <password>]
+
+  Options:
+    --help        Print Brief Help
+    --man         Print Full Documentation
+    --connection  The DBI connection string to use
+    --user        [Optional] Username for the DBI connection
+    --pass        [Optional] Password for the DBI connection
+    --schema      [Optional - default 'public'] Schema to dump from
+    --dbic        [Optional - default 'MyApp::Schema'] Package namespace for your DBIC Schema
+    --force       [Optional] will overwrite modifications in the schema
+    --verbose     [Optional] Print out all tables during processing
+
+=cut
+
+make_schema_at(
+  $dbic_schema,
+  {
+    db_schema => $schema,
+    relationships => 1,
+    dump_directory => "$Bin/../lib",
+    debug => 1,
+    overwrite_modifications => $overwrite,
+    components => [qw/
+      InflateColumn::DateTime
+    /],
+  },
+  [
+    $connection,
+    $username,
+    $password,
+  ],
+);
+

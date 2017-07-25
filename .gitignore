@@ -1,3 +1,9 @@
 /log
 myapp.conf
 hypnotoad.pid
+*.db
+*~
+/images
+*.swp
+
+cover_db/

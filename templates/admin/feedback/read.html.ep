@@ -1,0 +1,43 @@
+% layout 'admin';
+% title 'Feedback';
+% content_for javascript => begin
+% end
+% if ( my $error = flash 'error' ) {
+  <div class="alert alert-danger" role="alert">
+    <strong>Error!</strong> <%= $error %>
+  </div>
+% } elsif ( my $success = flash 'success' ) {
+  <div class="alert alert-success" role="alert">
+    <strong>Success!</strong> <%= $success %>
+  </div>
+% }
+<form action="<%= url_for %>" method="post">
+  <div class="form-group">
+    <label for="email">Email Address</label>
+    <input id="email" type="text" class="form-control" placeholder="Email" name="email" value="<%= $feedback->user->email %>" disabled>
+  </div>
+  <div class="form-group">
+    <label for="joindate">Submitted At</label>
+    <input id="submitted_at" type="datetime" class="form-control" placeholder="Date" name="submitted_at" value="<%= $feedback->submitted_at %>" disabled>
+  </div>
+  <div class="form-group">
+    <label for="feedback">Feedback</label>
+    <input id="feedback" type="text" class="form-control" placeholder="Feedback" name="feedback" value="<%= $feedback->feedbacktext %>" disabled>
+  </div>
+  <div class="form-group">
+    <label for="app_name">App Name</label>
+    <input id="app_name" type="text" class="form-control" placeholder="App Name" name="app_name" value="<%= $feedback->app_name %>" disabled>
+  </div>
+  <div class="form-group">
+    <label for="package_name">Package Name</label>
+    <input id="package_name" type="text" class="form-control" placeholder="Package Name" name="package_name" value="<%= $feedback->package_name %>" disabled>
+  </div>
+  <div class="form-group">
+    <label for="version_code">Version Code</label>
+    <input id="version_code" type="text" class="form-control" placeholder="Version Code" name="version_code" value="<%= $feedback->version_code %>" disabled>
+  </div>
+  <div class="form-group">
+    <label for="version_number">Version Number</label>
+    <input id="version_number" type="text" class="form-control" placeholder="Version Number" name="feedback" value="<%= $feedback->version_number %>" disabled>
+  </div>
+</form>
