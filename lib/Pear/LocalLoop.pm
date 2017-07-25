@@ -152,11 +152,6 @@ sub startup {
   $api->post('/stats')->to('api-stats#post_index');
   $api->post('/stats/leaderboard')->to('api-stats#post_leaderboards');
 
-  my $api_admin = $api->under('/')->to('api-admin#auth');
-
-  $api_admin->post('/admin-approve')->to('api-admin#post_admin_approve');
-  $api_admin->post('/admin-merge')->to('api-admin#post_admin_merge');
-
   my $admin_routes = $r->under('/admin')->to('admin#under');
 
   $admin_routes->get('/home')->to('admin#home');
