@@ -14,6 +14,7 @@ has schema => sub {
     $c->app->config->{dsn},
     $c->app->config->{user},
     $c->app->config->{pass},
+    { quote_names => 1 },
   );
 };
 
