@@ -2,7 +2,7 @@ package Pear::LocalLoop::Plugin::Validators;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Email::Valid;
-use Geo::UK::Postcode;
+use Geo::UK::Postcode::Regex qw/ is_valid_pc /;
 use Scalar::Util qw/ looks_like_number /;
 use File::Basename qw/ fileparse /;
 use DateTime::Format::Strptime;
@@ -28,14 +28,7 @@ sub register {
 
   $app->validator->add_check( postcode => sub {
     my ( $validation, $name, $value ) = @_;
-    my $postcode;
-    try {
-      $postcode = Geo::UK::Postcode->new( $value );
-    };
-    return 1 unless defined( $postcode );
-    return 1 if $postcode->partial;
-    return undef if $postcode->valid;
-    return 1;
+    return is_valid_pc( $value ) ? undef : 1;
   });
 
   $app->validator->add_check( number => sub {
