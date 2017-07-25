@@ -204,8 +204,8 @@ sub startup {
           submitted_at => $from_org_transaction->submitted_at,
         }
       );
+      $from_org_transaction->delete;
     }
-
     $from_org->delete;
   });
 }
