@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-  <head>  
+  <head>
     <meta charset="UTF-8">
     <title>LocalLoop Admin - <%= title %></title>
 
@@ -28,7 +28,7 @@
       <a class="navbar-brand" href="<%= url_for '/admin/home' %>">LocalLoop Admin</a>
       <div class="collapse navbar-collapse" id="navbarNav">
         <div class="navbar-nav ml-auto">
-          <a class="nav-item nav-link" href="<%= url_for '/' %>">User Section</a>
+          <a class="nav-item nav-link<%= title eq 'Feedback' ? ' active' : '' %>" href="<%= url_for '/admin/feedback' %>">Feedback</a>
           <a class="nav-item nav-link<%= title eq 'Tokens' ? ' active' : '' %>" href="<%= url_for '/admin/tokens' %>">Tokens</a>
           <a class="nav-item nav-link<%= title eq 'Users' ? ' active' : '' %>" href="<%= url_for '/admin/users' %>">Users</a>
           <a class="nav-item nav-link<%= title eq 'Organisations' ? ' active' : '' %>" href="<%= url_for '/admin/organisations' %>">Organisations</a>
@@ -40,5 +40,5 @@
       <%= content %>
     </div>
     %= content_for 'javascript';
-  </body> 
+  </body>
 </html>
