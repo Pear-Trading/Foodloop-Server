@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-  <head>  
+  <head>
     <meta charset="UTF-8">
     <title>LocalLoop - <%= title %></title>
 
@@ -28,9 +28,10 @@
       <a class="navbar-brand" href="<%= url_for '/home' %>">LocalLoop</a>
       <div class="collapse navbar-collapse" id="navbarNav">
         <div class="navbar-nav ml-auto">
-          <a class="nav-item nav-link<%= title eq 'Receipts' ? ' active' : '' %>" href="#">Receipts</a>
+          <!-- Commented out until the routing for existent pages used is made -->
+          <!-- <a class="nav-item nav-link<%= title eq 'Receipts' ? ' active' : '' %>" href="#">Receipts</a>
           <a class="nav-item nav-link<%= title eq 'Settings' ? ' active' : '' %>" href="#">Settings</a>
-          <a class="nav-item nav-link" href="<%= url_for '/logout' %>">Logout</a>
+          <a class="nav-item nav-link" href="<%= url_for '/logout' %>">Logout</a> -->
         </div>
       </div>
     </nav>
@@ -39,5 +40,5 @@
       <%= content %>
     </div>
     %= content_for 'javascript';
-  </body> 
+  </body>
 </html>
