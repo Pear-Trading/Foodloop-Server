@@ -172,12 +172,14 @@ sub post_search {
 
   my $search_name = $validation->param('search_name');
 
+  my $search_stmt = [ 'LOWER("name") LIKE ?', '%' . lc $search_name . '%' ];
+
   my $valid_orgs_rs = $c->schema->resultset('Organisation')->search(
-    { 'LOWER(name)' => { -like => '%' . lc $search_name . '%' } },
+    \$search_stmt,
   );
 
   my $pending_orgs_rs = $c->stash->{api_user}->pending_organisations->search(
-    { 'LOWER(name)' => { -like => '%' . lc $search_name . '%' } },
+    \$search_stmt,
   );
 
   my @valid_orgs = (
