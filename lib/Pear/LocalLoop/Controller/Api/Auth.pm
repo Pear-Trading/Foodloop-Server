@@ -75,7 +75,7 @@ sub post_login {
   my $password = $validation->param('password');
 
   my $user_result = $c->schema->resultset('User')->find({ email => $email });
-  
+
   if ( defined $user_result ) {
     if ( $user_result->check_password($password) ) {
       my $session_key = $user_result->generate_session;
@@ -83,6 +83,9 @@ sub post_login {
       return $c->render( json => {
         success => Mojo::JSON->true,
         session_key => $session_key,
+        full_name => $user_result->('full_name'),
+        full_name => $user_result->('display_name'),
+        full_name => $user_result->('postcode'),
       });
     }
   }
@@ -109,7 +112,7 @@ sub post_logout {
   $c->render( json => {
     success => Mojo::JSON->true,
     message => 'Logged Out',
-  }); 
+  });
 }
 
 1;
