@@ -26,4 +26,49 @@ sub post_day {
   });
 }
 
+sub post_account {
+  my $c = shift;
+
+  my $user = $c->stash->{api_user};
+  my $user_result = $c->schema->resultset('User')->find({ user_id => $c->stash->{api_user}->id });
+
+  if ( defined $user_result ) {
+    my $email = $user_result->email;
+    my $full_name;
+    my $display_name;
+    my $postcode;
+
+    #Needs elsif added for trader page for this similar relevant entry
+    if ( defined $user_result->customer_id ) {
+      $full_name = $user_result->customer->full_name;
+      $display_name = $user_result->customer->display_name;
+      $postcode = $user_result->customer->postcode;
+    } elsif ( defined $user_result->organisation_id ) {
+      $display_name = $user_result->organisation->name;
+    } else {
+      return undef;
+    }
+
+    return $c->render( json => {
+      success => Mojo::JSON->true,
+      session_key => $session_key,
+      full_name => $full_name,
+      display_name => $display_name,
+      email => $email,
+      postcode => $postcode,
+    });
+  }
+  return $c->render(
+    json => {
+      success => Mojo::JSON->false,
+      message => 'Email or password is invalid.',
+    },
+    status => 401
+  );
+}
+
+sub post_account_update {
+
+}
+
 1;
