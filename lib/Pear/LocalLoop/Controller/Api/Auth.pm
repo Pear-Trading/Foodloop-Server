@@ -84,8 +84,8 @@ sub post_login {
         success => Mojo::JSON->true,
         session_key => $session_key,
         full_name => $user_result->('full_name'),
-        full_name => $user_result->('display_name'),
-        full_name => $user_result->('postcode'),
+        display_name => $user_result->('display_name'),
+        postcode => $user_result->('postcode'),
       });
     }
   }
