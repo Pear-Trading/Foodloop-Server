@@ -68,7 +68,88 @@ sub post_account {
 }
 
 sub post_account_update {
+  my $c = shift;
 
+  my $user = $c->stash->{api_user};
+  my $validation = $c->validation;
+  $validation->input( $c->stash->{api_json} );
+
+  my $user_result = $c->schema->resultset('User');
+
+  $validation->required('email')->in_resultset( 'email', $user_result );
+  $validation->required('postcode')->postcode;
+
+  if ( $user_result->check_password($password) ) {
+    $validation->required('display_name');
+    $validation->required('full_name');
+  } elsif ( defined $user_result->customer_id ) {
+    $validation->required('name');
+    $validation->required('street_name');
+    $validation->required('town');
+  }
+
+  return $c->api_validation_error if $validation->has_error;
+
+  if ($usertype eq 'customer'){
+
+    $c->schema->txn_do( sub {
+      my $customer = $c->schema->resultset('Customer')->find({
+        user_id => $c->stash->{api_user}->id
+      })->update({
+        full_name     => $validation->param('full_name'),
+        display_name  => $validation->param('display_name'),
+        postcode      => $validation->param('postcode'),
+      });
+      $c->schema->resultset('User')->find({
+        user_id => $c->stash->{api_user}->id
+      })->update({
+        email        => $validation->param('email'),
+        password     => $validation->param('new_password')
+      });
+    });
+
+  }
+  elsif ($usertype eq 'organisation') {
+    my $fullAddress = $validation->param('fulladdress');
+
+    $c->schema->txn_do( sub {
+      my $organisation = $c->schema->resultset('Organisation')->find({
+        user_id => $c->stash->{api_user}->id
+      })->update({
+        name        => $validation->param('name'),
+        street_name => $validation->param('street_name'),
+        town        => $validation->param('town'),
+        postcode    => $validation->param('postcode'),
+      });
+      $c->schema->resultset('User')->find({
+        user_id => $c->stash->{api_user}->id
+      })->update({
+        # customer => $customer,
+        email        => $validation->param('email'),
+        password     => $validation->param('new_password')
+      });
+    });
+  }
+
+  $c->schema->resultset('Customer')->find({
+    user_id => $c->stash->{api_user}->id
+  })->update({
+    full_name     => $validation->param('full_name'),
+    display_name  => $validation->param('display_name'),
+    postcode      => $validation->param('postcode'),
+  });
+  $c->schema->resultset('User')->find({
+    user_id => $c->stash->{api_user}->id
+  })->update({
+    # organisation => $organisation,
+    email        => $validation->param('email'),
+    password     => $validation->param('new_password')
+  });
+
+  return $c->render( json => {
+    success => Mojo::JSON->true,
+    message => 'Edited Account Successfully',
+  });
 }
 
 1;
