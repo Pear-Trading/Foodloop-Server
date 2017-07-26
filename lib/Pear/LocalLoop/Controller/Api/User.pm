@@ -7,6 +7,33 @@ has error_messages => sub {
     day => {
       is_iso_datetime => { message => 'Invalid ISO8601 Datetime', status => 400 },
     },
+    name => {
+      required => { message => 'No name sent or was blank.', status => 400 },
+    },
+    display_name => {
+      required => { message => 'No name sent or was blank.', status => 400 },
+    },
+    full_name => {
+      required => { message => 'No name sent or was blank.', status => 400 },
+    },
+    email => {
+      required => { message => 'No email sent.', status => 400 },
+      email => { message => 'Email is invalid.', status => 400 },
+      not_in_resultset => { message => 'Email exists.', status => 403 },
+    },
+    postcode => {
+      required => { message => 'No postcode sent.', status => 400 },
+      postcode => { message => 'Postcode is invalid', status => 400 },
+    },
+    password => {
+      required => { message => 'No password sent.', status => 400 },
+    },
+    street_name => {
+      required => { message => 'No street_name sent.', status => 400 },
+    },
+    town => {
+      required => { message => 'No town sent.', status => 400 },
+    },
   };
 };
 
@@ -79,7 +106,7 @@ sub post_account_update {
   $validation->required('email')->in_resultset( 'email', $user_result );
   $validation->required('postcode')->postcode;
 
-  if ( $user_result->check_password($password) ) {
+  if ( defined $user_result->customer_id) ) {
     $validation->required('display_name');
     $validation->required('full_name');
   } elsif ( defined $user_result->customer_id ) {
