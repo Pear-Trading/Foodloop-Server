@@ -19,7 +19,6 @@ has error_messages => sub {
     email => {
       required => { message => 'No email sent.', status => 400 },
       email => { message => 'Email is invalid.', status => 400 },
-      not_in_resultset => { message => 'Email exists.', status => 403 },
     },
     postcode => {
       required => { message => 'No postcode sent.', status => 400 },
