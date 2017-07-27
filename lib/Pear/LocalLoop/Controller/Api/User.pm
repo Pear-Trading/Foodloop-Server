@@ -11,10 +11,10 @@ has error_messages => sub {
       required => { message => 'No name sent or was blank.', status => 400 },
     },
     display_name => {
-      required => { message => 'No name sent or was blank.', status => 400 },
+      required => { message => 'No display name sent or was blank.', status => 400 },
     },
     full_name => {
-      required => { message => 'No name sent or was blank.', status => 400 },
+      required => { message => 'No full name sent or was blank.', status => 400 },
     },
     email => {
       required => { message => 'No email sent.', status => 400 },
@@ -56,7 +56,7 @@ sub post_account {
   my $c = shift;
 
   my $user = $c->stash->{api_user};
-  my $user_result = $c->schema->resultset('User')->find({ user_id => $c->stash->{api_user}->id });
+  my $user_result = $c->schema->resultset('User')->find({ id => $c->stash->{api_user}->id });
 
   if ( defined $user_result ) {
     my $email = $user_result->email;
@@ -77,7 +77,6 @@ sub post_account {
 
     return $c->render( json => {
       success => Mojo::JSON->true,
-      session_key => $session_key,
       full_name => $full_name,
       display_name => $display_name,
       email => $email,
@@ -97,18 +96,35 @@ sub post_account_update {
   my $c = shift;
 
   my $user = $c->stash->{api_user};
+
   my $validation = $c->validation;
   $validation->input( $c->stash->{api_json} );
+  $validation->required('password');
 
-  my $user_result = $c->schema->resultset('User');
+  return $c->api_validation_error if $validation->has_error;
 
-  $validation->required('email')->in_resultset( 'email', $user_result );
+  if ( ! $user->check_password($validation->param('password')) ) {
+    return $c->render(
+      json => {
+        success => Mojo::JSON->false,
+        message => 'password is invalid.',
+      },
+      status => 401
+    );
+  }
+
+  my $user_rs = $c->schema->resultset('User')->search({
+    id => { "!=" => $user->id },
+  });
+
+  $validation->required('email')->not_in_resultset( 'email', $user_rs );
   $validation->required('postcode')->postcode;
+  $validation->optional('new_password');
 
-  if ( defined $user_result->customer_id) ) {
+  if ( defined $user->customer_id ) {
     $validation->required('display_name');
     $validation->required('full_name');
-  } elsif ( defined $user_result->customer_id ) {
+  } elsif ( defined $user->customer_id ) {
     $validation->required('name');
     $validation->required('street_name');
     $validation->required('town');
@@ -116,61 +132,37 @@ sub post_account_update {
 
   return $c->api_validation_error if $validation->has_error;
 
-  if ($usertype eq 'customer'){
+  if ( defined $user->customer_id ){
 
     $c->schema->txn_do( sub {
-      my $customer = $c->schema->resultset('Customer')->find({
-        user_id => $c->stash->{api_user}->id
-      })->update({
+      $user->customer->update({
         full_name     => $validation->param('full_name'),
         display_name  => $validation->param('display_name'),
         postcode      => $validation->param('postcode'),
       });
-      $c->schema->resultset('User')->find({
-        user_id => $c->stash->{api_user}->id
-      })->update({
-        email        => $validation->param('email'),
-        password     => $validation->param('new_password')
+      $user->update({
+        email => $validation->param('email'),
+        ( defined $validation->param('new_password') ? ( password => $validation->param('new_password') ) : () ),
       });
     });
 
   }
-  elsif ($usertype eq 'organisation') {
+  elsif ( defined $user->organisation_id ) {
     my $fullAddress = $validation->param('fulladdress');
 
     $c->schema->txn_do( sub {
-      my $organisation = $c->schema->resultset('Organisation')->find({
-        user_id => $c->stash->{api_user}->id
-      })->update({
+      $user->organisation->update({
         name        => $validation->param('name'),
         street_name => $validation->param('street_name'),
         town        => $validation->param('town'),
         postcode    => $validation->param('postcode'),
       });
-      $c->schema->resultset('User')->find({
-        user_id => $c->stash->{api_user}->id
-      })->update({
-        # customer => $customer,
+      $user->update({
         email        => $validation->param('email'),
-        password     => $validation->param('new_password')
+        ( defined $validation->param('new_password') ? ( password => $validation->param('new_password') ) : () ),
       });
     });
   }
-
-  $c->schema->resultset('Customer')->find({
-    user_id => $c->stash->{api_user}->id
-  })->update({
-    full_name     => $validation->param('full_name'),
-    display_name  => $validation->param('display_name'),
-    postcode      => $validation->param('postcode'),
-  });
-  $c->schema->resultset('User')->find({
-    user_id => $c->stash->{api_user}->id
-  })->update({
-    # organisation => $organisation,
-    email        => $validation->param('email'),
-    password     => $validation->param('new_password')
-  });
 
   return $c->render( json => {
     success => Mojo::JSON->true,
