@@ -75,14 +75,24 @@ sub post_login {
   my $password = $validation->param('password');
 
   my $user_result = $c->schema->resultset('User')->find({ email => $email });
-  
+
   if ( defined $user_result ) {
     if ( $user_result->check_password($password) ) {
       my $session_key = $user_result->generate_session;
+      my $display_name;
+
+      if ( defined $user_result->customer_id ) {
+        $display_name = $user_result->customer->display_name;
+      } elsif ( defined $user_result->organisation_id ) {
+        $display_name = $user_result->organisation->name;
+      } else {
+        return undef;
+      }
 
       return $c->render( json => {
         success => Mojo::JSON->true,
         session_key => $session_key,
+        display_name => $display_name,
       });
     }
   }
@@ -109,7 +119,7 @@ sub post_logout {
   $c->render( json => {
     success => Mojo::JSON->true,
     message => 'Logged Out',
-  }); 
+  });
 }
 
 1;
