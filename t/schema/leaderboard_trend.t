@@ -87,7 +87,7 @@ my $now = DateTime->today();
     seller_id => $org_result->id,
     value => 9,
     proof_image => 'a',
-    submitted_at => $dtf->format_datetime($now->clone->subtract( days => 1 )),
+    purchase_time => $dtf->format_datetime($now->clone->subtract( days => 1 )),
   });
 }
 
@@ -104,7 +104,7 @@ my $now = DateTime->today();
     seller_id => $org_result->id,
     value => 1,
     proof_image => 'a',
-    submitted_at => $dtf->format_datetime($now->clone->subtract( days => 1 )),
+    purchase_time => $dtf->format_datetime($now->clone->subtract( days => 1 )),
   });
 }
 
@@ -121,7 +121,7 @@ my $now = DateTime->today();
     seller_id => $org_result->id,
     value => 5,
     proof_image => 'a',
-    submitted_at => $dtf->format_datetime($now->clone->subtract( days => 1 )),
+    purchase_time => $dtf->format_datetime($now->clone->subtract( days => 1 )),
   });
 }
 
@@ -138,7 +138,7 @@ my $now = DateTime->today();
     seller_id => $org_result->id,
     value => 3,
     proof_image => 'a',
-    submitted_at => $dtf->format_datetime($now->clone->subtract( days => 1 )),
+    purchase_time => $dtf->format_datetime($now->clone->subtract( days => 1 )),
   });
 }
 
