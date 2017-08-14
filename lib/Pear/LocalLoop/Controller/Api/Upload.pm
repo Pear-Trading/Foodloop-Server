@@ -100,7 +100,7 @@ sub post_upload {
   $validation->required('transaction_type')->in( 1, 2, 3 );
 
   #Check a proper purchase time was submitted
-  $validation->required('purchase_time')->is_full_iso_datetime;
+  $validation->optional('purchase_time')->is_full_iso_datetime;
 
   # First pass of required items
   return $c->api_validation_error if $validation->has_error;
@@ -148,7 +148,8 @@ sub post_upload {
 
   my $transaction_value = $validation->param('transaction_value');
   my $upload = $validation->param('file');
-  my $purchase_time = $c->parse_iso_datetime($validation->param('purchase_time'));
+  my $purchase_time = $c->parse_iso_datetime($validation->param('purchase_time') || '');
+  $purchase_time ||= DateTime->now();
   my $file = $c->store_file_from_upload( $upload );
 
   $organisation->create_related(
