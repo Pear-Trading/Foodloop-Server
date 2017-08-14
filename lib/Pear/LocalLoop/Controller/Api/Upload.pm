@@ -99,8 +99,8 @@ sub post_upload {
   $validation->required('transaction_value')->number->gt_num(0);
   $validation->required('transaction_type')->in( 1, 2, 3 );
 
-  #Check a purchase time was submitted
-  $validation->required('purchase_time');
+  #Check a proper purchase time was submitted
+  $validation->required('purchase_time')->is_full_iso_datetime;
 
   # First pass of required items
   return $c->api_validation_error if $validation->has_error;

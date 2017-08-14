@@ -58,6 +58,12 @@ sub register {
     $value = $app->datetime_formatter->parse_datetime( $value );
     return defined $value ? undef : 1;
   });
+
+  $app->validator->add_check( is_full_iso_datetime => sub {
+    my ( $validation, $name, $value ) = @_;
+    $value = $app->parse_iso_datetime( $value );
+    return defined $value ? undef : 1;
+  });
 }
 
 1;
