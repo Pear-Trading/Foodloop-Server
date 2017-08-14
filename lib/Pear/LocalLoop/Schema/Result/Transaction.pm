@@ -44,6 +44,7 @@ __PACKAGE__->add_columns(
   },
   "purchase_time" => {
     data_type => "datetime",
+    timezone => "UTC",
     is_nullable => 0,
     set_on_create => 1,
   },

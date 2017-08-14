@@ -35,6 +35,7 @@ sub startup {
 
   $self->plugin('Pear::LocalLoop::Plugin::BootstrapPagination', { bootstrap4 => 1 } );
   $self->plugin('Pear::LocalLoop::Plugin::Validators');
+  $self->plugin('Pear::LocalLoop::Plugin::Datetime');
 
   $self->plugin('Authentication' => {
     'load_user' => sub {

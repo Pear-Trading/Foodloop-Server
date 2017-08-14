@@ -148,7 +148,7 @@ sub post_upload {
 
   my $transaction_value = $validation->param('transaction_value');
   my $upload = $validation->param('file');
-  my $purchase_time = $validation->param('purchase_time');
+  my $purchase_time = $c->parse_iso_datetime($validation->param('purchase_time'));
   my $file = $c->store_file_from_upload( $upload );
 
   $organisation->create_related(
@@ -157,7 +157,7 @@ sub post_upload {
       buyer => $user,
       value => $transaction_value,
       proof_image => $file,
-      purchase_time => $purchase_time,
+      purchase_time => $c->format_db_datetime($purchase_time),
     }
   );
 
