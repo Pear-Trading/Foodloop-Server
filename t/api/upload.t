@@ -333,10 +333,10 @@ $t->post_ok('/api/upload' => form => $upload )
   ->content_like(qr/organisation_id does not exist in the database/i);
 
 print "test 21 - purchase_time is missing\n";
-is $schema->resultset('Transaction')->count, 0, "no transactions";
+is $schema->resultset('PendingTransaction')->count, 1, "1 pending transactions";
 $json = {
   transaction_value => 10,
-  transaction_type => 1,
+  transaction_type => 2,
   organisation_id => $org_id_shinra,
   session_key => $session_key,
 };

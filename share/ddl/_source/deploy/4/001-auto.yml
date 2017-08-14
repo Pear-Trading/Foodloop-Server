@@ -1,0 +1,1247 @@
+---
+schema:
+  procedures: {}
+  tables:
+    account_tokens:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - name
+          match_type: ''
+          name: account_tokens_name
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: UNIQUE
+      fields:
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        name:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 1
+          name: name
+          order: 2
+          size:
+            - 0
+        used:
+          data_type: integer
+          default_value: 0
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: used
+          order: 3
+          size:
+            - 0
+      indices: []
+      name: account_tokens
+      options: []
+      order: 1
+    administrators:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - user_id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 0
+          expression: ''
+          fields:
+            - user_id
+          match_type: ''
+          name: administrators_fk_user_id
+          on_delete: NO ACTION
+          on_update: NO ACTION
+          options: []
+          reference_fields:
+            - id
+          reference_table: users
+          type: FOREIGN KEY
+      fields:
+        user_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: user_id
+          order: 1
+          size:
+            - 0
+      indices: []
+      name: administrators
+      options: []
+      order: 7
+    customers:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+      fields:
+        display_name:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: display_name
+          order: 2
+          size:
+            - 255
+        full_name:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: full_name
+          order: 3
+          size:
+            - 255
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        postcode:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: postcode
+          order: 5
+          size:
+            - 16
+        year_of_birth:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: year_of_birth
+          order: 4
+          size:
+            - 0
+      indices: []
+      name: customers
+      options: []
+      order: 2
+    feedback:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 0
+          expression: ''
+          fields:
+            - user_id
+          match_type: ''
+          name: feedback_fk_user_id
+          on_delete: NO ACTION
+          on_update: NO ACTION
+          options: []
+          reference_fields:
+            - id
+          reference_table: users
+          type: FOREIGN KEY
+      fields:
+        app_name:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: app_name
+          order: 5
+          size:
+            - 255
+        feedbacktext:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: feedbacktext
+          order: 4
+          size:
+            - 0
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        package_name:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: package_name
+          order: 6
+          size:
+            - 255
+        submitted_at:
+          data_type: datetime
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: submitted_at
+          order: 3
+          size:
+            - 0
+        user_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: user_id
+          order: 2
+          size:
+            - 0
+        version_code:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: version_code
+          order: 7
+          size:
+            - 255
+        version_number:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: version_number
+          order: 8
+          size:
+            - 255
+      indices:
+        - fields:
+            - user_id
+          name: feedback_idx_user_id
+          options: []
+          type: NORMAL
+      name: feedback
+      options: []
+      order: 8
+    leaderboard_sets:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 0
+          expression: ''
+          fields:
+            - leaderboard_id
+          match_type: ''
+          name: leaderboard_sets_fk_leaderboard_id
+          on_delete: NO ACTION
+          on_update: NO ACTION
+          options: []
+          reference_fields:
+            - id
+          reference_table: leaderboards
+          type: FOREIGN KEY
+      fields:
+        date:
+          data_type: datetime
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: date
+          order: 3
+          size:
+            - 0
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        leaderboard_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: leaderboard_id
+          order: 2
+          size:
+            - 0
+      indices:
+        - fields:
+            - leaderboard_id
+          name: leaderboard_sets_idx_leaderboard_id
+          options: []
+          type: NORMAL
+      name: leaderboard_sets
+      options: []
+      order: 5
+    leaderboard_values:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - user_id
+            - set_id
+          match_type: ''
+          name: leaderboard_values_user_id_set_id
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: UNIQUE
+        - deferrable: 0
+          expression: ''
+          fields:
+            - set_id
+          match_type: ''
+          name: leaderboard_values_fk_set_id
+          on_delete: NO ACTION
+          on_update: NO ACTION
+          options: []
+          reference_fields:
+            - id
+          reference_table: leaderboard_sets
+          type: FOREIGN KEY
+        - deferrable: 0
+          expression: ''
+          fields:
+            - user_id
+          match_type: ''
+          name: leaderboard_values_fk_user_id
+          on_delete: NO ACTION
+          on_update: NO ACTION
+          options: []
+          reference_fields:
+            - id
+          reference_table: users
+          type: FOREIGN KEY
+      fields:
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        position:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: position
+          order: 4
+          size:
+            - 0
+        set_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 1
+          name: set_id
+          order: 3
+          size:
+            - 0
+        trend:
+          data_type: integer
+          default_value: 0
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: trend
+          order: 6
+          size:
+            - 0
+        user_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 1
+          name: user_id
+          order: 2
+          size:
+            - 0
+        value:
+          data_type: decimal
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: value
+          order: 5
+          size:
+            - 16
+            - 2
+      indices:
+        - fields:
+            - set_id
+          name: leaderboard_values_idx_set_id
+          options: []
+          type: NORMAL
+        - fields:
+            - user_id
+          name: leaderboard_values_idx_user_id
+          options: []
+          type: NORMAL
+      name: leaderboard_values
+      options: []
+      order: 13
+    leaderboards:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - type
+          match_type: ''
+          name: leaderboards_type
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: UNIQUE
+      fields:
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        name:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: name
+          order: 2
+          size:
+            - 255
+        type:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 1
+          name: type
+          order: 3
+          size:
+            - 255
+      indices: []
+      name: leaderboards
+      options: []
+      order: 3
+    organisations:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+      fields:
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        name:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: name
+          order: 2
+          size:
+            - 255
+        postcode:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: postcode
+          order: 5
+          size:
+            - 16
+        street_name:
+          data_type: text
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: street_name
+          order: 3
+          size:
+            - 0
+        town:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: town
+          order: 4
+          size:
+            - 255
+      indices: []
+      name: organisations
+      options: []
+      order: 4
+    pending_organisations:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 0
+          expression: ''
+          fields:
+            - submitted_by_id
+          match_type: ''
+          name: pending_organisations_fk_submitted_by_id
+          on_delete: NO ACTION
+          on_update: NO ACTION
+          options: []
+          reference_fields:
+            - id
+          reference_table: users
+          type: FOREIGN KEY
+      fields:
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        name:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: name
+          order: 2
+          size:
+            - 255
+        postcode:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: postcode
+          order: 5
+          size:
+            - 16
+        street_name:
+          data_type: text
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: street_name
+          order: 3
+          size:
+            - 0
+        submitted_at:
+          data_type: datetime
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: submitted_at
+          order: 7
+          size:
+            - 0
+        submitted_by_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: submitted_by_id
+          order: 6
+          size:
+            - 0
+        town:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: town
+          order: 4
+          size:
+            - 255
+      indices:
+        - fields:
+            - submitted_by_id
+          name: pending_organisations_idx_submitted_by_id
+          options: []
+          type: NORMAL
+      name: pending_organisations
+      options: []
+      order: 9
+    pending_transactions:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 0
+          expression: ''
+          fields:
+            - buyer_id
+          match_type: ''
+          name: pending_transactions_fk_buyer_id
+          on_delete: NO ACTION
+          on_update: NO ACTION
+          options: []
+          reference_fields:
+            - id
+          reference_table: users
+          type: FOREIGN KEY
+        - deferrable: 0
+          expression: ''
+          fields:
+            - seller_id
+          match_type: ''
+          name: pending_transactions_fk_seller_id
+          on_delete: NO ACTION
+          on_update: NO ACTION
+          options: []
+          reference_fields:
+            - id
+          reference_table: pending_organisations
+          type: FOREIGN KEY
+      fields:
+        buyer_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: buyer_id
+          order: 2
+          size:
+            - 0
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        proof_image:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: proof_image
+          order: 5
+          size:
+            - 0
+        purchase_time:
+          data_type: datetime
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: purchase_time
+          order: 7
+          size:
+            - 0
+        seller_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: seller_id
+          order: 3
+          size:
+            - 0
+        submitted_at:
+          data_type: datetime
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: submitted_at
+          order: 6
+          size:
+            - 0
+        value:
+          data_type: decimal
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: value
+          order: 4
+          size:
+            - 16
+            - 2
+      indices:
+        - fields:
+            - buyer_id
+          name: pending_transactions_idx_buyer_id
+          options: []
+          type: NORMAL
+        - fields:
+            - seller_id
+          name: pending_transactions_idx_seller_id
+          options: []
+          type: NORMAL
+      name: pending_transactions
+      options: []
+      order: 12
+    session_tokens:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - token
+          match_type: ''
+          name: session_tokens_token
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: UNIQUE
+        - deferrable: 0
+          expression: ''
+          fields:
+            - user_id
+          match_type: ''
+          name: session_tokens_fk_user_id
+          on_delete: NO ACTION
+          on_update: NO ACTION
+          options: []
+          reference_fields:
+            - id
+          reference_table: users
+          type: FOREIGN KEY
+      fields:
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        token:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 1
+          name: token
+          order: 2
+          size:
+            - 255
+        user_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: user_id
+          order: 3
+          size:
+            - 0
+      indices:
+        - fields:
+            - user_id
+          name: session_tokens_idx_user_id
+          options: []
+          type: NORMAL
+      name: session_tokens
+      options: []
+      order: 10
+    transactions:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 0
+          expression: ''
+          fields:
+            - buyer_id
+          match_type: ''
+          name: transactions_fk_buyer_id
+          on_delete: NO ACTION
+          on_update: NO ACTION
+          options: []
+          reference_fields:
+            - id
+          reference_table: users
+          type: FOREIGN KEY
+        - deferrable: 0
+          expression: ''
+          fields:
+            - seller_id
+          match_type: ''
+          name: transactions_fk_seller_id
+          on_delete: NO ACTION
+          on_update: NO ACTION
+          options: []
+          reference_fields:
+            - id
+          reference_table: organisations
+          type: FOREIGN KEY
+      fields:
+        buyer_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: buyer_id
+          order: 2
+          size:
+            - 0
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        proof_image:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: proof_image
+          order: 5
+          size:
+            - 0
+        purchase_time:
+          data_type: datetime
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: purchase_time
+          order: 7
+          size:
+            - 0
+        seller_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: seller_id
+          order: 3
+          size:
+            - 0
+        submitted_at:
+          data_type: datetime
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: submitted_at
+          order: 6
+          size:
+            - 0
+        value:
+          data_type: decimal
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: value
+          order: 4
+          size:
+            - 16
+            - 2
+      indices:
+        - fields:
+            - buyer_id
+          name: transactions_idx_buyer_id
+          options: []
+          type: NORMAL
+        - fields:
+            - seller_id
+          name: transactions_idx_seller_id
+          options: []
+          type: NORMAL
+      name: transactions
+      options: []
+      order: 11
+    users:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - customer_id
+          match_type: ''
+          name: users_customer_id
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: UNIQUE
+        - deferrable: 1
+          expression: ''
+          fields:
+            - email
+          match_type: ''
+          name: users_email
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: UNIQUE
+        - deferrable: 1
+          expression: ''
+          fields:
+            - organisation_id
+          match_type: ''
+          name: users_organisation_id
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: UNIQUE
+        - deferrable: 0
+          expression: ''
+          fields:
+            - customer_id
+          match_type: ''
+          name: users_fk_customer_id
+          on_delete: NO ACTION
+          on_update: NO ACTION
+          options: []
+          reference_fields:
+            - id
+          reference_table: customers
+          type: FOREIGN KEY
+        - deferrable: 0
+          expression: ''
+          fields:
+            - organisation_id
+          match_type: ''
+          name: users_fk_organisation_id
+          on_delete: NO ACTION
+          on_update: NO ACTION
+          options: []
+          reference_fields:
+            - id
+          reference_table: organisations
+          type: FOREIGN KEY
+      fields:
+        customer_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 1
+          name: customer_id
+          order: 2
+          size:
+            - 0
+        email:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 1
+          name: email
+          order: 4
+          size:
+            - 0
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        join_date:
+          data_type: datetime
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: join_date
+          order: 5
+          size:
+            - 0
+        organisation_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 1
+          name: organisation_id
+          order: 3
+          size:
+            - 0
+        password:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: password
+          order: 6
+          size:
+            - 100
+      indices:
+        - fields:
+            - customer_id
+          name: users_idx_customer_id
+          options: []
+          type: NORMAL
+        - fields:
+            - organisation_id
+          name: users_idx_organisation_id
+          options: []
+          type: NORMAL
+      name: users
+      options: []
+      order: 6
+  triggers: {}
+  views: {}
+translator:
+  add_drop_table: 0
+  filename: ~
+  no_comments: 0
+  parser_args:
+    sources:
+      - AccountToken
+      - Administrator
+      - Customer
+      - Feedback
+      - Leaderboard
+      - LeaderboardSet
+      - LeaderboardValue
+      - Organisation
+      - PendingOrganisation
+      - PendingTransaction
+      - SessionToken
+      - Transaction
+      - User
+  parser_type: SQL::Translator::Parser::DBIx::Class
+  producer_args: {}
+  producer_type: SQL::Translator::Producer::YAML
+  show_warnings: 0
+  trace: 0
+  version: 0.11021
