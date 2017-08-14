@@ -342,9 +342,8 @@ $json = {
 };
 $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
-  ->status_is(400)
-  ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/purchase_time is missing/i);
+  ->status_is(200)
+  ->json_is('/success', Mojo::JSON->true);
 
 print "test 22 - Logout Rufus (type 2: existing organisation)\n";
 $t->post_ok('/api/logout', json => { session_key => $session_key } )
@@ -370,7 +369,7 @@ $session_key = $t->tx->res->json('/session_key');
 print "test 24 - add valid transaction but for with account (type 2: existing organisation)\n";
 my $org_result = $schema->resultset('PendingOrganisation')->find({ name => '7th Heaven' });
 my $unvalidatedOrganisationId = $org_result->id;
-is $schema->resultset('PendingTransaction')->count, 1, "1 pending transactions";
+is $schema->resultset('PendingTransaction')->count, 2, "2 pending transactions";
 $json = {
   transaction_value => 10,
   transaction_type => 2,
@@ -383,7 +382,7 @@ $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/organisation_id does not exist in the database/i);
-is $schema->resultset('PendingTransaction')->count, 1, "1 pending transactions";
+is $schema->resultset('PendingTransaction')->count, 2, "2 pending transactions";
 
 print "test 25 - Logout Hojo\n";
 $t->post_ok('/api/logout', json => { session_key => $session_key } )
@@ -407,7 +406,7 @@ $t->post_ok('/api/login' => json => $testJson)
 $session_key = $t->tx->res->json('/session_key');
 
 print "test 27 - add valid transaction (type 2: existing organisation)\n";
-is $schema->resultset('PendingTransaction')->count, 1, "1 pending transactions";
+is $schema->resultset('PendingTransaction')->count, 2, "2 pending transactions";
 $json = {
   transaction_value => 10,
   transaction_type => 2,
@@ -420,7 +419,7 @@ $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_like('/message', qr/Upload Successful/);
-is $schema->resultset('PendingTransaction')->count, 2, "2 pending transactions";
+is $schema->resultset('PendingTransaction')->count, 3, "3 pending transactions";
 
 
 print "test 28 - Logout Rufus\n";
