@@ -6,7 +6,7 @@ BEGIN;
 ;
 ALTER TABLE pending_transactions ADD COLUMN purchase_time timestamp;
 
-UPDATE transactions SET purchase_time = submitted_at;
+UPDATE pending_transactions SET purchase_time = submitted_at;
 
 ALTER TABLE pending_transactions ALTER COLUMN purchase_time SET NOT NULL;
 
