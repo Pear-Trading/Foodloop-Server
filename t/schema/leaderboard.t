@@ -90,7 +90,7 @@ for my $user ( $user1, $user2, $user3, $user4 ) {
       seller_id => $org_result->id,
       value => $_ + $tweak,
       proof_image => 'a',
-      submitted_at => $dtf->format_datetime($now->clone->subtract( days => 5 )),
+      purchase_time => $dtf->format_datetime($now->clone->subtract( days => 5 )),
     });
   }
 
@@ -99,7 +99,7 @@ for my $user ( $user1, $user2, $user3, $user4 ) {
       seller_id => $org_result->id,
       value => $_ + $tweak,
       proof_image => 'a',
-      submitted_at => $dtf->format_datetime($now->clone->subtract( days => 25 )),
+      purchase_time => $dtf->format_datetime($now->clone->subtract( days => 25 )),
     });
   }
 
@@ -108,7 +108,7 @@ for my $user ( $user1, $user2, $user3, $user4 ) {
       seller_id => $org_result->id,
       value => $_ + $tweak,
       proof_image => 'a',
-      submitted_at => $dtf->format_datetime($now->clone->subtract( days => 50 )),
+      purchase_time => $dtf->format_datetime($now->clone->subtract( days => 50 )),
     });
   }
 

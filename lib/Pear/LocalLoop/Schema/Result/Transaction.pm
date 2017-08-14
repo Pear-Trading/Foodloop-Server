@@ -42,6 +42,12 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
     set_on_create => 1,
   },
+  "purchase_time" => {
+    data_type => "datetime",
+    timezone => "UTC",
+    is_nullable => 0,
+    set_on_create => 1,
+  },
 );
 
 __PACKAGE__->set_primary_key("id");

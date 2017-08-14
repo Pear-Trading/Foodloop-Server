@@ -12,7 +12,7 @@ sub search_between {
 
   my $dtf = $self->result_source->schema->storage->datetime_parser;
   return $self->search({
-    submitted_at => {
+    purchase_time => {
       -between => [
         $dtf->format_datetime($from),
         $dtf->format_datetime($to),

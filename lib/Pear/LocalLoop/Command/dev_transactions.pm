@@ -73,7 +73,7 @@ sub run {
           seller_id => $organisations[int(rand($#organisations))]->organisation_id,
           value => int(rand(9999)) / 100,
           proof_image => 'a',
-          submitted_at => $dtf->format_datetime($datetime->clone->add( minutes => int(rand(1440)) )),
+          purchase_time => $dtf->format_datetime($datetime->clone->add( minutes => int(rand(1440)) )),
         });
       }
     }
