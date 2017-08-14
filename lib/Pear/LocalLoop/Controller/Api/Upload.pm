@@ -19,6 +19,10 @@ The value of the transaction
 
 Is a value of 1, 2, or 3 - depending on the type of transaction.
 
+=item * purchase_time
+
+Is a DateTime value submitted for when the receipt is from.
+
 =item * organisation_id
 
 An ID of a valid organisation. used when transaction_type is 1 or 2.
@@ -53,6 +57,9 @@ has error_messages => sub {
       required => { message => 'transaction_value is missing', status => 400 },
       number => { message => 'transaction_value does not look like a number', status => 400 },
       gt_num => { message => 'transaction_value cannot be equal to or less than zero', status => 400 },
+    },
+    purchase_time => {
+      required => { message => 'purchase_time is missing', status => 400 },
     },
     file => {
       required => { message => 'No file uploaded', status => 400 },
@@ -92,6 +99,9 @@ sub post_upload {
   $validation->required('transaction_value')->number->gt_num(0);
   $validation->required('transaction_type')->in( 1, 2, 3 );
 
+  #Check a proper purchase time was submitted
+  $validation->required('purchase_time')->is_full_iso_datetime;
+
   # First pass of required items
   return $c->api_validation_error if $validation->has_error;
 
@@ -112,7 +122,7 @@ sub post_upload {
     # Unvalidated Organisation
     my $valid_org_rs = $c->schema->resultset('PendingOrganisation')->search({ submitted_by_id => $user->id });
     $validation->required('organisation_id')->number->in_resultset( 'id', $valid_org_rs );
-    
+
     return $c->api_validation_error if $validation->has_error;
 
     $organisation = $valid_org_rs->find( $validation->param('organisation_id') );
@@ -123,7 +133,7 @@ sub post_upload {
     $validation->optional('street_name');
     $validation->optional('town');
     $validation->optional('postcode')->postcode;
-    
+
     return $c->api_validation_error if $validation->has_error;
 
     $organisation = $c->schema->resultset('PendingOrganisation')->create({
@@ -138,6 +148,7 @@ sub post_upload {
 
   my $transaction_value = $validation->param('transaction_value');
   my $upload = $validation->param('file');
+  my $purchase_time = $c->parse_iso_datetime($validation->param('purchase_time'));
   my $file = $c->store_file_from_upload( $upload );
 
   $organisation->create_related(
@@ -146,6 +157,7 @@ sub post_upload {
       buyer => $user,
       value => $transaction_value,
       proof_image => $file,
+      purchase_time => $c->format_db_datetime($purchase_time),
     }
   );
 
