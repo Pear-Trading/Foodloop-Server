@@ -29,13 +29,13 @@ print "test 1 - Create customer user account (Rufus)\n";
 my $emailRufus = 'rufus@shinra.energy';
 my $passwordRufus = 'MakoGold';
 my $testJson = {
-  'usertype' => 'customer', 
-  'token' => shift(@account_tokens), 
-  'full_name' =>  'RufusShinra', 
-  'display_name' =>  'RufusShinra', 
-  'email' => $emailRufus, 
-  'postcode' => 'RG26 5NU', 
-  'password' => $passwordRufus, 
+  'usertype' => 'customer',
+  'token' => shift(@account_tokens),
+  'full_name' =>  'RufusShinra',
+  'display_name' =>  'RufusShinra',
+  'email' => $emailRufus,
+  'postcode' => 'RG26 5NU',
+  'password' => $passwordRufus,
   'year_of_birth' => 2006
 };
 $t->post_ok('/api/register' => json => $testJson)
@@ -47,17 +47,17 @@ print "test 2 - Create organisation user account (Choco Billy)\n";
 my $emailBilly = 'choco.billy@chocofarm.org';
 my $passwordBilly = 'Choco';
 $testJson = {
-  'usertype' => 'organisation', 
-  'token' => shift(@account_tokens), 
-  'name' =>  'ChocoBillysGreens', 
-  'email' => $emailBilly, 
-  'postcode' => 'LA1 1HT', 
-  'password' => $passwordBilly, 
+  'usertype' => 'organisation',
+  'token' => shift(@account_tokens),
+  'name' =>  'ChocoBillysGreens',
+  'email' => $emailBilly,
+  'postcode' => 'LA1 1HT',
+  'password' => $passwordBilly,
   'street_name' => 'Market St',
   'town' => 'Lancaster',
 };
 $t->post_ok('/api/register' => json => $testJson)
-  ->status_is(200) 
+  ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
 
 my $session_key;
@@ -106,6 +106,7 @@ my $json = {
   street_name => "2 James St",
   town => "Lancaster",
   postcode => "LA1 1UP",
+  purchase_time => "2017-08-14T11:29:07.965+01:00",
   session_key => $session_key,
 };
 my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
@@ -133,6 +134,7 @@ $json = {
   street_name => "The Crescent",
   town => "Morecambe",
   postcode => "LA4 5BZ",
+  purchase_time => "2017-08-14T11:29:07.965+01:00",
   session_key => $session_key,
 };
 $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
@@ -148,6 +150,7 @@ $json = {
   street_name => "63-65 Church Street",
   town => "Lancaster",
   postcode => "LA1 1ET",
+  purchase_time => "2017-08-14T11:29:07.965+01:00",
   session_key => $session_key,
 };
 $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
@@ -180,7 +183,7 @@ sub check_vars{
     ->json_has("validated");
 
   my $sessionJsonTest = $t->tx->res->json;
-  my $validated = $sessionJsonTest->{validated};  
+  my $validated = $sessionJsonTest->{validated};
   my $unvalidated = $sessionJsonTest->{unvalidated};
 
   my $validSize = scalar @$validated;
@@ -188,7 +191,7 @@ sub check_vars{
 
   is $validSize,$numValidated,"validated returned - " . $searchTerm;
   is $unvalidSize,$numUnvalidated,"unvalidated returned - " . $searchTerm;
-  
+
 };
 
 print "test 11 - search blank\n";
