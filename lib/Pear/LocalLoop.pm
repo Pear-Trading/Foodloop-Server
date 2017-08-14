@@ -201,10 +201,11 @@ sub startup {
     while ( my $from_org_transaction = $from_org_transaction_rs->next ) {
       $to_org->create_related(
         'transactions', {
-          buyer_id     => $from_org_transaction->buyer_id,
-          value        => $from_org_transaction->value,
-          proof_image  => $from_org_transaction->proof_image,
-          submitted_at => $from_org_transaction->submitted_at,
+          buyer_id      => $from_org_transaction->buyer_id,
+          value         => $from_org_transaction->value,
+          proof_image   => $from_org_transaction->proof_image,
+          submitted_at  => $from_org_transaction->submitted_at,
+          purchase_time => $from_org_transaction->purchase_time,
         }
       );
       $from_org_transaction->delete;
