@@ -146,13 +146,21 @@ sub post_upload {
     });
   }
 
+  unless ( defined $organisation ) {
+    return $c->render( json => {
+      success => Mojo::JSON->false,
+      message => 'Error Finding Organisation',
+      error   => 'organisation_error',
+    });
+  }
+
   my $transaction_value = $validation->param('transaction_value');
   my $upload = $validation->param('file');
   my $purchase_time = $c->parse_iso_datetime($validation->param('purchase_time') || '');
   $purchase_time ||= DateTime->now();
   my $file = $c->store_file_from_upload( $upload );
 
-  $organisation->create_related(
+  my $new_transaction = $organisation->create_related(
     'transactions',
     {
       buyer => $user,
@@ -162,12 +170,19 @@ sub post_upload {
     }
   );
 
+  unless ( defined $new_transaction ) {
+    return $c->render( json => {
+      success => Mojo::JSON->false,
+      message => 'Error Adding Transaction',
+      error   => 'transaction_error',
+    });
+  }
+
   return $c->render( json => {
     success => Mojo::JSON->true,
     message => 'Upload Successful',
   });
 }
-
 
 # TODO Limit search results, possibly paginate them?
 # TODO Search by location as well
