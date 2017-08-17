@@ -60,6 +60,7 @@ has error_messages => sub {
     },
     purchase_time => {
       required => { message => 'purchase_time is missing', status => 400 },
+      is_full_iso_datetime => 'purchase_time is in incorrect format', status => 400 },
     },
     file => {
       required => { message => 'No file uploaded', status => 400 },
