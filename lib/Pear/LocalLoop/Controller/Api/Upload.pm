@@ -147,11 +147,14 @@ sub post_upload {
   }
 
   unless ( defined $organisation ) {
-    return $c->render( json => {
-      success => Mojo::JSON->false,
-      message => 'Error Finding Organisation',
-      error   => 'organisation_error',
-    });
+    return $c->render(
+      json => {
+        success => Mojo::JSON->false,
+        message => 'Error Finding Organisation',
+        error   => 'organisation_error',
+      },
+      status => 400,
+    );
   }
 
   my $transaction_value = $validation->param('transaction_value');
@@ -171,11 +174,14 @@ sub post_upload {
   );
 
   unless ( defined $new_transaction ) {
-    return $c->render( json => {
-      success => Mojo::JSON->false,
-      message => 'Error Adding Transaction',
-      error   => 'transaction_error',
-    });
+    return $c->render(
+      json => {
+        success => Mojo::JSON->false,
+        message => 'Error Adding Transaction',
+        error   => 'transaction_error',
+      },
+      status => 400,
+    );
   }
 
   return $c->render( json => {
