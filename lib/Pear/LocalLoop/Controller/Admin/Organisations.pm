@@ -117,7 +117,7 @@ sub pending_edit {
       $c->flash( success => 'Updated Organisation' );
     }
   };
-  $c->redirect_to( '/admin/organisations/valid/' . $pending_org->id );
+  $c->redirect_to( '/admin/organisations/pending/' . $pending_org->id );
 }
 
 sub pending_approve {
