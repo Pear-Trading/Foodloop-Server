@@ -16,9 +16,13 @@
     %= $valid_org->name
   </h3>
   <ul class="list-group list-group-flush">
-    <li class="list-group-item">Street Name: <%= $valid_org->street_name %></li>
-    <li class="list-group-item">Town: <%= $valid_org->town %></li>
-    <li class="list-group-item">Postcode: <%= $valid_org->postcode %></li>
+    <form action="<%= url_for . '/edit' %>">
+      <li class="list-group-item"><input id="name" type="text" class="form-control" placeholder="Organisation Name" name="name" value="<%= $valid_org->name %>"></li>
+      <li class="list-group-item"><input id="street_name" type="text" class="form-control" placeholder="Street Name" name="street_name" value="<%= $valid_org->street_name %>"></li>
+      <li class="list-group-item"><input id="town" type="text" class="form-control" placeholder="Town" name="town" value="<%= $valid_org->town %>"></li>
+      <li class="list-group-item"><input id="postcode" type="text" class="form-control" placeholder="Postcode" name="postcode" value="<%= $valid_org->postcode %>"></li>
+      <li class="list-group-item"><button class="btn btn-success" type="submit">Edit Organisation</button></li>
+    </form>
   </ul>
 </div>
 <div class="card mb-3">

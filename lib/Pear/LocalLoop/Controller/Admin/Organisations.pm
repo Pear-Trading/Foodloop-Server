@@ -2,6 +2,7 @@ package Pear::LocalLoop::Controller::Admin::Organisations;
 use Mojo::Base 'Mojolicious::Controller';
 
 use Try::Tiny;
+use Data::Dumper;
 
 sub list {
   my $c = shift;
@@ -30,6 +31,43 @@ sub valid_read {
   );
 }
 
+sub valid_edit {
+  my $c = shift;
+
+  my $validation = $c->validation;
+  $validation->required('name');
+  $validation->required('street_name');
+  $validation->required('town');
+  $validation->required('postcode')->postcode;
+
+  if ( $validation->has_error ) {
+    $c->flash( error => 'The validation has failed' );
+    $c->app->log->warn(Dumper $validation);
+    return $c->redirect_to( '/admin/organisations/valid/' . $c->param('id') );
+  }
+
+  my $valid_org = $c->schema->resultset('Organisation')->find( $c->param('id') );
+
+  try {
+    $c->schema->storage->txn_do( sub {
+      $valid_org->update({
+        name        => $validation->param('name'),
+        street_name => $validation->param('street_name'),
+        town        => $validation->param('town'),
+        postcode    => $validation->param('postcode'),
+      });
+    } );
+  } finally {
+    if ( @_ ) {
+      $c->flash( error => 'Something went wrong Updating the Organisation' );
+      $c->app->log->warn(Dumper @_);
+    } else {
+      $c->flash( success => 'Updated Organisation' );
+    }
+  };
+  $c->redirect_to( '/admin/organisations/valid/' . $valid_org->id );
+}
+
 sub pending_read {
   my $c = shift;
   my $pending_org = $c->schema->resultset('PendingOrganisation')->find( $c->param('id') );
@@ -43,6 +81,43 @@ sub pending_read {
     pending_org => $pending_org,
     transactions => $transactions,
   );
+}
+
+sub pending_edit {
+  my $c = shift;
+
+  my $validation = $c->validation;
+  $validation->required('name');
+  $validation->required('street_name');
+  $validation->required('town');
+  $validation->required('postcode')->postcode;
+
+  if ( $validation->has_error ) {
+    $c->flash( error => 'The validation has failed' );
+    $c->app->log->warn(Dumper $validation);
+    return $c->redirect_to( '/admin/organisations/pending/' . $c->param('id') );
+  }
+
+  my $pending_org = $c->schema->resultset('PendingOrganisation')->find( $c->param('id') );
+
+  try {
+    $c->schema->storage->txn_do( sub {
+      $pending_org->update({
+        name        => $validation->param('name'),
+        street_name => $validation->param('street_name'),
+        town        => $validation->param('town'),
+        postcode    => $validation->param('postcode'),
+      });
+    } );
+  } finally {
+    if ( @_ ) {
+      $c->flash( error => 'Something went wrong Updating the Organisation' );
+      $c->app->log->warn(Dumper @_);
+    } else {
+      $c->flash( success => 'Updated Organisation' );
+    }
+  };
+  $c->redirect_to( '/admin/organisations/valid/' . $pending_org->id );
 }
 
 sub pending_approve {

@@ -172,7 +172,9 @@ sub startup {
 
   $admin_routes->get('/organisations')->to('admin-organisations#list');
   $admin_routes->get('/organisations/valid/:id')->to('admin-organisations#valid_read');
+  $admin_routes->get('/organisations/valid/:id/edit')->to('admin-organisations#valid_edit');
   $admin_routes->get('/organisations/pending/:id')->to('admin-organisations#pending_read');
+  $admin_routes->get('/organisations/pending/:id/edit')->to('admin-organisations#pending_edit');
   $admin_routes->get('/organisations/pending/:id/approve')->to('admin-organisations#pending_approve');
 
   $admin_routes->get('/feedback')->to('admin-feedback#index');
