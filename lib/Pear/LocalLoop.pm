@@ -171,6 +171,8 @@ sub startup {
   $admin_routes->post('/users/:id/delete')->to('admin-users#delete');
 
   $admin_routes->get('/organisations')->to('admin-organisations#list');
+  $admin_routes->get('/organisations/add')->to('admin-organisations#add_org');
+  $admin_routes->post('/organisations/add/submit')->to('admin-organisations#add_org_submit');
   $admin_routes->get('/organisations/valid/:id')->to('admin-organisations#valid_read');
   $admin_routes->post('/organisations/valid/:id/edit')->to('admin-organisations#valid_edit');
   $admin_routes->get('/organisations/pending/:id')->to('admin-organisations#pending_read');

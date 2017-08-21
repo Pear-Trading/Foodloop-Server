@@ -1,0 +1,28 @@
+% layout 'admin';
+% title 'Organisations';
+% content_for javascript => begin
+% end
+% if ( my $error = flash 'error' ) {
+  <div class="alert alert-danger" role="alert">
+    <strong>Error!</strong> <%= $error %>
+  </div>
+% } elsif ( my $success = flash 'success' ) {
+  <div class="alert alert-success" role="alert">
+    <strong>Success!</strong> <%= $success %>
+  </div>
+% }
+<div class="card mb-3">
+  <h3 class="card-header">
+    Add an Organisation
+  </h3>
+  <ul class="list-group list-group-flush">
+    <form action="<%= url_for . '/submit' %>" method="post">
+      <li class="list-group-item">Only 'Organisation Name' and 'Town' are required entries.</li>
+      <li class="list-group-item"><input id="name" type="text" class="form-control" placeholder="Organisation Name" name="name"></li>
+      <li class="list-group-item"><input id="street_name" type="text" class="form-control" placeholder="Street Name" name="street_name"></li>
+      <li class="list-group-item"><input id="town" type="text" class="form-control" placeholder="Town" name="town"></li>
+      <li class="list-group-item"><input id="postcode" type="text" class="form-control" placeholder="Postcode" name="postcode"></li>
+      <li class="list-group-item"><button class="btn btn-success" type="submit">Add Organisation</button></li>
+    </form>
+  </ul>
+</div>
