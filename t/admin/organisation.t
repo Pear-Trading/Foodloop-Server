@@ -78,4 +78,19 @@ $t->post_ok('/admin/organisations/pending/2/edit', form => {
   postcode => 'WC1E 6AD',
 })->content_like(qr/The validation has failed/);
 
+#Valid adding organisation
+$t->post_ok('/admin/organisations/add/submit', form => {
+  name => 'Wall Market',
+  street_name => 'Slums, Sector 6',
+  town => 'Midgar',
+  postcode => 'TN35 5AQ',
+})->status_is(200)->content_like(qr/Added Organisation/);
+
+#Failed validation on adding organisation
+$t->post_ok('/admin/organisations/add/submit', form => {
+  name => 'Wall Market',
+  street_name => 'Slums, Sector 6',
+  postcode => 'TN35 5AQ',
+})->content_like(qr/The validation has failed/);
+
 done_testing();
