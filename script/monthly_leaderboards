@@ -1,9 +1,0 @@
-#! /bin/bash
-
-eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-
-YESTERDAY=`date -d "1 month ago" +%F`
-
-
-MOJO_MODE=production ./script/pear-local_loop leaderboard -t monthly_total -d $YESTERDAY
-MOJO_MODE=production ./script/pear-local_loop leaderboard -t monthly_count -d $YESTERDAY
