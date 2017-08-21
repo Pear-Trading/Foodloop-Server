@@ -184,7 +184,7 @@ sub _create_total_all_time {
   my @leaderboard;
 
   while ( my $user_result = $user_rs->next ) {
-    my $transaction_rs = $user_result->transactions;
+    my $transaction_rs = $user_result->transactions->search_before( $end );
 
     my $transaction_sum = $transaction_rs->get_column('value')->sum;
 
@@ -215,7 +215,7 @@ sub _create_count_all_time {
   my @leaderboard;
 
   while ( my $user_result = $user_rs->next ) {
-    my $transaction_rs = $user_result->transactions;
+    my $transaction_rs = $user_result->transactions->search_before( $end );
 
     my $transaction_count = $transaction_rs->count;
 
