@@ -16,6 +16,46 @@ sub list {
   );
 }
 
+sub add_org {
+  my $c = shift;
+}
+
+sub add_org_submit {
+  my $c = shift;
+
+  my $validation = $c->validation;
+
+  $validation->required('name');
+  $validation->optional('street_name');
+  $validation->required('town');
+  $validation->optional('postcode')->postcode;
+
+  if ( $validation->has_error ) {
+    $c->flash( error => 'The validation has failed' );
+    $c->app->log->warn(Dumper $validation);
+    return $c->redirect_to( '/admin/organisations/add/' );
+  }
+
+  my $organisation;
+
+  try {
+    $organisation = $c->schema->resultset('Organisation')->create({
+      name         => $validation->param('name'),
+      street_name  => $validation->param('street_name'),
+      town         => $validation->param('town'),
+      postcode     => $validation->param('postcode'),
+    });
+  } finally {
+    if ( @_ ) {
+      $c->flash( error => 'Something went wrong Adding the Organisation' );
+      $c->app->log->warn(Dumper @_);
+    } else {
+      $c->flash( success => 'Added Organisation' );
+    }
+  };
+  $c->redirect_to( '/admin/organisations/add/' );
+}
+
 sub valid_read {
   my $c = shift;
   my $valid_org = $c->schema->resultset('Organisation')->find( $c->param('id') );

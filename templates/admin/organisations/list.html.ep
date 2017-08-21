@@ -16,6 +16,7 @@
     <div class="card">
       <h3 class="card-header">
         Valid Organisations
+        <a href="<%= url_for . '/add' %>" class="btn btn-success" style="float: right">Add Organisation</a>
       </h3>
       <div class="list-group list-group-flush">
         % for my $valid_org ($valid_orgs_rs->all) {
