@@ -20,3 +20,4 @@ requires 'Try::Tiny';
 requires 'MooX::Options::Actions';
 requires 'Module::Runtime';
 requires 'DBIx::Class::DeploymentHandler';
+requires 'DBIx::Class::Fixtures';

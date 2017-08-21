@@ -217,10 +217,10 @@ test_leaderboard(
   'all_time_total',
   $now,
   [
-    { user_id => 4, value => 980, position => 1 },
-    { user_id => 3, value => 940, position => 2 },
-    { user_id => 2, value => 900, position => 3 },
-    { user_id => 1, value => 860, position => 4 },
+    { user_id => 4, value => 885, position => 1 },
+    { user_id => 3, value => 855, position => 2 },
+    { user_id => 2, value => 825, position => 3 },
+    { user_id => 1, value => 795, position => 4 },
   ]
 );
 
@@ -229,10 +229,10 @@ test_leaderboard(
   'all_time_count',
   $now,
   [
-    { user_id => 1, value => 40, position => 1 },
-    { user_id => 2, value => 40, position => 2 },
-    { user_id => 3, value => 40, position => 3 },
-    { user_id => 4, value => 40, position => 4 },
+    { user_id => 1, value => 30, position => 1 },
+    { user_id => 2, value => 30, position => 2 },
+    { user_id => 3, value => 30, position => 3 },
+    { user_id => 4, value => 30, position => 4 },
   ]
 );
 
