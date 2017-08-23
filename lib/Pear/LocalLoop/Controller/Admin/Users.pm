@@ -1,6 +1,8 @@
 package Pear::LocalLoop::Controller::Admin::Users;
 use Mojo::Base 'Mojolicious::Controller';
 
+use Data::Dumper;
+
 has result_set => sub {
   my $c = shift;
   return $c->schema->resultset('User');
@@ -32,16 +34,19 @@ sub edit {
 
   my $id = $c->param('id');
 
-  if ( my $user = $c->result_set->find($id) ) {
-    $c->stash( user => $user );
-  } else {
+  my $user;
+
+  unless ( $user = $c->result_set->find($id) ) {
     $c->flash( error => 'No User found' );
-    $c->redirect_to( '/admin/users/' . $id );
+    return $c->redirect_to( '/admin/users/' . $id );
   }
 
   my $validation = $c->validation;
 
-  $validation->required('email')->not_in_resultset( 'email', $user->id );
+  my $not_myself_user_rs = $c->result_set->search({
+    id => { "!=" => $user->id },
+  });
+  $validation->required('email')->email->not_in_resultset( 'email', $not_myself_user_rs );
   $validation->required('postcode')->postcode;
   $validation->optional('new_password');
 
@@ -62,34 +67,51 @@ sub edit {
 
   if ( defined $user->customer_id ){
 
-    $c->schema->txn_do( sub {
-      $user->customer->update({
-        full_name     => $validation->param('full_name'),
-        display_name  => $validation->param('display_name'),
-        postcode      => $validation->param('postcode'),
+    try {
+      $c->schema->txn_do( sub {
+        $user->customer->update({
+          full_name     => $validation->param('full_name'),
+          display_name  => $validation->param('display_name'),
+          postcode      => $validation->param('postcode'),
+        });
+        $user->update({
+          email => $validation->param('email'),
+          ( defined $validation->param('new_password') ? ( password => $validation->param('new_password') ) : () ),
+        });
       });
-      $user->update({
-        email => $validation->param('email'),
-        ( defined $validation->param('new_password') ? ( password => $validation->param('new_password') ) : () ),
-      });
-    });
-
+    } finally {
+      if ( @_ ) {
+        $c->flash( error => 'Something went wrong Updating the User' );
+        $c->app->log->warn(Dumper @_);
+      } else {
+        $c->flash( success => 'Updated User' );
+      };
+    }
   }
   elsif ( defined $user->organisation_id ) {
 
-    $c->schema->txn_do( sub {
-      $user->organisation->update({
-        name        => $validation->param('name'),
-        street_name => $validation->param('street_name'),
-        town        => $validation->param('town'),
-        postcode    => $validation->param('postcode'),
+    try {
+      $c->schema->txn_do( sub {
+        $user->organisation->update({
+          name        => $validation->param('name'),
+          street_name => $validation->param('street_name'),
+          town        => $validation->param('town'),
+          postcode    => $validation->param('postcode'),
+        });
+        $user->update({
+          email        => $validation->param('email'),
+          ( defined $validation->param('new_password') ? ( password => $validation->param('new_password') ) : () ),
+        });
       });
-      $user->update({
-        email        => $validation->param('email'),
-        ( defined $validation->param('new_password') ? ( password => $validation->param('new_password') ) : () ),
-      });
-    });
-  }
+    } finally {
+      if ( @_ ) {
+        $c->flash( error => 'Something went wrong Updating the User' );
+        $c->app->log->warn(Dumper @_);
+      } else {
+        $c->flash( success => 'Updated User' );
+      }
+    }
+  };
 
   $c->redirect_to( '/admin/users/' . $id );
 }
