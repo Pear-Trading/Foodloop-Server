@@ -148,7 +148,6 @@ sub post_account_update {
 
   }
   elsif ( defined $user->organisation_id ) {
-    my $fullAddress = $validation->param('fulladdress');
 
     $c->schema->txn_do( sub {
       $user->organisation->update({
