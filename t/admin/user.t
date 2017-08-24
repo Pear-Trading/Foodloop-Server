@@ -51,15 +51,43 @@ $t->post_ok('/admin', form => {
 })->status_is(200);
 
 #Read customer user
-$t->get_ok('/admin/users/1/')
-  ->status_is(200);
-
-#Read organisation user
 $t->get_ok('/admin/users/2/')
   ->status_is(200);
 
+#Read organisation user
+$t->get_ok('/admin/users/3/')
+  ->status_is(200);
+
+#Valid customer user update
+$t->post_ok('/admin/users/2/edit', form => {
+  email => 'test12@example.com',
+  new_password => 'abc123',
+  full_name => 'Test User1',
+  display_name => 'Test User1',
+  town => 'Midgar',
+  postcode => 'WC1E 6AD',
+})->status_is(200)->content_like(qr/Updated User/);
+
+#Failed validation on customer user from no postcode
+$t->post_ok('/admin/users/2/edit', form => {
+  email => 'test12@example.com',
+  new_password => 'abc123',
+  full_name => 'Test User1',
+  display_name => 'Test User1',
+  town => 'Midgar',
+})->content_like(qr/The validation has failed/);
+
+#Failed validation on customer user from no display name
+$t->post_ok('/admin/users/2/edit', form => {
+  email => 'test12@example.com',
+  new_password => 'abc123',
+  full_name => 'Test User1',
+  town => 'Midgar',
+  postcode => 'WC1E 6AD',
+})->content_like(qr/The validation has failed/);
+
 #Valid organisation user update
-$t->post_ok('/admin/users/1/edit', form => {
+$t->post_ok('/admin/users/3/edit', form => {
   email => 'test51@example.com',
   new_password => 'abc123',
   name => '7th Heaven',
@@ -68,18 +96,8 @@ $t->post_ok('/admin/users/1/edit', form => {
   postcode => 'WC1E 6AD',
 })->status_is(200)->content_like(qr/Updated User/);
 
-#Failed validation on organisation user from wrong email
-$t->post_ok('/admin/users/1/edit', form => {
-  email => 'test55@example.com',
-  new_password => 'abc123',
-  name => '7th Heaven',
-  street_name => 'Slums, Sector 7',
-  town => 'Midgar',
-  postcode => 'WC1E 6AD',
-})->content_like(qr/The validation has failed/);
-
 #Failed validation on organisation user from no postcode
-$t->post_ok('/admin/users/1/edit', form => {
+$t->post_ok('/admin/users/3/edit', form => {
   email => 'test50@example.com',
   new_password => 'abc123',
   name => '7th Heaven',
@@ -88,7 +106,7 @@ $t->post_ok('/admin/users/1/edit', form => {
 })->content_like(qr/The validation has failed/);
 
 #Failed validation on organisation user from no street name
-$t->post_ok('/admin/users/1/edit', form => {
+$t->post_ok('/admin/users/3/edit', form => {
   email => 'test50@example.com',
   new_password => 'abc123',
   name => '7th Heaven',

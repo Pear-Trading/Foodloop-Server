@@ -49,7 +49,7 @@
     </div>
     <div class="form-group">
       <label for="year_of_birth">Year of Birth</label>
-      <input id="year_of_birth" type="number" class="form-control" placeholder="Year of Birth" name="year_of_birth" value="<%= $customer_rs->year_of_birth %>">
+      <input id="year_of_birth" type="number" class="form-control" placeholder="Year of Birth" name="year_of_birth" value="<%= $customer_rs->year_of_birth %>" disabled>
     </div>
     % } elsif (  my $org_rs = $user->organisation ) {
   <h3 class="card-header">
