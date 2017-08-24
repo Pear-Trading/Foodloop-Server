@@ -124,7 +124,7 @@ sub post_account_update {
   if ( defined $user->customer_id ) {
     $validation->required('display_name');
     $validation->required('full_name');
-  } elsif ( defined $user->customer_id ) {
+  } elsif ( defined $user->organisation_id ) {
     $validation->required('name');
     $validation->required('street_name');
     $validation->required('town');
