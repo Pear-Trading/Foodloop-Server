@@ -1,17 +1,28 @@
 package Pear::LocalLoop::Controller::Admin::Users;
 use Mojo::Base 'Mojolicious::Controller';
 
+use Try::Tiny;
 use Data::Dumper;
 
-has result_set => sub {
+has user_result_set => sub {
   my $c = shift;
   return $c->schema->resultset('User');
+};
+
+has customer_result_set => sub {
+  my $c = shift;
+  return $c->schema->resultset('Customer');
+};
+
+has organisation_result_set => sub {
+  my $c = shift;
+  return $c->schema->resultset('Organisation');
 };
 
 sub index {
   my $c = shift;
 
-  my $user_rs = $c->result_set;
+  my $user_rs = $c->user_result_set;
   $user_rs->result_class('DBIx::Class::ResultClass::HashRefInflator');
   $c->stash( users => [ $user_rs->all ] );
 }
@@ -21,7 +32,7 @@ sub read {
 
   my $id = $c->param('id');
 
-  if ( my $user = $c->result_set->find($id) ) {
+  if ( my $user = $c->user_result_set->find($id) ) {
     $c->stash( user => $user );
   } else {
     $c->flash( error => 'No User found' );
@@ -36,14 +47,14 @@ sub edit {
 
   my $user;
 
-  unless ( $user = $c->result_set->find($id) ) {
+  unless ( $user = $c->user_result_set->find($id) ) {
     $c->flash( error => 'No User found' );
     return $c->redirect_to( '/admin/users/' . $id );
   }
 
   my $validation = $c->validation;
 
-  my $not_myself_user_rs = $c->result_set->search({
+  my $not_myself_user_rs = $c->user_result_set->search({
     id => { "!=" => $user->id },
   });
   $validation->required('email')->email->not_in_resultset( 'email', $not_myself_user_rs );
