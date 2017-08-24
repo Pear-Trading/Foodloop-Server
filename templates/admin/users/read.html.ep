@@ -11,25 +11,26 @@
     <strong>Success!</strong> <%= $success %>
   </div>
 % }
-<form action="<%= url_for . '/edit' %>" method="post">
+<form action="<%= url_for . '/edit' %>" method="post" autocomplete="off">
   <h3 class="card-header">
     User Details
   </h3>
     <div class="form-group">
       <label for="email">Email Address</label>
-      <input id="email" type="text" class="form-control" placeholder="Email" name="email" value="<%= $user->email %>">
+      <input id="email" type="text" autocomplete="off" class="form-control" placeholder="Email" name="email" value="<%= $user->email %>">
     </div>
     <div class="form-group">
       <label for="joindate">Join Date</label>
-      <input id="joindate" type="datetime" class="form-control" placeholder="Date" name="joindate" value="<%= $user->join_date %>">
+      <input id="joindate" type="datetime" class="form-control" placeholder="Date" name="joindate" value="<%= $user->join_date %>" disabled>
     </div>
     <div class="form-group">
       <label for="type">Account Type</label>
-      <input id="type" type="text" class="form-control" value="<%= defined $user->customer_id ? 'Customer' : 'Organisation' %>">
+      <input id="type" type="text" class="form-control" value="<%= defined $user->customer_id ? 'Customer' : 'Organisation' %>" disabled>
     </div>
     <div class="form-group">
       <label for="new_password">New Password</label>
-      <input id="new_password" type="text" class="form-control" placeholder="New Password" name="new_password">
+      <input id="new_password" type="password" autocomplete="off" class="form-control" placeholder="New Password" name="new_password">
+      <p class="help-block">Leave blank unless you want to change their password</p>
     </div>
   % if ( my $customer_rs = $user->customer ) {
   <h3 class="card-header">
