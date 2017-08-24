@@ -102,7 +102,6 @@ sub post_register{
 
   }
   elsif ($usertype eq 'organisation') {
-    my $fullAddress = $validation->param('fulladdress');
 
     $c->schema->txn_do( sub {
       $c->schema->resultset('AccountToken')->find({
