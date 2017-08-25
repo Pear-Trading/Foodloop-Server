@@ -75,6 +75,7 @@ sub post_register{
     $validation->required('name');
     $validation->required('street_name');
     $validation->required('town');
+    $validation->required('sector');
   }
 
   return $c->api_validation_error if $validation->has_error;
@@ -112,6 +113,7 @@ sub post_register{
         name        => $validation->param('name'),
         street_name => $validation->param('street_name'),
         town        => $validation->param('town'),
+        sector      => $validation->param('sector'),
         postcode    => $validation->param('postcode'),
       });
       $c->schema->resultset('User')->create({

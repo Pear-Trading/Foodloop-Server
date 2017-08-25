@@ -342,6 +342,7 @@ $testJson = {
   'email' => 'org@org.com',
   'postcode' => 'LA1 1AA',
   'password' => 'Meh',
+  'sector' => 'A',
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
@@ -360,6 +361,7 @@ $testJson = {
   'password' => 'Meh',
   'street_name' => 'mary lane testing....',
   'town' => 'Lancaster',
+  'sector' => 'A',
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)

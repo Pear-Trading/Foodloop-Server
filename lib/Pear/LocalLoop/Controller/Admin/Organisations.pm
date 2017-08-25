@@ -28,6 +28,7 @@ sub add_org_submit {
   $validation->required('name');
   $validation->optional('street_name');
   $validation->required('town');
+  $validation->optional('sector');
   $validation->optional('postcode')->postcode;
 
   if ( $validation->has_error ) {
@@ -43,6 +44,7 @@ sub add_org_submit {
       name         => $validation->param('name'),
       street_name  => $validation->param('street_name'),
       town         => $validation->param('town'),
+      sector       => $validation->param('sector'),
       postcode     => $validation->param('postcode'),
     });
   } finally {
@@ -78,6 +80,7 @@ sub valid_edit {
   $validation->required('name');
   $validation->required('street_name');
   $validation->required('town');
+  $validation->optional('sector');
   $validation->required('postcode')->postcode;
 
   if ( $validation->has_error ) {
@@ -94,6 +97,7 @@ sub valid_edit {
         name        => $validation->param('name'),
         street_name => $validation->param('street_name'),
         town        => $validation->param('town'),
+        sector      => $validation->param('sector'),
         postcode    => $validation->param('postcode'),
       });
     } );

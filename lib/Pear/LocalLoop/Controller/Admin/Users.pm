@@ -68,6 +68,7 @@ sub edit {
     $validation->required('name');
     $validation->required('street_name');
     $validation->required('town');
+    $validation->optional('sector');
   }
 
   if ( $validation->has_error ) {
@@ -107,6 +108,7 @@ sub edit {
           name        => $validation->param('name'),
           street_name => $validation->param('street_name'),
           town        => $validation->param('town'),
+          sector      => $validation->param('sector'),
           postcode    => $validation->param('postcode'),
         });
         $user->update({
