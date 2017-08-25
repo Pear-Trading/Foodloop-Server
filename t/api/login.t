@@ -8,28 +8,22 @@ my $framework = Test::Pear::LocalLoop->new;
 my $t = $framework->framework;
 my $schema = $t->app->schema;
 
-my $account_token = 'a';
-my $email = 'rufus@shinra.energy';
-my $password = 'MakoGold';
-
-$schema->resultset('AccountToken')->create({
-  name => $account_token
-});
-
-my $test_json = {
-  'usertype' => 'customer', 
-  'token' => $account_token, 
-  'display_name' =>  'RufusShinra', 
-  'full_name' =>  'RufusShinra', 
-  'email' => $email, 
-  'postcode' => 'LA1 1AA', 
-  'password' => $password, 
-  year_of_birth => 2006
+my $user = {
+  token         => 'a',
+  usertype      => 'customer',
+  display_name  => 'Display Guy',
+  full_name     => 'Real Name',
+  email         => 'test@example.com',
+  postcode      => 'LA1 1AA',
+  password      => 'testerising',
+  year_of_birth => 2006,
 };
-$t->post_ok('/api/register' => json => $test_json)
+
+$schema->resultset('AccountToken')->create({ name => $user->{token} });
+
+$t->post_ok('/api/register' => json => $user)
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true);
-use Data::Dumper;
 
 is $schema->resultset('User')->count, 1, 'found a user';
 
@@ -48,8 +42,8 @@ $t->post_ok('/api/login' => json => {
   ->json_is('/success', Mojo::JSON->false);
 
 $t->post_ok('/api/login' => json => {
-    email => $email,
-    password => $password,
+    email => $user->{email},
+    password => $user->{password},
   })
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
