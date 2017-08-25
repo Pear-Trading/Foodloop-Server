@@ -1,0 +1,65 @@
+$VAR1 = {
+          'has_many' => {
+                          'fetch' => 0
+                        },
+          'belongs_to' => {
+                            'fetch' => 0
+                          },
+          'might_have' => {
+                            'fetch' => 0
+                          },
+          'sets' => [
+                      {
+                        'class' => 'Leaderboard',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'class' => 'AccountToken',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'class' => 'LeaderboardValue',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'SessionToken'
+                      },
+                      {
+                        'class' => 'Administrator',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'class' => 'LeaderboardSet',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'Feedback'
+                      },
+                      {
+                        'class' => 'PendingOrganisation',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'class' => 'User',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'class' => 'Transaction',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'Organisation'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'Customer'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'PendingTransaction'
+                      }
+                    ]
+        };

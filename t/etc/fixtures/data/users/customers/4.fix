@@ -1,0 +1,7 @@
+$HASH1 = {
+           display_name  => 'Test User4',
+           full_name     => 'Test User4',
+           id            => 4,
+           postcode      => 'LA1 1AA',
+           year_of_birth => 2006
+         };
