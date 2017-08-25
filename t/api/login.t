@@ -47,6 +47,8 @@ $t->post_ok('/api/login' => json => {
   })
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
+  ->json_is('/display_name', 'Display Guy')
+  ->json_is('/user_type', 'customer')
   ->json_has('/session_key');
 
 my $session_key = $t->tx->res->json->{session_key};
