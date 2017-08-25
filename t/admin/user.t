@@ -32,6 +32,7 @@ my $org = {
   name        => '7th Heaven',
   street_name => 'Slums, Sector 7',
   town        => 'Midgar',
+  sector      => 'A',
   postcode    => 'WC1E 6AD',
   password    => 'abc123',
 };
@@ -65,6 +66,7 @@ $t->post_ok('/admin/users/2/edit', form => {
   full_name => 'Test User1',
   display_name => 'Test User1',
   town => 'Midgar',
+  sector => 'A',
   postcode => 'WC1E 6AD',
 })->status_is(200)->content_like(qr/Updated User/);
 
@@ -75,6 +77,7 @@ $t->post_ok('/admin/users/2/edit', form => {
   full_name => 'Test User1',
   display_name => 'Test User1',
   town => 'Midgar',
+  sector => 'A',
 })->content_like(qr/The validation has failed/);
 
 #Failed validation on customer user from no display name
@@ -84,6 +87,7 @@ $t->post_ok('/admin/users/2/edit', form => {
   full_name => 'Test User1',
   town => 'Midgar',
   postcode => 'WC1E 6AD',
+  sector => 'A',
 })->content_like(qr/The validation has failed/);
 
 #Valid organisation user update
@@ -93,6 +97,7 @@ $t->post_ok('/admin/users/3/edit', form => {
   name => '7th Heaven',
   street_name => 'Slums, Sector 7',
   town => 'Midgar',
+  sector => 'A',
   postcode => 'WC1E 6AD',
 })->status_is(200)->content_like(qr/Updated User/);
 
@@ -103,6 +108,7 @@ $t->post_ok('/admin/users/3/edit', form => {
   name => '7th Heaven',
   street_name => 'Slums, Sector 7',
   town => 'Midgar',
+  sector => 'A',
 })->content_like(qr/The validation has failed/);
 
 #Failed validation on organisation user from no street name
@@ -111,6 +117,7 @@ $t->post_ok('/admin/users/3/edit', form => {
   new_password => 'abc123',
   name => '7th Heaven',
   town => 'Midgar',
+  sector => 'A',
   postcode => 'WC1E 6AD',
 })->content_like(qr/The validation has failed/);
 
