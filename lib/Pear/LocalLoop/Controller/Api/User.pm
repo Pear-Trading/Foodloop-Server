@@ -128,6 +128,7 @@ sub post_account_update {
     $validation->required('name');
     $validation->required('street_name');
     $validation->required('town');
+    $validation->required('sector');
   }
 
   return $c->api_validation_error if $validation->has_error;
@@ -154,6 +155,7 @@ sub post_account_update {
         name        => $validation->param('name'),
         street_name => $validation->param('street_name'),
         town        => $validation->param('town'),
+        sector      => $validation->param('sector'),
         postcode    => $validation->param('postcode'),
       });
       $user->update({

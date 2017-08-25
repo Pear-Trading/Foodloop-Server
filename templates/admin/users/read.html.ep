@@ -72,6 +72,10 @@
       <label for="town">Town</label>
       <input id="town" type="text" class="form-control" placeholder="Town" name="town" value="<%= $org_rs->town %>">
     </div>
+    <div class="form-group">
+      <label for="town">Town</label>
+      <input id="town" type="sector" class="form-control" placeholder="Sector Area Code" name="sector" value="<%= $org_rs->sector %>">
+    </div>
     % } else {
     <h3 class="card-header">
       User is not a customer or an organisation
