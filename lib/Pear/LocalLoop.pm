@@ -50,7 +50,7 @@ sub startup {
             return $user->id;
         }
       }
-      return undef;
+      return;
     },
   });
 
