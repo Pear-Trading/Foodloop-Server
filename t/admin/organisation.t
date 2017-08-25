@@ -21,6 +21,7 @@ $schema->resultset('Organisation')->create({
   name => 'Shinra Electric Power Company',
   street_name => 'Sector 0, Midgar, Eastern Continent',
   town => 'Gaia',
+  sector => 'A',
   postcode => 'WC1E 6AD',
 });
 
@@ -53,6 +54,7 @@ $t->post_ok('/admin/organisations/valid/1/edit', form => {
   name => 'Shinra Electric Power Company',
   street_name => 'Sector 0, Midgar, Eastern Continent',
   town => 'Gaia',
+  sector => 'A',
   postcode => 'WC1E 6AD',
 })->status_is(200)->content_like(qr/Updated Organisation/);
 
@@ -60,6 +62,7 @@ $t->post_ok('/admin/organisations/valid/1/edit', form => {
 $t->post_ok('/admin/organisations/valid/1/edit', form => {
   name => 'Shinra Electric Power Company',
   street_name => 'Sector 0, Midgar, Eastern Continent',
+  sector => 'A',
   postcode => 'WC1E 6AD',
 })->content_like(qr/The validation has failed/);
 
@@ -83,6 +86,7 @@ $t->post_ok('/admin/organisations/add/submit', form => {
   name => 'Wall Market',
   street_name => 'Slums, Sector 6',
   town => 'Midgar',
+  sector => 'A',
   postcode => 'TN35 5AQ',
 })->status_is(200)->content_like(qr/Added Organisation/);
 

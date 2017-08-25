@@ -58,6 +58,7 @@ my $org = {
   town        => 'Lancaster',
   postcode    => 'LA1 1AA',
   password    => 'abc123',
+  sector      => 'A',
 };
 
 $schema->resultset('AccountToken')->create({ name => $_->{token} })

@@ -56,6 +56,7 @@ my $org = {
   name        => 'Test Org',
   street_name => 'Test Street',
   town        => 'Lancaster',
+  sector      => 'A',
   postcode    => 'LA1 1AA',
   password    => 'abc123',
 };
