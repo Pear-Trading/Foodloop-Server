@@ -5,6 +5,7 @@ use Test::More;
 use File::Temp;
 use Test::Mojo;
 use DateTime::Format::Strptime;
+use DBIx::Class::Fixtures;
 
 has config => sub {
   my $file = File::Temp->new;
@@ -21,29 +22,46 @@ END
   return $file;
 };
 
-has framework => sub {
+has mojo => sub {
   my $self = shift;
 
   $ENV{MOJO_CONFIG} = $self->config->filename;
 
   my $t = Test::Mojo->new('Pear::LocalLoop');
-  my $schema = $t->app->schema;
-  $schema->deploy;
-
-  $schema->resultset('Leaderboard')->populate([
-    [ qw/ name type / ],
-    [ 'Daily Total', 'daily_total' ],
-    [ 'Daily Count', 'daily_count' ],
-    [ 'Weekly Total', 'weekly_total' ],
-    [ 'Weekly Count', 'weekly_count' ],
-    [ 'Monthly Total', 'monthly_total' ],
-    [ 'Monthly Count', 'monthly_count' ],
-    [ 'All Time Total', 'all_time_total' ],
-    [ 'All Time Count', 'all_time_count' ],
-  ]);
+  $t->app->schema->deploy;
 
   return $t;
 };
+
+has _deployed => sub { 0 };
+
+sub framework {
+  my $self = shift;
+  my $no_populate = shift;
+
+  my $t = $self->mojo;
+  my $schema = $t->app->schema;
+
+  unless ( $no_populate || $self->_deployed ) {
+    $schema->resultset('Leaderboard')->populate([
+      [ qw/ name type / ],
+      [ 'Daily Total', 'daily_total' ],
+      [ 'Daily Count', 'daily_count' ],
+      [ 'Weekly Total', 'weekly_total' ],
+      [ 'Weekly Count', 'weekly_count' ],
+      [ 'Monthly Total', 'monthly_total' ],
+      [ 'Monthly Count', 'monthly_count' ],
+      [ 'All Time Total', 'all_time_total' ],
+      [ 'All Time Count', 'all_time_count' ],
+    ]);
+  }
+
+  $self->_deployed(1);
+
+  return $t;
+};
+
+has etc_dir => sub { die "etc dir not set" };
 
 sub dump_error {
   return sub {
@@ -104,6 +122,21 @@ sub gen_upload {
     json => Mojo::JSON::encode_json($args),
     file => $file,
   };
+}
+
+sub install_fixtures {
+  my ( $self, $fixture_name ) = @_;
+
+  my $fixtures = DBIx::Class::Fixtures->new({
+    config_dir => File::Spec->catdir( $self->etc_dir, 'fixtures', 'config'),
+  });
+
+  my $t = $self->framework(1);
+  $fixtures->populate({
+    directory => File::Spec->catdir( $self->etc_dir, 'fixtures', 'data', $fixture_name ),
+    no_deploy => 1,
+    schema => $t->app->schema,
+  });
 }
 
 1;
