@@ -86,7 +86,7 @@ sub post_login {
       } elsif ( defined $user_result->organisation_id ) {
         $display_name = $user_result->organisation->name;
       } else {
-        return undef;
+        return;
       }
 
       return $c->render( json => {
