@@ -79,20 +79,12 @@ sub post_login {
   if ( defined $user_result ) {
     if ( $user_result->check_password($password) ) {
       my $session_key = $user_result->generate_session;
-      my $display_name;
-
-      if ( defined $user_result->customer_id ) {
-        $display_name = $user_result->customer->display_name;
-      } elsif ( defined $user_result->organisation_id ) {
-        $display_name = $user_result->organisation->name;
-      } else {
-        return;
-      }
 
       return $c->render( json => {
         success => Mojo::JSON->true,
         session_key => $session_key,
-        display_name => $display_name,
+        display_name => $user_result->name,
+        user_type => $user_result->type,
       });
     }
   }
