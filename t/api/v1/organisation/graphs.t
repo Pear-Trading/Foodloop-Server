@@ -37,7 +37,6 @@ my $session_key = $framework->login({
   email => 'org@example.com',
   password => 'abc123',
 });
-use Devel::Dwarn;
 
 $t->post_ok('/api/v1/organisation/graphs' => json => {
     session_key => $session_key,
