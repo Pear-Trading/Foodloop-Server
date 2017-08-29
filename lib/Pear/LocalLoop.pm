@@ -155,6 +155,12 @@ sub startup {
   $api->post('/stats')->to('api-stats#post_index');
   $api->post('/stats/leaderboard')->to('api-stats#post_leaderboards');
 
+  my $api_v1 = $api->under('/v1');
+
+  my $api_v1_org = $api_v1->under('/organisation')->to('api-v1-organisation#auth');
+
+  $api_v1_org->post('/graphs')->to('api-v1-organisation-graphs#index');
+
   my $admin_routes = $r->under('/admin')->to('admin#under');
 
   $admin_routes->get('/home')->to('admin#home');

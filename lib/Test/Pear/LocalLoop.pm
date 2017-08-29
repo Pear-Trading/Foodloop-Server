@@ -109,6 +109,16 @@ sub login {
   return $self->framework->tx->res->json->{session_key};
 }
 
+sub logout {
+  my $self = shift;
+  my $session_key = shift;
+
+  $self->framework->post_ok('/api/logout' => json => { session_key => $session_key })
+    ->status_is(200)
+    ->json_is('/success', Mojo::JSON->true)
+    ->json_like('/message', qr/Logged Out/);
+}
+
 sub gen_upload {
   my ( $self, $args ) = @_;
 
