@@ -1,0 +1,21 @@
+<option value=''>Select Organisation Sector</option>
+<option value='A'<%= $selected_sector eq 'A' ? ' selected' : '' %>>Agriculture, Forestry & Fishing</option>
+<option value='B'<%= $selected_sector eq 'B' ? ' selected' : '' %>>Mining & Quarrying</option>
+<option value='C'<%= $selected_sector eq 'C' ? ' selected' : '' %>>Manufacturing</option>
+<option value='D'<%= $selected_sector eq 'D' ? ' selected' : '' %>>Electricity, Gas, Steam & Air Conditioning</option>
+<option value='E'<%= $selected_sector eq 'E' ? ' selected' : '' %>>Water & Waste Management</option>
+<option value='F'<%= $selected_sector eq 'F' ? ' selected' : '' %>>Construction</option>
+<option value='G'<%= $selected_sector eq 'G' ? ' selected' : '' %>>Wholesale & Retail Trade</option>
+<option value='H'<%= $selected_sector eq 'H' ? ' selected' : '' %>>Transportation & Storage</option>
+<option value='I'<%= $selected_sector eq 'I' ? ' selected' : '' %>>Accomodation & Food Services</option>
+<option value='J'<%= $selected_sector eq 'J' ? ' selected' : '' %>>Information & Communication</option>
+<option value='K'<%= $selected_sector eq 'K' ? ' selected' : '' %>>Financial & Insurance Activities</option>
+<option value='L'<%= $selected_sector eq 'L' ? ' selected' : '' %>>Real Estate</option>
+<option value='M'<%= $selected_sector eq 'M' ? ' selected' : '' %>>Professional, Scientfic & Technical</option>
+<option value='N'<%= $selected_sector eq 'N' ? ' selected' : '' %>>Administrative & Support Services</option>
+<option value='O'<%= $selected_sector eq 'O' ? ' selected' : '' %>>Public Administration, Defence & Social Security</option>
+<option value='P'<%= $selected_sector eq 'P' ? ' selected' : '' %>>Education</option>
+<option value='Q'<%= $selected_sector eq 'Q' ? ' selected' : '' %>>Human Health & Social Work</option>
+<option value='R'<%= $selected_sector eq 'R' ? ' selected' : '' %>>Arts, Entertainment & Recreation</option>
+<option value='S'<%= $selected_sector eq 'S' ? ' selected' : '' %>>Other Service Activities</option>
+<option value='T'<%= $selected_sector eq 'T' ? ' selected' : '' %>>Household Domestic Business</option>
