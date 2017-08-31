@@ -1,122 +1,46 @@
 use Mojo::Base -strict;
 
+use FindBin qw/ $Bin /;
+
 use Test::More;
 use Mojo::JSON;
 use Test::Pear::LocalLoop;
 
-my $framework = Test::Pear::LocalLoop->new;
+my $framework = Test::Pear::LocalLoop->new(
+  etc_dir => "$Bin/../etc",
+);
+$framework->install_fixtures('search');
+
 my $t = $framework->framework;
 my $schema = $t->app->schema;
-my $dump_error = sub { diag $t->tx->res->to_string };
 
-my @account_tokens = ('a', 'b');
-$schema->resultset('AccountToken')->populate([
-  [ qw/ name / ],
-  map { [ $_ ] } @account_tokens,
-]);
+#Login as customer
+my $session_key = $framework->login({
+  'email' => 'test1@example.com',
+  'password' => 'abc123',
+});
 
-$schema->resultset('Organisation')->populate([
-  [ qw/ name street_name town postcode / ],
-  [ "Avanti Bar & Restaurant", "57 Main St", "Kirkby Lonsdale", "LA6 2AH" ],
-  [ "Full House Noodle Bar", "21 Common Garden St", "Lancaster", "LA1 1XD" ],
-  [ "The Quay's Fishbar", "1 Adcliffe Rd", "Lancaster", "LA1 1SS" ],
-  [ "Dan's Fishop", "56 North Rd", "Lancaster", "LA1 1LT" ],
-  [ "Hodgeson's Chippy", "96 Prospect St", "Lancaster", "LA1 3BH" ],
-]);
+my $json;
+my $upload;
 
-#test with a customer.
-print "test 1 - Create customer user account (Rufus)\n";
-my $emailRufus = 'rufus@shinra.energy';
-my $passwordRufus = 'MakoGold';
-my $testJson = {
-  'usertype' => 'customer',
-  'token' => shift(@account_tokens),
-  'full_name' =>  'RufusShinra',
-  'display_name' =>  'RufusShinra',
-  'email' => $emailRufus,
-  'postcode' => 'RG26 5NU',
-  'password' => $passwordRufus,
-  'year_of_birth' => 2006
-};
-$t->post_ok('/api/register' => json => $testJson)
-  ->status_is(200)->or($framework->dump_error)
-  ->json_is('/success', Mojo::JSON->true);
-
-#test with an organisation.
-print "test 2 - Create organisation user account (Choco Billy)\n";
-my $emailBilly = 'choco.billy@chocofarm.org';
-my $passwordBilly = 'Choco';
-$testJson = {
-  'usertype' => 'organisation',
-  'token' => shift(@account_tokens),
-  'name' =>  'ChocoBillysGreens',
-  'email' => $emailBilly,
-  'postcode' => 'LA1 1HT',
-  'password' => $passwordBilly,
-  'street_name' => 'Market St',
-  'town' => 'Lancaster',
-  'sector' => 'A',
-};
-$t->post_ok('/api/register' => json => $testJson)
+$t->post_ok( '/api/upload', form => {
+    json => Mojo::JSON::encode_json({
+      transaction_value => 10,
+      transaction_type => 3,
+      organisation_name => 'Shoreway Fisheries',
+      street_name => "2 James St",
+      town => "Lancaster",
+      postcode => "LA1 1UP",
+      purchase_time => "2017-08-14T11:29:07.965+01:00",
+      session_key => $session_key,
+    }),
+    file => { file => './t/test.jpg' },
+  })
   ->status_is(200)
+  ->or($framework->dump_error)
   ->json_is('/success', Mojo::JSON->true);
 
-my $session_key;
-
-sub login_rufus {
-  $testJson = {
-    'email' => $emailRufus,
-    'password' => $passwordRufus,
-  };
-  $t->post_ok('/api/login' => json => $testJson)
-    ->status_is(200)
-    ->json_is('/success', Mojo::JSON->true);
-  $session_key = $t->tx->res->json('/session_key');
-};
-
-sub login_billy {
-  $testJson = {
-    'email' => $emailBilly,
-    'password' => $passwordBilly,
-  };
-  $t->post_ok('/api/login' => json => $testJson)
-    ->status_is(200)
-    ->json_is('/success', Mojo::JSON->true);
-  $session_key = $t->tx->res->json('/session_key');
-};
-
-sub log_out{
-  $t->post_ok('/api/logout', json => { session_key => $session_key })
-    ->status_is(200)
-    ->json_is('/success', Mojo::JSON->true);
-}
-
-
-######################################################
-
-#Login as Rufus (customer)
-
-print "test 3 - Login - Rufus (cookies, customer)\n";
-login_rufus();
-
-print "test 4 - Added something containing 'fish'\n";
-my $json = {
-  transaction_value => 10,
-  transaction_type => 3,
-  organisation_name => 'Shoreway Fisheries',
-  street_name => "2 James St",
-  town => "Lancaster",
-  postcode => "LA1 1UP",
-  purchase_time => "2017-08-14T11:29:07.965+01:00",
-  session_key => $session_key,
-};
-my $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
-$t->post_ok('/api/upload' => form => $upload )
-  ->status_is(200)
-  ->json_is('/success', Mojo::JSON->true);
-
-print "test 5 - Logout Rufus \n";
-log_out();
+$framework->logout( $session_key );
 
 #End of Rufus (customer)
 
@@ -125,7 +49,10 @@ log_out();
 #Login as Choco billy (organisation)
 
 print "test 6 - Login - Choco billy (cookies, organisation)\n";
-login_billy();
+$session_key = $framework->login({
+  'email' => 'org@example.com',
+  'password' => 'abc123',
+});
 
 print "test 7 - Added something containing 'bar'\n";
 $json = {
@@ -160,16 +87,12 @@ $t->post_ok('/api/upload' => form => $upload )
   ->json_is('/success', Mojo::JSON->true);
 
 print "test 9 - Logout Choco billy \n";
-log_out();
+$framework->logout( $session_key );
 
-#End of Choco billy (organisation)
-
-######################################################
-
-#Login as Rufus (customer)
-
-print "test 10 - Login - Rufus (cookies, customer)\n";
-login_rufus();
+$session_key = $framework->login({
+  'email' => 'test1@example.com',
+  'password' => 'abc123',
+});
 
 sub check_vars{
   my ($searchTerm, $numValidated, $numUnvalidated) = @_;
@@ -179,6 +102,7 @@ sub check_vars{
       session_key => $session_key,
     })
     ->status_is(200)
+    ->or($framework->dump_error)
     ->json_is('/success', Mojo::JSON->true)
     ->json_has("unvalidated")
     ->json_has("validated");
@@ -196,7 +120,7 @@ sub check_vars{
 };
 
 print "test 11 - search blank\n";
-check_vars(" ", 5, 1);
+check_vars(" ", 6, 1);
 
 print "test 12 - Testing expected values with 'booths'\n";
 #Expect 0 validated and 0 unvalidated with "booths".
@@ -215,7 +139,7 @@ print "test 15 - Testing expected values with 'bar'\n";
 check_vars("bar", 3, 0);
 
 print "test 16 - Logout Rufus \n";
-log_out();
+$framework->logout( $session_key );
 
 #End of Rufus (customer)
 
@@ -224,7 +148,10 @@ log_out();
 #Login as Choco billy (organisation)
 
 print "test 17 - Login - Choco billy (cookies, organisation)\n";
-login_billy();
+$session_key = $framework->login({
+  'email' => 'org@example.com',
+  'password' => 'abc123',
+});
 
 print "test 18 - Testing expected values with 'booths'\n";
 #Expect 0 validated and 0 unvalidated with "booths".
@@ -243,7 +170,6 @@ print "test 21 - Testing expected values with 'bar', with two unvalidated organi
 check_vars("bar", 3, 2);
 
 print "test 22 - Logout Choco billy \n";
-log_out();
-
+$framework->logout( $session_key );
 
 done_testing();
