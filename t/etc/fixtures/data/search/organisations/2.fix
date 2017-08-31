@@ -1,0 +1,16 @@
+$HASH1 = {
+           country => undef,
+           entity_id
+                   => 7,
+           id      => 2,
+           name    => 'Avanti Bar & Restaurant',
+           pending => 0,
+           postcode
+                   => 'LA6 2AH',
+           sector  => 'I',
+           street_name
+                   => '57 Main St',
+           submitted_by_id
+                   => undef,
+           town    => 'Kirkby Lonsdale'
+         };
