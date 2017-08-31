@@ -1,26 +1,17 @@
 use Mojo::Base -strict;
 
+use FindBin qw/ $Bin /;
+
 use Test::More;
-use Mojo::JSON;
 use Test::Pear::LocalLoop;
 
-my $framework = Test::Pear::LocalLoop->new;
+my $framework = Test::Pear::LocalLoop->new(
+  etc_dir => "$Bin/../etc",
+);
+$framework->install_fixtures('users');
+
 my $t = $framework->framework;
 my $schema = $t->app->schema;
-
-$schema->resultset('User')->create({
-  email => 'admin@example.com',
-  password => 'abc123',
-  administrator => {},
-});
-
-$schema->resultset('User')->create({
-  email => 'user@example.com',
-  password => 'abc123',
-});
-
-is $schema->resultset('User')->count, 2, 'Users Created';
-is $schema->resultset('Administrator')->count, 1, 'Admin Created';
 
 my $location_is = sub {
   my ($t, $value, $desc) = @_;
@@ -34,7 +25,7 @@ $t->get_ok('/admin')
 
 $t->ua->max_redirects(10);
 $t->post_ok('/admin', form => {
-  email => 'user@example.com',
+  email => 'test1@example.com',
   password => 'abc123',
 })->status_is(200);
 

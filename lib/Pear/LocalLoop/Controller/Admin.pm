@@ -5,10 +5,10 @@ sub under {
   my $c = shift;
 
   if ( $c->is_user_authenticated ) {
-    return 1 if defined $c->current_user->administrator;
+    return 1 if $c->current_user->is_admin;
   }
   $c->redirect_to('/');
-  return undef;
+  return 0;
 }
 
 sub home {
@@ -16,8 +16,8 @@ sub home {
 
   my $user_rs = $c->schema->resultset('User');
   my $token_rs = $c->schema->resultset('AccountToken');
-  my $pending_orgs_rs = $c->schema->resultset('PendingOrganisation');
-  my $pending_transaction_rs = $c->schema->resultset('PendingTransaction');
+  my $pending_orgs_rs = $c->schema->resultset('Organisation')->search({ pending => 1 });
+  my $pending_transaction_rs = $pending_orgs_rs->entity->sales;
   $c->stash(
     user_count => $user_rs->count,
     tokens => {
