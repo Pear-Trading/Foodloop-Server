@@ -40,7 +40,7 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key("id");
 
-__PACKAGE__->add_unique_constraint([qw/ user_id set_id /]);
+__PACKAGE__->add_unique_constraint([qw/ entity_id set_id /]);
 
 __PACKAGE__->belongs_to(
   "set",
