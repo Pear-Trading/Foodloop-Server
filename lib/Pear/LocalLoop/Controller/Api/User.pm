@@ -65,12 +65,12 @@ sub post_account {
     my $postcode;
 
     #Needs elsif added for trader page for this similar relevant entry
-    if ( defined $user_result->customer_id ) {
-      $full_name = $user_result->customer->full_name;
-      $display_name = $user_result->customer->display_name;
-      $postcode = $user_result->customer->postcode;
-    } elsif ( defined $user_result->organisation_id ) {
-      $display_name = $user_result->organisation->name;
+    if ( $user_result->type eq 'customer' ) {
+      $full_name = $user_result->entity->customer->full_name;
+      $display_name = $user_result->entity->customer->display_name;
+      $postcode = $user_result->entity->customer->postcode;
+    } elsif ( $user_result->type eq 'organisation' ) {
+      $display_name = $user_result->entity->organisation->name;
     } else {
       return;
     }
@@ -121,10 +121,10 @@ sub post_account_update {
   $validation->required('postcode')->postcode;
   $validation->optional('new_password');
 
-  if ( defined $user->customer_id ) {
+  if ( $user->type eq 'customer' ) {
     $validation->required('display_name');
     $validation->required('full_name');
-  } elsif ( defined $user->organisation_id ) {
+  } elsif ( $user->type eq 'organisation' ) {
     $validation->required('name');
     $validation->required('street_name');
     $validation->required('town');
@@ -133,10 +133,10 @@ sub post_account_update {
 
   return $c->api_validation_error if $validation->has_error;
 
-  if ( defined $user->customer_id ){
+  if ( $user->type eq 'customer' ){
 
     $c->schema->txn_do( sub {
-      $user->customer->update({
+      $user->entity->customer->update({
         full_name     => $validation->param('full_name'),
         display_name  => $validation->param('display_name'),
         postcode      => $validation->param('postcode'),
@@ -148,10 +148,10 @@ sub post_account_update {
     });
 
   }
-  elsif ( defined $user->organisation_id ) {
+  elsif ( $user->type eq 'organisation' ) {
 
     $c->schema->txn_do( sub {
-      $user->organisation->update({
+      $user->entity->organisation->update({
         name        => $validation->param('name'),
         street_name => $validation->param('street_name'),
         town        => $validation->param('town'),
