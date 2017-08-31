@@ -96,7 +96,7 @@ my $entity5 = {
     email    => 'org@example.com',
     password => 'abc123',
   },
-  type => "customer",
+  type => "organisation",
 };
 
 my $entity6 = {
