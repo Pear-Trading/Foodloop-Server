@@ -56,7 +56,7 @@ sub graph_customers_last_30_days {
 sub _customers_last_duration {
   my ( $c, $duration ) = @_;
 
-  my $org = $c->stash->{api_user}->organisation;
+  my $org = $c->stash->{api_user}->entity;
 
   my $data = { day => [], count => [] };
 
