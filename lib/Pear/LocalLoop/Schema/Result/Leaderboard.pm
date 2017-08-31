@@ -67,8 +67,8 @@ sub create_new {
 
 sub _get_customer_rs {
   my $self = shift;
-  return $self->result_source->schema->resultset('User')->search({
-    organisation_id => undef,
+  return $self->result_source->schema->resultset('Entity')->search({
+    type => 'customer',
   });
 }
 
@@ -93,7 +93,7 @@ sub _set_position_and_trend {
     my $previous_value;
 
     if ( defined $previous_board ) {
-      $previous_value = $previous_board->find({ user_id => $lb_val->{user_id} });
+      $previous_value = $previous_board->find({ entity_id => $lb_val->{entity_id} });
     }
 
     my $trend;
@@ -122,12 +122,12 @@ sub _create_total_set {
   my @leaderboard;
 
   while ( my $user_result = $user_rs->next ) {
-    my $transaction_rs = $user_result->transactions->search_between( $start, $end );
+    my $transaction_rs = $user_result->purchases->search_between( $start, $end );
 
     my $transaction_sum = $transaction_rs->get_column('value')->sum;
 
     push @leaderboard, {
-      user_id => $user_result->id,
+      entity_id => $user_result->id,
       value => $transaction_sum || 0,
     };
   }
@@ -153,12 +153,12 @@ sub _create_count_set {
   my @leaderboard;
 
   while ( my $user_result = $user_rs->next ) {
-    my $transaction_rs = $user_result->transactions->search_between( $start, $end );
+    my $transaction_rs = $user_result->purchases->search_between( $start, $end );
 
     my $transaction_count = $transaction_rs->count;
 
     push @leaderboard, {
-      user_id => $user_result->id,
+      entity_id => $user_result->id,
       value => $transaction_count || 0,
     };
   }
@@ -184,12 +184,12 @@ sub _create_total_all_time {
   my @leaderboard;
 
   while ( my $user_result = $user_rs->next ) {
-    my $transaction_rs = $user_result->transactions->search_before( $end );
+    my $transaction_rs = $user_result->purchases->search_before( $end );
 
     my $transaction_sum = $transaction_rs->get_column('value')->sum;
 
     push @leaderboard, {
-      user_id => $user_result->id,
+      entity_id => $user_result->id,
       value => $transaction_sum || 0,
     };
   }
@@ -215,12 +215,12 @@ sub _create_count_all_time {
   my @leaderboard;
 
   while ( my $user_result = $user_rs->next ) {
-    my $transaction_rs = $user_result->transactions->search_before( $end );
+    my $transaction_rs = $user_result->purchases->search_before( $end );
 
     my $transaction_count = $transaction_rs->count;
 
     push @leaderboard, {
-      user_id => $user_result->id,
+      entity_id => $user_result->id,
       value => $transaction_count || 0,
     };
   }
