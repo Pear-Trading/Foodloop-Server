@@ -1,5 +1,6 @@
 $HASH1 = {
            display_name  => 'Test User3',
+           entity_id     => 3,
            full_name     => 'Test User3',
            id            => 3,
            postcode      => 'LA1 1AA',

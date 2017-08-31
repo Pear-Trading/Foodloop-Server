@@ -1,11 +1,8 @@
 $HASH1 = {
-           customer_id
-                    => 4,
-           email    => 'test4@example.com',
-           id       => 4,
-           join_date
-                    => '2017-08-25 15:36:11',
-           organisation_id
-                    => undef,
-           password => '$2a$08$svjdm.Syn3f062pDIN3/ROTUU7W16n0zJFm9/sm3x7pfbMLZFV.5G'
+           email     => 'test4@example.com',
+           entity_id => 4,
+           id        => 4,
+           is_admin  => 0,
+           join_date => '2017-08-31 12:17:25',
+           password  => '$2a$08$fkkTUYA9zvt32iBbN7aOcOnmiHzOkbMEjN31PB9CsitGrE.KF7cAG'
          };
