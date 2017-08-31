@@ -22,7 +22,7 @@
       <li class="list-group-item"><input id="town" type="text" class="form-control" placeholder="Town" name="town" value="<%= $valid_org->town %>"></li>
       <li class="list-group-item">
         <select class="form-control" name="sector">
-        %= include 'partials/sector_options', selected_sector => $valid_org->sector;
+        %= include 'partials/sector_options', selected_sector => $valid_org->sector || '';
         </select>
       </li>
       <li class="list-group-item"><input id="postcode" type="text" class="form-control" placeholder="Postcode" name="postcode" value="<%= $valid_org->postcode %>"></li>
