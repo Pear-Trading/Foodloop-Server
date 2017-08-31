@@ -149,8 +149,17 @@ sub name {
   } elsif ( defined $self->organisation_id ) {
     return $self->organisation->name;
   } else {
-    return undef;
+    return;
   }
+}
+
+sub type {
+  my $self = shift;
+
+  if ( defined $self->customer_id ) {
+    return "customer";
+  }
+  return "organisation";
 }
 
 1;

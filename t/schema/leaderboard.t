@@ -58,6 +58,7 @@ my $org = {
   town        => 'Lancaster',
   postcode    => 'LA1 1AA',
   password    => 'abc123',
+  sector      => 'A',
 };
 
 $schema->resultset('AccountToken')->create({ name => $_->{token} })
@@ -215,10 +216,10 @@ test_leaderboard(
   'all_time_total',
   $now,
   [
-    { user_id => 4, value => 980 },
-    { user_id => 3, value => 940 },
-    { user_id => 2, value => 900 },
-    { user_id => 1, value => 860 },
+    { user_id => 4, value => 885 },
+    { user_id => 3, value => 855 },
+    { user_id => 2, value => 825 },
+    { user_id => 1, value => 795 },
   ]
 );
 
@@ -227,10 +228,10 @@ test_leaderboard(
   'all_time_count',
   $now,
   [
-    { user_id => 1, value => 40 },
-    { user_id => 2, value => 40 },
-    { user_id => 3, value => 40 },
-    { user_id => 4, value => 40 },
+    { user_id => 1, value => 30 },
+    { user_id => 2, value => 30 },
+    { user_id => 3, value => 30 },
+    { user_id => 4, value => 30 },
   ]
 );
 

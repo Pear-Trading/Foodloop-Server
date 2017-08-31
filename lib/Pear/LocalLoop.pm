@@ -50,7 +50,7 @@ sub startup {
             return $user->id;
         }
       }
-      return undef;
+      return;
     },
   });
 
@@ -155,6 +155,12 @@ sub startup {
   $api->post('/stats')->to('api-stats#post_index');
   $api->post('/stats/leaderboard')->to('api-stats#post_leaderboards');
 
+  my $api_v1 = $api->under('/v1');
+
+  my $api_v1_org = $api_v1->under('/organisation')->to('api-v1-organisation#auth');
+
+  $api_v1_org->post('/graphs')->to('api-v1-organisation-graphs#index');
+
   my $admin_routes = $r->under('/admin')->to('admin#under');
 
   $admin_routes->get('/home')->to('admin#home');
@@ -169,10 +175,15 @@ sub startup {
   $admin_routes->get('/users/:id')->to('admin-users#read');
   $admin_routes->post('/users/:id')->to('admin-users#update');
   $admin_routes->post('/users/:id/delete')->to('admin-users#delete');
+  $admin_routes->post('/users/:id/edit')->to('admin-users#edit');
 
   $admin_routes->get('/organisations')->to('admin-organisations#list');
+  $admin_routes->get('/organisations/add')->to('admin-organisations#add_org');
+  $admin_routes->post('/organisations/add/submit')->to('admin-organisations#add_org_submit');
   $admin_routes->get('/organisations/valid/:id')->to('admin-organisations#valid_read');
+  $admin_routes->post('/organisations/valid/:id/edit')->to('admin-organisations#valid_edit');
   $admin_routes->get('/organisations/pending/:id')->to('admin-organisations#pending_read');
+  $admin_routes->post('/organisations/pending/:id/edit')->to('admin-organisations#pending_edit');
   $admin_routes->get('/organisations/pending/:id/approve')->to('admin-organisations#pending_approve');
 
   $admin_routes->get('/feedback')->to('admin-feedback#index');

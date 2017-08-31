@@ -34,6 +34,11 @@ __PACKAGE__->add_columns(
     size => 16,
     is_nullable => 1,
   },
+  sector => {
+    data_type => "varchar",
+    size => 1,
+    is_nullable => 1,
+  },
 );
 
 __PACKAGE__->set_primary_key('id');

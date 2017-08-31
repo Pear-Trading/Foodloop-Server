@@ -93,7 +93,7 @@ sub post_upload {
   my $validation = $c->validation;
 
   # Test for file before loading the JSON in to the validator
-  $validation->required('file')->upload->filetype('image/jpeg');
+  $validation->optional('file')->upload->filetype('image/jpeg');
 
   $validation->input( $c->stash->{api_json} );
 
@@ -162,14 +162,14 @@ sub post_upload {
   my $upload = $validation->param('file');
   my $purchase_time = $c->parse_iso_datetime($validation->param('purchase_time') || '');
   $purchase_time ||= DateTime->now();
-  my $file = $c->store_file_from_upload( $upload );
+  my $file = defined $upload ? $c->store_file_from_upload( $upload ) : undef;
 
   my $new_transaction = $organisation->create_related(
     'transactions',
     {
       buyer => $user,
       value => $transaction_value,
-      proof_image => $file,
+      ( defined $file ? ( proof_image => $file ) : ( proof_image => 'a' ) ),
       purchase_time => $c->format_db_datetime($purchase_time),
     }
   );

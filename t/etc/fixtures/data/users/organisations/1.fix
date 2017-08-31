@@ -1,0 +1,10 @@
+$HASH1 = {
+           id     => 1,
+           name   => 'Test Org',
+           postcode
+                  => 'LA1 1AA',
+           sector => undef,
+           street_name
+                  => 'Test Street',
+           town   => 'Lancaster'
+         };

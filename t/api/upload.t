@@ -81,6 +81,7 @@ $testJson = {
   'password' => $passwordBilly,
   'street_name' => 'Chocobo Farm, Eastern Continent',
   'town' => 'Gaia',
+  'sector' => 'A',
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)
@@ -201,9 +202,10 @@ $json = {
 };
 $upload = {json => Mojo::JSON::encode_json($json)};
 $t->post_ok('/api/upload' => form => $upload )
-  ->status_is(400)
-  ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/no file uploaded/i);
+->status_is(200)
+->json_is('/success', Mojo::JSON->true)
+->json_like('/message', qr/Upload Successful/);
+is $schema->resultset('Transaction')->count, 1, "1 transaction";
 
 print "test 13 - organisation_id missing (type 1: already validated)\n";
 $json = {
@@ -234,7 +236,7 @@ $t->post_ok('/api/upload' => form => $upload )
   ->content_like(qr/organisation_id does not exist in the database/i);
 
 print "test 15 - valid addition. (type 1: already validated)\n";
-is $schema->resultset('Transaction')->count, 0, "no transactions";
+is $schema->resultset('Transaction')->count, 1, "1 transaction";
 $json = {
   transaction_value => 10,
   transaction_type => 1,
@@ -247,7 +249,7 @@ $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_like('/message', qr/Upload Successful/);
-is $schema->resultset('Transaction')->count, 1, "1 transaction";
+is $schema->resultset('Transaction')->count, 2, "2 transaction";
 
 # Add type 3 (new organisation) checking.
 
@@ -444,7 +446,7 @@ $t->post_ok('/api/login' => json => $testJson)
 $session_key = $t->tx->res->json('/session_key');
 
 print "test 30 - organisation buy from another organisation\n";
-is $schema->resultset('Transaction')->count, 1, "1 transaction";
+is $schema->resultset('Transaction')->count, 2, "2 transaction";
 $json = {
   transaction_value => 100000,
   transaction_type => 1,
@@ -457,6 +459,6 @@ $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_like('/message', qr/Upload Successful/);
-is $schema->resultset('Transaction')->count, 2, "2 transaction";
+is $schema->resultset('Transaction')->count, 3, "3 transaction";
 
 done_testing();

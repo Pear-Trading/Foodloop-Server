@@ -55,6 +55,7 @@ $testJson = {
   'password' => $passwordBilly,
   'street_name' => 'Market St',
   'town' => 'Lancaster',
+  'sector' => 'A',
 };
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(200)

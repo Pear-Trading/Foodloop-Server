@@ -1,0 +1,11 @@
+$HASH1 = {
+           customer_id
+                    => 1,
+           email    => 'test1@example.com',
+           id       => 1,
+           join_date
+                    => '2017-08-25 15:36:11',
+           organisation_id
+                    => undef,
+           password => '$2a$08$yCau6xDkRFZINg80iVvMh.M3JnLq2g.LJ7GMJL5KQvO45pDL.D/Rq'
+         };

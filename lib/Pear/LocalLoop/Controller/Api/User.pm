@@ -72,7 +72,7 @@ sub post_account {
     } elsif ( defined $user_result->organisation_id ) {
       $display_name = $user_result->organisation->name;
     } else {
-      return undef;
+      return;
     }
 
     return $c->render( json => {
@@ -124,10 +124,11 @@ sub post_account_update {
   if ( defined $user->customer_id ) {
     $validation->required('display_name');
     $validation->required('full_name');
-  } elsif ( defined $user->customer_id ) {
+  } elsif ( defined $user->organisation_id ) {
     $validation->required('name');
     $validation->required('street_name');
     $validation->required('town');
+    $validation->required('sector');
   }
 
   return $c->api_validation_error if $validation->has_error;
@@ -148,13 +149,13 @@ sub post_account_update {
 
   }
   elsif ( defined $user->organisation_id ) {
-    my $fullAddress = $validation->param('fulladdress');
 
     $c->schema->txn_do( sub {
       $user->organisation->update({
         name        => $validation->param('name'),
         street_name => $validation->param('street_name'),
         town        => $validation->param('town'),
+        sector      => $validation->param('sector'),
         postcode    => $validation->param('postcode'),
       });
       $user->update({

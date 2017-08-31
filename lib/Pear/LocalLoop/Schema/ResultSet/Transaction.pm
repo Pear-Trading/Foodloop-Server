@@ -21,6 +21,15 @@ sub search_between {
   });
 }
 
+sub search_before {
+  my ( $self, $date ) = @_;
+
+  my $dtf = $self->result_source->schema->storage->datetime_parser;
+  return $self->search({
+    purchase_time => { '<' => $dtf->format_datetime( $date ) },
+  });
+}
+
 sub today_rs {
   my ( $self ) = @_;
 
