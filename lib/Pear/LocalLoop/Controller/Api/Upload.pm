@@ -112,7 +112,7 @@ sub post_upload {
 
   if ( $type == 1 ) {
     # Validated Organisation
-    my $valid_org_rs = $c->schema->resultset('Organisation');
+    my $valid_org_rs = $c->schema->resultset('Organisation')->search({ pending => 0 });
     $validation->required('organisation_id')->number->in_resultset( 'id', $valid_org_rs );
 
     return $c->api_validation_error if $validation->has_error;
@@ -121,7 +121,7 @@ sub post_upload {
 
   } elsif ( $type == 2 ) {
     # Unvalidated Organisation
-    my $valid_org_rs = $c->schema->resultset('PendingOrganisation')->search({ submitted_by_id => $user->id });
+    my $valid_org_rs = $c->schema->resultset('Organisation')->search({ submitted_by_id => $user->id, pending => 1 });
     $validation->required('organisation_id')->number->in_resultset( 'id', $valid_org_rs );
 
     return $c->api_validation_error if $validation->has_error;

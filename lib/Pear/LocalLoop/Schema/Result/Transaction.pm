@@ -35,7 +35,7 @@ __PACKAGE__->add_columns(
   },
   "proof_image" => {
     data_type => "text",
-    is_nullable => 0,
+    is_nullable => 1,
   },
   "submitted_at" => {
     data_type => "datetime",
