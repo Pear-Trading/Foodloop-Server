@@ -21,7 +21,11 @@
       <li class="list-group-item"><input id="name" type="text" class="form-control" placeholder="Organisation Name" name="name"></li>
       <li class="list-group-item"><input id="street_name" type="text" class="form-control" placeholder="Street Name" name="street_name"></li>
       <li class="list-group-item"><input id="town" type="text" class="form-control" placeholder="Town" name="town"></li>
-      <li class="list-group-item"><input id="sector" type="text" class="form-control" placeholder="Sector Area Code" name="sector"></li>
+      <li class="list-group-item">
+        <select class="form-control" name="sector">
+        %= include 'partials/sector_options', selected_sector => '';
+        </select>
+      </li>
       <li class="list-group-item"><input id="postcode" type="text" class="form-control" placeholder="Postcode" name="postcode"></li>
       <li class="list-group-item"><button class="btn btn-success" type="submit">Add Organisation</button></li>
     </form>
