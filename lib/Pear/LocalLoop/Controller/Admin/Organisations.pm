@@ -65,6 +65,7 @@ sub valid_read {
     undef, {
       page => $c->param('page') || 1,
       rows => 10,
+      order_by => { -desc => 'submitted_at' },
     },
   );
   $c->stash(
