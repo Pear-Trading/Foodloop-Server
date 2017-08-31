@@ -175,7 +175,6 @@ sub startup {
   $admin_routes->get('/users/:id')->to('admin-users#read');
   $admin_routes->post('/users/:id')->to('admin-users#update');
   $admin_routes->post('/users/:id/delete')->to('admin-users#delete');
-  $admin_routes->post('/users/:id/edit')->to('admin-users#edit');
 
   $admin_routes->get('/organisations')->to('admin-organisations#list');
   $admin_routes->get('/organisations/add')->to('admin-organisations#add_org');
