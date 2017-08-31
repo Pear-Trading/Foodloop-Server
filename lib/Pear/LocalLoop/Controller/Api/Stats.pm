@@ -84,14 +84,14 @@ sub post_leaderboards {
         /,
         { display_name => 'customer.display_name' },
       ],
-      join => { user => 'customer' },
+      join => { entity => 'customer' },
     },
   );
   $today_values->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
 
   my @leaderboard_array = $today_values->all;
 
-  my $current_user_position = $today_values->find({ user_id => $c->stash->{api_user}->id });
+  my $current_user_position = $today_values->find({ entity_id => $c->stash->{api_user}->entity->id });
 
   return $c->render( json => {
     success => Mojo::JSON->true,

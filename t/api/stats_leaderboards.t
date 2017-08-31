@@ -69,22 +69,22 @@ $framework->register_customer($_)
 
 $framework->register_organisation($org);
 
-my $org_result = $schema->resultset('Organisation')->find({ name => $org->{name} });
+my $org_result = $schema->resultset('Organisation')->find({ name => $org->{name} })->entity;
 
 my $tweak = 0;
 
 my $now = DateTime->today();
 
 {
-  my $user_result = $schema->resultset('User')->find({ email => $user1->{email} });
+  my $user_result = $schema->resultset('User')->find({ email => $user1->{email} })->entity;
 
-  $user_result->create_related( 'transactions', {
+  $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
     value => 1,
     proof_image => 'a',
   });
 
-  $user_result->create_related( 'transactions', {
+  $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
     value => 9,
     proof_image => 'a',
@@ -93,15 +93,15 @@ my $now = DateTime->today();
 }
 
 {
-  my $user_result = $schema->resultset('User')->find({ email => $user2->{email} });
+  my $user_result = $schema->resultset('User')->find({ email => $user2->{email} })->entity;
 
-  $user_result->create_related( 'transactions', {
+  $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
     value => 3,
     proof_image => 'a',
   });
 
-  $user_result->create_related( 'transactions', {
+  $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
     value => 1,
     proof_image => 'a',
@@ -110,15 +110,15 @@ my $now = DateTime->today();
 }
 
 {
-  my $user_result = $schema->resultset('User')->find({ email => $user3->{email} });
+  my $user_result = $schema->resultset('User')->find({ email => $user3->{email} })->entity;
 
-  $user_result->create_related( 'transactions', {
+  $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
     value => 5,
     proof_image => 'a',
   });
 
-  $user_result->create_related( 'transactions', {
+  $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
     value => 5,
     proof_image => 'a',
@@ -127,15 +127,15 @@ my $now = DateTime->today();
 }
 
 {
-  my $user_result = $schema->resultset('User')->find({ email => $user4->{email} });
+  my $user_result = $schema->resultset('User')->find({ email => $user4->{email} })->entity;
 
-  $user_result->create_related( 'transactions', {
+  $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
     value => 9,
     proof_image => 'a',
   });
 
-  $user_result->create_related( 'transactions', {
+  $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
     value => 3,
     proof_image => 'a',
