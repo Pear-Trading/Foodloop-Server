@@ -48,7 +48,7 @@ has error_messages => sub {
   };
 };
 
-sub post_register{
+sub post_register {
   my $c = shift;
 
   my $validation = $c->validation;
@@ -87,17 +87,19 @@ sub post_register{
         name => $validation->param('token'),
         used => 0,
       })->update({ used => 1 });
-      # Create customer as a seperate step, so we dont leak data
-      my $customer = $c->schema->resultset('Customer')->create({
-        full_name     => $validation->param('full_name'),
-        display_name  => $validation->param('display_name'),
-        year_of_birth => $validation->param('year_of_birth'),
-        postcode      => $validation->param('postcode'),
-      });
-      $c->schema->resultset('User')->create({
-        customer => $customer,
-        email    => $validation->param('email'),
-        password => $validation->param('password'),
+
+      $c->schema->resultset('Entity')->create({
+        customer => {
+          full_name     => $validation->param('full_name'),
+          display_name  => $validation->param('display_name'),
+          year_of_birth => $validation->param('year_of_birth'),
+          postcode      => $validation->param('postcode'),
+        },
+        user => {
+          email    => $validation->param('email'),
+          password => $validation->param('password'),
+        },
+        type => 'customer',
       });
     });
 
@@ -109,17 +111,19 @@ sub post_register{
         name => $validation->param('token'),
         used => 0,
       })->update({ used => 1 });
-      my $organisation = $c->schema->resultset('Organisation')->create({
-        name        => $validation->param('name'),
-        street_name => $validation->param('street_name'),
-        town        => $validation->param('town'),
-        sector      => $validation->param('sector'),
-        postcode    => $validation->param('postcode'),
-      });
-      $c->schema->resultset('User')->create({
-        organisation => $organisation,
-        email        => $validation->param('email'),
-        password     => $validation->param('password'),
+      $c->schema->resultset('Entity')->create({
+        organisation => {
+          name        => $validation->param('name'),
+          street_name => $validation->param('street_name'),
+          town        => $validation->param('town'),
+          sector      => $validation->param('sector'),
+          postcode    => $validation->param('postcode'),
+        },
+        user => {
+          email        => $validation->param('email'),
+          password     => $validation->param('password'),
+        },
+        type => 'organisation',
       });
     });
   }
