@@ -15,6 +15,11 @@ __PACKAGE__->add_columns(
     is_auto_increment => 1,
     is_nullable => 0,
   },
+  entity_id => {
+    data_type => 'integer',
+    is_nullable => 0,
+    is_foreign_key => 1,
+  },
   name => {
     data_type => 'varchar',
     size => 255,
@@ -34,27 +39,33 @@ __PACKAGE__->add_columns(
     size => 16,
     is_nullable => 1,
   },
+  country => {
+    data_type => 'varchar',
+    size => 255,
+    is_nullable => 1,
+  },
   sector => {
-    data_type => "varchar",
+    data_type => 'varchar',
     size => 1,
+    is_nullable => 1,
+  },
+  pending => {
+    data_type => 'boolean',
+    default_value => \"0",
+    is_nullable => 0,
+  },
+  submitted_by_id => {
+    data_type => 'integer',
     is_nullable => 1,
   },
 );
 
 __PACKAGE__->set_primary_key('id');
 
-__PACKAGE__->has_many(
-  "transactions",
-  "Pear::LocalLoop::Schema::Result::Transaction",
-  { "foreign.seller_id" => 'self.id' },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-__PACKAGE__->might_have(
-  "user",
-  "Pear::LocalLoop::Schema::Result::User",
-  { "foreign.organisation_id" => 'self.id' },
-  { cascade_copy => 0, cascade_delete => 0 },
+__PACKAGE__->belongs_to(
+  "entity",
+  "Pear::LocalLoop::Schema::Result::Entity",
+  "entity_id",
 );
 
 1;
