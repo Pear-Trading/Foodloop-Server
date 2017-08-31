@@ -1,15 +1,16 @@
 use Mojo::Base -strict;
+
+use FindBin qw/ $Bin /;
+
 use Test::More;
-use Test::Mojo;
+use Test::Pear::LocalLoop;
 
-use FindBin;
+my $framework = Test::Pear::LocalLoop->new(
+  etc_dir => "$Bin/etc",
+);
+$framework->install_fixtures('users');
 
-BEGIN {
-  $ENV{MOJO_MODE} = 'testing';
-  $ENV{MOJO_LOG_LEVEL} = 'debug';
-}
-
-my $t = Test::Mojo->new("Pear::LocalLoop");
+my $t = $framework->framework;
 $t->get_ok('/')->status_is(200);
 
 done_testing();
