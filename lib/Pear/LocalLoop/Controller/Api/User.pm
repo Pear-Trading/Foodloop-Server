@@ -60,28 +60,42 @@ sub post_account {
 
   if ( defined $user_result ) {
     my $email = $user_result->email;
-    my $full_name;
-    my $display_name;
-    my $postcode;
 
     #Needs elsif added for trader page for this similar relevant entry
     if ( $user_result->type eq 'customer' ) {
-      $full_name = $user_result->entity->customer->full_name;
-      $display_name = $user_result->entity->customer->display_name;
-      $postcode = $user_result->entity->customer->postcode;
+      my $full_name = $user_result->entity->customer->full_name;
+      my $display_name = $user_result->entity->customer->display_name;
+      my $postcode = $user_result->entity->customer->postcode;
+      return $c->render( json => {
+        success => Mojo::JSON->true,
+        full_name => $full_name,
+        display_name => $display_name,
+        email => $email,
+        postcode => $postcode,
+      });
     } elsif ( $user_result->type eq 'organisation' ) {
-      $display_name = $user_result->entity->organisation->name;
+      my $name = $user_result->entity->organisation->name;
+      my $postcode = $user_result->entity->organisation->postcode;
+      my $street_name = $user_result->entity->organisation->street_name;
+      my $town = $user_result->entity->organisation->town;
+      return $c->render( json => {
+        success => Mojo::JSON->true,
+        town => $town,
+        name => $name,
+        street_name => $street_name,
+        email => $email,
+        postcode => $postcode,
+      });
     } else {
-      return;
+      return $c->render(
+        json => {
+          success => Mojo::JSON->false,
+          message => 'Invalid Server Error.',
+        },
+        status => 500
+      );
     }
 
-    return $c->render( json => {
-      success => Mojo::JSON->true,
-      full_name => $full_name,
-      display_name => $display_name,
-      email => $email,
-      postcode => $postcode,
-    });
   }
   return $c->render(
     json => {
