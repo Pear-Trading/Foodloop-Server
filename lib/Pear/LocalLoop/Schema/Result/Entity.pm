@@ -51,4 +51,16 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+sub name {
+  my $self = shift;
+
+  if ( $self->type eq 'customer' ) {
+    return $self->customer->display_name;
+  } elsif ( $self->type eq 'organisation' ) {
+    return $self->organisation->name;
+  } else {
+    return "Unknown Name";
+  }
+}
+
 1;

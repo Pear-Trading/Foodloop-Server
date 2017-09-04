@@ -6,8 +6,8 @@ use Try::Tiny;
 sub list {
   my $c = shift;
 
-  my $valid_orgs_rs = $c->schema->resultset('Organisation');
-  my $pending_orgs_rs = $c->schema->resultset('PendingOrganisation');
+  my $valid_orgs_rs = $c->schema->resultset('Organisation')->search({ pending => 0 });
+  my $pending_orgs_rs = $c->schema->resultset('Organisation')->search({ pending => 1 });
 
   $c->stash(
     valid_orgs_rs => $valid_orgs_rs,
@@ -85,6 +85,7 @@ sub valid_edit {
   $validation->required('town');
   $validation->optional('sector');
   $validation->required('postcode')->postcode;
+  $validation->optional('pending');
 
   if ( $validation->has_error ) {
     $c->flash( error => 'The validation has failed' );
@@ -101,6 +102,7 @@ sub valid_edit {
         town        => $validation->param('town'),
         sector      => $validation->param('sector'),
         postcode    => $validation->param('postcode'),
+        pending     => defined $validation->param('pending') ? 0 : 1,
       });
     } );
   } finally {
