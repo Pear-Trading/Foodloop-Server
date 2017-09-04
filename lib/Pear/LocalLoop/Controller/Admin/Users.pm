@@ -40,7 +40,7 @@ sub read {
   }
 }
 
-sub edit {
+sub update {
   my $c = shift;
 
   my $id = $c->param('id');
@@ -61,10 +61,10 @@ sub edit {
   $validation->required('postcode')->postcode;
   $validation->optional('new_password');
 
-  if ( defined $user->customer_id ) {
+  if ( $user->type eq 'customer' ) {
     $validation->required('display_name');
     $validation->required('full_name');
-  } elsif ( defined $user->organisation_id ) {
+  } elsif ( $user->type eq 'organisation' ) {
     $validation->required('name');
     $validation->required('street_name');
     $validation->required('town');
@@ -73,15 +73,14 @@ sub edit {
 
   if ( $validation->has_error ) {
     $c->flash( error => 'The validation has failed' );
-    $c->app->log->warn(Dumper $validation);
     return $c->redirect_to( '/admin/users/' . $id );
   }
 
-  if ( defined $user->customer_id ){
+  if ( $user->type eq 'customer' ){
 
     try {
       $c->schema->txn_do( sub {
-        $user->customer->update({
+        $user->entity->customer->update({
           full_name     => $validation->param('full_name'),
           display_name  => $validation->param('display_name'),
           postcode      => $validation->param('postcode'),
@@ -100,11 +99,11 @@ sub edit {
       };
     }
   }
-  elsif ( defined $user->organisation_id ) {
+  elsif ( $user->type eq 'organisation' ) {
 
     try {
       $c->schema->txn_do( sub {
-        $user->organisation->update({
+        $user->entity->organisation->update({
           name        => $validation->param('name'),
           street_name => $validation->param('street_name'),
           town        => $validation->param('town'),
@@ -127,11 +126,6 @@ sub edit {
   };
 
   $c->redirect_to( '/admin/users/' . $id );
-}
-
-sub update {
-  my $c = shift;
-  $c->redirect_to( '/admin/users' );
 }
 
 1;

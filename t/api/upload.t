@@ -20,24 +20,25 @@ $schema->resultset('AccountToken')->populate([
 my $test_purchase_time = "2017-08-14T11:29:07.965+01:00";
 
 #Add one company that we've apparently authenticated but does not have an account.
-my $org_id_shinra = 1;
 
 my $org_rs = $schema->resultset('Organisation');
 
 is $org_rs->count, 0, "No organisations";
-$org_rs->create({
-  id => $org_id_shinra,
+my $shinra_entity = $schema->resultset('Entity')->create_org({
   name => 'Shinra Electric Power Company',
   street_name => 'Sector 0, Midgar, Eastern Continent',
   town => 'Gaia',
   postcode => 'E1 M00',
+  submitted_by_id => 1,
 });
 is $org_rs->count, 1, "1 testing organisation";
 
+my $org_id_shinra = $shinra_entity->organisation->id;
+
 #Valid customer, this also tests that redirects are disabled for register.
 print "test 1 - Create customer user account (Rufus)\n";
-my $emailRufus = 'rufus@shinra.energy';
-my $passwordRufus = 'MakoGold';
+my $emailRufus = 'test1@example.com';
+my $passwordRufus = 'abc123';
 my $testJson = {
   'usertype' => 'customer',
   'token' => shift(@account_tokens),
@@ -203,6 +204,7 @@ $json = {
 $upload = {json => Mojo::JSON::encode_json($json)};
 $t->post_ok('/api/upload' => form => $upload )
 ->status_is(200)
+->or($framework->dump_error)
 ->json_is('/success', Mojo::JSON->true)
 ->json_like('/message', qr/Upload Successful/);
 is $schema->resultset('Transaction')->count, 1, "1 transaction";
@@ -270,8 +272,8 @@ $t->post_ok('/api/upload' => form => $upload )
   ->content_like(qr/organisation_name is missing/i);
 
 print "test 17 - add valid transaction (type 3: new organisation)\n";
-is $schema->resultset('PendingOrganisation')->count, 0, "No pending organisations";
-is $schema->resultset('PendingTransaction')->count, 0, "No pending transactions";
+is $schema->resultset('Organisation')->search({ pending => 1 })->count, 0, "No pending organisations";
+is $schema->resultset('Organisation')->search({ pending => 1 })->entity->sales->count, 0, "No pending transactions";
 
 $json = {
   transaction_value => 10,
@@ -288,8 +290,8 @@ $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_like('/message', qr/Upload Successful/);
-is $schema->resultset('PendingOrganisation')->count, 1, "1 pending organisations";
-is $schema->resultset('PendingTransaction')->count, 1, "1 pending transactions";
+is $schema->resultset('Organisation')->search({ pending => 1 })->count, 1, "1 pending organisations";
+is $schema->resultset('Organisation')->search({ pending => 1 })->entity->sales->count, 1, "1 pending transactions";
 
 # Add type 2 (unverified organisation) checking.
 
@@ -303,6 +305,7 @@ $json = {
 $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
+  ->or($framework->dump_error)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/organisation_id is missing/i);
 
@@ -335,10 +338,10 @@ $t->post_ok('/api/upload' => form => $upload )
   ->content_like(qr/organisation_id does not exist in the database/i);
 
 print "test 21 - purchase_time is missing\n";
-is $schema->resultset('PendingTransaction')->count, 1, "1 pending transactions";
+is $schema->resultset('Organisation')->search({ pending => 1 })->entity->sales->count, 1, "1 pending transactions";
 $json = {
   transaction_value => 10,
-  transaction_type => 2,
+  transaction_type => 1,
   organisation_id => $org_id_shinra,
   session_key => $session_key,
 };
@@ -369,9 +372,9 @@ $t->post_ok('/api/login' => json => $testJson)
 $session_key = $t->tx->res->json('/session_key');
 
 print "test 24 - add valid transaction but for with account (type 2: existing organisation)\n";
-my $org_result = $schema->resultset('PendingOrganisation')->find({ name => '7th Heaven' });
+my $org_result = $schema->resultset('Organisation')->find({ name => '7th Heaven' });
 my $unvalidatedOrganisationId = $org_result->id;
-is $schema->resultset('PendingTransaction')->count, 2, "2 pending transactions";
+is $schema->resultset('Organisation')->search({ pending => 1 })->entity->sales->count, 1, "1 pending transactions";
 $json = {
   transaction_value => 10,
   transaction_type => 2,
@@ -384,7 +387,7 @@ $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/organisation_id does not exist in the database/i);
-is $schema->resultset('PendingTransaction')->count, 2, "2 pending transactions";
+is $schema->resultset('Organisation')->search({ pending => 1 })->entity->sales->count, 1, "1 pending transactions";
 
 print "test 25 - Logout Hojo\n";
 $t->post_ok('/api/logout', json => { session_key => $session_key } )
@@ -408,7 +411,7 @@ $t->post_ok('/api/login' => json => $testJson)
 $session_key = $t->tx->res->json('/session_key');
 
 print "test 27 - add valid transaction (type 2: existing organisation)\n";
-is $schema->resultset('PendingTransaction')->count, 2, "2 pending transactions";
+is $schema->resultset('Organisation')->search({ pending => 1 })->entity->sales->count, 1, "1 pending transactions";
 $json = {
   transaction_value => 10,
   transaction_type => 2,
@@ -421,7 +424,7 @@ $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_like('/message', qr/Upload Successful/);
-is $schema->resultset('PendingTransaction')->count, 3, "3 pending transactions";
+is $schema->resultset('Organisation')->search({ pending => 1 })->entity->sales->count, 2, "2 pending transactions";
 
 
 print "test 28 - Logout Rufus\n";
@@ -446,7 +449,7 @@ $t->post_ok('/api/login' => json => $testJson)
 $session_key = $t->tx->res->json('/session_key');
 
 print "test 30 - organisation buy from another organisation\n";
-is $schema->resultset('Transaction')->count, 2, "2 transaction";
+is $schema->resultset('Transaction')->count, 5, "5 transaction";
 $json = {
   transaction_value => 100000,
   transaction_type => 1,
@@ -459,6 +462,6 @@ $t->post_ok('/api/upload' => form => $upload )
   ->status_is(200)
   ->json_is('/success', Mojo::JSON->true)
   ->json_like('/message', qr/Upload Successful/);
-is $schema->resultset('Transaction')->count, 3, "3 transaction";
+is $schema->resultset('Transaction')->count, 6, "6 transaction";
 
 done_testing();

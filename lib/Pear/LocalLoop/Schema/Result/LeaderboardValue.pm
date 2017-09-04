@@ -13,7 +13,7 @@ __PACKAGE__->add_columns(
     is_auto_increment => 1,
     is_nullable => 0,
   },
-  "user_id" => {
+  "entity_id" => {
     data_type => "integer",
     is_foreign_key => 1,
     is_nullable => 0,
@@ -40,7 +40,7 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key("id");
 
-__PACKAGE__->add_unique_constraint([qw/ user_id set_id /]);
+__PACKAGE__->add_unique_constraint([qw/ entity_id set_id /]);
 
 __PACKAGE__->belongs_to(
   "set",
@@ -55,9 +55,9 @@ __PACKAGE__->belongs_to(
 );
 
 __PACKAGE__->belongs_to(
-  "user",
-  "Pear::LocalLoop::Schema::Result::User",
-  { "foreign.id" => "self.user_id" },
+  "entity",
+  "Pear::LocalLoop::Schema::Result::Entity",
+  { "foreign.id" => "self.entity_id" },
   {
     is_deferrable => 0,
     join_type     => "LEFT",

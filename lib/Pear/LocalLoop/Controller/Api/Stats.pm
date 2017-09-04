@@ -15,21 +15,21 @@ has error_messages => sub {
 sub post_index {
   my $c = shift;
 
-  my $user = $c->stash->{api_user};
+  my $user = $c->stash->{api_user}->entity;
 
-  my $today_rs = $user->transactions->today_rs;
+  my $today_rs = $user->purchases->today_rs;
   my $today_sum = $today_rs->get_column('value')->sum;
   my $today_count = $today_rs->count;
 
-  my $week_rs = $user->transactions->week_rs;
+  my $week_rs = $user->purchases->week_rs;
   my $week_sum = $week_rs->get_column('value')->sum;
   my $week_count = $week_rs->count;
 
-  my $month_rs = $user->transactions->month_rs;
+  my $month_rs = $user->purchases->month_rs;
   my $month_sum = $month_rs->get_column('value')->sum;
   my $month_count = $month_rs->count;
 
-  my $user_rs = $user->transactions;
+  my $user_rs = $user->purchases;
   my $user_sum = $user_rs->get_column('value')->sum;
   my $user_count = $user_rs->count;
 
@@ -40,7 +40,7 @@ sub post_index {
   my $leaderboard_rs = $c->schema->resultset('Leaderboard');
   my $monthly_board = $leaderboard_rs->get_latest( 'monthly_total' );
   my $monthly_values = $monthly_board->values;
-  my $current_user_position = $monthly_values ? $monthly_values->find({ user_id => $c->stash->{api_user}->id }) : undef;
+  my $current_user_position = $monthly_values ? $monthly_values->find({ entity_id => $user->id }) : undef;
 
   return $c->render( json => {
     success => Mojo::JSON->true,
@@ -84,14 +84,14 @@ sub post_leaderboards {
         /,
         { display_name => 'customer.display_name' },
       ],
-      join => { user => 'customer' },
+      join => { entity => 'customer' },
     },
   );
   $today_values->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
 
   my @leaderboard_array = $today_values->all;
 
-  my $current_user_position = $today_values->find({ user_id => $c->stash->{api_user}->id });
+  my $current_user_position = $today_values->find({ entity_id => $c->stash->{api_user}->entity->id });
 
   return $c->render( json => {
     success => Mojo::JSON->true,

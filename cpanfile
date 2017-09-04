@@ -21,3 +21,8 @@ requires 'MooX::Options::Actions';
 requires 'Module::Runtime';
 requires 'DBIx::Class::DeploymentHandler';
 requires 'DBIx::Class::Fixtures';
+
+on 'schema-graph' => sub {
+  requires 'GraphViz';
+  requires 'SQL::Translator';
+};

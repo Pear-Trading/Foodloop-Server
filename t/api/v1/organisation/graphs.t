@@ -77,9 +77,11 @@ sub create_random_transaction {
   my $buyer = shift;
   my $time = shift;
 
+  my $buyer_result = $schema->resultset('User')->find({ email => $buyer })->entity;
+  my $seller_result = $schema->resultset('Organisation')->find({ name => 'Test Org' })->entity;
   $schema->resultset('Transaction')->create({
-    buyer => { email => $buyer },
-    seller => { name => 'Test Org' },
+    buyer => $buyer_result,
+    seller => $seller_result,
     value => ( int( rand( 10000 ) ) / 100 ),
     proof_image => 'a',
     purchase_time => $time,
