@@ -33,6 +33,9 @@ has error_messages => sub {
     town => {
       required => { message => 'No town sent.', status => 400 },
     },
+    sector => {
+      required => { message => 'No sector sent.', status => 400 },
+    },
   };
 };
 
@@ -78,10 +81,12 @@ sub post_account {
       my $postcode = $user_result->entity->organisation->postcode;
       my $street_name = $user_result->entity->organisation->street_name;
       my $town = $user_result->entity->organisation->town;
+      my $sector = $user_result->entity->organisation->sector;
       return $c->render( json => {
         success => Mojo::JSON->true,
         town => $town,
         name => $name,
+        sector => $sector,
         street_name => $street_name,
         email => $email,
         postcode => $postcode,
