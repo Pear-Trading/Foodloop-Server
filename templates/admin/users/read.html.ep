@@ -11,7 +11,7 @@
     <strong>Success!</strong> <%= $success %>
   </div>
 % }
-<form action="<%= url_for . '/edit' %>" method="post" autocomplete="off">
+<form action="<%= url_for %>" method="post" autocomplete="off">
   <h3 class="card-header">
     User Details
   </h3>
