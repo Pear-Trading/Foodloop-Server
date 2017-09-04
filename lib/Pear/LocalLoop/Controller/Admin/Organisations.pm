@@ -29,6 +29,7 @@ sub add_org_submit {
   $validation->required('town');
   $validation->optional('sector');
   $validation->optional('postcode')->postcode;
+  $validation->optional('pending');
 
   if ( $validation->has_error ) {
     $c->flash( error => 'The validation has failed' );
@@ -45,6 +46,8 @@ sub add_org_submit {
         town         => $validation->param('town'),
         sector       => $validation->param('sector'),
         postcode     => $validation->param('postcode'),
+        submitted_by_id => $c->current_user->id,
+        pending     => defined $validation->param('pending') ? 0 : 1,
       },
       type => 'organisation',
     });

@@ -15,19 +15,51 @@
   <h3 class="card-header">
     Add an Organisation
   </h3>
-  <ul class="list-group list-group-flush">
-    <form action="<%= url_for . '/submit' %>" method="post">
-      <li class="list-group-item">Only 'Organisation Name' and 'Town' are required entries.</li>
-      <li class="list-group-item"><input id="name" type="text" class="form-control" placeholder="Organisation Name" name="name"></li>
-      <li class="list-group-item"><input id="street_name" type="text" class="form-control" placeholder="Street Name" name="street_name"></li>
-      <li class="list-group-item"><input id="town" type="text" class="form-control" placeholder="Town" name="town"></li>
-      <li class="list-group-item">
-        <select class="form-control" name="sector">
-        %= include 'partials/sector_options', selected_sector => '';
-        </select>
-      </li>
-      <li class="list-group-item"><input id="postcode" type="text" class="form-control" placeholder="Postcode" name="postcode"></li>
-      <li class="list-group-item"><button class="btn btn-success" type="submit">Add Organisation</button></li>
+  <div class="card-block">
+    <form action="<%= url_for %>" method="post">
+      <div class="form-group row">
+        <label for="name" class="col-sm-2 col-form-label">Organisation Name</label>
+        <div class="col-sm-10">
+          <input id="name" type="text" class="form-control" placeholder="Organisation Name" name="name">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="name" class="col-sm-2 col-form-label">Street Name</label>
+        <div class="col-sm-10">
+          <input id="street_name" type="text" class="form-control" placeholder="Street Name" name="street_name">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="name" class="col-sm-2 col-form-label">Town/City</label>
+        <div class="col-sm-10">
+          <input id="town" type="text" class="form-control" placeholder="Town" name="town">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="name" class="col-sm-2 col-form-label">Sector</label>
+        <div class="col-sm-10">
+          <select class="form-control" name="sector">
+          %= include 'partials/sector_options', selected_sector => '';
+          </select>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="name" class="col-sm-2 col-form-label">Postcode</label>
+        <div class="col-sm-10">
+          <input id="postcode" type="text" class="form-control" placeholder="Postcode" name="postcode">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="name" class="col-sm-2 col-form-label">Validated</label>
+        <div class="col-sm-10">
+          <input id="pending" type="checkbox" name="pending" value="0">
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="ml-auto col-sm-10">
+          <button class="btn btn-success" type="submit">Save Changes To Organisation</button>
+        </div>
+      </div>
     </form>
-  </ul>
+  </div>
 </div>
