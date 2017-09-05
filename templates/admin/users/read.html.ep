@@ -86,3 +86,28 @@
       <button class="btn btn-primary form-control" type="submit">Edit Account</button>
     </div>
 </form>
+<div class="card mb-3">
+  <h3 class="card-header">
+    Transactions
+  </h3>
+  <ul class="list-group list-group-flush">
+    % for my $transaction ( $transactions->all ) {
+    <li class="list-group-item">
+      <div class="container">
+        <div class="row text-center">
+          <div class="col">From: <%= $transaction->buyer->name %></div>
+          <div class="col">To: <%= $transaction->seller->name %></div>
+          <div class="col">Value: <%= $transaction->value %></div>
+          <div class="col">Submitted At: <%= $transaction->submitted_at %></div>
+          <div class="col">Purchase Time: <%= $transaction->purchase_time %></div>
+        </div>
+      </div>
+    </li>
+    % }
+    <li class="list-group-item">
+      <div class="container">
+        %= bootstrap_pagination( $c->param('page') || 1, $transactions->pager->last_page, { class => 'justify-content-center' } );
+      </div>
+    </li>
+  </ul>
+</div>

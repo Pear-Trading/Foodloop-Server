@@ -33,7 +33,17 @@ sub read {
   my $id = $c->param('id');
 
   if ( my $user = $c->user_result_set->find($id) ) {
-    $c->stash( user => $user );
+    my $transactions = $user->entity->purchases->search(
+      undef, {
+        page => $c->param('page') || 1,
+        rows => 10,
+        order_by => { -desc => 'submitted_at' },
+      },
+    );
+    $c->stash(
+      user => $user,
+      transactions => $transactions,
+    );
   } else {
     $c->flash( error => 'No User found' );
     $c->redirect_to( '/admin/users' );
