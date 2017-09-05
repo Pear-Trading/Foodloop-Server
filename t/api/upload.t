@@ -464,4 +464,19 @@ $t->post_ok('/api/upload' => form => $upload )
   ->json_like('/message', qr/Upload Successful/);
 is $schema->resultset('Transaction')->count, 6, "6 transaction";
 
+print "test 31 - organisation buy from same organisation\n";
+$json = {
+  transaction_value => 100000,
+  transaction_type => 1,
+  purchase_time => $test_purchase_time,
+  organisation_id => 2,
+  session_key => $session_key,
+};
+$upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
+$t->post_ok('/api/upload' => form => $upload )
+  ->status_is(400)
+  ->json_is('/success', Mojo::JSON->false)
+  ->json_like('/message', qr/organisation_id does not exist in the database/);
+is $schema->resultset('Transaction')->count, 6, "6 transaction";
+
 done_testing();

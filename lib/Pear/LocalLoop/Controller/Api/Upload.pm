@@ -112,7 +112,10 @@ sub post_upload {
 
   if ( $type == 1 ) {
     # Validated Organisation
-    my $valid_org_rs = $c->schema->resultset('Organisation')->search({ pending => 0 });
+    my $valid_org_rs = $c->schema->resultset('Organisation')->search({
+      pending => 0,
+      entity_id => { "!=" => $user->entity_id },
+     });
     $validation->required('organisation_id')->number->in_resultset( 'id', $valid_org_rs );
 
     return $c->api_validation_error if $validation->has_error;
@@ -121,7 +124,11 @@ sub post_upload {
 
   } elsif ( $type == 2 ) {
     # Unvalidated Organisation
-    my $valid_org_rs = $c->schema->resultset('Organisation')->search({ submitted_by_id => $user->id, pending => 1 });
+    my $valid_org_rs = $c->schema->resultset('Organisation')->search({
+      submitted_by_id => $user->id,
+      pending => 1,
+      entity_id => { "!=" => $user->entity_id },
+    });
     $validation->required('organisation_id')->number->in_resultset( 'id', $valid_org_rs );
 
     return $c->api_validation_error if $validation->has_error;
@@ -198,6 +205,8 @@ sub post_search {
   my $c = shift;
   my $self = $c;
 
+  my $user = $c->stash->{api_user};
+
   my $validation = $c->validation;
 
   $validation->input( $c->stash->{api_json} );
@@ -211,13 +220,17 @@ sub post_search {
   my $search_stmt = [ 'LOWER("name") LIKE ?', '%' . lc $search_name . '%' ];
 
   my $org_rs = $c->schema->resultset('Organisation');
-  my $valid_orgs_rs = $org_rs->search({ pending => 0 })->search(
+  my $valid_orgs_rs = $org_rs->search({
+    pending => 0,
+    entity_id => { "!=" => $user->entity_id },
+  })->search(
     \$search_stmt,
   );
 
   my $pending_orgs_rs = $org_rs->search({
       pending => 1,
       submitted_by_id => $c->stash->{api_user}->id,
+      entity_id => { "!=" => $user->entity_id },
     })->search(
     \$search_stmt,
   );
