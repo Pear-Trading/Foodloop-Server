@@ -185,6 +185,10 @@ sub startup {
   $admin_routes->get('/feedback')->to('admin-feedback#index');
   $admin_routes->get('/feedback/:id')->to('admin-feedback#read');
 
+  $admin_routes->get('/transactions')->to('admin-transactions#index');
+  $admin_routes->get('/transactions/:id')->to('admin-transactions#read');
+  $admin_routes->get('/transactions/:id/image')->to('admin-transactions#image');
+
 #  my $user_routes = $r->under('/')->to('root#under');
 
 # $user_routes->get('/home')->to('root#home');

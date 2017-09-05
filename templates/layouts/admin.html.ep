@@ -30,6 +30,7 @@
         <div class="navbar-nav ml-auto">
           <a class="nav-item nav-link<%= title eq 'Feedback' ? ' active' : '' %>" href="<%= url_for '/admin/feedback' %>">Feedback</a>
           <a class="nav-item nav-link<%= title eq 'Tokens' ? ' active' : '' %>" href="<%= url_for '/admin/tokens' %>">Tokens</a>
+          <a class="nav-item nav-link<%= title eq 'Transactions' ? ' active' : '' %>" href="<%= url_for '/admin/transactions' %>">Transactions</a>
           <a class="nav-item nav-link<%= title eq 'Users' ? ' active' : '' %>" href="<%= url_for '/admin/users' %>">Users</a>
           <a class="nav-item nav-link<%= title eq 'Organisations' ? ' active' : '' %>" href="<%= url_for '/admin/organisations' %>">Organisations</a>
           <a class="nav-item nav-link" href="<%= url_for '/admin/logout' %>">Logout</a>
