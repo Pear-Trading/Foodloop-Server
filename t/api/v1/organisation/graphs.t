@@ -44,8 +44,8 @@ $t->post_ok('/api/v1/organisation/graphs' => json => {
   })
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/graph', {
-    day => [ map { $start->clone->subtract( days => $_ )->day_name } reverse ( 0 .. 6 ) ],
-    count => [ 2, 4, 2, 3, 3, 4, 1 ],
+    labels => [ map { $start->clone->subtract( days => $_ )->day_name } reverse ( 0 .. 6 ) ],
+    data => [ 2, 4, 2, 3, 3, 4, 1 ],
   });
 
 $t->post_ok('/api/v1/organisation/graphs' => json => {
@@ -54,8 +54,28 @@ $t->post_ok('/api/v1/organisation/graphs' => json => {
   })
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/graph', {
-    day => [ map { $start->clone->subtract( days => $_ )->day_name } reverse ( 0 .. 29 ) ],
-    count => [ 4, 2, 3, 3, 4, 1, 4, 3, 3, 2, 4, 2, 4, 2, 3, 3, 4, 1, 4, 3, 3, 2, 4, 2, 4, 2, 3, 3, 4, 1 ],
+    labels => [ map { $start->clone->subtract( days => $_ )->day_name } reverse ( 0 .. 29 ) ],
+    data => [ 4, 2, 3, 3, 4, 1, 4, 3, 3, 2, 4, 2, 4, 2, 3, 3, 4, 1, 4, 3, 3, 2, 4, 2, 4, 2, 3, 3, 4, 1 ],
+  });
+
+$t->post_ok('/api/v1/organisation/graphs' => json => {
+    session_key => $session_key,
+    graph => 'sales_last_7_days',
+  })
+  ->status_is(200)->or($framework->dump_error)
+  ->json_is('/graph', {
+    labels => [ map { $start->clone->subtract( days => $_ )->day_name } reverse ( 0 .. 6 ) ],
+    data => [ 20, 40, 20, 30, 30, 40, 10 ],
+  });
+
+$t->post_ok('/api/v1/organisation/graphs' => json => {
+    session_key => $session_key,
+    graph => 'sales_last_30_days',
+  })
+  ->status_is(200)->or($framework->dump_error)
+  ->json_is('/graph', {
+    labels => [ map { $start->clone->subtract( days => $_ )->day_name } reverse ( 0 .. 29 ) ],
+    data => [ 40, 20, 30, 30, 40, 10, 40, 30, 30, 20, 40, 20, 40, 20, 30, 30, 40, 10, 40, 30, 30, 20, 40, 20, 40, 20, 30, 30, 40, 10 ],
   });
 
 $framework->logout( $session_key );
@@ -73,6 +93,7 @@ $t->post_ok('/api/v1/organisation/graphs' => json => {
   ->json_is('/success', Mojo::JSON->false)
   ->json_is('/error', 'user_not_org');
 
+
 sub create_random_transaction {
   my $buyer = shift;
   my $time = shift;
@@ -82,7 +103,7 @@ sub create_random_transaction {
   $schema->resultset('Transaction')->create({
     buyer => $buyer_result,
     seller => $seller_result,
-    value => ( int( rand( 10000 ) ) / 100 ),
+    value => 10,
     proof_image => 'a',
     purchase_time => $time,
   });
