@@ -29,13 +29,16 @@ sub post_transaction_list_purchases {
       order_by => { -desc => 'purchase_time' },
     },
   );
+
+# purchase_time needs timezone attached to it
   my @transaction_list = (
     map {{
-      seller => $_->entity->name,
+      seller => $_->seller->name,
       value => $_->value,
       purchase_time => $_->purchase_time,
     }} $transactions->all
-  )
+  );
+
   return $c->render( json => {
     success => Mojo::JSON->true,
     transactions => \@transaction_list,
