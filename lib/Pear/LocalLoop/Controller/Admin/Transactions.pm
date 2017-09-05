@@ -43,6 +43,8 @@ sub image {
 
   if ( $transaction->proof_image ) {
     $c->reply->asset($c->get_file_from_uuid($transaction->proof_image));
+  } else {
+    $c->reply->static('image/no_transaction.jpg');
   }
 }
 
