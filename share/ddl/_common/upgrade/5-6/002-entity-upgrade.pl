@@ -16,7 +16,7 @@ schema_from_schema_loader({ naming => 'v7' }, sub {
   my $pending_org_rs   = $schema->resultset('PendingOrganisation');
   my $pending_trans_rs = $schema->resultset('PendingTransaction');
   my $feedback_rs      = $schema->resultset('FeedbackTemp');
-  my $session_token_rs = $scheme->resultset('SessionTokensTemp');
+  my $session_token_rs = $schema->resultset('SessionTokensTemp');
 
   # Lookups used for converting transactions
   my $org_lookup = {};
