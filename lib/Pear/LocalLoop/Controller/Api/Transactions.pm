@@ -42,6 +42,7 @@ sub post_transaction_list_purchases {
   return $c->render( json => {
     success => Mojo::JSON->true,
     transactions => \@transaction_list,
+    page_no => $transactions->pager->total_entries,
   });
 }
 
