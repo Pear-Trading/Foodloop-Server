@@ -14,6 +14,9 @@ ALTER TABLE organisations RENAME TO organisations_temp;
 ALTER TABLE transactions RENAME TO transactions_temp;
 ALTER TABLE users RENAME TO users_temp;
 
+ALTER INDEX transactions_idx_buyer_id RENAME TO transactions_temp_idx_buyer_id;
+ALTER INDEX transactions_idx_seller_id RENAME TO transactions_temp_idx_seller_id;
+
 CREATE TABLE "customers" (
   "id" serial NOT NULL,
   "entity_id" integer NOT NULL,
