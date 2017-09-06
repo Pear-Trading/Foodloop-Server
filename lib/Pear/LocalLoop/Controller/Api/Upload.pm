@@ -150,7 +150,7 @@ sub post_upload {
       street_name     => $validation->param('street_name'),
       town            => $validation->param('town'),
       postcode        => $validation->param('postcode'),
-      pending         => \"1"
+      pending         => 1,
     });
     $organisation = $entity->organisation;
   }

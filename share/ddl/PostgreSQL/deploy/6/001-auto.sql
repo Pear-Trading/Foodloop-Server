@@ -1,6 +1,6 @@
 -- 
 -- Created by SQL::Translator::Producer::PostgreSQL
--- Created on Fri Sep  1 15:14:28 2017
+-- Created on Tue Sep  5 17:22:16 2017
 -- 
 ;
 --
@@ -76,7 +76,7 @@ CREATE TABLE "organisations" (
   "postcode" character varying(16),
   "country" character varying(255),
   "sector" character varying(1),
-  "pending" boolean DEFAULT 0 NOT NULL,
+  "pending" boolean DEFAULT false NOT NULL,
   "submitted_by_id" integer,
   PRIMARY KEY ("id")
 );
@@ -109,7 +109,7 @@ CREATE TABLE "users" (
   "email" text NOT NULL,
   "join_date" timestamp NOT NULL,
   "password" character varying(100) NOT NULL,
-  "is_admin" boolean DEFAULT 0 NOT NULL,
+  "is_admin" boolean DEFAULT false NOT NULL,
   PRIMARY KEY ("id"),
   CONSTRAINT "users_email" UNIQUE ("email")
 );

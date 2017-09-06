@@ -201,12 +201,11 @@ $json = {
   organisation_id => 1,
   session_key => $session_key,
 };
-$upload = {json => Mojo::JSON::encode_json($json)};
-$t->post_ok('/api/upload' => form => $upload )
-->status_is(200)
-->or($framework->dump_error)
-->json_is('/success', Mojo::JSON->true)
-->json_like('/message', qr/Upload Successful/);
+$t->post_ok('/api/upload' => json => $json )
+  ->status_is(200)
+  ->or($framework->dump_error)
+  ->json_is('/success', Mojo::JSON->true)
+  ->json_like('/message', qr/Upload Successful/);
 is $schema->resultset('Transaction')->count, 1, "1 transaction";
 
 print "test 13 - organisation_id missing (type 1: already validated)\n";
