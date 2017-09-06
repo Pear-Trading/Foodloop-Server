@@ -11,6 +11,7 @@ __PACKAGE__->load_components( qw/
   InflateColumn::DateTime
   PassphraseColumn
   TimeStamp
+  FilterColumn
 /);
 
 __PACKAGE__->table("users");
@@ -48,7 +49,7 @@ __PACKAGE__->add_columns(
   },
   "is_admin" => {
     data_type => "boolean",
-    default_value => \"0",
+    default_value => \"false",
     is_nullable => 0,
   },
 );
@@ -76,6 +77,41 @@ __PACKAGE__->has_many(
   { "foreign.user_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
+
+sub sqlt_deploy_hook {
+  my ( $source_instance, $sqlt_table ) = @_;
+  my $pending_field = $sqlt_table->get_field('is_admin');
+  if ( $sqlt_table->schema->translator->producer_type =~ /SQLite$/ ) {
+    $pending_field->{default_value} = 0;
+  } else {
+    $pending_field->{default_value} = \"false";
+  }
+}
+
+__PACKAGE__->filter_column( is_admin => {
+  filter_to_storage => 'to_bool',
+  filter_from_storage => 'from_bool',
+});
+
+sub to_bool {
+  my ( $self, $val ) = @_;
+  my $driver_name = $self->result_source->schema->storage->dbh->{Driver}->{Name};
+  if ( $driver_name eq 'SQLite' ) {
+    return $val ? 1 : 0;
+  } else {
+    return $val ? 'true' : 'false';
+  }
+}
+
+sub from_bool {
+  my ( $self, $val ) = @_;
+  my $driver_name = $self->result_source->schema->storage->dbh->{Driver}->{Name};
+  if ( $driver_name eq 'SQLite' ) {
+    return $val;
+  } else {
+    return lc $val eq 'true' ? 1 : 0;
+  }
+}
 
 sub generate_session {
   my $self = shift;
