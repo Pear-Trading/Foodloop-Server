@@ -13,9 +13,15 @@ ALTER TABLE customers RENAME TO customers_temp;
 ALTER TABLE organisations RENAME TO organisations_temp;
 ALTER TABLE transactions RENAME TO transactions_temp;
 ALTER TABLE users RENAME TO users_temp;
+ALTER TABLE session_tokens RENAME TO session_tokens_temp;
+ALTER TABLE feedback RENAME TO feedback_temp;
 
 ALTER INDEX transactions_idx_buyer_id RENAME TO transactions_temp_idx_buyer_id;
 ALTER INDEX transactions_idx_seller_id RENAME TO transactions_temp_idx_seller_id;
+ALTER INDEX session_tokens_idx_user_id RENAME TO session_tokens_temp_idx_user_id;
+ALTER INDEX feedback_idx_user_id RENAME TO feedback_temp_idx_user_id;
+
+ALTER TABLE users_temp DROP CONSTRAINT users_email;
 
 CREATE TABLE "customers" (
   "id" serial NOT NULL,
@@ -68,6 +74,30 @@ CREATE TABLE "users" (
 );
 CREATE INDEX "users_idx_entity_id" on "users" ("entity_id");
 
+-- Recreate session table as users is changing completely
+CREATE TABLE "session_tokens" (
+  "id" serial NOT NULL,
+  "token" character varying(255) NOT NULL,
+  "user_id" integer NOT NULL,
+  PRIMARY KEY ("id"),
+  CONSTRAINT "session_tokens_token" UNIQUE ("token")
+);
+CREATE INDEX "session_tokens_idx_user_id" on "session_tokens" ("user_id");
+
+-- Also recreate feedback as this also gets broken by the user_id changes
+CREATE TABLE "feedback" (
+  "id" serial NOT NULL,
+  "user_id" integer NOT NULL,
+  "submitted_at" timestamp NOT NULL,
+  "feedbacktext" text NOT NULL,
+  "app_name" character varying(255) NOT NULL,
+  "package_name" character varying(255) NOT NULL,
+  "version_code" character varying(255) NOT NULL,
+  "version_number" character varying(255) NOT NULL,
+  PRIMARY KEY ("id")
+);
+CREATE INDEX "feedback_idx_user_id" on "feedback" ("user_id");
+
 DROP TABLE leaderboard_values;
 TRUNCATE TABLE leaderboard_sets;
 
@@ -83,6 +113,7 @@ CREATE TABLE "leaderboard_values" (
 );
 CREATE INDEX "leaderboard_values_idx_entity_id" on "leaderboard_values" ("entity_id");
 CREATE INDEX "leaderboard_values_idx_set_id" on "leaderboard_values" ("set_id");
+
 
 COMMIT;
 

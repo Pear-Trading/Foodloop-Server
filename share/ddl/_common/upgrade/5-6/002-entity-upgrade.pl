@@ -15,6 +15,8 @@ schema_from_schema_loader({ naming => 'v7' }, sub {
   my $transaction_rs   = $schema->resultset('TransactionsTemp');
   my $pending_org_rs   = $schema->resultset('PendingOrganisation');
   my $pending_trans_rs = $schema->resultset('PendingTransaction');
+  my $feedback_rs      = $schema->resultset('FeedbackTemp');
+  my $session_token_rs = $scheme->resultset('SessionTokensTemp');
 
   # Lookups used for converting transactions
   my $org_lookup = {};
@@ -107,5 +109,24 @@ schema_from_schema_loader({ naming => 'v7' }, sub {
         purchase_time => $trans_result->purchase_time,
       });
     }
+  }
+
+  for my $session_token ( $session_token_rs->all ) {
+    $schema->resultset('SessionToken')->create({
+      token   => $session_token->token,
+      user_id => $user_lookup->{ $session_token->user_id },
+    });
+  }
+
+  for my $feedback_result ( $feedback_rs->all ) {
+    $schema->resultset('Feedback')->create({
+      user_id        => $user_lookup->{ $feedback_result->user_id },
+      submitted_at   => $feedback_result->submitted_at,
+      feedbacktext   => $feedback_result->feedbacktext,
+      app_name       => $feedback_result->app_name,
+      package_name   => $feedback_result->package_name,
+      version_code   => $feedback_result->version_code,
+      version_number => $feedback_result->version_number,
+    });
   }
 });

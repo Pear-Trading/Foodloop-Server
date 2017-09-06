@@ -86,5 +86,31 @@ CREATE TABLE users (
 CREATE INDEX users_idx_entity_id02 ON users (entity_id);
 CREATE UNIQUE INDEX users_email02 ON users (email);
 
+ALTER TABLE session_tokens RENAME TO session_tokens_temp;
+
+CREATE TABLE session_tokens (
+  id INTEGER PRIMARY KEY NOT NULL,
+  token varchar(255) NOT NULL,
+  user_id integer NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+);
+CREATE INDEX session_tokens_idx_user_id02 ON session_tokens (user_id);
+CREATE UNIQUE INDEX session_tokens_token02 ON session_tokens (token);
+
+ALTER TABLE feedback RENAME TO feedback_temp;
+
+CREATE TABLE feedback (
+  id INTEGER PRIMARY KEY NOT NULL,
+  user_id integer NOT NULL,
+  submitted_at datetime NOT NULL,
+  feedbacktext text NOT NULL,
+  app_name varchar(255) NOT NULL,
+  package_name varchar(255) NOT NULL,
+  version_code varchar(255) NOT NULL,
+  version_number varchar(255) NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+);
+CREATE INDEX feedback_idx_user_id02 ON feedback (user_id);
+
 COMMIT;
 
