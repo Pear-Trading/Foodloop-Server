@@ -154,6 +154,7 @@ sub startup {
   $api->post('/user-history')->to('api-user#post_user_history');
   $api->post('/stats')->to('api-stats#post_index');
   $api->post('/stats/leaderboard')->to('api-stats#post_leaderboards');
+  $api->post('/outgoing-transactions')->to('api-transactions#post_transaction_list_purchases');
 
   my $api_v1 = $api->under('/v1');
 

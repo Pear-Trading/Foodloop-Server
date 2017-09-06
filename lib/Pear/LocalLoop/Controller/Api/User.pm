@@ -64,7 +64,6 @@ sub post_account {
   if ( defined $user_result ) {
     my $email = $user_result->email;
 
-    #Needs elsif added for trader page for this similar relevant entry
     if ( $user_result->type eq 'customer' ) {
       my $full_name = $user_result->entity->customer->full_name;
       my $display_name = $user_result->entity->customer->display_name;
