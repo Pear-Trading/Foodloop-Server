@@ -21,6 +21,7 @@ ALTER INDEX transactions_idx_seller_id RENAME TO transactions_temp_idx_seller_id
 ALTER INDEX session_tokens_idx_user_id RENAME TO session_tokens_temp_idx_user_id;
 ALTER INDEX feedback_idx_user_id RENAME TO feedback_temp_idx_user_id;
 
+ALTER TABLE session_tokens_temp DROP CONSTRAINT session_tokens_token;
 ALTER TABLE users_temp DROP CONSTRAINT users_email;
 
 CREATE TABLE "customers" (
