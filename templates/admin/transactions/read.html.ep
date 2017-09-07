@@ -14,10 +14,14 @@
 <div class="card mb-3">
   <h3 class="card-header">
     Transaction Details
-    <a href="<%= url_for . '/delete' %>" class="btn btn-danger" style="float: right">Delete Transaction</a>
+    <form action="<%= url_for . '/delete' %>" method="post">
+      <div class="form-group">
+        <button class="btn btn-danger" type="submit" style="float: left">Delete Transaction</button>
+      </div>
+    </form>
   </h3>
   <div class="card-block">
-    <form action="<%= url_for %>" method="post">
+    <form>
       <div class="form-group">
         <label for="email">Buyer</label>
         <input id="buyer" type="text" class="form-control" placeholder="Buyer ID" name="buyer" value="<%= $transaction->buyer->name %>" disabled>
