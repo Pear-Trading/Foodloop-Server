@@ -161,6 +161,7 @@ sub startup {
   my $api_v1_org = $api_v1->under('/organisation')->to('api-v1-organisation#auth');
 
   $api_v1_org->post('/graphs')->to('api-v1-organisation-graphs#index');
+  $api_v1_org->post('/snippets')->to('api-v1-organisation-snippets#index');
 
   my $admin_routes = $r->under('/admin')->to('admin#under');
 
