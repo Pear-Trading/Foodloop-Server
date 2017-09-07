@@ -11,28 +11,40 @@
     <strong>Success!</strong> <%= $success %>
   </div>
 % }
-<form action="<%= url_for %>" method="post">
-  <div class="form-group">
-    <label for="email">Buyer</label>
-    <input id="buyer" type="text" class="form-control" placeholder="Buyer ID" name="buyer" value="<%= $transaction->buyer->name %>" disabled>
+<div class="card mb-3">
+  <h3 class="card-header">
+    Transaction Details
+    <form action="<%= url_for . '/delete' %>" method="post">
+      <div class="form-group">
+        <button class="btn btn-danger" type="submit" style="float: left">Delete Transaction</button>
+      </div>
+    </form>
+  </h3>
+  <div class="card-block">
+    <form>
+      <div class="form-group">
+        <label for="email">Buyer</label>
+        <input id="buyer" type="text" class="form-control" placeholder="Buyer ID" name="buyer" value="<%= $transaction->buyer->name %>" disabled>
+      </div>
+      <div class="form-group">
+        <label for="email">Seller</label>
+        <input id="seller" type="text" class="form-control" placeholder="Seller ID" name="seller" value="<%= $transaction->seller->name %>" disabled>
+      </div>
+      <div class="form-group">
+        <label for="email">Value</label>
+        <input id="value" type="text" class="form-control" placeholder="Value" name="value" value="<%= $transaction->value %>" disabled>
+      </div>
+      <div class="form-group">
+        <label for="email">Submitted At</label>
+        <input id="submitted_at" type="text" class="form-control" placeholder="Submitted At" name="submitted_at" value="<%= $transaction->submitted_at %>" disabled>
+      </div>
+      <div class="form-group">
+        <label for="email">Purchase Time</label>
+        <input id="purchase_time" type="text" class="form-control" placeholder="Purchase Time" name="purchase_time" value="<%= $transaction->purchase_time %>" disabled>
+      </div>
+      <div class="form-group">
+        <img src="<%= url_for . '/image' %>"/>
+      </div>
+    </form>
   </div>
-  <div class="form-group">
-    <label for="email">Seller</label>
-    <input id="seller" type="text" class="form-control" placeholder="Seller ID" name="seller" value="<%= $transaction->seller->name %>" disabled>
-  </div>
-  <div class="form-group">
-    <label for="email">Value</label>
-    <input id="value" type="text" class="form-control" placeholder="Value" name="value" value="<%= $transaction->value %>" disabled>
-  </div>
-  <div class="form-group">
-    <label for="email">Submitted At</label>
-    <input id="submitted_at" type="text" class="form-control" placeholder="Submitted At" name="submitted_at" value="<%= $transaction->submitted_at %>" disabled>
-  </div>
-  <div class="form-group">
-    <label for="email">Purchase Time</label>
-    <input id="purchase_time" type="text" class="form-control" placeholder="Purchase Time" name="purchase_time" value="<%= $transaction->purchase_time %>" disabled>
-  </div>
-  <div class="form-group">
-    <img src="<%= url_for . '/image' %>"/>
-  </div>
-</form>
+</div>
