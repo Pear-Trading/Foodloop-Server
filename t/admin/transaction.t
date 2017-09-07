@@ -33,6 +33,8 @@ for my $count ( 0 .. 29 ) {
   }
 }
 
+is $schema->resultset('Transaction')->count, 87;
+
 #login to admin
 $t->ua->max_redirects(10);
 $t->post_ok('/admin', form => {
@@ -52,6 +54,8 @@ $t->get_ok("/admin/transactions/1/image")
 $t->post_ok("/admin/transactions/1/delete")
   ->status_is(200)->or($framework->dump_error)
   ->content_like(qr/Successfully deleted transaction/);
+
+is $schema->resultset('Transaction')->count, 86;
 
 #Read deleted transaction
 $t->get_ok("/admin/transactions/1")
