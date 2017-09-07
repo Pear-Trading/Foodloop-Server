@@ -90,7 +90,6 @@ sub sqlt_deploy_hook {
 
 __PACKAGE__->filter_column( is_admin => {
   filter_to_storage => 'to_bool',
-  filter_from_storage => 'from_bool',
 });
 
 sub to_bool {
@@ -100,16 +99,6 @@ sub to_bool {
     return $val ? 1 : 0;
   } else {
     return $val ? 'true' : 'false';
-  }
-}
-
-sub from_bool {
-  my ( $self, $val ) = @_;
-  my $driver_name = $self->result_source->schema->storage->dbh->{Driver}->{Name};
-  if ( $driver_name eq 'SQLite' ) {
-    return $val;
-  } else {
-    return lc $val eq 'true' ? 1 : 0;
   }
 }
 
