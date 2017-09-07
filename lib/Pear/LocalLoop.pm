@@ -189,6 +189,7 @@ sub startup {
   $admin_routes->get('/transactions')->to('admin-transactions#index');
   $admin_routes->get('/transactions/:id')->to('admin-transactions#read');
   $admin_routes->get('/transactions/:id/image')->to('admin-transactions#image');
+  $admin_routes->post('/transactions/:id/delete')->to('admin-transactions#delete');
 
 #  my $user_routes = $r->under('/')->to('root#under');
 
