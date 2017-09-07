@@ -48,4 +48,19 @@ sub image {
   }
 }
 
+sub delete {
+  my $c = shift;
+
+  my $id = $c->param('id');
+
+if ( my $transaction = $c->result_set->find($id) ) {
+    $transaction->delete;
+    $c->flash( success => 'Successfully deleted transaction' );
+    $c->redirect_to( '/admin/transactions' );
+  } else {
+    $c->flash( error => 'No transaction found' );
+    $c->redirect_to( '/admin/transactions' );
+  }
+}
+
 1;
