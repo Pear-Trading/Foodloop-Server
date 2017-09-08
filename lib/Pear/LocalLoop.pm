@@ -155,6 +155,9 @@ sub startup {
   $api->post('/stats')->to('api-stats#post_index');
   $api->post('/stats/leaderboard')->to('api-stats#post_leaderboards');
   $api->post('/outgoing-transactions')->to('api-transactions#post_transaction_list_purchases');
+  $api->post('/org/payroll')->to('api-organisation#post_payroll');
+  $api->post('/org/supplier')->to('api-organisation#post_supplier');
+  $api->post('/org/employee')->to('api-organisation#post_employee');
 
   my $api_v1 = $api->under('/v1');
 
