@@ -32,28 +32,6 @@ my $session_key = $framework->login({
   password => $password,
 });
 
-my $json_no_date = { session_key => $session_key };
-$t->post_ok('/api/user/day', json => $json_no_date)
-  ->status_is(200)->or($framework->dump_error)
-  ->json_is('/success', Mojo::JSON->true);
-
-my $json_invalid_date = {
-  session_key => $session_key,
-  day => 'invalid',
-};
-$t->post_ok('/api/user/day', json => $json_invalid_date)
-  ->status_is(400)->or($framework->dump_error)
-  ->json_is('/success', Mojo::JSON->false)
-  ->json_like('/message', qr/Invalid ISO8601 Datetime/);
-
-my $json_valid_date = {
-  session_key => $session_key,
-  day => $t->app->datetime_formatter->format_datetime(DateTime->now),
-};
-$t->post_ok('/api/user/day', json => $json_valid_date)
-  ->status_is(200)->or($framework->dump_error)
-  ->json_is('/success', Mojo::JSON->true);
-
 $t->post_ok('/api/user', json => { session_key => $session_key })
   ->status_is(200)->or($framework->dump_error)
   ->json_is({
