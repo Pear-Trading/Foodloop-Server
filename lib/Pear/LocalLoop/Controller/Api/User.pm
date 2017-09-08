@@ -39,22 +39,6 @@ has error_messages => sub {
   };
 };
 
-sub post_day {
-  my $c = shift;
-
-  my $validation = $c->validation;
-
-  $validation->input( $c->stash->{api_json} );
-
-  $validation->optional('day')->is_iso_datetime;
-
-  return $c->api_validation_error if $validation->has_error;
-
-  $c->render( json => {
-    success => Mojo::JSON->true,
-  });
-}
-
 sub post_account {
   my $c = shift;
 
