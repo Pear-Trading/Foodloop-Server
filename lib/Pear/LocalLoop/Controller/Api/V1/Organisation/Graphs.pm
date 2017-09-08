@@ -102,7 +102,7 @@ sub _sales_last_duration {
     my $transactions = $entity->sales
       ->search_between( $start, $next_end )
       ->get_column('value')
-      ->sum || 0;
+      ->sum || 0 + 0;
     push @{ $data->{ labels } }, $start->day_name;
     push @{ $data->{ data } }, $transactions;
     $start->add( days => 1 );
@@ -134,7 +134,7 @@ sub _purchases_last_duration {
     my $transactions = $entity->purchases
       ->search_between( $start, $next_end )
       ->get_column('value')
-      ->sum || 0;
+      ->sum || 0 + 0;
     push @{ $data->{ labels } }, $start->day_name;
     push @{ $data->{ data } }, $transactions;
     $start->add( days => 1 );
