@@ -78,6 +78,18 @@ $t->post_ok('/api/v1/organisation/graphs' => json => {
     data => [ 40, 20, 30, 30, 40, 10, 40, 30, 30, 20, 40, 20, 40, 20, 30, 30, 40, 10, 40, 30, 30, 20, 40, 20, 40, 20, 30, 30, 40, 10 ],
   });
 
+$t->post_ok('/api/v1/organisation/graphs' => json => {
+    session_key => $session_key,
+    graph => 'customers_range',
+    start => $start->clone->subtract( days => 8 )->ymd,
+    end => $start->clone->ymd,
+  })
+  ->status_is(200)->or($framework->dump_error)
+  ->json_is('/graph', {
+    labels => [ map { $start->clone->subtract( days => $_ )->ymd } reverse ( 0 .. 8 ) ],
+    data => [ 2, 4, 2, 4, 2, 3, 3, 4, 1 ],
+  });
+
 $framework->logout( $session_key );
 
 $session_key = $framework->login({

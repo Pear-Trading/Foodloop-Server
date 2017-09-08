@@ -53,9 +53,9 @@ sub register {
     return $app->types->type($extension) eq $filetype ? undef : 1;
   });
 
-  $app->validator->add_check( is_iso_datetime => sub {
+  $app->validator->add_check( is_iso_date => sub {
     my ( $validation, $name, $value ) = @_;
-    $value = $app->datetime_formatter->parse_datetime( $value );
+    $value = $app->iso_date_parser->parse_datetime( $value );
     return defined $value ? undef : 1;
   });
 
