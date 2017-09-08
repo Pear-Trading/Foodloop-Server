@@ -4,59 +4,59 @@ use Mojo::JSON;
 
 has error_messages => sub {
   return {
-    entryperiod => {
+    entry_period => {
       required => { message => 'No entry period sent.', status => 400 },
     },
-    employeeamount => {
+    employee_amount => {
       required => { message => 'No employee amount sent.', status => 400 },
     },
-    localemployeeamount => {
+    local_employee_amount => {
       required => { message => 'No local employee amount sent.', status => 400 },
     },
-    grosspayroll => {
+    gross_payroll => {
       required => { message => 'No gross payroll sent.', status => 400 },
     },
-    payrollincometax => {
+    payroll_income_tax => {
       required => { message => 'no payroll income tax sent.', status => 400 },
     },
-    payrollemployeeni => {
+    payroll_employee_ni => {
       required => { message => 'no payroll employee ni sent.', status => 400 },
     },
-    payrollemployerni => {
+    payroll_employer_ni => {
       required => { message => 'no payroll employer ni sent.', status => 400 },
     },
-    payrolltotalpension => {
+    payroll_total_pension => {
       required => { message => 'no payroll total pension sent.', status => 400 },
     },
-    payrollotherbenefit => {
+    payroll_other_benefit => {
       required => { message => 'no payroll other benefit sent.', status => 400 },
     },
-    supplierbusinessname => {
+    supplier_business_name => {
       required => { message => 'no supplier business name sent.', status => 400 },
     },
     postcode => {
       required => { message => 'no postcode sent.', status => 400 },
       postcode => { message => 'postcode must be valid', status => 400 },
     },
-    monthlyspend => {
+    monthly_spend => {
       required => { message => 'no monthly spend sent.', status => 400 },
     },
-    employeeno => {
+    employee_no => {
       required => { message => 'no employee no sent.', status => 400 },
     },
-    employeeincometax => {
+    employee_income_tax => {
       required => { message => 'no employee income tax sent.', status => 400 },
     },
-    employeegrosswage => {
+    employee_gross_wage => {
       required => { message => 'no employee gross wage sent.', status => 400 },
     },
-    employeeni => {
+    employee_ni => {
       required => { message => 'no employee ni sent.', status => 400 },
     },
-    employeepension => {
+    employee_pension => {
       required => { message => 'no employee pension sent.', status => 400 },
     },
-    employeeotherbenefit => {
+    employee_other_benefit => {
       required => { message => 'no employee other benefits sent.', status => 400 },
     },
   };
@@ -76,21 +76,21 @@ sub post_payroll {
     id => { "!=" => $user->id },
   });
 
-  $validation->required('entryperiod');
-  $validation->required('employeeamount');
-  $validation->required('localemployeeamount');
-  $validation->required('grosspayroll');
-  $validation->required('payrollincometax');
-  $validation->required('payrollemployeeni');
-  $validation->required('payrollemployerni');
-  $validation->required('payrolltotalpension');
-  $validation->required('payrollotherbenefit');
+  $validation->required('entry_period');
+  $validation->required('employee_amount');
+  $validation->required('local_employee_amount');
+  $validation->required('gross_payroll');
+  $validation->required('payroll_income_tax');
+  $validation->required('payroll_employee_ni');
+  $validation->required('payroll_employer_ni');
+  $validation->required('payroll_total_pension');
+  $validation->required('payroll_other_benefit');
 
   return $c->api_validation_error if $validation->has_error;
 
   $c->schema->txn_do( sub {
     $user->entity->organisation->update({
-      entry_period        => $validation->param('entryperiod'),
+      entry_period        => $validation->param('entry_period'),
     });
   });
 
@@ -114,16 +114,16 @@ sub post_supplier {
     id => { "!=" => $user->id },
   });
 
-  $validation->required('entryperiod');
+  $validation->required('entry_period');
   $validation->required('postcode')->postcode;
-  $validation->required('supplierbusinessname');
-  $validation->required('monthlyspend');
+  $validation->required('supplier_business_name');
+  $validation->required('monthly_spend');
 
   return $c->api_validation_error if $validation->has_error;
 
   $c->schema->txn_do( sub {
     $user->entity->organisation->update({
-      entry_period        => $validation->param('entryperiod'),
+      entry_period        => $validation->param('entry_period'),
     });
   });
 
@@ -147,19 +147,19 @@ sub post_employee {
     id => { "!=" => $user->id },
   });
 
-  $validation->required('entryperiod');
-  $validation->required('employeeno');
-  $validation->required('employeeincometax');
-  $validation->required('employeegrosswage');
-  $validation->required('employeeni');
-  $validation->required('employeepension');
-  $validation->required('employeeotherbenefit');
+  $validation->required('entry_period');
+  $validation->required('employee_no');
+  $validation->required('employee_income_tax');
+  $validation->required('employee_gross_wage');
+  $validation->required('employee_ni');
+  $validation->required('employee_pension');
+  $validation->required('employee_other_benefit');
 
   return $c->api_validation_error if $validation->has_error;
 
   $c->schema->txn_do( sub {
     $user->entity->organisation->update({
-      entry_period        => $validation->param('entryperiod'),
+      entry_period        => $validation->param('entry_period'),
     });
   });
 
