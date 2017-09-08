@@ -79,7 +79,6 @@ has error_messages => sub {
       required => { message => 'search_name is missing', status => 400 },
     },
     postcode => {
-      required => { message => 'postcode is missing', status => 400 },
       postcode => { message => 'postcode must be valid', status => 400 },
     },
   };

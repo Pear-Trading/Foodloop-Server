@@ -4,8 +4,60 @@ use Mojo::JSON;
 
 has error_messages => sub {
   return {
-    sector => {
-      required => { message => 'No sector sent.', status => 400 },
+    entryperiod => {
+      required => { message => 'No entry period sent.', status => 400 },
+    },
+    employeeamount => {
+      required => { message => 'No employee amount sent.', status => 400 },
+    },
+    localemployeeamount => {
+      required => { message => 'No local employee amount sent.', status => 400 },
+    },
+    grosspayroll => {
+      required => { message => 'No gross payroll sent.', status => 400 },
+    },
+    payrollincometax => {
+      required => { message => 'no payroll income tax sent.', status => 400 },
+    },
+    payrollemployeeni => {
+      required => { message => 'no payroll employee ni sent.', status => 400 },
+    },
+    payrollemployerni => {
+      required => { message => 'no payroll employer ni sent.', status => 400 },
+    },
+    payrolltotalpension => {
+      required => { message => 'no payroll total pension sent.', status => 400 },
+    },
+    payrollotherbenefit => {
+      required => { message => 'no payroll other benefit sent.', status => 400 },
+    },
+    supplierbusinessname => {
+      required => { message => 'no supplier business name sent.', status => 400 },
+    },
+    postcode => {
+      required => { message => 'no postcode sent.', status => 400 },
+      postcode => { message => 'postcode must be valid', status => 400 },
+    },
+    monthlyspend => {
+      required => { message => 'no monthly spend sent.', status => 400 },
+    },
+    employeeno => {
+      required => { message => 'no employee no sent.', status => 400 },
+    },
+    employeeincometax => {
+      required => { message => 'no employee income tax sent.', status => 400 },
+    },
+    employeegrosswage => {
+      required => { message => 'no employee gross wage sent.', status => 400 },
+    },
+    employeeni => {
+      required => { message => 'no employee ni sent.', status => 400 },
+    },
+    employeepension => {
+      required => { message => 'no employee pension sent.', status => 400 },
+    },
+    employeeotherbenefit => {
+      required => { message => 'no employee other benefits sent.', status => 400 },
     },
   };
 };
@@ -28,11 +80,11 @@ sub post_payroll {
   $validation->required('employeeamount');
   $validation->required('localemployeeamount');
   $validation->required('grosspayroll');
-  $validation->optional('payrollincometax');
-  $validation->optional('payrollemployeeni');
-  $validation->optional('payrollemployerni');
-  $validation->optional('payrolltotalpension');
-  $validation->optional('payrollotherbenefit');
+  $validation->required('payrollincometax');
+  $validation->required('payrollemployeeni');
+  $validation->required('payrollemployerni');
+  $validation->required('payrolltotalpension');
+  $validation->required('payrollotherbenefit');
 
   return $c->api_validation_error if $validation->has_error;
 
@@ -63,9 +115,9 @@ sub post_supplier {
   });
 
   $validation->required('entryperiod');
-  $validation->optional('postcode')->postcode;
-  $validation->optional('supplierbusinessname');
-  $validation->optional('monthlyspend');
+  $validation->required('postcode')->postcode;
+  $validation->required('supplierbusinessname');
+  $validation->required('monthlyspend');
 
   return $c->api_validation_error if $validation->has_error;
 
@@ -77,7 +129,7 @@ sub post_supplier {
 
   return $c->render( json => {
     success => Mojo::JSON->true,
-    message => 'Submitted Payroll Info Successfully',
+    message => 'Submitted Supplier Info Successfully',
   });
 }
 
@@ -96,12 +148,12 @@ sub post_employee {
   });
 
   $validation->required('entryperiod');
-  $validation->optional('employeeno');
-  $validation->optional('employeeincometax');
-  $validation->optional('employeegrosswage');
-  $validation->optional('employeeni');
-  $validation->optional('employeepension');
-  $validation->optional('employeeotherbenefit');
+  $validation->required('employeeno');
+  $validation->required('employeeincometax');
+  $validation->required('employeegrosswage');
+  $validation->required('employeeni');
+  $validation->required('employeepension');
+  $validation->required('employeeotherbenefit');
 
   return $c->api_validation_error if $validation->has_error;
 
@@ -113,7 +165,7 @@ sub post_employee {
 
   return $c->render( json => {
     success => Mojo::JSON->true,
-    message => 'Submitted Payroll Info Successfully',
+    message => 'Submitted Employee Info Successfully',
   });
 }
 
