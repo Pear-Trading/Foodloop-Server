@@ -73,7 +73,7 @@ sub create_random_transaction {
   $schema->resultset('Transaction')->create({
     buyer => $buyer_result,
     seller => $seller_result,
-    value => 10,
+    value => 10 * 100000,
     proof_image => 'a',
     purchase_time => $time,
   });

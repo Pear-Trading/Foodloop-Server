@@ -43,7 +43,7 @@ $t->post_ok('/api/stats' => json => { session_key => $session_key } )
 for ( 1 .. 10 ) {
   $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
-    value => $_,
+    value => $_ * 100000,
     proof_image => 'a',
   });
 }
@@ -51,7 +51,7 @@ for ( 1 .. 10 ) {
 for ( 11 .. 20 ) {
   $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
-    value => $_,
+    value => $_ * 100000,
     proof_image => 'a',
     purchase_time => $dtf->format_datetime(DateTime->today()->subtract( days => 5 )),
   });
@@ -60,7 +60,7 @@ for ( 11 .. 20 ) {
 for ( 21 .. 30 ) {
   $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
-    value => $_,
+    value => $_ * 100000,
     proof_image => 'a',
     purchase_time => $dtf->format_datetime(DateTime->today()->subtract( days => 25 )),
   });
@@ -69,7 +69,7 @@ for ( 21 .. 30 ) {
 for ( 31 .. 40 ) {
   $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
-    value => $_,
+    value => $_ * 100000,
     proof_image => 'a',
     purchase_time => $dtf->format_datetime(DateTime->today()->subtract( days => 50 )),
   });
@@ -78,7 +78,7 @@ for ( 31 .. 40 ) {
 for ( 41 .. 50 ) {
   $org_result->create_related( 'purchases', {
     seller_id => $org_result->id,
-    value => $_,
+    value => $_ * 100000,
     proof_image => 'a',
     purchase_time => $dtf->format_datetime(DateTime->today()->subtract( days => 50 )),
   });
@@ -91,8 +91,8 @@ is $user_result->purchases->search({
       $dtf->format_datetime(DateTime->today()->add( days => 1 )),
     ],
   },
-})->get_column('value')->sum, 55, 'Got correct sum';
-is $user_result->purchases->today_rs->get_column('value')->sum, 55, 'Got correct sum through rs';
+})->get_column('value')->sum, 5500000, 'Got correct sum';
+is $user_result->purchases->today_rs->get_column('value')->sum, 5500000, 'Got correct sum through rs';
 
 $t->post_ok('/api/stats' => json => { session_key => $session_key } )
   ->status_is(200)

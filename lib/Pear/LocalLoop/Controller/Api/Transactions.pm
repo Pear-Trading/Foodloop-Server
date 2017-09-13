@@ -34,7 +34,7 @@ sub post_transaction_list_purchases {
   my @transaction_list = (
     map {{
       seller => $_->seller->name,
-      value => $_->value,
+      value => $_->value / 100000,
       purchase_time => $_->purchase_time,
     }} $transactions->all
   );

@@ -18,23 +18,23 @@ sub post_index {
   my $user = $c->stash->{api_user}->entity;
 
   my $today_rs = $user->purchases->today_rs;
-  my $today_sum = $today_rs->get_column('value')->sum;
+  my $today_sum = $today_rs->get_column('value')->sum || 0;
   my $today_count = $today_rs->count;
 
   my $week_rs = $user->purchases->week_rs;
-  my $week_sum = $week_rs->get_column('value')->sum;
+  my $week_sum = $week_rs->get_column('value')->sum || 0;
   my $week_count = $week_rs->count;
 
   my $month_rs = $user->purchases->month_rs;
-  my $month_sum = $month_rs->get_column('value')->sum;
+  my $month_sum = $month_rs->get_column('value')->sum || 0;
   my $month_count = $month_rs->count;
 
   my $user_rs = $user->purchases;
-  my $user_sum = $user_rs->get_column('value')->sum;
+  my $user_sum = $user_rs->get_column('value')->sum || 0;
   my $user_count = $user_rs->count;
 
   my $global_rs = $c->schema->resultset('Transaction');
-  my $global_sum = $global_rs->get_column('value')->sum;
+  my $global_sum = $global_rs->get_column('value')->sum || 0;
   my $global_count = $global_rs->count;
 
   my $leaderboard_rs = $c->schema->resultset('Leaderboard');
@@ -44,15 +44,15 @@ sub post_index {
 
   return $c->render( json => {
     success => Mojo::JSON->true,
-    today_sum => $today_sum || 0,
+    today_sum => $today_sum / 100000,
     today_count => $today_count,
-    week_sum => $week_sum || 0,
+    week_sum => $week_sum / 100000,
     week_count => $week_count,
-    month_sum => $month_sum || 0,
+    month_sum => $month_sum / 100000,
     month_count => $month_count,
-    user_sum => $user_sum || 0,
+    user_sum => $user_sum / 100000,
     user_count => $user_count,
-    global_sum => $global_sum || 0,
+    global_sum => $global_sum / 100000,
     global_count => $global_count,
     user_position => defined $current_user_position ? $current_user_position->position : 0,
   });
@@ -90,6 +90,10 @@ sub post_leaderboards {
   $today_values->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
 
   my @leaderboard_array = $today_values->all;
+
+  if ( $validation->param('type') =~ /total$/ ) {
+    map { $_->{value} / 100000 } @leaderboard_array;
+  }
 
   my $current_user_position = $today_values->find({ entity_id => $c->stash->{api_user}->entity->id });
 
