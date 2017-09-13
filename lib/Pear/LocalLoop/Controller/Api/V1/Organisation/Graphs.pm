@@ -139,7 +139,7 @@ sub _sales_last_duration {
       ->get_column('value')
       ->sum || 0 + 0;
     push @{ $data->{ labels } }, $start->day_name;
-    push @{ $data->{ data } }, $transactions;
+    push @{ $data->{ data } }, $transactions / 100000;
     $start->add( days => 1 );
   }
 
@@ -171,7 +171,7 @@ sub _purchases_last_duration {
       ->get_column('value')
       ->sum || 0 + 0;
     push @{ $data->{ labels } }, $start->day_name;
-    push @{ $data->{ data } }, $transactions;
+    push @{ $data->{ data } }, $transactions / 100000;
     $start->add( days => 1 );
   }
 

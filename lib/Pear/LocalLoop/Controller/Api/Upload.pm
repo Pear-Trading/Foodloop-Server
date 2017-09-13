@@ -176,7 +176,7 @@ sub post_upload {
     'sales',
     {
       buyer => $user->entity,
-      value => $transaction_value,
+      value => $transaction_value * 100000,
       ( defined $file ? ( proof_image => $file ) : () ),
       purchase_time => $c->format_db_datetime($purchase_time),
     }
