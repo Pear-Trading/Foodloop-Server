@@ -1,5 +1,7 @@
 # Changelog
 
+# Next Release
+
 # v0.9.1
 
 * Change to semantic versioning
