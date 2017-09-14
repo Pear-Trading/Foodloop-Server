@@ -29,63 +29,93 @@ $schema->resultset('Leaderboard')->populate([
   [ 'All Time Count', 'all_time_count' ],
 ]);
 
-my $user1 = {
+my $entity1 = {
   customer => {
     full_name    => 'Test User1',
     display_name => 'Test User1',
     postcode     => 'LA1 1AA',
     year_of_birth => 2006,
   },
-  email        => 'test1@example.com',
-  password     => 'abc123',
+  user => {
+    email    => 'test1@example.com',
+    password => 'abc123',
+  },
+  type => "customer",
 };
 
-my $user2 = {
+my $entity2 = {
   customer => {
-    full_name    => 'Test User2',
-    display_name => 'Test User2',
-    postcode     => 'LA1 1AA',
+    full_name     => 'Test User2',
+    display_name  => 'Test User2',
+    postcode      => 'LA1 1AA',
     year_of_birth => 2006,
   },
-  email        => 'test2@example.com',
-  password     => 'abc123',
+  user => {
+    email    => 'test2@example.com',
+    password => 'abc123',
+  },
+  type => "customer",
 };
 
-my $user3 = {
+my $entity3 = {
   customer => {
-    full_name    => 'Test User3',
-    display_name => 'Test User3',
-    postcode     => 'LA1 1AA',
+    full_name     => 'Test User3',
+    display_name  => 'Test User3',
+    postcode      => 'LA1 1AA',
     year_of_birth => 2006,
   },
-  email        => 'test3@example.com',
-  password     => 'abc123',
+  user => {
+    email    => 'test3@example.com',
+    password => 'abc123',
+  },
+  type => "customer",
 };
 
-my $user4 = {
+my $entity4 = {
   customer => {
-    full_name    => 'Test User4',
-    display_name => 'Test User4',
-    postcode     => 'LA1 1AA',
+    full_name     => 'Test User4',
+    display_name  => 'Test User4',
+    postcode      => 'LA1 1AA',
     year_of_birth => 2006,
   },
-  email        => 'test4@example.com',
-  password     => 'abc123',
+  user => {
+    email    => 'test4@example.com',
+    password => 'abc123',
+  },
+  type => "customer",
 };
 
-my $org = {
+my $entity5 = {
   organisation => {
     name        => 'Test Org',
     street_name => 'Test Street',
     town        => 'Lancaster',
     postcode    => 'LA1 1AA',
   },
-  email       => 'org@example.com',
-  password    => 'abc123',
+  user => {
+    email    => 'org@example.com',
+    password => 'abc123',
+  },
+  type => "organisation",
 };
 
-$schema->resultset('User')->create( $_ )
-  for ( $user1, $user2, $user3, $user4, $org );
+my $entity6 = {
+  customer => {
+    full_name     => 'Test Admin',
+    display_name  => 'Test Admin',
+    postcode      => 'LA1 1AA',
+    year_of_birth => 2006,
+  },
+  user => {
+    email    => 'admin@example.com',
+    password => 'abc123',
+    is_admin => \"1",
+  },
+  type => "customer",
+};
+
+$schema->resultset('Entity')->create( $_ )
+  for ( $entity1, $entity2, $entity3, $entity4, $entity5, $entity6 );
 
 my $data_set = 'users';
 

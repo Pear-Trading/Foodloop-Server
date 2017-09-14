@@ -13,6 +13,11 @@ __PACKAGE__->add_columns(
     is_auto_increment => 1,
     is_nullable => 0,
   },
+  "entity_id" => {
+    data_type => "integer",
+    is_nullable => 0,
+    is_foreign_key => 1,
+  },
   "display_name" => {
     data_type => "varchar",
     size => 255,
@@ -36,11 +41,10 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key("id");
 
-__PACKAGE__->might_have(
-  "user",
-  "Pear::LocalLoop::Schema::Result::User",
-  { "foreign.customer_id" => "self.id" },
-  { cascade_copy => 0, cascade_delete => 0 },
+__PACKAGE__->belongs_to(
+  "entity",
+  "Pear::LocalLoop::Schema::Result::Entity",
+  "entity_id",
 );
 
 1;

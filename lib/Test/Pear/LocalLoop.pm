@@ -1,5 +1,5 @@
 package Test::Pear::LocalLoop;
-use Mojo::Base -base;
+use Moo;
 
 use Test::More;
 use File::Temp;
@@ -7,12 +7,48 @@ use Test::Mojo;
 use DateTime::Format::Strptime;
 use DBIx::Class::Fixtures;
 
-has config => sub {
+# Conditionally require Test::PostgreSQL
+sub BUILD {
+  if ( $ENV{PEAR_TEST_PG} ) {
+    require Test::PostgreSQL
+      or die "you need Test::PostgreSQL to run PG testing";
+    Test::PostgreSQL->import;
+  }
+}
+
+sub DEMOLISH {
+  my ( $self, $in_global_destruction ) = @_;
+
+  if ( $ENV{PEAR_TEST_PG} && !$in_global_destruction ) {
+    $self->mojo->app->schema->storage->dbh->disconnect;
+    $self->pg->stop;
+  }
+}
+
+has pg => (
+  is => 'lazy',
+  builder => sub {
+    return Test::PostgreSQL->new();
+  },
+);
+
+has config => (
+  is => 'lazy',
+  builder => sub {
+  my $self = shift;
   my $file = File::Temp->new;
 
-  print $file <<'END';
+  my $dsn;
+
+  if ( $ENV{PEAR_TEST_PG} ) {
+    $dsn = $self->pg->dsn;
+  } else {
+    $dsn = "dbi:SQLite::memory:";
+  }
+
+  print $file <<"END";
 {
-  dsn => "dbi:SQLite::memory:",
+  dsn => "$dsn",
   user => undef,
   pass => undef,
 }
@@ -20,9 +56,12 @@ END
 
   $file->seek( 0, SEEK_END );
   return $file;
-};
+  },
+);
 
-has mojo => sub {
+has mojo => (
+  is => 'lazy',
+  builder => sub {
   my $self = shift;
 
   $ENV{MOJO_CONFIG} = $self->config->filename;
@@ -31,9 +70,18 @@ has mojo => sub {
   $t->app->schema->deploy;
 
   return $t;
-};
+  },
+);
 
-has _deployed => sub { 0 };
+has etc_dir => (
+  is => 'lazy',
+  builder => sub { die "etc dir not set" },
+);
+
+has _deployed => (
+  is => 'rwp',
+  default => 0,
+);
 
 sub framework {
   my $self = shift;
@@ -56,12 +104,10 @@ sub framework {
     ]);
   }
 
-  $self->_deployed(1);
+  $self->_set__deployed(1);
 
   return $t;
 };
-
-has etc_dir => sub { die "etc dir not set" };
 
 sub dump_error {
   return sub {
@@ -142,11 +188,40 @@ sub install_fixtures {
   });
 
   my $t = $self->framework(1);
+  my $schema = $t->app->schema;
+
   $fixtures->populate({
     directory => File::Spec->catdir( $self->etc_dir, 'fixtures', 'data', $fixture_name ),
     no_deploy => 1,
-    schema => $t->app->schema,
+    schema => $schema,
   });
+
+  # Reset table id sequences
+  if ( $ENV{PEAR_TEST_PG} ) {
+    $schema->storage->dbh_do(
+      sub {
+        my ( $storage, $dbh, $sets ) = @_;
+        for my $table ( keys %$sets ) {
+          my $seq = $sets->{$table};
+          $dbh->do(
+          qq/
+          SELECT setval(
+            '$seq',
+            COALESCE(
+              (SELECT MAX(id)+1 FROM $table),
+              1
+            ),
+            false
+          );
+          /);
+        }
+      },
+      {
+        entities => 'entities_id_seq',
+        organisations => 'organisations_id_seq',
+      }
+    );
+  }
 }
 
 1;

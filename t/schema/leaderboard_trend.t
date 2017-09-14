@@ -76,15 +76,15 @@ my $tweak = 0;
 my $now = DateTime->today();
 
 {
-  my $user_result = $schema->resultset('User')->find({ email => $user1->{email} });
+  my $user_result = $schema->resultset('User')->find({ email => $user1->{email} })->entity;
 
-  $user_result->create_related( 'transactions', {
+  $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
     value => 1,
     proof_image => 'a',
   });
 
-  $user_result->create_related( 'transactions', {
+  $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
     value => 9,
     proof_image => 'a',
@@ -93,15 +93,15 @@ my $now = DateTime->today();
 }
 
 {
-  my $user_result = $schema->resultset('User')->find({ email => $user2->{email} });
+  my $user_result = $schema->resultset('User')->find({ email => $user2->{email} })->entity;
 
-  $user_result->create_related( 'transactions', {
+  $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
     value => 3,
     proof_image => 'a',
   });
 
-  $user_result->create_related( 'transactions', {
+  $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
     value => 1,
     proof_image => 'a',
@@ -110,15 +110,15 @@ my $now = DateTime->today();
 }
 
 {
-  my $user_result = $schema->resultset('User')->find({ email => $user3->{email} });
+  my $user_result = $schema->resultset('User')->find({ email => $user3->{email} })->entity;
 
-  $user_result->create_related( 'transactions', {
+  $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
     value => 5,
     proof_image => 'a',
   });
 
-  $user_result->create_related( 'transactions', {
+  $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
     value => 5,
     proof_image => 'a',
@@ -127,15 +127,15 @@ my $now = DateTime->today();
 }
 
 {
-  my $user_result = $schema->resultset('User')->find({ email => $user4->{email} });
+  my $user_result = $schema->resultset('User')->find({ email => $user4->{email} })->entity;
 
-  $user_result->create_related( 'transactions', {
+  $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
     value => 9,
     proof_image => 'a',
   });
 
-  $user_result->create_related( 'transactions', {
+  $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
     value => 3,
     proof_image => 'a',
@@ -162,7 +162,7 @@ sub test_leaderboard {
       {},
       {
         order_by => { -desc => 'value' },
-        columns => [ qw/ user_id value trend position / ],
+        columns => [ qw/ entity_id value trend position / ],
       },
     );
     $today_values->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
@@ -178,10 +178,10 @@ test_leaderboard(
   'daily_total',
   $now,
   [
-    { user_id => 4, value => 9, trend => -1, position => 1},
-    { user_id => 3, value => 5, trend => 0,  position => 2},
-    { user_id => 2, value => 3, trend => -1, position => 3},
-    { user_id => 1, value => 1, trend => 1,  position => 4},
+    { entity_id => 4, value => 9, trend => -1, position => 1},
+    { entity_id => 3, value => 5, trend => 0,  position => 2},
+    { entity_id => 2, value => 3, trend => -1, position => 3},
+    { entity_id => 1, value => 1, trend => 1,  position => 4},
   ]
 );
 
@@ -190,10 +190,10 @@ test_leaderboard(
   'daily_count',
   $now,
   [
-    { user_id => 1, value => 1, trend => 0, position => 1 },
-    { user_id => 2, value => 1, trend => 0, position => 2 },
-    { user_id => 3, value => 1, trend => 0, position => 3 },
-    { user_id => 4, value => 1, trend => 0, position => 4 },
+    { entity_id => 1, value => 1, trend => 0, position => 1 },
+    { entity_id => 2, value => 1, trend => 0, position => 2 },
+    { entity_id => 3, value => 1, trend => 0, position => 3 },
+    { entity_id => 4, value => 1, trend => 0, position => 4 },
   ]
 );
 

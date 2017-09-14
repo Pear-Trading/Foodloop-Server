@@ -29,13 +29,13 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
   },
   "value" => {
-    data_type => "decimal",
-    size => [ 16, 2 ],
+    data_type => "numeric",
+    size => [ 100, 0 ],
     is_nullable => 0,
   },
   "proof_image" => {
     data_type => "text",
-    is_nullable => 0,
+    is_nullable => 1,
   },
   "submitted_at" => {
     data_type => "datetime",
@@ -54,14 +54,14 @@ __PACKAGE__->set_primary_key("id");
 
 __PACKAGE__->belongs_to(
   "buyer",
-  "Pear::LocalLoop::Schema::Result::User",
+  "Pear::LocalLoop::Schema::Result::Entity",
   { id => "buyer_id" },
   { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },
 );
 
 __PACKAGE__->belongs_to(
   "seller",
-  "Pear::LocalLoop::Schema::Result::Organisation",
+  "Pear::LocalLoop::Schema::Result::Entity",
   { id => "seller_id" },
   { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },
 );

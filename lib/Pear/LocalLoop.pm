@@ -74,16 +74,6 @@ sub startup {
     }
   });
 
-  $self->helper( datetime_formatter => sub {
-    my $c = shift;
-
-    return DateTime::Format::Strptime->new(
-      pattern => '%FT%T%z',
-      strict => 1,
-      on_error => 'undef',
-    );
-  });
-
   $self->helper( get_path_from_uuid => sub {
     my $c = shift;
     my $uuid = shift;
@@ -150,16 +140,17 @@ sub startup {
   $api->post('/search')->to('api-upload#post_search');
   $api->post('/user')->to('api-user#post_account');
   $api->post('/user/account')->to('api-user#post_account_update');
-  $api->post('/user/day')->to('api-user#post_day');
   $api->post('/user-history')->to('api-user#post_user_history');
   $api->post('/stats')->to('api-stats#post_index');
   $api->post('/stats/leaderboard')->to('api-stats#post_leaderboards');
+  $api->post('/outgoing-transactions')->to('api-transactions#post_transaction_list_purchases');
 
   my $api_v1 = $api->under('/v1');
 
   my $api_v1_org = $api_v1->under('/organisation')->to('api-v1-organisation#auth');
 
   $api_v1_org->post('/graphs')->to('api-v1-organisation-graphs#index');
+  $api_v1_org->post('/snippets')->to('api-v1-organisation-snippets#index');
 
   my $admin_routes = $r->under('/admin')->to('admin#under');
 
@@ -175,19 +166,20 @@ sub startup {
   $admin_routes->get('/users/:id')->to('admin-users#read');
   $admin_routes->post('/users/:id')->to('admin-users#update');
   $admin_routes->post('/users/:id/delete')->to('admin-users#delete');
-  $admin_routes->post('/users/:id/edit')->to('admin-users#edit');
 
   $admin_routes->get('/organisations')->to('admin-organisations#list');
   $admin_routes->get('/organisations/add')->to('admin-organisations#add_org');
-  $admin_routes->post('/organisations/add/submit')->to('admin-organisations#add_org_submit');
-  $admin_routes->get('/organisations/valid/:id')->to('admin-organisations#valid_read');
-  $admin_routes->post('/organisations/valid/:id/edit')->to('admin-organisations#valid_edit');
-  $admin_routes->get('/organisations/pending/:id')->to('admin-organisations#pending_read');
-  $admin_routes->post('/organisations/pending/:id/edit')->to('admin-organisations#pending_edit');
-  $admin_routes->get('/organisations/pending/:id/approve')->to('admin-organisations#pending_approve');
+  $admin_routes->post('/organisations/add')->to('admin-organisations#add_org_submit');
+  $admin_routes->get('/organisations/:id')->to('admin-organisations#valid_read');
+  $admin_routes->post('/organisations/:id')->to('admin-organisations#valid_edit');
 
   $admin_routes->get('/feedback')->to('admin-feedback#index');
   $admin_routes->get('/feedback/:id')->to('admin-feedback#read');
+
+  $admin_routes->get('/transactions')->to('admin-transactions#index');
+  $admin_routes->get('/transactions/:id')->to('admin-transactions#read');
+  $admin_routes->get('/transactions/:id/image')->to('admin-transactions#image');
+  $admin_routes->post('/transactions/:id/delete')->to('admin-transactions#delete');
 
 #  my $user_routes = $r->under('/')->to('root#under');
 

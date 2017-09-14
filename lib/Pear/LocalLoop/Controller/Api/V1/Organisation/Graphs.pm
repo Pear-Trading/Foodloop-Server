@@ -18,6 +18,11 @@ sub index {
   $validation->required('graph')->in( qw/
     customers_last_7_days
     customers_last_30_days
+    sales_last_7_days
+    sales_last_30_days
+    purchases_last_7_days
+    purchases_last_30_days
+    customers_range
   / );
 
   return $c->api_validation_error if $validation->has_error;
@@ -39,6 +44,40 @@ sub index {
   return $c->$graph_sub;
 }
 
+sub graph_customers_range {
+  my $c = shift;
+
+  my $validation = $c->validation;
+  $validation->input( $c->stash->{api_json} );
+  $validation->required('start')->is_iso_date;
+  $validation->required('end')->is_iso_date;
+
+  return $c->api_validation_error if $validation->has_error;
+
+  my $entity = $c->stash->{api_user}->entity;
+
+  my $data = { labels => [], data => [] };
+  my $start = $c->parse_iso_date( $validation->param('start') );
+  my $end = $c->parse_iso_date( $validation->param('end') );
+
+  while ( $start <= $end ) {
+    my $next_end = $start->clone->add( days => 1 );
+    my $transactions = $entity->sales
+      ->search_between( $start, $next_end )
+      ->count;
+    push @{ $data->{ labels } }, $c->format_iso_date( $start );
+    push @{ $data->{ data } }, $transactions;
+    $start->add( days => 1 );
+  }
+
+  return $c->render(
+    json => {
+      success => Mojo::JSON->true,
+      graph => $data,
+    }
+  );
+}
+
 sub graph_customers_last_7_days {
   my $c = shift;
 
@@ -56,24 +95,20 @@ sub graph_customers_last_30_days {
 sub _customers_last_duration {
   my ( $c, $duration ) = @_;
 
-  my $org = $c->stash->{api_user}->organisation;
+  my $entity = $c->stash->{api_user}->entity;
 
-  my $data = { day => [], count => [] };
+  my $data = { labels => [], data => [] };
 
-  my $start = DateTime->today;
-  my $end = $start->clone->subtract_duration( $duration );
+  my ( $start, $end ) = $c->_get_start_end_duration( $duration );
 
-  my $dtf = $c->schema->storage->datetime_parser;
-
-  while ( $end < $start ) {
-    my $moving_end = $end->clone->add( days => 1 );
-    my $transactions = $c->schema->resultset('Transaction')->search({
-      seller_id => $org->id,
-      purchase_time => { '-between' => [ $dtf->format_datetime($end), $dtf->format_datetime($moving_end) ] },
-    })->count;
-    push @{$data->{day}}, $end->day_name;
-    push @{$data->{count}}, $transactions;
-    $end->add( days => 1 );
+  while ( $start < $end ) {
+    my $next_end = $start->clone->add( days => 1 );
+    my $transactions = $entity->sales
+      ->search_between( $start, $next_end )
+      ->count;
+    push @{ $data->{ labels } }, $start->day_name;
+    push @{ $data->{ data } }, $transactions;
+    $start->add( days => 1 );
   }
 
   return $c->render(
@@ -82,6 +117,77 @@ sub _customers_last_duration {
       graph => $data,
     }
   );
+}
+
+sub graph_sales_last_7_days { return shift->_sales_last_duration( 7 ) }
+sub graph_sales_last_30_days { return shift->_sales_last_duration( 30 ) }
+
+sub _sales_last_duration {
+  my ( $c, $day_duration ) = @_;
+
+  my $duration = DateTime::Duration->new( days => $day_duration );
+  my $entity = $c->stash->{api_user}->entity;
+
+  my $data = { labels => [], data => [] };
+
+  my ( $start, $end ) = $c->_get_start_end_duration( $duration );
+
+  while ( $start < $end ) {
+    my $next_end = $start->clone->add( days => 1 );
+    my $transactions = $entity->sales
+      ->search_between( $start, $next_end )
+      ->get_column('value')
+      ->sum || 0 + 0;
+    push @{ $data->{ labels } }, $start->day_name;
+    push @{ $data->{ data } }, $transactions / 100000;
+    $start->add( days => 1 );
+  }
+
+  return $c->render(
+    json => {
+      success => Mojo::JSON->true,
+      graph => $data,
+    }
+  );
+}
+
+sub graph_purchases_last_7_days { return shift->_purchases_last_duration( 7 ) }
+sub graph_purchases_last_30_days { return shift->_purchases_last_duration( 30 ) }
+
+sub _purchases_last_duration {
+  my ( $c, $day_duration ) = @_;
+
+  my $duration = DateTime::Duration->new( days => $day_duration );
+  my $entity = $c->stash->{api_user}->entity;
+
+  my $data = { labels => [], data => [] };
+
+  my ( $start, $end ) = $c->_get_start_end_duration( $duration );
+
+  while ( $start < $end ) {
+    my $next_end = $start->clone->add( days => 1 );
+    my $transactions = $entity->purchases
+      ->search_between( $start, $next_end )
+      ->get_column('value')
+      ->sum || 0 + 0;
+    push @{ $data->{ labels } }, $start->day_name;
+    push @{ $data->{ data } }, $transactions / 100000;
+    $start->add( days => 1 );
+  }
+
+  return $c->render(
+    json => {
+      success => Mojo::JSON->true,
+      graph => $data,
+    }
+  );
+}
+
+sub _get_start_end_duration {
+  my ( $c, $duration ) = @_;
+  my $end = DateTime->today;
+  my $start = $end->clone->subtract_duration( $duration );
+  return ( $start, $end );
 }
 
 1;

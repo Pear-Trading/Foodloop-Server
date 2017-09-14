@@ -11,7 +11,7 @@
     <strong>Success!</strong> <%= $success %>
   </div>
 % }
-<form action="<%= url_for . '/edit' %>" method="post" autocomplete="off">
+<form action="<%= url_for %>" method="post" autocomplete="off">
   <h3 class="card-header">
     User Details
   </h3>
@@ -25,14 +25,14 @@
     </div>
     <div class="form-group">
       <label for="type">Account Type</label>
-      <input id="type" type="text" class="form-control" value="<%= defined $user->customer_id ? 'Customer' : 'Organisation' %>" disabled>
+      <input id="type" type="text" class="form-control" value="<%= $user->type eq 'customer' ? 'Customer' : 'Organisation' %>" disabled>
     </div>
     <div class="form-group">
       <label for="new_password">New Password</label>
       <input id="new_password" type="password" autocomplete="off" class="form-control" placeholder="New Password" name="new_password">
       <p class="help-block">Leave blank unless you want to change their password</p>
     </div>
-  % if ( my $customer_rs = $user->customer ) {
+    % if ( my $customer_rs = $user->entity->customer ) {
   <h3 class="card-header">
     Customer Details
   </h3>
@@ -52,7 +52,7 @@
       <label for="year_of_birth">Year of Birth</label>
       <input id="year_of_birth" type="number" class="form-control" placeholder="Year of Birth" name="year_of_birth" value="<%= $customer_rs->year_of_birth %>" disabled>
     </div>
-    % } elsif (  my $org_rs = $user->organisation ) {
+    % } elsif (  my $org_rs = $user->entity->organisation ) {
   <h3 class="card-header">
     Organisation Details
   </h3>
@@ -86,3 +86,30 @@
       <button class="btn btn-primary form-control" type="submit">Edit Account</button>
     </div>
 </form>
+<div class="card mb-3">
+  <h3 class="card-header">
+    Transactions
+  </h3>
+  <ul class="list-group list-group-flush">
+    % for my $transaction ( $transactions->all ) {
+    <li class="list-group-item">
+      <div class="container">
+        <a href="<%= url_for '/admin/transactions/' . $transaction->id %>" class="list-group-item list-group-item-action">
+          <div class="row text-center">
+            <div class="col">From: <%= $transaction->buyer->name %></div>
+            <div class="col">To: <%= $transaction->seller->name %></div>
+            <div class="col">Value: <%= $transaction->value %></div>
+            <div class="col">Submitted At: <%= $transaction->submitted_at %></div>
+            <div class="col">Purchase Time: <%= $transaction->purchase_time %></div>
+          </div>
+        </a>
+      </div>
+    </li>
+    % }
+    <li class="list-group-item">
+      <div class="container">
+        %= bootstrap_pagination( $c->param('page') || 1, $transactions->pager->last_page, { class => 'justify-content-center' } );
+      </div>
+    </li>
+  </ul>
+</div>

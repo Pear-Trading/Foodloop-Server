@@ -33,24 +33,11 @@ has error_messages => sub {
     town => {
       required => { message => 'No town sent.', status => 400 },
     },
+    sector => {
+      required => { message => 'No sector sent.', status => 400 },
+    },
   };
 };
-
-sub post_day {
-  my $c = shift;
-
-  my $validation = $c->validation;
-
-  $validation->input( $c->stash->{api_json} );
-
-  $validation->optional('day')->is_iso_datetime;
-
-  return $c->api_validation_error if $validation->has_error;
-
-  $c->render( json => {
-    success => Mojo::JSON->true,
-  });
-}
 
 sub post_account {
   my $c = shift;
@@ -60,28 +47,43 @@ sub post_account {
 
   if ( defined $user_result ) {
     my $email = $user_result->email;
-    my $full_name;
-    my $display_name;
-    my $postcode;
 
-    #Needs elsif added for trader page for this similar relevant entry
-    if ( defined $user_result->customer_id ) {
-      $full_name = $user_result->customer->full_name;
-      $display_name = $user_result->customer->display_name;
-      $postcode = $user_result->customer->postcode;
-    } elsif ( defined $user_result->organisation_id ) {
-      $display_name = $user_result->organisation->name;
+    if ( $user_result->type eq 'customer' ) {
+      my $full_name = $user_result->entity->customer->full_name;
+      my $display_name = $user_result->entity->customer->display_name;
+      my $postcode = $user_result->entity->customer->postcode;
+      return $c->render( json => {
+        success => Mojo::JSON->true,
+        full_name => $full_name,
+        display_name => $display_name,
+        email => $email,
+        postcode => $postcode,
+      });
+    } elsif ( $user_result->type eq 'organisation' ) {
+      my $name = $user_result->entity->organisation->name;
+      my $postcode = $user_result->entity->organisation->postcode;
+      my $street_name = $user_result->entity->organisation->street_name;
+      my $town = $user_result->entity->organisation->town;
+      my $sector = $user_result->entity->organisation->sector;
+      return $c->render( json => {
+        success => Mojo::JSON->true,
+        town => $town,
+        name => $name,
+        sector => $sector,
+        street_name => $street_name,
+        email => $email,
+        postcode => $postcode,
+      });
     } else {
-      return;
+      return $c->render(
+        json => {
+          success => Mojo::JSON->false,
+          message => 'Invalid Server Error.',
+        },
+        status => 500
+      );
     }
 
-    return $c->render( json => {
-      success => Mojo::JSON->true,
-      full_name => $full_name,
-      display_name => $display_name,
-      email => $email,
-      postcode => $postcode,
-    });
   }
   return $c->render(
     json => {
@@ -121,10 +123,10 @@ sub post_account_update {
   $validation->required('postcode')->postcode;
   $validation->optional('new_password');
 
-  if ( defined $user->customer_id ) {
+  if ( $user->type eq 'customer' ) {
     $validation->required('display_name');
     $validation->required('full_name');
-  } elsif ( defined $user->organisation_id ) {
+  } elsif ( $user->type eq 'organisation' ) {
     $validation->required('name');
     $validation->required('street_name');
     $validation->required('town');
@@ -133,10 +135,10 @@ sub post_account_update {
 
   return $c->api_validation_error if $validation->has_error;
 
-  if ( defined $user->customer_id ){
+  if ( $user->type eq 'customer' ){
 
     $c->schema->txn_do( sub {
-      $user->customer->update({
+      $user->entity->customer->update({
         full_name     => $validation->param('full_name'),
         display_name  => $validation->param('display_name'),
         postcode      => $validation->param('postcode'),
@@ -148,10 +150,10 @@ sub post_account_update {
     });
 
   }
-  elsif ( defined $user->organisation_id ) {
+  elsif ( $user->type eq 'organisation' ) {
 
     $c->schema->txn_do( sub {
-      $user->organisation->update({
+      $user->entity->organisation->update({
         name        => $validation->param('name'),
         street_name => $validation->param('street_name'),
         town        => $validation->param('town'),

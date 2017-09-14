@@ -44,8 +44,8 @@ $t->post_ok('/api/v1/organisation/graphs' => json => {
   })
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/graph', {
-    day => [ map { $start->clone->subtract( days => $_ )->day_name } reverse ( 0 .. 6 ) ],
-    count => [ 2, 4, 2, 3, 3, 4, 1 ],
+    labels => [ map { $start->clone->subtract( days => $_ )->day_name } reverse ( 0 .. 6 ) ],
+    data => [ 2, 4, 2, 3, 3, 4, 1 ],
   });
 
 $t->post_ok('/api/v1/organisation/graphs' => json => {
@@ -54,8 +54,40 @@ $t->post_ok('/api/v1/organisation/graphs' => json => {
   })
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/graph', {
-    day => [ map { $start->clone->subtract( days => $_ )->day_name } reverse ( 0 .. 29 ) ],
-    count => [ 4, 2, 3, 3, 4, 1, 4, 3, 3, 2, 4, 2, 4, 2, 3, 3, 4, 1, 4, 3, 3, 2, 4, 2, 4, 2, 3, 3, 4, 1 ],
+    labels => [ map { $start->clone->subtract( days => $_ )->day_name } reverse ( 0 .. 29 ) ],
+    data => [ 4, 2, 3, 3, 4, 1, 4, 3, 3, 2, 4, 2, 4, 2, 3, 3, 4, 1, 4, 3, 3, 2, 4, 2, 4, 2, 3, 3, 4, 1 ],
+  });
+
+$t->post_ok('/api/v1/organisation/graphs' => json => {
+    session_key => $session_key,
+    graph => 'sales_last_7_days',
+  })
+  ->status_is(200)->or($framework->dump_error)
+  ->json_is('/graph', {
+    labels => [ map { $start->clone->subtract( days => $_ )->day_name } reverse ( 0 .. 6 ) ],
+    data => [ 20, 40, 20, 30, 30, 40, 10 ],
+  });
+
+$t->post_ok('/api/v1/organisation/graphs' => json => {
+    session_key => $session_key,
+    graph => 'sales_last_30_days',
+  })
+  ->status_is(200)->or($framework->dump_error)
+  ->json_is('/graph', {
+    labels => [ map { $start->clone->subtract( days => $_ )->day_name } reverse ( 0 .. 29 ) ],
+    data => [ 40, 20, 30, 30, 40, 10, 40, 30, 30, 20, 40, 20, 40, 20, 30, 30, 40, 10, 40, 30, 30, 20, 40, 20, 40, 20, 30, 30, 40, 10 ],
+  });
+
+$t->post_ok('/api/v1/organisation/graphs' => json => {
+    session_key => $session_key,
+    graph => 'customers_range',
+    start => $start->clone->subtract( days => 8 )->ymd,
+    end => $start->clone->ymd,
+  })
+  ->status_is(200)->or($framework->dump_error)
+  ->json_is('/graph', {
+    labels => [ map { $start->clone->subtract( days => $_ )->ymd } reverse ( 0 .. 8 ) ],
+    data => [ 2, 4, 2, 4, 2, 3, 3, 4, 1 ],
   });
 
 $framework->logout( $session_key );
@@ -73,14 +105,17 @@ $t->post_ok('/api/v1/organisation/graphs' => json => {
   ->json_is('/success', Mojo::JSON->false)
   ->json_is('/error', 'user_not_org');
 
+
 sub create_random_transaction {
   my $buyer = shift;
   my $time = shift;
 
+  my $buyer_result = $schema->resultset('User')->find({ email => $buyer })->entity;
+  my $seller_result = $schema->resultset('Organisation')->find({ name => 'Test Org' })->entity;
   $schema->resultset('Transaction')->create({
-    buyer => { email => $buyer },
-    seller => { name => 'Test Org' },
-    value => ( int( rand( 10000 ) ) / 100 ),
+    buyer => $buyer_result,
+    seller => $seller_result,
+    value => 10 * 100000,
     proof_image => 'a',
     purchase_time => $time,
   });

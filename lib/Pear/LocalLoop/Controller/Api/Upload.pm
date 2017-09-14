@@ -112,7 +112,10 @@ sub post_upload {
 
   if ( $type == 1 ) {
     # Validated Organisation
-    my $valid_org_rs = $c->schema->resultset('Organisation');
+    my $valid_org_rs = $c->schema->resultset('Organisation')->search({
+      pending => 0,
+      entity_id => { "!=" => $user->entity_id },
+     });
     $validation->required('organisation_id')->number->in_resultset( 'id', $valid_org_rs );
 
     return $c->api_validation_error if $validation->has_error;
@@ -121,7 +124,11 @@ sub post_upload {
 
   } elsif ( $type == 2 ) {
     # Unvalidated Organisation
-    my $valid_org_rs = $c->schema->resultset('PendingOrganisation')->search({ submitted_by_id => $user->id });
+    my $valid_org_rs = $c->schema->resultset('Organisation')->search({
+      submitted_by_id => $user->id,
+      pending => 1,
+      entity_id => { "!=" => $user->entity_id },
+    });
     $validation->required('organisation_id')->number->in_resultset( 'id', $valid_org_rs );
 
     return $c->api_validation_error if $validation->has_error;
@@ -137,14 +144,15 @@ sub post_upload {
 
     return $c->api_validation_error if $validation->has_error;
 
-    $organisation = $c->schema->resultset('PendingOrganisation')->create({
-      submitted_by => $user,
-      submitted_at => DateTime->now,
-      name         => $validation->param('organisation_name'),
-      street_name  => $validation->param('street_name'),
-      town         => $validation->param('town'),
-      postcode     => $validation->param('postcode'),
+    my $entity = $c->schema->resultset('Entity')->create_org({
+      submitted_by_id => $user->id,
+      name            => $validation->param('organisation_name'),
+      street_name     => $validation->param('street_name'),
+      town            => $validation->param('town'),
+      postcode        => $validation->param('postcode'),
+      pending         => 1,
     });
+    $organisation = $entity->organisation;
   }
 
   unless ( defined $organisation ) {
@@ -164,12 +172,12 @@ sub post_upload {
   $purchase_time ||= DateTime->now();
   my $file = defined $upload ? $c->store_file_from_upload( $upload ) : undef;
 
-  my $new_transaction = $organisation->create_related(
-    'transactions',
+  my $new_transaction = $organisation->entity->create_related(
+    'sales',
     {
-      buyer => $user,
-      value => $transaction_value,
-      ( defined $file ? ( proof_image => $file ) : ( proof_image => 'a' ) ),
+      buyer => $user->entity,
+      value => $transaction_value * 100000,
+      ( defined $file ? ( proof_image => $file ) : () ),
       purchase_time => $c->format_db_datetime($purchase_time),
     }
   );
@@ -197,6 +205,8 @@ sub post_search {
   my $c = shift;
   my $self = $c;
 
+  my $user = $c->stash->{api_user};
+
   my $validation = $c->validation;
 
   $validation->input( $c->stash->{api_json} );
@@ -209,11 +219,19 @@ sub post_search {
 
   my $search_stmt = [ 'LOWER("name") LIKE ?', '%' . lc $search_name . '%' ];
 
-  my $valid_orgs_rs = $c->schema->resultset('Organisation')->search(
+  my $org_rs = $c->schema->resultset('Organisation');
+  my $valid_orgs_rs = $org_rs->search({
+    pending => 0,
+    entity_id => { "!=" => $user->entity_id },
+  })->search(
     \$search_stmt,
   );
 
-  my $pending_orgs_rs = $c->stash->{api_user}->pending_organisations->search(
+  my $pending_orgs_rs = $org_rs->search({
+      pending => 1,
+      submitted_by_id => $c->stash->{api_user}->id,
+      entity_id => { "!=" => $user->entity_id },
+    })->search(
     \$search_stmt,
   );
 

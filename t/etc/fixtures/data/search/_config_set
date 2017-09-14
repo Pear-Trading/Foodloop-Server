@@ -1,0 +1,57 @@
+$VAR1 = {
+          'has_many' => {
+                          'fetch' => 0
+                        },
+          'sets' => [
+                      {
+                        'class' => 'Feedback',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'Transaction'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'User'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'LeaderboardSet'
+                      },
+                      {
+                        'class' => 'Customer',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'Organisation'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'LeaderboardValue'
+                      },
+                      {
+                        'class' => 'Entity',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'Leaderboard'
+                      },
+                      {
+                        'class' => 'SessionToken',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'AccountToken'
+                      }
+                    ],
+          'might_have' => {
+                            'fetch' => 0
+                          },
+          'belongs_to' => {
+                            'fetch' => 0
+                          }
+        };

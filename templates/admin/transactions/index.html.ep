@@ -1,0 +1,35 @@
+% layout 'admin';
+% title 'Transactions';
+% content_for javascript => begin
+% end
+% if ( my $error = flash 'error' ) {
+  <div class="alert alert-danger" role="alert">
+    <strong>Error!</strong> <%= $error %>
+  </div>
+% } elsif ( my $success = flash 'success' ) {
+  <div class="alert alert-success" role="alert">
+    <strong>Success!</strong> <%= $success %>
+  </div>
+% }
+<div class="list-group list-group-flush">
+  % for my $transaction ( $transactions->all ) {
+  <li class="list-group-item">
+    <div class="container">
+      <a href="<%= url_for . '/' . $transaction->id %>" class="list-group-item list-group-item-action">
+        <div class="row text-center">
+          <div class="col">From: <%= $transaction->buyer->name %></div>
+          <div class="col">To: <%= $transaction->seller->name %></div>
+          <div class="col">Value: <%= $transaction->value %></div>
+          <div class="col">Submitted At: <%= $transaction->submitted_at %></div>
+          <div class="col">Purchase Time: <%= $transaction->purchase_time %></div>
+        </div>
+      </a>
+    </div>
+  </li>
+  % }
+  <li class="list-group-item">
+    <div class="container">
+      %= bootstrap_pagination( $c->param('page') || 1, $transactions->pager->last_page, { class => 'justify-content-center' } );
+    </div>
+  </li>
+</div>

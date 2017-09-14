@@ -1,0 +1,16 @@
+$HASH1 = {
+           country => undef,
+           entity_id
+                   => 10,
+           id      => 5,
+           name    => 'Dan\'s Fishop',
+           pending => 0,
+           postcode
+                   => 'LA1 1LT',
+           sector  => 'I',
+           street_name
+                   => '56 North Rd',
+           submitted_by_id
+                   => undef,
+           town    => 'Lancaster'
+         };

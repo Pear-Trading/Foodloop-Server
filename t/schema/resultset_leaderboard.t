@@ -69,7 +69,7 @@ $framework->register_customer($_)
 
 $framework->register_organisation($org);
 
-my $org_result = $schema->resultset('Organisation')->find({ name => $org->{name} });
+my $org_result = $schema->resultset('Organisation')->find({ name => $org->{name} })->entity;
 
 my $tweak = 0;
 
@@ -77,9 +77,9 @@ my $now = DateTime->today();
 
 for my $user ( $user1, $user2, $user3, $user4 ) {
   $tweak ++;
-  my $user_result = $schema->resultset('User')->find({ email => $user->{email} });
+  my $user_result = $schema->resultset('User')->find({ email => $user->{email} })->entity;
   for ( 1 .. 10 ) {
-    $user_result->create_related( 'transactions', {
+    $user_result->create_related( 'purchases', {
       seller_id => $org_result->id,
       value => $_ + $tweak,
       proof_image => 'a',
@@ -87,7 +87,7 @@ for my $user ( $user1, $user2, $user3, $user4 ) {
   }
 
   for ( 11 .. 20 ) {
-    $user_result->create_related( 'transactions', {
+    $user_result->create_related( 'purchases', {
       seller_id => $org_result->id,
       value => $_ + $tweak,
       proof_image => 'a',
@@ -96,7 +96,7 @@ for my $user ( $user1, $user2, $user3, $user4 ) {
   }
 
   for ( 21 .. 30 ) {
-    $user_result->create_related( 'transactions', {
+    $user_result->create_related( 'purchases', {
       seller_id => $org_result->id,
       value => $_ + $tweak,
       proof_image => 'a',
@@ -105,7 +105,7 @@ for my $user ( $user1, $user2, $user3, $user4 ) {
   }
 
   for ( 31 .. 40 ) {
-    $user_result->create_related( 'transactions', {
+    $user_result->create_related( 'purchases', {
       seller_id => $org_result->id,
       value => $_ + $tweak,
       proof_image => 'a',
@@ -113,7 +113,7 @@ for my $user ( $user1, $user2, $user3, $user4 ) {
     });
   }
 
-  is $user_result->transactions->count, 40, 'correct count for user' . $tweak;
+  is $user_result->purchases->count, 40, 'correct count for user' . $tweak;
 }
 
 sub test_leaderboard {
@@ -132,7 +132,7 @@ sub test_leaderboard {
       {},
       {
         order_by => { -desc => 'value' },
-        columns => [ qw/ user_id value position / ],
+        columns => [ qw/ entity_id value position / ],
       },
     );
     $today_values->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
@@ -146,10 +146,10 @@ test_leaderboard(
   'daily_total',
   $now,
   [
-    { user_id => 4, value => 95, position => 1 },
-    { user_id => 3, value => 85, position => 2 },
-    { user_id => 2, value => 75, position => 3 },
-    { user_id => 1, value => 65, position => 4 },
+    { entity_id => 4, value => 95, position => 1 },
+    { entity_id => 3, value => 85, position => 2 },
+    { entity_id => 2, value => 75, position => 3 },
+    { entity_id => 1, value => 65, position => 4 },
   ]
 );
 
@@ -158,10 +158,10 @@ test_leaderboard(
   'daily_count',
   $now,
   [
-    { user_id => 1, value => 10, position => 1 },
-    { user_id => 2, value => 10, position => 2 },
-    { user_id => 3, value => 10, position => 3 },
-    { user_id => 4, value => 10, position => 4 },
+    { entity_id => 1, value => 10, position => 1 },
+    { entity_id => 2, value => 10, position => 2 },
+    { entity_id => 3, value => 10, position => 3 },
+    { entity_id => 4, value => 10, position => 4 },
   ]
 );
 
@@ -170,10 +170,10 @@ test_leaderboard(
   'weekly_total',
   $now->clone->subtract( days => 7 ),
   [
-    { user_id => 4, value => 195, position => 1 },
-    { user_id => 3, value => 185, position => 2 },
-    { user_id => 2, value => 175, position => 3 },
-    { user_id => 1, value => 165, position => 4 },
+    { entity_id => 4, value => 195, position => 1 },
+    { entity_id => 3, value => 185, position => 2 },
+    { entity_id => 2, value => 175, position => 3 },
+    { entity_id => 1, value => 165, position => 4 },
   ]
 );
 
@@ -182,10 +182,10 @@ test_leaderboard(
   'weekly_count',
   $now->clone->subtract( days => 7 ),
   [
-    { user_id => 1, value => 10, position => 1 },
-    { user_id => 2, value => 10, position => 2 },
-    { user_id => 3, value => 10, position => 3 },
-    { user_id => 4, value => 10, position => 4 },
+    { entity_id => 1, value => 10, position => 1 },
+    { entity_id => 2, value => 10, position => 2 },
+    { entity_id => 3, value => 10, position => 3 },
+    { entity_id => 4, value => 10, position => 4 },
   ]
 );
 
@@ -194,10 +194,10 @@ test_leaderboard(
   'monthly_total',
   $now->clone->subtract( months => 1 ),
   [
-    { user_id => 4, value => 490, position => 1 },
-    { user_id => 3, value => 470, position => 2 },
-    { user_id => 2, value => 450, position => 3 },
-    { user_id => 1, value => 430, position => 4 },
+    { entity_id => 4, value => 490, position => 1 },
+    { entity_id => 3, value => 470, position => 2 },
+    { entity_id => 2, value => 450, position => 3 },
+    { entity_id => 1, value => 430, position => 4 },
   ]
 );
 
@@ -206,10 +206,10 @@ test_leaderboard(
   'monthly_count',
   $now->clone->subtract( months => 1 ),
   [
-    { user_id => 1, value => 20, position => 1 },
-    { user_id => 2, value => 20, position => 2 },
-    { user_id => 3, value => 20, position => 3 },
-    { user_id => 4, value => 20, position => 4 },
+    { entity_id => 1, value => 20, position => 1 },
+    { entity_id => 2, value => 20, position => 2 },
+    { entity_id => 3, value => 20, position => 3 },
+    { entity_id => 4, value => 20, position => 4 },
   ]
 );
 
@@ -218,10 +218,10 @@ test_leaderboard(
   'all_time_total',
   $now,
   [
-    { user_id => 4, value => 885, position => 1 },
-    { user_id => 3, value => 855, position => 2 },
-    { user_id => 2, value => 825, position => 3 },
-    { user_id => 1, value => 795, position => 4 },
+    { entity_id => 4, value => 885, position => 1 },
+    { entity_id => 3, value => 855, position => 2 },
+    { entity_id => 2, value => 825, position => 3 },
+    { entity_id => 1, value => 795, position => 4 },
   ]
 );
 
@@ -230,10 +230,10 @@ test_leaderboard(
   'all_time_count',
   $now,
   [
-    { user_id => 1, value => 30, position => 1 },
-    { user_id => 2, value => 30, position => 2 },
-    { user_id => 3, value => 30, position => 3 },
-    { user_id => 4, value => 30, position => 4 },
+    { entity_id => 1, value => 30, position => 1 },
+    { entity_id => 2, value => 30, position => 2 },
+    { entity_id => 3, value => 30, position => 3 },
+    { entity_id => 4, value => 30, position => 4 },
   ]
 );
 
@@ -251,16 +251,16 @@ subtest 'get_latest' => sub {
     {},
     {
       order_by => { -desc => 'value' },
-      columns => [ qw/ user_id value position / ],
+      columns => [ qw/ entity_id value position / ],
     },
   );
   $today_values->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
 
   my $expected = [
-    { user_id => 4, value => 95, position => 1 },
-    { user_id => 3, value => 85, position => 2 },
-    { user_id => 2, value => 75, position => 3 },
-    { user_id => 1, value => 65, position => 4 },
+    { entity_id => 4, value => 95, position => 1 },
+    { entity_id => 3, value => 85, position => 2 },
+    { entity_id => 2, value => 75, position => 3 },
+    { entity_id => 1, value => 65, position => 4 },
   ];
 
   is_deeply [ $today_values->all ], $expected, 'array as expected';
