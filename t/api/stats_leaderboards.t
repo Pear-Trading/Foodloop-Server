@@ -80,13 +80,13 @@ my $now = DateTime->today();
 
   $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
-    value => 1,
+    value => 100000,
     proof_image => 'a',
   });
 
   $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
-    value => 9,
+    value => 900000,
     proof_image => 'a',
     purchase_time => $dtf->format_datetime($now->clone->subtract( days => 1 )),
   });
@@ -97,13 +97,13 @@ my $now = DateTime->today();
 
   $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
-    value => 3,
+    value => 300000,
     proof_image => 'a',
   });
 
   $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
-    value => 1,
+    value => 100000,
     proof_image => 'a',
     purchase_time => $dtf->format_datetime($now->clone->subtract( days => 1 )),
   });
@@ -114,13 +114,13 @@ my $now = DateTime->today();
 
   $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
-    value => 5,
+    value => 500000,
     proof_image => 'a',
   });
 
   $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
-    value => 5,
+    value => 500000,
     proof_image => 'a',
     purchase_time => $dtf->format_datetime($now->clone->subtract( days => 1 )),
   });
@@ -131,13 +131,13 @@ my $now = DateTime->today();
 
   $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
-    value => 9,
+    value => 900000,
     proof_image => 'a',
   });
 
   $user_result->create_related( 'purchases', {
     seller_id => $org_result->id,
-    value => 3,
+    value => 300000,
     proof_image => 'a',
     purchase_time => $dtf->format_datetime($now->clone->subtract( days => 1 )),
   });
