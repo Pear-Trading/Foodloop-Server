@@ -2,6 +2,11 @@
 
 # Next Release
 
+# v0.9.2
+
+* **Fix:** Leaderboard total calculations not mapped correctly
+* **Fix:** Reroute to org list on submission
+
 # v0.9.1
 
 * Change to semantic versioning
