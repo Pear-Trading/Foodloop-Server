@@ -115,7 +115,7 @@ sub valid_edit {
       $c->flash( success => 'Updated Organisation' );
     }
   };
-  $c->redirect_to( '/admin/organisations/' . $valid_org->id );
+  $c->redirect_to( '/admin/organisations/');
 }
 
 1;
