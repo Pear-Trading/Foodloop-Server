@@ -92,7 +92,12 @@ sub post_leaderboards {
   my @leaderboard_array = $today_values->all;
 
   if ( $validation->param('type') =~ /total$/ ) {
-    map { $_->{value} / 100000 } @leaderboard_array;
+    @leaderboard_array = (map {
+      {
+        %$_,
+        value => $_->{value} / 100000,
+      }
+    } @leaderboard_array);
   }
 
   my $current_user_position = $today_values->find({ entity_id => $c->stash->{api_user}->entity->id });
