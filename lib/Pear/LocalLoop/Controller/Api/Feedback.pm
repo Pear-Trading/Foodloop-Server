@@ -4,8 +4,8 @@ use Mojo::Base 'Mojolicious::Controller';
 has error_messages => sub {
   return {
     email => {
-      required => { message => 'Email is required', status => 400 },
-      in_resultset => { message => 'Email does not exist in database', status => 400 },
+      required => { message => 'Email is required or not registered', status => 400 },
+      in_resultset => { message => 'Email is required or not registered', status => 400, error => "required" },
     },
     feedbacktext => {
       required => { message => 'Feedback is required', status => 400 },

@@ -67,7 +67,7 @@ sub startup {
         json => {
           success => Mojo::JSON->false,
           message => $c->error_messages->{$val}->{$check}->{message},
-          error => $check,
+          error => $c->error_messages->{$val}->{$check}->{error} || $check,
         },
         status => $c->error_messages->{$val}->{$check}->{status},
       );
