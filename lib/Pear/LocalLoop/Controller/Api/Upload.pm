@@ -50,8 +50,8 @@ The postcode of an organisation, optional key. Used when transaction_Type is 3.
 has error_messages => sub {
   return {
     transaction_type => {
-      required => { message => 'transaction_type is missing.', status => 400 },
-      in => { message => 'transaction_type is not a valid value.', status => 400 },
+      required => { message => 'transaction type is missing.', status => 400 },
+      in => { message => 'transaction type is not a valid value.', status => 400 },
     },
     transaction_value => {
       required => { message => 'transaction amount is missing', status => 400 },
