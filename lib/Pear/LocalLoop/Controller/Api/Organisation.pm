@@ -17,47 +17,47 @@ has error_messages => sub {
       required => { message => 'No gross payroll sent.', status => 400 },
     },
     payroll_income_tax => {
-      required => { message => 'no payroll income tax sent.', status => 400 },
+      required => { message => 'No total income tax sent.', status => 400 },
     },
     payroll_employee_ni => {
-      required => { message => 'no payroll employee ni sent.', status => 400 },
+      required => { message => 'No total employee NI sent.', status => 400 },
     },
     payroll_employer_ni => {
-      required => { message => 'no payroll employer ni sent.', status => 400 },
+      required => { message => 'No total employer NI sent.', status => 400 },
     },
     payroll_total_pension => {
-      required => { message => 'no payroll total pension sent.', status => 400 },
+      required => { message => 'No total total pension sent.', status => 400 },
     },
     payroll_other_benefit => {
-      required => { message => 'no payroll other benefit sent.', status => 400 },
+      required => { message => 'No total other benefits total sent.', status => 400 },
     },
     supplier_business_name => {
-      required => { message => 'no supplier business name sent.', status => 400 },
+      required => { message => 'No supplier business name sent.', status => 400 },
     },
     postcode => {
-      required => { message => 'no postcode sent.', status => 400 },
+      required => { message => 'No postcode sent.', status => 400 },
       postcode => { message => 'postcode must be valid', status => 400 },
     },
     monthly_spend => {
-      required => { message => 'no monthly spend sent.', status => 400 },
+      required => { message => 'No monthly spend sent.', status => 400 },
     },
     employee_no => {
-      required => { message => 'no employee no sent.', status => 400 },
+      required => { message => 'No employee no sent.', status => 400 },
     },
     employee_income_tax => {
-      required => { message => 'no employee income tax sent.', status => 400 },
+      required => { message => 'No employee income tax sent.', status => 400 },
     },
     employee_gross_wage => {
-      required => { message => 'no employee gross wage sent.', status => 400 },
+      required => { message => 'No employee gross wage sent.', status => 400 },
     },
     employee_ni => {
-      required => { message => 'no employee ni sent.', status => 400 },
+      required => { message => 'No employee ni sent.', status => 400 },
     },
     employee_pension => {
-      required => { message => 'no employee pension sent.', status => 400 },
+      required => { message => 'No employee pension sent.', status => 400 },
     },
     employee_other_benefit => {
-      required => { message => 'no employee other benefits sent.', status => 400 },
+      required => { message => 'No employee other benefits sent.', status => 400 },
     },
   };
 };
@@ -86,11 +86,26 @@ sub post_payroll {
   $validation->required('payroll_total_pension');
   $validation->required('payroll_other_benefit');
 
+  my $gross_payroll = $validation->param('gross_payroll');
+  my $payroll_income_tax = $validation->param('payroll_income_tax');
+  my $payroll_employee_ni = $validation->param('payroll_employee_ni');
+  my $payroll_employer_ni = $validation->param('payroll_employer_ni');
+  my $payroll_total_pension = $validation->param('payroll_total_pension');
+  my $payroll_other_benefit = $validation->param('payroll_other_benefit');
+
   return $c->api_validation_error if $validation->has_error;
 
   $c->schema->txn_do( sub {
-    $user->entity->organisation->update({
+    $user->entity->organisation->payroll->create({
       entry_period        => $validation->param('entry_period'),
+      employee_amount     => $validation->param('employee_amount'),
+      local_employee_amount     => $validation->param('local_employee_amount'),
+      gross_payroll       => $gross_payroll * 100000,
+      payroll_income_tax       => $payroll_income_tax * 100000,
+      payroll_employee_ni       => $payroll_employee_ni * 100000,
+      payroll_employer_ni       => $payroll_employer_ni * 100000,
+      payroll_total_pension       => $payroll_total_pension * 100000,
+      payroll_other_benefit       => $payroll_other_benefit * 100000,
     });
   });
 

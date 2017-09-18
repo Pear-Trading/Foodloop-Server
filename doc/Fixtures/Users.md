@@ -17,7 +17,7 @@
   * email: test4@example.com
   * password: abc123
 * Test Org
-  * email: test5@example.com
+  * email: org@example.com
   * password: abc123
 * Test Admin
   * email: admin@example.com
