@@ -30,7 +30,7 @@ my $pending_entity = $schema->resultset('Entity')->create({
     town => 'Midgar',
     sector => 'A',
     postcode => 'WC1E 6AD',
-    pending => \"1",
+    pending => 1,
   },
   type => "organisation",
 });

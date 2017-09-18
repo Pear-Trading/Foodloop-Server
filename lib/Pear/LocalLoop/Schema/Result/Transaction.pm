@@ -29,8 +29,8 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
   },
   "value" => {
-    data_type => "decimal",
-    size => [ 16, 2 ],
+    data_type => "numeric",
+    size => [ 100, 0 ],
     is_nullable => 0,
   },
   "proof_image" => {

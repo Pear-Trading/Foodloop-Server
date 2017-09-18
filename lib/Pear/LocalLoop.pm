@@ -67,21 +67,11 @@ sub startup {
         json => {
           success => Mojo::JSON->false,
           message => $c->error_messages->{$val}->{$check}->{message},
-          error => $check,
+          error => $c->error_messages->{$val}->{$check}->{error} || $check,
         },
         status => $c->error_messages->{$val}->{$check}->{status},
       );
     }
-  });
-
-  $self->helper( datetime_formatter => sub {
-    my $c = shift;
-
-    return DateTime::Format::Strptime->new(
-      pattern => '%FT%T%z',
-      strict => 1,
-      on_error => 'undef',
-    );
   });
 
   $self->helper( get_path_from_uuid => sub {
@@ -150,7 +140,6 @@ sub startup {
   $api->post('/search')->to('api-upload#post_search');
   $api->post('/user')->to('api-user#post_account');
   $api->post('/user/account')->to('api-user#post_account_update');
-  $api->post('/user/day')->to('api-user#post_day');
   $api->post('/user-history')->to('api-user#post_user_history');
   $api->post('/stats')->to('api-stats#post_index');
   $api->post('/stats/leaderboard')->to('api-stats#post_leaderboards');

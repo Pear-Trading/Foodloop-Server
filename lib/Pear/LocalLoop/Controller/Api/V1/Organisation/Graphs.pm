@@ -22,6 +22,7 @@ sub index {
     sales_last_30_days
     purchases_last_7_days
     purchases_last_30_days
+    customers_range
   / );
 
   return $c->api_validation_error if $validation->has_error;
@@ -41,6 +42,40 @@ sub index {
   }
 
   return $c->$graph_sub;
+}
+
+sub graph_customers_range {
+  my $c = shift;
+
+  my $validation = $c->validation;
+  $validation->input( $c->stash->{api_json} );
+  $validation->required('start')->is_iso_date;
+  $validation->required('end')->is_iso_date;
+
+  return $c->api_validation_error if $validation->has_error;
+
+  my $entity = $c->stash->{api_user}->entity;
+
+  my $data = { labels => [], data => [] };
+  my $start = $c->parse_iso_date( $validation->param('start') );
+  my $end = $c->parse_iso_date( $validation->param('end') );
+
+  while ( $start <= $end ) {
+    my $next_end = $start->clone->add( days => 1 );
+    my $transactions = $entity->sales
+      ->search_between( $start, $next_end )
+      ->count;
+    push @{ $data->{ labels } }, $c->format_iso_date( $start );
+    push @{ $data->{ data } }, $transactions;
+    $start->add( days => 1 );
+  }
+
+  return $c->render(
+    json => {
+      success => Mojo::JSON->true,
+      graph => $data,
+    }
+  );
 }
 
 sub graph_customers_last_7_days {
@@ -102,9 +137,9 @@ sub _sales_last_duration {
     my $transactions = $entity->sales
       ->search_between( $start, $next_end )
       ->get_column('value')
-      ->sum || 0;
+      ->sum || 0 + 0;
     push @{ $data->{ labels } }, $start->day_name;
-    push @{ $data->{ data } }, $transactions;
+    push @{ $data->{ data } }, $transactions / 100000;
     $start->add( days => 1 );
   }
 
@@ -134,9 +169,9 @@ sub _purchases_last_duration {
     my $transactions = $entity->purchases
       ->search_between( $start, $next_end )
       ->get_column('value')
-      ->sum || 0;
+      ->sum || 0 + 0;
     push @{ $data->{ labels } }, $start->day_name;
-    push @{ $data->{ data } }, $transactions;
+    push @{ $data->{ data } }, $transactions / 100000;
     $start->add( days => 1 );
   }
 

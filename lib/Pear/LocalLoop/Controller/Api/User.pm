@@ -28,32 +28,16 @@ has error_messages => sub {
       required => { message => 'No password sent.', status => 400 },
     },
     street_name => {
-      required => { message => 'No street_name sent.', status => 400 },
+      required => { message => 'No street name sent.', status => 400 },
     },
     town => {
-      required => { message => 'No town sent.', status => 400 },
+      required => { message => 'No town/city sent.', status => 400 },
     },
     sector => {
       required => { message => 'No sector sent.', status => 400 },
     },
   };
 };
-
-sub post_day {
-  my $c = shift;
-
-  my $validation = $c->validation;
-
-  $validation->input( $c->stash->{api_json} );
-
-  $validation->optional('day')->is_iso_datetime;
-
-  return $c->api_validation_error if $validation->has_error;
-
-  $c->render( json => {
-    success => Mojo::JSON->true,
-  });
-}
 
 sub post_account {
   my $c = shift;
