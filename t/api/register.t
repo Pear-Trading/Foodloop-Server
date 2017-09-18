@@ -73,7 +73,7 @@ $testJson = {
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/no name sent/i);
+  ->content_like(qr/no display name sent/i);
 #name missing JSON
 $testJson = {
   'usertype' => 'customer',
@@ -87,7 +87,7 @@ $testJson = {
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/no name sent/i);
+  ->content_like(qr/no full name sent/i);
 
 #Blank name
 $testJson = {
@@ -235,7 +235,7 @@ $t->post_ok('/api/register' => json => $testJson)
   ->status_is(403)
   ->json_is('/success', Mojo::JSON->false)
   ->content_like(qr/email/i)
-  ->content_like(qr/exists/i);
+  ->content_like(qr/already in use/i);
 
 #postcode missing JSON
 $testJson = {
@@ -315,7 +315,7 @@ $testJson = {
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/no year_of_birth sent/i);
+  ->content_like(qr/no year of birth sent/i);
 
 #Age is invalid
 $testJson = {
@@ -331,7 +331,7 @@ $testJson = {
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/year_of_birth/i)
+  ->content_like(qr/year of birth/i)
   ->content_like(qr/invalid/i);
 
 #full address missing JSON
@@ -347,7 +347,7 @@ $testJson = {
 $t->post_ok('/api/register' => json => $testJson)
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/no street_name sent/i);
+  ->content_like(qr/no street name sent/i);
 
 #TODO Validation of full address
 
