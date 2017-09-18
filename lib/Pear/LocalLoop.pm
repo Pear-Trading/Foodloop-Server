@@ -144,9 +144,7 @@ sub startup {
   $api->post('/stats')->to('api-stats#post_index');
   $api->post('/stats/leaderboard')->to('api-stats#post_leaderboards');
   $api->post('/outgoing-transactions')->to('api-transactions#post_transaction_list_purchases');
-  $api->post('/org/payroll/add')->to('api-organisation#post_payroll_add');
-  $api->post('/org/supplier/add')->to('api-organisation#post_supplier_add');
-  $api->post('/org/employee/add')->to('api-organisation#post_employee_add');
+
 
   my $api_v1 = $api->under('/v1');
 
@@ -154,6 +152,9 @@ sub startup {
 
   $api_v1_org->post('/graphs')->to('api-v1-organisation-graphs#index');
   $api_v1_org->post('/snippets')->to('api-v1-organisation-snippets#index');
+  $api_v1_org->post('/payroll/add')->to('api-organisation#post_payroll_add');
+  $api_v1_org->post('/supplier/add')->to('api-organisation#post_supplier_add');
+  $api_v1_org->post('/employee/add')->to('api-organisation#post_employee_add');
 
   my $admin_routes = $r->under('/admin')->to('admin#under');
 
