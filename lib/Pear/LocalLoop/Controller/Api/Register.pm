@@ -9,18 +9,18 @@ has error_messages => sub {
       in_resultset => { message => 'Token invalid or has been used.', status => 401 },
     },
     name => {
-      required => { message => 'No name sent or was blank.', status => 400 },
+      required => { message => 'No organisation name sent or was blank.', status => 400 },
     },
     display_name => {
-      required => { message => 'No name sent or was blank.', status => 400 },
+      required => { message => 'No display name sent or was blank.', status => 400 },
     },
     full_name => {
-      required => { message => 'No name sent or was blank.', status => 400 },
+      required => { message => 'No full name sent or was blank.', status => 400 },
     },
     email => {
       required => { message => 'No email sent.', status => 400 },
       email => { message => 'Email is invalid.', status => 400 },
-      not_in_resultset => { message => 'Email exists.', status => 403 },
+      not_in_resultset => { message => 'Email already in use.', status => 403 },
     },
     postcode => {
       required => { message => 'No postcode sent.', status => 400 },
@@ -34,16 +34,16 @@ has error_messages => sub {
       in => { message => '"usertype" is invalid.', status => 400 },
     },
     year_of_birth => {
-      required => { message => 'No year_of_birth sent.', status => 400 },
-      number => { message => 'year_of_birth is invalid', status => 400 },
-      gt_num => { message => 'year_of_birth must be within last 150 years', status => 400 },
-      lt_num => { message => 'year_of_birth must be atleast 10 years ago', status => 400 },
+      required => { message => 'No year of birth sent.', status => 400 },
+      number => { message => 'year of birth is invalid', status => 400 },
+      gt_num => { message => 'year of birth must be within last 150 years', status => 400 },
+      lt_num => { message => 'year of birth must be atleast 10 years ago', status => 400 },
     },
     street_name => {
-      required => { message => 'No street_name sent.', status => 400 },
+      required => { message => 'No street name sent.', status => 400 },
     },
     town => {
-      required => { message => 'No town sent.', status => 400 },
+      required => { message => 'No town/city sent.', status => 400 },
     },
   };
 };
