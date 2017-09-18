@@ -123,7 +123,7 @@ $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jp
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/transaction_value is missing/i);
+  ->content_like(qr/transaction amount is missing/i);
 
 print "test 7 - transaction_value non-numbers\n";
 $json = {
@@ -137,7 +137,7 @@ $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jp
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/transaction_value does not look like a number/i);
+  ->content_like(qr/transaction amount does not look like a number/i);
 
 print "test 8 - transaction_value equal to zero\n";
 $json = {
@@ -151,7 +151,7 @@ $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jp
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/transaction_value cannot be equal to or less than zero/i);
+  ->content_like(qr/transaction amount cannot be equal to or less than zero/i);
 
 print "test 9 - transaction_value less than zero\n";
 $json = {
@@ -165,7 +165,7 @@ $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jp
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/transaction_value cannot be equal to or less than zero/i);
+  ->content_like(qr/transaction amount cannot be equal to or less than zero/i);
 
 print "test 10 - transaction_type missing\n";
 $json = {
@@ -177,7 +177,7 @@ $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jp
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/transaction_type is missing/i);
+  ->content_like(qr/transaction type is missing/i);
 
 print "test 11 - transaction_type invalid.\n";
 $json = {
@@ -191,7 +191,7 @@ $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jp
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/transaction_type is not a valid value/i);
+  ->content_like(qr/transaction type is not a valid value/i);
 
 print "test 12 - file not uploaded.\n";
 $json = {
@@ -220,7 +220,7 @@ $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jp
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/organisation_id is missing/i);
+  ->content_like(qr/organisation ID is missing/i);
 
 print "test 14 - organisation_id for non-existent id. (type 1: already validated)\n";
 $json = {
@@ -234,7 +234,7 @@ $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jp
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/organisation_id does not exist in the database/i);
+  ->content_like(qr/organisation ID does not exist in the database/i);
 
 print "test 15 - valid addition. (type 1: already validated)\n";
 is $schema->resultset('Transaction')->count, 1, "1 transaction";
@@ -268,7 +268,7 @@ $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jp
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/organisation_name is missing/i);
+  ->content_like(qr/organisation name is missing/i);
 
 print "test 17 - add valid transaction (type 3: new organisation)\n";
 is $schema->resultset('Organisation')->search({ pending => 1 })->count, 0, "No pending organisations";
@@ -306,7 +306,7 @@ $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->or($framework->dump_error)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/organisation_id is missing/i);
+  ->content_like(qr/organisation ID is missing/i);
 
 print "test 19 - organisation_id not a number (type 2: existing organisation)\n";
 $json = {
@@ -320,7 +320,7 @@ $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jp
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/organisation_id is not a number/i);
+  ->content_like(qr/organisation ID is not a number/i);
 
 print "test 20 - id does not exist (type 2: existing organisation)\n";
 $json = {
@@ -334,7 +334,7 @@ $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jp
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/organisation_id does not exist in the database/i);
+  ->content_like(qr/organisation ID does not exist in the database/i);
 
 print "test 21 - purchase_time is missing\n";
 is $schema->resultset('Organisation')->search({ pending => 1 })->entity->sales->count, 1, "1 pending transactions";
@@ -385,7 +385,7 @@ $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jp
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->content_like(qr/organisation_id does not exist in the database/i);
+  ->content_like(qr/organisation ID does not exist in the database/i);
 is $schema->resultset('Organisation')->search({ pending => 1 })->entity->sales->count, 1, "1 pending transactions";
 
 print "test 25 - Logout Hojo\n";
@@ -475,7 +475,7 @@ $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jp
 $t->post_ok('/api/upload' => form => $upload )
   ->status_is(400)
   ->json_is('/success', Mojo::JSON->false)
-  ->json_like('/message', qr/organisation_id does not exist in the database/);
+  ->json_like('/message', qr/organisation ID does not exist in the database/);
 is $schema->resultset('Transaction')->count, 6, "6 transaction";
 
 done_testing();

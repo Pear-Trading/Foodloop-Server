@@ -5,7 +5,7 @@ has error_messages => sub {
   return {
     email => {
       required => { message => 'Email is required', status => 400 },
-      in_resultset => { message => 'Change meeee', status => 400 },
+      in_resultset => { message => 'Email does not exist in database', status => 400 },
     },
     feedbacktext => {
       required => { message => 'Feedback is required', status => 400 },

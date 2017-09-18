@@ -28,10 +28,10 @@ has error_messages => sub {
       required => { message => 'No password sent.', status => 400 },
     },
     street_name => {
-      required => { message => 'No street_name sent.', status => 400 },
+      required => { message => 'No street name sent.', status => 400 },
     },
     town => {
-      required => { message => 'No town sent.', status => 400 },
+      required => { message => 'No town/city sent.', status => 400 },
     },
     sector => {
       required => { message => 'No sector sent.', status => 400 },
