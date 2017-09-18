@@ -62,7 +62,7 @@ has error_messages => sub {
   };
 };
 
-sub post_payroll {
+sub post_payroll_add {
   my $c = shift;
 
   my $user = $c->stash->{api_user};
@@ -115,7 +115,7 @@ sub post_payroll {
   });
 }
 
-sub post_supplier {
+sub post_supplier_add {
   my $c = shift;
 
   my $user = $c->stash->{api_user};
@@ -148,7 +148,7 @@ sub post_supplier {
   });
 }
 
-sub post_employee {
+sub post_employee_add {
   my $c = shift;
 
   my $user = $c->stash->{api_user};
