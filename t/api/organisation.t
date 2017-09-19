@@ -208,6 +208,24 @@ $t->post_ok('/api/v1/organisation/payroll/add' => json => {
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/success', Mojo::JSON->true);
 
+## Payroll Data List read
+
+$t->post_ok('/api/v1/organisation/payroll' => json => {
+    session_key => $session_key,
+  })
+  ->status_is(200)->or($framework->dump_error)
+  ->json_is('/success', Mojo::JSON->true)
+  ->json_has('/payrolls')
+  ->json_has('/payrolls/0/entry_period')
+  ->json_has('/payrolls/0/employee_amount')
+  ->json_has('/payrolls/0/local_employee_amount')
+  ->json_has('/payrolls/0/gross_payroll')
+  ->json_has('/payrolls/0/payroll_income_tax')
+  ->json_has('/payrolls/0/payroll_employee_ni')
+  ->json_has('/payrolls/0/payroll_employer_ni')
+  ->json_has('/payrolls/0/payroll_total_pension')
+  ->json_has('/payrolls/0/payroll_other_benefit');
+
 ## Supplier Form submission
 
 #TODO make the test!

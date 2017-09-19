@@ -14,6 +14,10 @@ sub register {
     return DateTime::Format::Strptime->new( pattern => '%Y-%m-%d' );
   });
 
+  $app->helper( iso_month_parser => sub {
+    return DateTime::Format::Strptime->new( pattern => '%Y-%m' );
+  });
+
   $app->helper( parse_iso_date => sub {
     my ( $c, $date_string ) = @_;
     return $c->iso_date_parser->parse_datetime(
@@ -24,6 +28,20 @@ sub register {
   $app->helper( format_iso_date => sub {
     my ( $c, $datetime_obj ) = @_;
     return $c->iso_date_parser->format_datetime(
+      $datetime_obj,
+    );
+  });
+
+  $app->helper( parse_iso_month => sub {
+    my ( $c, $date_string ) = @_;
+    return $c->iso_month_parser->parse_datetime(
+      $date_string,
+    );
+  });
+
+  $app->helper( format_iso_month => sub {
+    my ( $c, $datetime_obj ) = @_;
+    return $c->iso_month_parser->format_datetime(
       $datetime_obj,
     );
   });

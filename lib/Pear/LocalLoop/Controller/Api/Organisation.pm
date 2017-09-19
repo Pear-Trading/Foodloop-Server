@@ -98,7 +98,7 @@ sub post_payroll_read {
 
   return $c->render( json => {
     success => Mojo::JSON->true,
-    transactions => \@payroll_list,
+    payrolls => \@payroll_list,
     page_no => $payrolls->pager->total_entries,
   });
 }
@@ -127,6 +127,11 @@ sub post_payroll_add {
   $validation->required('payroll_total_pension');
   $validation->required('payroll_other_benefit');
 
+  return $c->api_validation_error if $validation->has_error;
+
+  my $entry_period = $c->parse_iso_month($validation->param('entry_period'));
+  my $employee_amount = $validation->param('employee_amount');
+  my $local_employee_amount = $validation->param('local_employee_amount');
   my $gross_payroll = $validation->param('gross_payroll');
   my $payroll_income_tax = $validation->param('payroll_income_tax');
   my $payroll_employee_ni = $validation->param('payroll_employee_ni');
@@ -134,13 +139,11 @@ sub post_payroll_add {
   my $payroll_total_pension = $validation->param('payroll_total_pension');
   my $payroll_other_benefit = $validation->param('payroll_other_benefit');
 
-  return $c->api_validation_error if $validation->has_error;
-
   $c->schema->txn_do( sub {
     $user->entity->organisation->payroll->create({
-      entry_period          => $validation->param('entry_period'),
-      employee_amount       => $validation->param('employee_amount'),
-      local_employee_amount => $validation->param('local_employee_amount'),
+      entry_period          => $entry_period,
+      employee_amount       => $employee_amount,
+      local_employee_amount => $local_employee_amount,
       gross_payroll         => $gross_payroll * 100000,
       payroll_income_tax    => $payroll_income_tax * 100000,
       payroll_employee_ni   => $payroll_employee_ni * 100000,
