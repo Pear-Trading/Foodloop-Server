@@ -62,6 +62,10 @@ has error_messages => sub {
   };
 };
 
+sub post_payroll_read {
+
+}
+
 sub post_payroll_add {
   my $c = shift;
 
@@ -115,6 +119,10 @@ sub post_payroll_add {
   });
 }
 
+sub post_supplier_read {
+
+}
+
 sub post_supplier_add {
   my $c = shift;
 
@@ -146,6 +154,10 @@ sub post_supplier_add {
     success => Mojo::JSON->true,
     message => 'Submitted Supplier Info Successfully',
   });
+}
+
+sub post_employee_read {
+
 }
 
 sub post_employee_add {
