@@ -63,7 +63,44 @@ has error_messages => sub {
 };
 
 sub post_payroll_read {
+  my $c = shift;
 
+  my $user = $c->stash->{api_user};
+
+  my $validation = $c->validation;
+  $validation->input( $c->stash->{api_json} );
+  $validation->optional('page')->number;
+
+  return $c->api_validation_error if $validation->has_error;
+
+  my $payrolls = $user->entity->organisation->payroll->search(
+    undef, {
+      page => $validation->param('page') || 1,
+      rows => 10,
+      order_by => { -desc => 'submitted_at' },
+    },
+  );
+
+# purchase_time needs timezone attached to it
+  my @payroll_list = (
+    map {{
+      entry_period          => $_->entry_period,
+      employee_amount       => $_->employee_amount,
+      local_employee_amount => $_->local_employee_amount,
+      gross_payroll         => $_->gross_payroll / 100000,
+      payroll_income_tax    => $_->payroll_income_tax / 100000,
+      payroll_employee_ni   => $_->payroll_employee_ni / 100000,
+      payroll_employer_ni   => $_->payroll_employer_ni / 100000,
+      payroll_total_pension => $_->payroll_total_pension / 100000,
+      payroll_other_benefit => $_->payroll_other_benefit / 100000,
+    }} $payrolls->all
+  );
+
+  return $c->render( json => {
+    success => Mojo::JSON->true,
+    transactions => \@payroll_list,
+    page_no => $payrolls->pager->total_entries,
+  });
 }
 
 sub post_payroll_add {
@@ -101,15 +138,15 @@ sub post_payroll_add {
 
   $c->schema->txn_do( sub {
     $user->entity->organisation->payroll->create({
-      entry_period        => $validation->param('entry_period'),
-      employee_amount     => $validation->param('employee_amount'),
-      local_employee_amount     => $validation->param('local_employee_amount'),
-      gross_payroll       => $gross_payroll * 100000,
-      payroll_income_tax       => $payroll_income_tax * 100000,
-      payroll_employee_ni       => $payroll_employee_ni * 100000,
-      payroll_employer_ni       => $payroll_employer_ni * 100000,
-      payroll_total_pension       => $payroll_total_pension * 100000,
-      payroll_other_benefit       => $payroll_other_benefit * 100000,
+      entry_period          => $validation->param('entry_period'),
+      employee_amount       => $validation->param('employee_amount'),
+      local_employee_amount => $validation->param('local_employee_amount'),
+      gross_payroll         => $gross_payroll * 100000,
+      payroll_income_tax    => $payroll_income_tax * 100000,
+      payroll_employee_ni   => $payroll_employee_ni * 100000,
+      payroll_employer_ni   => $payroll_employer_ni * 100000,
+      payroll_total_pension => $payroll_total_pension * 100000,
+      payroll_other_benefit => $payroll_other_benefit * 100000,
     });
   });
 
