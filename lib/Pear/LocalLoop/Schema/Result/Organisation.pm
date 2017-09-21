@@ -68,6 +68,13 @@ __PACKAGE__->belongs_to(
   "entity_id",
 );
 
+__PACKAGE__->has_many(
+  "payroll",
+  "Pear::LocalLoop::Schema::Result::OrganisationPayroll",
+  { "foreign.org_id" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 __PACKAGE__->filter_column( pending => {
   filter_to_storage => 'to_bool',
 });
