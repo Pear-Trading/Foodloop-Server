@@ -48,6 +48,11 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
     set_on_create => 1,
   },
+  distance => {
+    data_type => 'numeric',
+    size => [15],
+    is_nullable => 1,
+  },
 );
 
 __PACKAGE__->set_primary_key("id");
