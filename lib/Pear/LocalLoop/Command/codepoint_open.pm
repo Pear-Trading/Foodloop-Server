@@ -13,7 +13,7 @@ sub run {
   my ( $self, @args ) = @_;
 
   getopt \@args,
-    'o|outcodes=s' => \my @outcodes;
+    'o|outcodes=s' => \my @outcodes,
     'q|quiet'      => \my $quiet_mode;
 
   my $cpo_dir = $self->app->home->child('etc')->child('code-point-open');
@@ -27,22 +27,28 @@ sub run {
 
   my $cpo = Geo::UK::Postcode::CodePointOpen->new( path => $output_dir );
 
-use Devel::Dwarn;
-Dwarn \@outcodes;
-
-  print 'Importing data for ' . $#outcodes ? join( ' ', @outcodes ) : 'all' . 'outcodes\n'
+  printf( "Importing data for %s outcode(s)\n", @outcodes ? join( ' ', @outcodes ) : 'all' )
     unless $quiet_mode;
-  my $i = 0;
+
   my $iter = $cpo->read_iterator(
     outcodes => \@outcodes,
     include_lat_long => 1,
     split_postcode => 1,
   );
-  while ( my $pc = $iter->() ) {
-    $i++;
-  }
 
-  Dwarn $i;
+  use Devel::Dwarn;
+  my $pc_rs = $self->app->schema->resultset('GbPostcode');
+  while ( my $pc = $iter->() ) {
+    $pc_rs->find_or_create(
+      {
+        outcode   => $pc->{Outcode},
+        incode    => $pc->{Incode},
+        latitude  => $pc->{Latitude},
+        longitude => $pc->{Longitude},
+      },
+      { key => 'primary' },
+    );
+  }
 }
 
 =head1 SYNOPSIS
