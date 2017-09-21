@@ -58,6 +58,18 @@ __PACKAGE__->add_columns(
     data_type => 'integer',
     is_nullable => 1,
   },
+  latitude => {
+    data_type => 'decimal',
+    size => [8,5],
+    is_nullable => 1,
+    default_value => undef,
+  },
+  longitude => {
+    data_type => 'decimal',
+    size => [8,5],
+    is_nullable => 1,
+    default_value => undef,
+  },
 );
 
 __PACKAGE__->set_primary_key('id');
