@@ -1,0 +1,6 @@
+$HASH1 = {
+           incode    => '0AQ',
+           latitude  => 54.02042,
+           longitude => -2.80675,
+           outcode   => 'LA2'
+         };
