@@ -21,6 +21,7 @@ requires 'MooX::Options::Actions';
 requires 'Module::Runtime';
 requires 'DBIx::Class::DeploymentHandler';
 requires 'DBIx::Class::Fixtures';
+requires 'GIS::Distance';
 
 feature 'schema-graph', 'Draw diagrams of Schema' => sub {
   requires 'GraphViz';
