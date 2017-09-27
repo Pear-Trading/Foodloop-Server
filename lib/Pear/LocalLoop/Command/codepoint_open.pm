@@ -36,7 +36,6 @@ sub run {
     split_postcode => 1,
   );
 
-  use Devel::Dwarn;
   my $pc_rs = $self->app->schema->resultset('GbPostcode');
   while ( my $pc = $iter->() ) {
     $pc_rs->find_or_create(

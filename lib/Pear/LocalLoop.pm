@@ -148,6 +148,10 @@ sub startup {
 
   my $api_v1 = $api->under('/v1');
 
+  my $api_v1_supplier = $api_v1->under('/supplier');
+
+  $api_v1_supplier->post('/location')->to('api-v1-supplier-location#index');
+
   my $api_v1_org = $api_v1->under('/organisation')->to('api-v1-organisation#auth');
 
   $api_v1_org->post('/graphs')->to('api-v1-organisation-graphs#index');
