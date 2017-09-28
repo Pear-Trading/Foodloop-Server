@@ -1,0 +1,5 @@
+$HASH1 = {
+           id   => 4,
+           name => 'Weekly Count',
+           type => 'weekly_count'
+         };

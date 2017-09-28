@@ -1,0 +1,5 @@
+$HASH1 = {
+           id   => 7,
+           name => 'All Time Total',
+           type => 'all_time_total'
+         };

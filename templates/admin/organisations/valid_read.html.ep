@@ -1,6 +1,25 @@
 % layout 'admin';
 % title 'Organisations';
 % content_for javascript => begin
+<script>
+function initMap() {
+  var org_latlng = {
+    lat: <%= $valid_org->latitude %>,
+    lng: <%= $valid_org->longitude %>
+  };
+  var map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 18,
+    center: org_latlng
+  });
+  var marker = new google.maps.Marker({
+    position: org_latlng,
+    map: map
+  });
+}
+</script>
+<script async defer
+     src="https://maps.googleapis.com/maps/api/js?key=<%= $c->config->{api_keys}->{google_maps_js_api} %>&callback=initMap">
+</script>
 % end
 % if ( my $error = flash 'error' ) {
   <div class="alert alert-danger" role="alert">
@@ -11,82 +30,104 @@
     <strong>Success!</strong> <%= $success %>
   </div>
 % }
-<div class="card mb-3">
-  <h3 class="card-header">
-    %= $valid_org->name
-  </h3>
-  <div class="card-block">
-    <form action="<%= url_for %>" method="post">
-      <div class="form-group row">
-        <label for="name" class="col-sm-2 col-form-label">Organisation Name</label>
-        <div class="col-sm-10">
-          <input id="name" type="text" class="form-control" placeholder="Organisation Name" name="name" value="<%= $valid_org->name %>">
-        </div>
-      </div>
-      <div class="form-group row">
-        <label for="name" class="col-sm-2 col-form-label">Street Name</label>
-        <div class="col-sm-10">
-          <input id="street_name" type="text" class="form-control" placeholder="Street Name" name="street_name" value="<%= $valid_org->street_name %>">
-        </div>
-      </div>
-      <div class="form-group row">
-        <label for="name" class="col-sm-2 col-form-label">Town/City</label>
-        <div class="col-sm-10">
-          <input id="town" type="text" class="form-control" placeholder="Town" name="town" value="<%= $valid_org->town %>">
-        </div>
-      </div>
-      <div class="form-group row">
-        <label for="name" class="col-sm-2 col-form-label">Sector</label>
-        <div class="col-sm-10">
-          <select class="form-control" name="sector">
-          %= include 'partials/sector_options', selected_sector => $valid_org->sector || '';
-          </select>
-        </div>
-      </div>
-      <div class="form-group row">
-        <label for="name" class="col-sm-2 col-form-label">Postcode</label>
-        <div class="col-sm-10">
-          <input id="postcode" type="text" class="form-control" placeholder="Postcode" name="postcode" value="<%= $valid_org->postcode %>">
-        </div>
-      </div>
-      <div class="form-group row">
-        <label for="name" class="col-sm-2 col-form-label">Validated</label>
-        <div class="col-sm-10">
-          <input id="pending" type="checkbox" name="pending" value="0"<%= $valid_org->pending ? '' : ' checked' %>>
-        </div>
-      </div>
-      <div class="form-group row">
-        <div class="ml-auto col-sm-10">
-          <button class="btn btn-success" type="submit">Save Changes To Organisation</button>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
-<div class="card mb-3">
-  <h3 class="card-header">
-    Transactions
-  </h3>
-  <ul class="list-group list-group-flush">
-    % for my $transaction ( $transactions->all ) {
-    <li class="list-group-item">
-      <div class="container">
-        <a href="<%= url_for '/admin/transactions/' . $transaction->id %>" class="list-group-item list-group-item-action">
-          <div class="row text-center">
-            <div class="col">From: <%= $transaction->buyer->name %></div>
-            <div class="col">To: <%= $transaction->seller->name %></div>
-            <div class="col">Value: <%= $transaction->value %></div>
-            <div class="col">Submitted At: <%= $transaction->submitted_at %></div>
-            <div class="col">Purchase Time: <%= $transaction->purchase_time %></div>
+<div class="row">
+  <div class="col-sm-12 col-md-6">
+    <div class="card mb-3">
+      <h3 class="card-header">
+        %= $valid_org->name
+      </h3>
+      <div class="card-block">
+        <form action="<%= url_for %>" method="post">
+          <div class="form-group row">
+            <label for="name" class="col-md-4 col-form-label">Organisation Name</label>
+            <div class="col-md-8">
+              <input id="name" type="text" class="form-control" placeholder="Organisation Name" name="name" value="<%= $valid_org->name %>">
+            </div>
           </div>
-        </a>
+          <div class="form-group row">
+            <label for="name" class="col-md-4 col-form-label">Street Name</label>
+            <div class="col-md-8">
+              <input id="street_name" type="text" class="form-control" placeholder="Street Name" name="street_name" value="<%= $valid_org->street_name %>">
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="name" class="col-md-4 col-form-label">Town/City</label>
+            <div class="col-md-8">
+              <input id="town" type="text" class="form-control" placeholder="Town" name="town" value="<%= $valid_org->town %>">
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="name" class="col-md-4 col-form-label">Sector</label>
+            <div class="col-md-8">
+              <select class="form-control" name="sector">
+              %= include 'partials/sector_options', selected_sector => $valid_org->sector || '';
+              </select>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="name" class="col-md-4 col-form-label">Postcode</label>
+            <div class="col-md-8">
+              <input id="postcode" type="text" class="form-control" placeholder="Postcode" name="postcode" value="<%= $valid_org->postcode %>">
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="name" class="col-md-4 col-form-label">Validated</label>
+            <div class="col-md-8">
+              <input id="pending" type="checkbox" name="pending" value="0"<%= $valid_org->pending ? '' : ' checked' %>>
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="ml-auto col-md-8">
+              <button class="btn btn-success btn-block" type="submit">Save Changes To Organisation</button>
+            </div>
+          </div>
+        </form>
       </div>
-    </li>
-    % }
-    <li class="list-group-item">
-      <div class="container">
-        %= bootstrap_pagination( $c->param('page') || 1, $transactions->pager->last_page, { class => 'justify-content-center' } );
+    </div>
+  </div>
+  <div class="col-sm-12 col-md-6">
+    <div class="card mb-3">
+      <div class="card-header" role="tab" id="mapHeader">
+        <h3 class="mb-0">
+          Location
+        </h3>
       </div>
-    </li>
-  </ul>
+      <div id="mapBody" role="tabpanel">
+        <div class="card-block">
+          <!-- Yes this is nasty. no i dont care. --!>
+          <style> #map {  width: 100%; height: 400px; background-color: grey; } </style>
+          <div id="map"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="card mb-3">
+      <h3 class="card-header">
+        Transactions
+      </h3>
+      <ul class="list-group list-group-flush">
+        % for my $transaction ( $transactions->all ) {
+        <li class="list-group-item">
+          <div class="container">
+            <a href="<%= url_for '/admin/transactions/' . $transaction->id %>" class="list-group-item list-group-item-action">
+              <div class="row text-center">
+                <div class="col">From: <%= $transaction->buyer->name %></div>
+                <div class="col">To: <%= $transaction->seller->name %></div>
+                <div class="col">Value: <%= $transaction->value %></div>
+                <div class="col">Submitted At: <%= $transaction->submitted_at %></div>
+                <div class="col">Purchase Time: <%= $transaction->purchase_time %></div>
+              </div>
+            </a>
+          </div>
+        </li>
+        % }
+        <li class="list-group-item">
+          <div class="container">
+            %= bootstrap_pagination( $c->param('page') || 1, $transactions->pager->last_page, { class => 'justify-content-center' } );
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
 </div>

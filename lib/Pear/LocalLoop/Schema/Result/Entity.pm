@@ -63,4 +63,16 @@ sub name {
   }
 }
 
+sub type_object {
+  my $self = shift;
+
+  if ( $self->type eq 'customer' ) {
+    return $self->customer;
+  } elsif ( $self->type eq 'organisation' ) {
+    return $self->organisation;
+  } else {
+    return;
+  }
+}
+
 1;

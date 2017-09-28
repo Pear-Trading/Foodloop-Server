@@ -1,0 +1,65 @@
+$VAR1 = {
+          'has_many' => {
+                          'fetch' => 0
+                        },
+          'sets' => [
+                      {
+                        'class' => 'OrganisationPayroll',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'User'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'Customer'
+                      },
+                      {
+                        'class' => 'Entity',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'LeaderboardValue'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'Feedback'
+                      },
+                      {
+                        'class' => 'Organisation',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'class' => 'GbPostcode',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'LeaderboardSet'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'AccountToken'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'SessionToken'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'Transaction'
+                      },
+                      {
+                        'class' => 'Leaderboard',
+                        'quantity' => 'all'
+                      }
+                    ],
+          'belongs_to' => {
+                            'fetch' => 0
+                          },
+          'might_have' => {
+                            'fetch' => 0
+                          }
+        };
