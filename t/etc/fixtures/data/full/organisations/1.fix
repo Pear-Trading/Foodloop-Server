@@ -1,0 +1,18 @@
+$HASH1 = {
+           country  => undef,
+           entity_id
+                    => 5,
+           id       => 1,
+           latitude => 54.04725,
+           longitude
+                    => -2.79611,
+           name     => 'Test Org',
+           pending  => 0,
+           postcode => 'LA1 1AF',
+           sector   => undef,
+           street_name
+                    => 'Test Street',
+           submitted_by_id
+                    => undef,
+           town     => 'Lancaster'
+         };

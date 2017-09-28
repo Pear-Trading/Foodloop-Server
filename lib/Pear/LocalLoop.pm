@@ -67,7 +67,7 @@ sub startup {
         json => {
           success => Mojo::JSON->false,
           message => $c->error_messages->{$val}->{$check}->{message},
-          error => $check,
+          error => $c->error_messages->{$val}->{$check}->{error} || $check,
         },
         status => $c->error_messages->{$val}->{$check}->{status},
       );
@@ -145,12 +145,23 @@ sub startup {
   $api->post('/stats/leaderboard')->to('api-stats#post_leaderboards');
   $api->post('/outgoing-transactions')->to('api-transactions#post_transaction_list_purchases');
 
+
   my $api_v1 = $api->under('/v1');
+
+  my $api_v1_supplier = $api_v1->under('/supplier');
+
+  $api_v1_supplier->post('/location')->to('api-v1-supplier-location#index');
 
   my $api_v1_org = $api_v1->under('/organisation')->to('api-v1-organisation#auth');
 
   $api_v1_org->post('/graphs')->to('api-v1-organisation-graphs#index');
   $api_v1_org->post('/snippets')->to('api-v1-organisation-snippets#index');
+  $api_v1_org->post('/payroll')->to('api-organisation#post_payroll_read');
+  $api_v1_org->post('/payroll/add')->to('api-organisation#post_payroll_add');
+  $api_v1_org->post('/supplier')->to('api-organisation#post_supplier_read');
+  $api_v1_org->post('/supplier/add')->to('api-organisation#post_supplier_add');
+  $api_v1_org->post('/employee')->to('api-organisation#post_employee_read');
+  $api_v1_org->post('/employee/add')->to('api-organisation#post_employee_add');
 
   my $admin_routes = $r->under('/admin')->to('admin#under');
 

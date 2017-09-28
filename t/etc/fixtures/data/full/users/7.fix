@@ -1,0 +1,8 @@
+$HASH1 = {
+           email     => 'admin@example.com',
+           entity_id => 7,
+           id        => 7,
+           is_admin  => 1,
+           join_date => '2017-09-26 16:46:07',
+           password  => '$2a$08$PKmst2sVN6N1Qrp9i98GYuWW.mwVrOAktQYCP.ibu7eLDYVP3yja2'
+         };

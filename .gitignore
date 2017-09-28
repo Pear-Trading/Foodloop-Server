@@ -8,3 +8,7 @@ hypnotoad.pid
 
 cover_db/
 schema.png
+
+etc/code-point-open/codepo_gb/
+
+pear-local_loop.production.conf

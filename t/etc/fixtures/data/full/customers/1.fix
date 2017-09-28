@@ -1,0 +1,10 @@
+$HASH1 = {
+           display_name  => 'Test User1',
+           entity_id     => 1,
+           full_name     => 'Test User1',
+           id            => 1,
+           latitude      => 54.04,
+           longitude     => -2.8,
+           postcode      => 'LA1 1AA',
+           year_of_birth => 2006
+         };

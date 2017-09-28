@@ -50,17 +50,17 @@ The postcode of an organisation, optional key. Used when transaction_Type is 3.
 has error_messages => sub {
   return {
     transaction_type => {
-      required => { message => 'transaction_type is missing.', status => 400 },
-      in => { message => 'transaction_type is not a valid value.', status => 400 },
+      required => { message => 'transaction type is missing.', status => 400 },
+      in => { message => 'transaction type is not a valid value.', status => 400 },
     },
     transaction_value => {
-      required => { message => 'transaction_value is missing', status => 400 },
-      number => { message => 'transaction_value does not look like a number', status => 400 },
-      gt_num => { message => 'transaction_value cannot be equal to or less than zero', status => 400 },
+      required => { message => 'transaction amount is missing', status => 400 },
+      number => { message => 'transaction amount does not look like a number', status => 400 },
+      gt_num => { message => 'transaction amount cannot be equal to or less than zero', status => 400 },
     },
     purchase_time => {
-      required => { message => 'purchase_time is missing', status => 400 },
-      is_full_iso_datetime => { message => 'purchase_time is in incorrect format', status => 400 },
+      required => { message => 'purchase time is missing', status => 400 },
+      is_full_iso_datetime => { message => 'purchase time is in incorrect format', status => 400 },
     },
     file => {
       required => { message => 'No file uploaded', status => 400 },
@@ -68,18 +68,20 @@ has error_messages => sub {
       filetype => { message => 'File must be of type image/jpeg', status => 400 },
     },
     organisation_id => {
-      required => { message => 'organisation_id is missing', status => 400 },
-      number => { message => 'organisation_id is not a number', status => 400 },
-      in_resultset => { message => 'organisation_id does not exist in the database', status => 400 },
+      required => { message => 'existing organisation ID is missing', status => 400 },
+      number => { message => 'organisation ID is not a number', status => 400 },
+      in_resultset => { message => 'organisation ID does not exist in the database', status => 400 },
     },
     organisation_name => {
-      required => { message => 'organisation_name is missing', status => 400 },
+      required => { message => 'organisation name is missing', status => 400 },
+    },
+    town => {
+      required => { message => 'town/city is missing', status => 400 },
     },
     search_name => {
-      required => { message => 'search_name is missing', status => 400 },
+      required => { message => 'search name is missing', status => 400 },
     },
     postcode => {
-      required => { message => 'postcode is missing', status => 400 },
       postcode => { message => 'postcode must be valid', status => 400 },
     },
   };
@@ -139,7 +141,7 @@ sub post_upload {
     # Unknown Organisation
     $validation->required('organisation_name');
     $validation->optional('street_name');
-    $validation->optional('town');
+    $validation->required('town');
     $validation->optional('postcode')->postcode;
 
     return $c->api_validation_error if $validation->has_error;

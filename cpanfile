@@ -21,8 +21,19 @@ requires 'MooX::Options::Actions';
 requires 'Module::Runtime';
 requires 'DBIx::Class::DeploymentHandler';
 requires 'DBIx::Class::Fixtures';
+requires 'GIS::Distance';
 
-on 'schema-graph' => sub {
+feature 'schema-graph', 'Draw diagrams of Schema' => sub {
   requires 'GraphViz';
   requires 'SQL::Translator';
 };
+
+feature 'postgres', 'PostgreSQL Support' => sub {
+  requires 'DBD::Pg';
+  requires 'Test::PostgreSQL';
+};
+
+feature 'codepoint-open', 'Code Point Open manipulation' => sub {
+  requires 'Geo::UK::Postcode::CodePointOpen';
+};
+

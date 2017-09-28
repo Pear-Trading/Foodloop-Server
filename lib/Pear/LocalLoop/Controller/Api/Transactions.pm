@@ -35,7 +35,7 @@ sub post_transaction_list_purchases {
     map {{
       seller => $_->seller->name,
       value => $_->value / 100000,
-      purchase_time => $_->purchase_time,
+      purchase_time => $c->format_iso_datetime($_->purchase_time),
     }} $transactions->all
   );
 

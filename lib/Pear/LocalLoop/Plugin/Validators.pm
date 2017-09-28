@@ -64,6 +64,115 @@ sub register {
     $value = $app->parse_iso_datetime( $value );
     return defined $value ? undef : 1;
   });
+
+  $app->validator->add_check( is_object => sub {
+    my ( $validation, $name, $value ) = @_;
+    return ref ( $value ) eq 'HASH' ? undef : 1;
+  });
+
+  $app->validator->add_check( in_range => sub {
+    my ( $validation, $name, $value, $low, $high ) = @_;
+    return $low < $value && $value < $high ? undef : 1;
+  });
+
+  $app->helper( validation_error => sub { _validation_error(@_) } );
+}
+
+=head2 validation_error
+
+Returns undef if there is no validation error, returns true otherwise - having
+set the errors up as required. Renders out the errors as an array, with status
+400
+
+=cut
+
+sub _validation_error {
+  my ( $c, $sub_name ) = @_;
+
+  my $val_data = $c->validation_data->{ $sub_name };
+  return unless defined $val_data;
+  my $data = $c->stash->{api_json};
+
+  my @errors = _validate_set( $c, $val_data, $data );
+
+  if ( scalar @errors ) {
+    my @sorted_errors = sort @errors;
+    $c->render(
+      json => {
+        success => Mojo::JSON->false,
+        errors => \@sorted_errors,
+      },
+      status => 400,
+    );
+    return \@errors;
+  }
+
+  return;
+}
+
+sub _validate_set {
+  my ( $c, $val_data, $data, $parent_name ) = @_;
+
+  my @errors;
+
+  # MUST get a raw validation object
+  my $validation = $c->app->validator->validation;
+  $validation->input( $data );
+
+  for my $val_data_key ( keys %$val_data ) {
+
+    $validation->topic( $val_data_key );
+
+    my $val_set = $val_data->{$val_data_key};
+
+    my $custom_check_prefix = {};
+
+    for my $val_error ( @{$val_set->{validation}} ) {
+      my ( $val_validator ) = keys %$val_error;
+
+      unless (
+          $validation->validator->checks->{$val_validator}
+          || $val_validator =~ /required|optional/
+        ) {
+        $c->app->log->warn( 'Unknown Validator [' . $val_validator . ']' );
+        next;
+      }
+
+      if ( my $custom_prefix = $val_error->{ $val_validator }->{ error_prefix } ) {
+        $custom_check_prefix->{ $val_validator } = $custom_prefix;
+      }
+      my $val_args = $val_error->{ $val_validator }->{ args };
+      
+      $validation->$val_validator(
+        ( $val_validator =~ /required|optional/ ? $val_data_key : () ),
+        ( defined $val_args ? @$val_args : () )
+      );
+
+      # stop bothering checking if failed, validation stops after first failure
+      last if $validation->has_error( $val_data_key );
+    }
+
+    if ( $validation->has_error( $val_data_key ) ) {
+      my ( $check ) = @{ $validation->error( $val_data_key ) };
+      my $error_prefix = defined $custom_check_prefix->{ $check }
+                       ? $custom_check_prefix->{ $check }
+                       : $check;
+      my $error_string = join ('_',
+        $error_prefix,
+        ( defined $parent_name ? $parent_name :  () ),
+        $val_data_key,
+      );
+      push @errors, $error_string;
+    } elsif ( defined $val_set->{ children } ) {
+      push @errors, _validate_set(
+        $c,
+        $val_set->{ children },
+        $data->{ $val_data_key },
+        $val_data_key );
+    }
+  }
+
+  return @errors;
 }
 
 1;
