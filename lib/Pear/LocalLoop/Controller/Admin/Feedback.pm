@@ -9,8 +9,15 @@ has result_set => sub {
 sub index {
   my $c = shift;
 
-  my $feedback_rs = $c->result_set;
-  $c->stash( feedbacks => [ $feedback_rs->all ] );
+  my $feedback_rs = $c->result_set->search(
+    undef, 
+    {
+      page => $c->param('page') || 1,
+      rows => 12,
+      order_by => { -desc => 'submitted_at' },
+    },
+  );
+  $c->stash( feedback_rs => $feedback_rs );
 }
 
 sub read {
