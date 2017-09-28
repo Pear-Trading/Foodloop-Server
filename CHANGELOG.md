@@ -2,6 +2,9 @@
 
 # Next Release
 
+* **Feature:** lat/long locations on customers and organisations
+* **Feature:** Suppliers map co-ords
+
 # v0.9.2
 
 * **Fix:** Leaderboard total calculations not mapped correctly
