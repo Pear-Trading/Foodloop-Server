@@ -2,6 +2,8 @@
 
 # Next Release
 
+# v0.9.3
+
 * **Feature:** lat/long locations on customers and organisations
 * **Feature:** Suppliers map co-ords
 
