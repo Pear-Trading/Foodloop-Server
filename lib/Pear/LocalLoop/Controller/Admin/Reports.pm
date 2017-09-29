@@ -6,13 +6,18 @@ use Mojo::JSON qw/ encode_json /;
 sub transaction_data {
   my $c = shift;
 
+  my $quantised_column = 'quantised_hours';
+  if ( $c->param('scale') eq 'days' ) {
+    $quantised_column = 'quantised_days';
+  }
+
   my $driver = $c->schema->storage->dbh->{Driver}->{Name};
   my $transaction_rs = $c->schema->resultset('ViewQuantisedTransaction' . $driver)->search(
     {},
     {
       columns => [
-        'quantised_hours',
         {
+          quantised        => $quantised_column,
           count            => \"COUNT(*)",
           sum_distance     => $c->pg_or_sqlite(
                                 '',
@@ -32,8 +37,8 @@ sub transaction_data {
                               ),
         }
       ],
-      group_by => 'quantised_hours',
-      order_by => { '-asc' => 'quantised_hours' },
+      group_by => $quantised_column,
+      order_by => { '-asc' => $quantised_column },
     }
   );
 

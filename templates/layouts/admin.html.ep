@@ -31,7 +31,8 @@
               Reports
             </a>
             <div class="dropdown-menu">
-              <a class="dropdown-item" href="<%= url_for '/admin/reports/transactions' %>">Transactions</a>
+              <a class="dropdown-item" href="<%= url_for '/admin/reports/transactions' %>">Transactions (Hourly)</a>
+              <a class="dropdown-item" href="<%= url_for('/admin/reports/transactions')->query(scale =>'days') %>">Transactions (Daily)</a>
             </div>
           </li>
           <li class="nav-item">

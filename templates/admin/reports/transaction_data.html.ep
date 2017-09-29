@@ -7,7 +7,7 @@ var raw_data = <%== $transaction_rs %>;
 var mapped_data = $.map(raw_data, function( val, i ) {
   return [
     [
-      new Date(val.quantised_hours),
+      new Date(val.quantised),
       val.count,
       val.average_value / 100000,
       val.sum_value / 100000,
