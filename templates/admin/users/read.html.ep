@@ -12,88 +12,98 @@
   </div>
 % }
 <form action="<%= url_for %>" method="post" autocomplete="off">
-  <h3 class="card-header">
-    User Details
-  </h3>
-    <div class="form-group">
-      <label for="email">Email Address</label>
-      <input id="email" type="text" autocomplete="off" class="form-control" placeholder="Email" name="email" value="<%= $user->email %>">
+  <div class="card mb-3">
+    <h3 class="card-header">
+      User Details
+    </h3>
+    <div class="card-body">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input id="email" type="text" autocomplete="off" class="form-control" placeholder="Email" name="email" value="<%= $user->email %>">
+      </div>
+      <div class="form-group">
+        <label for="joindate">Join Date</label>
+        <input id="joindate" type="datetime" class="form-control" placeholder="Date" name="joindate" value="<%= $user->join_date %>" disabled>
+      </div>
+      <div class="form-group">
+        <label for="type">Account Type</label>
+        <input id="type" type="text" class="form-control" value="<%= $user->type eq 'customer' ? 'Customer' : 'Organisation' %>" disabled>
+      </div>
+      <div class="form-group">
+        <label for="new_password">New Password</label>
+        <input id="new_password" type="password" autocomplete="off" class="form-control" placeholder="New Password" name="new_password">
+        <p class="help-block">Leave blank unless you want to change their password</p>
+      </div>
     </div>
-    <div class="form-group">
-      <label for="joindate">Join Date</label>
-      <input id="joindate" type="datetime" class="form-control" placeholder="Date" name="joindate" value="<%= $user->join_date %>" disabled>
-    </div>
-    <div class="form-group">
-      <label for="type">Account Type</label>
-      <input id="type" type="text" class="form-control" value="<%= $user->type eq 'customer' ? 'Customer' : 'Organisation' %>" disabled>
-    </div>
-    <div class="form-group">
-      <label for="new_password">New Password</label>
-      <input id="new_password" type="password" autocomplete="off" class="form-control" placeholder="New Password" name="new_password">
-      <p class="help-block">Leave blank unless you want to change their password</p>
-    </div>
+  </div>
+  <div class="card mb-3">
     % if ( my $customer_rs = $user->entity->customer ) {
-  <h3 class="card-header">
-    Customer Details
-  </h3>
-    <div class="form-group">
-      <label for="postcode">Customer Postcode</label>
-      <input id="postcode" type="text" class="form-control" placeholder="Postcode" name="postcode" value="<%= $customer_rs->postcode %>">
-    </div>
-    <div class="form-group">
-      <label for="full_name">Full Name</label>
-      <input id="full_name" type="text" class="form-control" placeholder="Full Name" name="full_name" value="<%= $customer_rs->full_name %>">
-    </div>
-    <div class="form-group">
-      <label for="display_name">Display Name</label>
-      <input id="display_name" type="text" class="form-control" placeholder="Display Name" name="display_name" value="<%= $customer_rs->display_name %>">
-    </div>
-    <div class="form-group">
-      <label for="year_of_birth">Year of Birth</label>
-      <input id="year_of_birth" type="number" class="form-control" placeholder="Year of Birth" name="year_of_birth" value="<%= $customer_rs->year_of_birth %>" disabled>
+    <h3 class="card-header">
+      Customer Details
+    </h3>
+    <div class="card-body">
+      <div class="form-group">
+        <label for="postcode">Customer Postcode</label>
+        <input id="postcode" type="text" class="form-control" placeholder="Postcode" name="postcode" value="<%= $customer_rs->postcode %>">
+      </div>
+      <div class="form-group">
+        <label for="full_name">Full Name</label>
+        <input id="full_name" type="text" class="form-control" placeholder="Full Name" name="full_name" value="<%= $customer_rs->full_name %>">
+      </div>
+      <div class="form-group">
+        <label for="display_name">Display Name</label>
+        <input id="display_name" type="text" class="form-control" placeholder="Display Name" name="display_name" value="<%= $customer_rs->display_name %>">
+      </div>
+      <div class="form-group">
+        <label for="year_of_birth">Year of Birth</label>
+        <input id="year_of_birth" type="number" class="form-control" placeholder="Year of Birth" name="year_of_birth" value="<%= $customer_rs->year_of_birth %>" disabled>
+      </div>
     </div>
     % } elsif (  my $org_rs = $user->entity->organisation ) {
-  <h3 class="card-header">
-    Organisation Details
-  </h3>
-    <div class="form-group">
-      <label for="postcode">Organisation Postcode</label>
-      <input id="postcode" type="text" class="form-control" placeholder="Postcode" name="postcode" value="<%= $org_rs->postcode %>">
-    </div>
-    <div class="form-group">
-      <label for="name">Organisation Name</label>
-      <input id="name" type="text" class="form-control" placeholder="Organisation Name" name="name" value="<%= $org_rs->name %>">
-    </div>
-    <div class="form-group">
-      <label for="street_name">Street Name</label>
-      <input id="street_name" type="text" class="form-control" placeholder="Street Name" name="street_name" value="<%= $org_rs->street_name %>">
-    </div>
-    <div class="form-group">
-      <label for="town">Town</label>
-      <input id="town" type="text" class="form-control" placeholder="Town" name="town" value="<%= $org_rs->town %>">
-    </div>
-    <div class="form-group">
-      <label for="town">Town</label>
-      <input id="town" type="sector" class="form-control" placeholder="Sector Area Code" name="sector" value="<%= $org_rs->sector %>">
+    <h3 class="card-header">
+      Organisation Details
+    </h3>
+    <div class="card-body">
+      <div class="form-group">
+        <label for="postcode">Organisation Postcode</label>
+        <input id="postcode" type="text" class="form-control" placeholder="Postcode" name="postcode" value="<%= $org_rs->postcode %>">
+      </div>
+      <div class="form-group">
+        <label for="name">Organisation Name</label>
+        <input id="name" type="text" class="form-control" placeholder="Organisation Name" name="name" value="<%= $org_rs->name %>">
+      </div>
+      <div class="form-group">
+        <label for="street_name">Street Name</label>
+        <input id="street_name" type="text" class="form-control" placeholder="Street Name" name="street_name" value="<%= $org_rs->street_name %>">
+      </div>
+      <div class="form-group">
+        <label for="town">Town</label>
+        <input id="town" type="text" class="form-control" placeholder="Town" name="town" value="<%= $org_rs->town %>">
+      </div>
+      <div class="form-group">
+        <label for="town">Town</label>
+        <input id="town" type="sector" class="form-control" placeholder="Sector Area Code" name="sector" value="<%= $org_rs->sector %>">
+      </div>
     </div>
     % } else {
-    <h3 class="card-header">
-      User is not a customer or an organisation
+    <h3 class="card-header text-white bg-danger">
+      Warning!
     </h3>
-    % }
-
-    <div class="form-group">
-      <button class="btn btn-primary form-control" type="submit">Edit Account</button>
+    <div class="card-body">
+      User is not a customer or an organisation
     </div>
+    % }
+  </div>
+  <div class="form-group">
+    <button class="btn btn-primary form-control" type="submit">Edit Account</button>
+  </div>
 </form>
 <div class="card mb-3">
   <h3 class="card-header">
     Transactions
   </h3>
-  <ul class="list-group list-group-flush">
+  <div class="list-group list-group-flush">
     % for my $transaction ( $transactions->all ) {
-    <li class="list-group-item">
-      <div class="container">
         <a href="<%= url_for '/admin/transactions/' . $transaction->id %>" class="list-group-item list-group-item-action">
           <div class="row text-center">
             <div class="col">From: <%= $transaction->buyer->name %></div>
@@ -103,13 +113,9 @@
             <div class="col">Purchase Time: <%= $transaction->purchase_time %></div>
           </div>
         </a>
-      </div>
-    </li>
     % }
-    <li class="list-group-item">
-      <div class="container">
-        %= bootstrap_pagination( $c->param('page') || 1, $transactions->pager->last_page, { class => 'justify-content-center' } );
-      </div>
-    </li>
-  </ul>
+    <div class="list-group-item">
+      %= bootstrap_pagination( $c->param('page') || 1, $transactions->pager->last_page, { class => 'justify-content-center' } );
+    </div>
+  </div>
 </div>

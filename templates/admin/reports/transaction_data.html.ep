@@ -1,27 +1,27 @@
 % layout 'admin';
-% title 'Tokens';
+% title 'Transaction Report';
 % content_for javascript => begin
 <script src="//www.gstatic.com/charts/loader.js"></script>
 <script>
 var raw_data = <%== $transaction_rs %>;
 var mapped_data = $.map(raw_data, function( val, i ) {
-  return [[
-    new Date(val.quantised_hours),
-    val.count,
-    val.average_value / 100000,
-    val.sum_value / 100000,
-    val.average_distance / 1000,
-    val.sum_distance / 1000,
-  ]];
+  return [
+    [
+      new Date(val.quantised_hours),
+      val.count,
+      val.average_value / 100000,
+      val.sum_value / 100000,
+      val.average_distance / 1000,
+      val.sum_distance / 1000,
+    ]
+  ];
 });
-
-var data;
 
 google.charts.load('current', {packages: ['corechart']});
 google.charts.setOnLoadCallback(loadData);
 
 function loadData() {
-  data = new google.visualization.DataTable();
+  var data = new google.visualization.DataTable();
   data.addColumn('datetime', 'Hours');
   data.addColumn('number', 'Count');
   data.addColumn('number', 'Average Value');
@@ -31,12 +31,12 @@ function loadData() {
 
   data.addRows(mapped_data);
 
-  drawCountChart();
-  drawDistanceChart();
-  drawValueChart();
+  drawCountChart(data);
+  drawDistanceChart(data);
+  drawValueChart(data);
 }
 
-function drawCountChart() {
+function drawCountChart(data) {
   var options = {
     title: 'Transaction Count',
     height: 500,
@@ -56,7 +56,7 @@ function drawCountChart() {
   chart.draw(chart_data, options);
 }
 
-function drawDistanceChart() {
+function drawDistanceChart(data) {
   var options = {
     title: 'Transaction Distance',
     height: 500,
@@ -77,7 +77,7 @@ function drawDistanceChart() {
   chart.draw(chart_data, options);
 }
 
-function drawValueChart() {
+function drawValueChart(data) {
   var options = {
     title: 'Transaction Value',
     height: 500,
@@ -108,9 +108,33 @@ function drawValueChart() {
     <strong>Success!</strong> <%= $success %>
   </div>
 % }
-<div id="count_chart_div"></div>
-<div id="distance_chart_div"></div>
-<div id="value_chart_div"></div>
-<pre>
-%= $transaction_rs;
-</pre>
+<div class="card mb-3 text-center">
+  <div class="card-header">
+    Transaction Count
+  </div>
+  <div id="count_chart_div" class="card-body">
+    <div class="card-text">
+      <em>Loading...</em>
+    </div>
+  </div>
+</div>
+<div class="card mb-3 text-center">
+  <div class="card-header">
+    Transaction Distance
+  </div>
+  <div id="distance_chart_div" class="card-body">
+    <div class="card-text">
+      <em>Loading...</em>
+    </div>
+  </div>
+</div>
+<div class="card mb-3 text-center">
+  <div class="card-header">
+    Transaction Value
+  </div>
+  <div id="value_chart_div" class="card-body">
+    <div class="card-text">
+      <em>Loading...</em>
+    </div>
+  </div>
+</div>

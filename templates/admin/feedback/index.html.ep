@@ -18,7 +18,7 @@
       <div class="card-header">
         %= $feedback->user->email;
       </div>
-      <div class="card-block">
+      <div class="card-body">
         <h6 class="card-title">
           %= format_human_datetime $feedback->submitted_at;
         </h6>

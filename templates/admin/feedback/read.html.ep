@@ -24,7 +24,7 @@
         </li>
         <li class="list-group-item justify-content-between">
           <span>Submitted At:</span>
-          <span><%= format_human_datetime$feedback->submitted_at %></span>
+          <span><%= format_human_datetime $feedback->submitted_at %></span>
         </li>
       </ul>
     </div>
@@ -34,8 +34,10 @@
       <h4 class="card-header">
         Feedback Message
       </h4>
-      <div class="card-block">
-        <pre class="card-text"><%= $feedback->feedbacktext %></pre>
+      <div class="card-body">
+        <div class="card-text">
+        <pre><%= $feedback->feedbacktext %></pre>
+        </div>
       </div>
     </div>
   </div>
