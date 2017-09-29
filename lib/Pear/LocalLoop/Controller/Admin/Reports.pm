@@ -7,7 +7,7 @@ sub transaction_data {
   my $c = shift;
 
   my $quantised_column = 'quantised_hours';
-  if ( $c->param('scale') eq 'days' ) {
+  if ( defined $c->param('scale') && $c->param('scale') eq 'days' ) {
     $quantised_column = 'quantised_days';
   }
 
