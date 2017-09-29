@@ -21,12 +21,15 @@ has schema => sub {
 sub startup {
   my $self = shift;
 
+  my $version = `git describe --tags`;
+
   $self->plugin('Config', {
     default => {
       storage_path => tempdir,
       sessionTimeSeconds => 60 * 60 * 24 * 7,
       sessionTokenJsonName => 'session_key',
       sessionExpiresJsonName => 'sessionExpires',
+      version => $version,
     },
   });
   my $config = $self->config;
