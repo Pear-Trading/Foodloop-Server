@@ -193,6 +193,8 @@ sub startup {
   $admin_routes->get('/transactions/:id/image')->to('admin-transactions#image');
   $admin_routes->post('/transactions/:id/delete')->to('admin-transactions#delete');
 
+  $admin_routes->get('/reports/transactions')->to('admin-reports#transaction_data');
+
 #  my $user_routes = $r->under('/')->to('root#under');
 
 # $user_routes->get('/home')->to('root#home');

@@ -1,0 +1,116 @@
+% layout 'admin';
+% title 'Tokens';
+% content_for javascript => begin
+<script src="//www.gstatic.com/charts/loader.js"></script>
+<script>
+var raw_data = <%== $transaction_rs %>;
+var mapped_data = $.map(raw_data, function( val, i ) {
+  return [[
+    new Date(val.quantised_hours),
+    val.count,
+    val.average_value / 100000,
+    val.sum_value / 100000,
+    val.average_distance / 1000,
+    val.sum_distance / 1000,
+  ]];
+});
+
+var data;
+
+google.charts.load('current', {packages: ['corechart']});
+google.charts.setOnLoadCallback(loadData);
+
+function loadData() {
+  data = new google.visualization.DataTable();
+  data.addColumn('datetime', 'Hours');
+  data.addColumn('number', 'Count');
+  data.addColumn('number', 'Average Value');
+  data.addColumn('number', 'Sum Value');
+  data.addColumn('number', 'Average Distance');
+  data.addColumn('number', 'Sum Distance');
+
+  data.addRows(mapped_data);
+
+  drawCountChart();
+  drawDistanceChart();
+  drawValueChart();
+}
+
+function drawCountChart() {
+  var options = {
+    title: 'Transaction Count',
+    height: 500,
+    series: {
+      0: {targetAxisIndex: 0},
+    },
+    vAxes: {
+      0: { title: 'Count' },
+    },
+    explorer: { axis: 'horizontal' }
+  };
+
+  var chart_data = new google.visualization.DataView(data);
+  chart_data.setColumns([0, 1]);
+
+  var chart = new google.visualization.LineChart(document.getElementById('count_chart_div'));
+  chart.draw(chart_data, options);
+}
+
+function drawDistanceChart() {
+  var options = {
+    title: 'Transaction Distance',
+    height: 500,
+    series: {
+      0: {targetAxisIndex: 0},
+      1: {targetAxisIndex: 0},
+    },
+    vAxes: {
+      0: { title: 'Distance (km)' },
+    },
+    explorer: { axis: 'horizontal' }
+  };
+
+  var chart_data = new google.visualization.DataView(data);
+  chart_data.setColumns([0, 4, 5]);
+
+  var chart = new google.visualization.LineChart(document.getElementById('distance_chart_div'));
+  chart.draw(chart_data, options);
+}
+
+function drawValueChart() {
+  var options = {
+    title: 'Transaction Value',
+    height: 500,
+    series: {
+      0: {targetAxisIndex: 0},
+      1: {targetAxisIndex: 0},
+    },
+    vAxes: {
+      0: { title: 'Value (GBP)' },
+    },
+    explorer: { axis: 'horizontal' }
+  };
+
+  var chart_data = new google.visualization.DataView(data);
+  chart_data.setColumns([0, 2, 3]);
+
+  var chart = new google.visualization.LineChart(document.getElementById('value_chart_div'));
+  chart.draw(chart_data, options);
+}
+</script>
+% end
+% if ( my $error = flash 'error' ) {
+  <div class="alert alert-danger" role="alert">
+    <strong>Error!</strong> <%= $error %>
+  </div>
+% } elsif ( my $success = flash 'success' ) {
+  <div class="alert alert-success" role="alert">
+    <strong>Success!</strong> <%= $success %>
+  </div>
+% }
+<div id="count_chart_div"></div>
+<div id="distance_chart_div"></div>
+<div id="value_chart_div"></div>
+<pre>
+%= $transaction_rs;
+</pre>
