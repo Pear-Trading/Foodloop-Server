@@ -20,19 +20,19 @@ sub transaction_data {
           quantised        => $quantised_column,
           count            => \"COUNT(*)",
           sum_distance     => $c->pg_or_sqlite(
-                                '',
+                                'SUM("me"."distance")',
                                 'SUM("me"."distance")',
                               ),
           average_distance => $c->pg_or_sqlite(
-                                '',
+                                'AVG("me"."distance")',
                                 'AVG("me"."distance")',
                               ),
           sum_value        => $c->pg_or_sqlite(
-                                '',
+                                'SUM("me"."value")',
                                 'SUM("me"."value")',
                               ),
           average_value    => $c->pg_or_sqlite(
-                                '',
+                                'AVG("me"."value")',
                                 'AVG("me"."value")',
                               ),
         }
@@ -42,10 +42,23 @@ sub transaction_data {
     }
   );
 
-  $transaction_rs->result_class('DBIx::Class::ResultClass::HashRefInflator');
+  my $transaction_data = [
+    map{
+      my $quantised = $c->db_datetime_parser->parse_datetime($_->get_column('quantised'));
+      {
+        sum_value         => ($_->get_column('sum_value') || 0) * 1,
+        sum_distance      => ($_->get_column('sum_distance') || 0) * 1,
+        average_value     => ($_->get_column('average_value') || 0) * 1,
+        average_distance  => ($_->get_column('average_distance') || 0) * 1,
+        count             => $_->get_column('count'),
+        quantised         => $c->format_iso_datetime($quantised),
+      }
+    } $transaction_rs->all
+  ];
 
-  $c->stash(
-    transaction_rs => encode_json( [$transaction_rs->all] ),
+  $c->respond_to(
+    json => { json => { data => $transaction_data } },
+    html => { transaction_rs => encode_json( $transaction_data ) },
   );
 }
 
