@@ -12,15 +12,15 @@
   </div>
 % }
 <div class="card mb-3">
-  <h3 class="card-header">
+  <h3 class="card-header d-flex justify-content-between">
     Transaction Details
-    <form action="<%= url_for . '/delete' %>" method="post">
+    <form class="form-inline" action="<%= url_for . '/delete' %>" method="post">
       <div class="form-group">
-        <button class="btn btn-danger" type="submit" style="float: left">Delete Transaction</button>
+        <button class="btn btn-danger" type="submit">Delete Transaction</button>
       </div>
     </form>
   </h3>
-  <div class="card-block">
+  <div class="card-body">
     <form>
       <div class="form-group">
         <label for="email">Buyer</label>
@@ -42,8 +42,8 @@
         <label for="email">Purchase Time</label>
         <input id="purchase_time" type="text" class="form-control" placeholder="Purchase Time" name="purchase_time" value="<%= $transaction->purchase_time %>" disabled>
       </div>
-      <div class="form-group">
-        <img src="<%= url_for . '/image' %>"/>
+      <div class="form-group d-flex justify-content-center">
+        <img class="mw-100" src="<%= url_for . '/image' %>"/>
       </div>
     </form>
   </div>

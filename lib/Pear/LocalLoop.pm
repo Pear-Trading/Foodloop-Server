@@ -21,12 +21,15 @@ has schema => sub {
 sub startup {
   my $self = shift;
 
+  my $version = `git describe --tags`;
+
   $self->plugin('Config', {
     default => {
       storage_path => tempdir,
       sessionTimeSeconds => 60 * 60 * 24 * 7,
       sessionTokenJsonName => 'session_key',
       sessionExpiresJsonName => 'sessionExpires',
+      version => $version,
     },
   });
   my $config = $self->config;
@@ -36,6 +39,7 @@ sub startup {
   $self->plugin('Pear::LocalLoop::Plugin::BootstrapPagination', { bootstrap4 => 1 } );
   $self->plugin('Pear::LocalLoop::Plugin::Validators');
   $self->plugin('Pear::LocalLoop::Plugin::Datetime');
+  $self->plugin('Pear::LocalLoop::Plugin::TemplateHelpers');
 
   $self->plugin('Authentication' => {
     'load_user' => sub {
@@ -191,6 +195,8 @@ sub startup {
   $admin_routes->get('/transactions/:id')->to('admin-transactions#read');
   $admin_routes->get('/transactions/:id/image')->to('admin-transactions#image');
   $admin_routes->post('/transactions/:id/delete')->to('admin-transactions#delete');
+
+  $admin_routes->get('/reports/transactions')->to('admin-reports#transaction_data');
 
 #  my $user_routes = $r->under('/')->to('root#under');
 

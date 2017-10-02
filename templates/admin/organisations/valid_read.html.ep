@@ -36,7 +36,7 @@ function initMap() {
       <h3 class="card-header">
         %= $valid_org->name
       </h3>
-      <div class="card-block">
+      <div class="card-body">
         <form action="<%= url_for %>" method="post">
           <div class="form-group row">
             <label for="name" class="col-md-4 col-form-label">Organisation Name</label>
@@ -93,11 +93,7 @@ function initMap() {
         </h3>
       </div>
       <div id="mapBody" role="tabpanel">
-        <div class="card-block">
-          <!-- Yes this is nasty. no i dont care. --!>
-          <style> #map {  width: 100%; height: 400px; background-color: grey; } </style>
-          <div id="map"></div>
-        </div>
+        <div id="map"></div>
       </div>
     </div>
   </div>
@@ -106,28 +102,22 @@ function initMap() {
       <h3 class="card-header">
         Transactions
       </h3>
-      <ul class="list-group list-group-flush">
+      <div class="list-group list-group-flush">
         % for my $transaction ( $transactions->all ) {
-        <li class="list-group-item">
-          <div class="container">
-            <a href="<%= url_for '/admin/transactions/' . $transaction->id %>" class="list-group-item list-group-item-action">
-              <div class="row text-center">
-                <div class="col">From: <%= $transaction->buyer->name %></div>
-                <div class="col">To: <%= $transaction->seller->name %></div>
-                <div class="col">Value: <%= $transaction->value %></div>
-                <div class="col">Submitted At: <%= $transaction->submitted_at %></div>
-                <div class="col">Purchase Time: <%= $transaction->purchase_time %></div>
-              </div>
-            </a>
-          </div>
-        </li>
+          <a href="<%= url_for '/admin/transactions/' . $transaction->id %>" class="list-group-item list-group-item-action">
+            <div class="row text-center">
+              <div class="col">From: <%= $transaction->buyer->name %></div>
+              <div class="col">To: <%= $transaction->seller->name %></div>
+              <div class="col">Value: <%= $transaction->value %></div>
+              <div class="col">Submitted At: <%= $transaction->submitted_at %></div>
+              <div class="col">Purchase Time: <%= $transaction->purchase_time %></div>
+            </div>
+          </a>
         % }
-        <li class="list-group-item">
-          <div class="container">
-            %= bootstrap_pagination( $c->param('page') || 1, $transactions->pager->last_page, { class => 'justify-content-center' } );
-          </div>
-        </li>
-      </ul>
+        <div class="list-group-item">
+          %= bootstrap_pagination( $c->param('page') || 1, $transactions->pager->last_page, { class => 'justify-content-center' } );
+        </div>
+      </div>
     </div>
   </div>
 </div>

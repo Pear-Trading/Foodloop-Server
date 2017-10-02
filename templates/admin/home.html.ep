@@ -3,41 +3,41 @@
 % content_for javascript => begin
 % end
 <div class="card-deck">
-  <div class="card text-center">
-    <div class="card-header card-inverse card-primary">
+  <div class="card text-center text-white bg-primary">
+    <div class="card-header card-inverse">
       User Count
     </div>
-    <div class="card-block">
+    <div class="card-body">
       <h2 class="card-title">
         %= $user_count
       </h2>
     </div>
   </div>
-  <div class="card text-center">
-    <div class="card-header card-inverse card-success">
+  <div class="card text-center text-white bg-success">
+    <div class="card-header card-inverse">
       Unused Tokens
     </div>
-    <div class="card-block">
+    <div class="card-body">
       <h2 class="card-title">
         <%= $tokens->{unused} %> / <%= $tokens->{total} %>
       </h2>
     </div>
   </div>
-  <div class="card text-center">
-    <div class="card-header card-inverse card-danger">
+  <div class="card text-center text-white bg-danger">
+    <div class="card-header card-inverse">
       Pending Organisations
     </div>
-    <div class="card-block">
+    <div class="card-body">
       <h2 class="card-title">
         %= $pending_orgs
       </h2>
     </div>
   </div>
-  <div class="card text-center">
-    <div class="card-header card-inverse card-danger">
+  <div class="card text-center text-white bg-danger">
+    <div class="card-header card-inverse">
       Pending Transactions
     </div>
-    <div class="card-block">
+    <div class="card-body">
       <h2 class="card-title">
         %= $pending_trans
       </h2>

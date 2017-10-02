@@ -11,10 +11,8 @@
     <strong>Success!</strong> <%= $success %>
   </div>
 % }
-<div class="list-group list-group-flush">
+<div class="list-group">
   % for my $transaction ( $transactions->all ) {
-  <li class="list-group-item">
-    <div class="container">
       <a href="<%= url_for . '/' . $transaction->id %>" class="list-group-item list-group-item-action">
         <div class="row text-center">
           <div class="col">From: <%= $transaction->buyer->name %></div>
@@ -24,12 +22,8 @@
           <div class="col">Purchase Time: <%= $transaction->purchase_time %></div>
         </div>
       </a>
-    </div>
-  </li>
   % }
-  <li class="list-group-item">
-    <div class="container">
+  <div class="list-group-item">
       %= bootstrap_pagination( $c->param('page') || 1, $transactions->pager->last_page, { class => 'justify-content-center' } );
-    </div>
-  </li>
+  </div>
 </div>

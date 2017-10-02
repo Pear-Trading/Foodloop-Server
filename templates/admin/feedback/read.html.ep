@@ -11,33 +11,59 @@
     <strong>Success!</strong> <%= $success %>
   </div>
 % }
-<form action="<%= url_for %>" method="post">
-  <div class="form-group">
-    <label for="email">Email Address</label>
-    <input id="email" type="text" class="form-control" placeholder="Email" name="email" value="<%= $feedback->user->email %>" disabled>
+<div class="row">
+  <div class="col col-md-6 mb-3">
+    <div class="card">
+      <h4 class="card-header">
+        User Info
+      </h4>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item justify-content-between">
+          <span>Email Address:</span>
+          <span><%= $feedback->user->email %></span>
+        </li>
+        <li class="list-group-item justify-content-between">
+          <span>Submitted At:</span>
+          <span><%= format_human_datetime $feedback->submitted_at %></span>
+        </li>
+      </ul>
+    </div>
   </div>
-  <div class="form-group">
-    <label for="joindate">Submitted At</label>
-    <input id="submitted_at" type="datetime" class="form-control" placeholder="Date" name="submitted_at" value="<%= $feedback->submitted_at %>" disabled>
+  <div class="col col-md-6 mb-3">
+    <div class="card">
+      <h4 class="card-header">
+        Feedback Message
+      </h4>
+      <div class="card-body">
+        <div class="card-text">
+        <pre><%= $feedback->feedbacktext %></pre>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="form-group">
-    <label for="feedback">Feedback</label>
-    <input id="feedback" type="text" class="form-control" placeholder="Feedback" name="feedback" value="<%= $feedback->feedbacktext %>" disabled>
+  <div class="col col-md-6 mb-3">
+    <div class="card">
+      <h4 class="card-header">
+        Debug Info
+      </h4>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item justify-content-between">
+          <span>App Name:</span>
+          <span><%= $feedback->app_name %></span>
+        </li>
+        <li class="list-group-item justify-content-between">
+          <span>Package Name:</span>
+          <span><%= $feedback->package_name %></span>
+        </li>
+        <li class="list-group-item justify-content-between">
+          <span>Version Code:</span>
+          <span><%= $feedback->version_code %></span>
+        </li>
+        <li class="list-group-item justify-content-between">
+          <span>Version Number:</span>
+          <span><%= $feedback->version_number %></span>
+        </li>
+      </ul>
+    </div>
   </div>
-  <div class="form-group">
-    <label for="app_name">App Name</label>
-    <input id="app_name" type="text" class="form-control" placeholder="App Name" name="app_name" value="<%= $feedback->app_name %>" disabled>
-  </div>
-  <div class="form-group">
-    <label for="package_name">Package Name</label>
-    <input id="package_name" type="text" class="form-control" placeholder="Package Name" name="package_name" value="<%= $feedback->package_name %>" disabled>
-  </div>
-  <div class="form-group">
-    <label for="version_code">Version Code</label>
-    <input id="version_code" type="text" class="form-control" placeholder="Version Code" name="version_code" value="<%= $feedback->version_code %>" disabled>
-  </div>
-  <div class="form-group">
-    <label for="version_number">Version Number</label>
-    <input id="version_number" type="text" class="form-control" placeholder="Version Number" name="feedback" value="<%= $feedback->version_number %>" disabled>
-  </div>
-</form>
+</div>
