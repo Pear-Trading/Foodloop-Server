@@ -23,13 +23,9 @@
 </form>
 <div class="list-group">
   % for my $token (@$tokens) {
-  <a href="<%= url_for . '/' . $token->{id} %>" class="list-group-item list-group-item-action">
-    <div>
-      %= $token->{name}
-    </div>
-    <div class="ml-auto">
-      <%= $token->{used} == 1 ? 'Used' : 'Available' %>
-    </div>
+  <a href="<%= url_for . '/' . $token->{id} %>" class="list-group-item list-group-item-action d-flex justify-content-between <%= $token->{used} ? 'disabled' : 'list-group-item-success' %>">
+    <span><%= $token->{name} %></span>
+    <span><%= $token->{used} == 1 ? 'Used' : 'Available' %></span>
   </a>
   % }
 </div>

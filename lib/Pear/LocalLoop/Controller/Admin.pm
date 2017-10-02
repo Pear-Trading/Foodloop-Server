@@ -7,7 +7,7 @@ sub under {
   if ( $c->is_user_authenticated ) {
     return 1 if $c->current_user->is_admin;
   }
-  $c->redirect_to('/');
+  $c->redirect_to('/admin');
   return 0;
 }
 

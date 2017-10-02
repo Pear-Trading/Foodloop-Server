@@ -6,6 +6,17 @@ use DateTime::Format::Strptime;
 sub register {
   my ( $plugin, $app, $conf ) = @_;
 
+  $app->helper( human_datetime_parser => sub {
+    return DateTime::Format::Strptime->new( pattern => '%x %X' );
+  });
+
+  $app->helper( format_human_datetime => sub {
+    my ( $c, $datetime_obj ) = @_;
+    return $c->human_datetime_parser->format_datetime(
+      $datetime_obj,
+    );
+  });
+
   $app->helper( iso_datetime_parser => sub {
     return DateTime::Format::Strptime->new( pattern => '%Y-%m-%dT%H:%M:%S.%3N%z' );
   });

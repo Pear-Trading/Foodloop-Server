@@ -11,12 +11,30 @@
     <strong>Success!</strong> <%= $success %>
   </div>
 % }
-<div class="list-group">
-  % for my $feedback (@$feedbacks) {
-  <a href="<%= url_for . '/' . $feedback->id %>" class="list-group-item list-group-item-action">
-    <div>
-      <%= $feedback->user->email %> <%= $feedback->submitted_at %>
+<div class="row">
+  % for my $feedback ( $feedback_rs->all ) {
+  <div class="col col-md-4 mb-3">
+    <div class="card">
+      <div class="card-header">
+        %= $feedback->user->email;
+      </div>
+      <div class="card-body">
+        <h6 class="card-title">
+          %= format_human_datetime $feedback->submitted_at;
+        </h6>
+        <pre class="card-text"><%= truncate_text $feedback->feedbacktext => 50; %></pre>
+      </div>
+      <div class="card-footer text-right">
+        <a href="<%= url_for . '/' . $feedback->id %>" class="card-link">
+          More info
+        </a>
+      </div>
     </div>
-  </a>
+  </div>
   % }
+</div>
+<div class="row">
+  <div class="col">
+      %= bootstrap_pagination( $c->param('page') || 1, $feedback_rs->pager->last_page, { class => 'justify-content-center' } );
+  </div>
 </div>

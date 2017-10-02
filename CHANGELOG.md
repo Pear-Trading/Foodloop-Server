@@ -2,6 +2,13 @@
 
 # Next Release
 
+# v0.9.4
+
+* **Admin Feature:** Report of transaction data graphs
+* **Fix:** Mobile view meta tag for admin
+* Upgrade all CSS to Bootstrap 4 beta
+* **Admin Feature:** Added version number to admin console
+
 # v0.9.3
 
 * **Feature:** lat/long locations on customers and organisations
