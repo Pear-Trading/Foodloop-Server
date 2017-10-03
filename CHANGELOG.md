@@ -5,6 +5,7 @@
 * Location is now updated on registration. Customers location is truncated to 2
   decimal places based on their postcode.
 * Location is also updated on changing a users postcode
+* Distance is now calculated when a transaction is submitted
 
 ## Bug Fixes
 

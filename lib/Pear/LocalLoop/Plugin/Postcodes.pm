@@ -1,7 +1,8 @@
 package Pear::LocalLoop::Plugin::Postcodes;
 use Mojo::Base 'Mojolicious::Plugin';
 
-use DateTime::Format::Strptime;
+use Geo::UK::Postcode::Regex;
+use GIS::Distance;
 
 sub register {
   my ( $plugin, $app, $conf ) = @_;
@@ -34,6 +35,23 @@ sub register {
       }
     }
     return $location;
+  });
+
+  $app->helper( get_distance_from_coords => sub {
+    my ( $c, $buyer, $seller ) = @_;
+
+    my $gis = GIS::Distance->new();
+
+    my $buyer_lat = $buyer->latitude;
+    my $buyer_long = $buyer->longitude;
+    my $seller_lat = $seller->latitude;
+    my $seller_long = $seller->longitude;
+
+    if ( $buyer_lat && $buyer_long 
+      && $seller_lat && $seller_long ) {
+      return int( $gis->distance( $buyer_lat, $buyer_long => $seller_lat, $seller_long )->meters );
+    }
+    return;
   });
 }
 
