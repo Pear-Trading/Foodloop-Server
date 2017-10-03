@@ -49,22 +49,28 @@ sub post_account {
     my $email = $user_result->email;
 
     if ( $user_result->type eq 'customer' ) {
-      my $full_name = $user_result->entity->customer->full_name;
-      my $display_name = $user_result->entity->customer->display_name;
-      my $postcode = $user_result->entity->customer->postcode;
+      my $customer = $user_result->entity->customer;
+      my $full_name    = $customer->full_name;
+      my $display_name = $customer->display_name;
+      my $postcode     = $customer->postcode;
       return $c->render( json => {
         success => Mojo::JSON->true,
         full_name => $full_name,
         display_name => $display_name,
         email => $email,
         postcode => $postcode,
+        location => {
+          latitude => (defined $customer->latitude ? $customer->latitude * 1 : undef),
+          longitude => (defined $customer->longitude ? $customer->longitude * 1 : undef),
+        },
       });
     } elsif ( $user_result->type eq 'organisation' ) {
-      my $name = $user_result->entity->organisation->name;
-      my $postcode = $user_result->entity->organisation->postcode;
-      my $street_name = $user_result->entity->organisation->street_name;
-      my $town = $user_result->entity->organisation->town;
-      my $sector = $user_result->entity->organisation->sector;
+      my $organisation = $user_result->entity->organisation;
+      my $name        = $organisation->name;
+      my $postcode    = $organisation->postcode;
+      my $street_name = $organisation->street_name;
+      my $town        = $organisation->town;
+      my $sector      = $organisation->sector;
       return $c->render( json => {
         success => Mojo::JSON->true,
         town => $town,
@@ -73,6 +79,10 @@ sub post_account {
         street_name => $street_name,
         email => $email,
         postcode => $postcode,
+        location => {
+          latitude => (defined $organisation->latitude ? $organisation->latitude * 1 : undef),
+          longitude => (defined $organisation->longitude ? $organisation->longitude * 1 : undef),
+        },
       });
     } else {
       return $c->render(

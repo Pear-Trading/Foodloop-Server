@@ -40,6 +40,10 @@ $t->post_ok('/api/user', json => { session_key => $session_key })
     display_name => 'Testing User',
     email => $email,
     postcode => 'LA1 1AA',
+    location => {
+      latitude => undef,
+      longitude => undef,
+    },
   });
 
 #with wrong password
@@ -80,6 +84,11 @@ $t->post_ok('/api/user', json => { session_key => $session_key })
     display_name => 'Testing User 2',
     email => 'test50@example.com',
     postcode => 'LA1 1AB',
+    location => {
+      latitude => undef,
+      longitude => undef,
+    },
+
   });
 
 $t->post_ok('/api/user/account', json => {
@@ -105,6 +114,11 @@ $t->post_ok('/api/user', json => { session_key => $session_key })
     display_name => 'Testing User 3',
     email => 'test60@example.com',
     postcode => 'LA1 1AD',
+    location => {
+      latitude => undef,
+      longitude => undef,
+    },
+
   });
 
 $session_key = $framework->login({
