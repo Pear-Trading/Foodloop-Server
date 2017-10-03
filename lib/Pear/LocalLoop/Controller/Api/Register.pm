@@ -82,33 +82,10 @@ sub post_register {
 
   return $c->api_validation_error if $validation->has_error;
 
-  my $postcode_obj = Geo::UK::Postcode::Regex->parse(
-    $validation->param('postcode')
+  my $location = $c->get_location_from_postcode(
+    $validation->param('postcode'),
+    $usertype,
   );
-
-  my $location;
-
-  unless ( defined $postcode_obj && $postcode_obj->{non_geographical} ) {
-    my $pc_result = $c->schema->resultset('GbPostcode')->find({
-      incode => $postcode_obj->{incode},
-      outcode => $postcode_obj->{outcode},
-    });
-    if ( defined $pc_result ) {
-      # Force truncation here as SQLite is stupid
-      $location = {
-        latitude => (
-          $usertype eq 'customer'
-          ? int($pc_result->latitude * 100 ) / 100
-          : $pc_result->latitude
-        ),
-        longitude => (
-          $usertype eq 'customer'
-          ? int($pc_result->longitude * 100 ) / 100
-          : $pc_result->longitude
-        ),
-      };
-    }
-  }
 
   if ($usertype eq 'customer'){
 

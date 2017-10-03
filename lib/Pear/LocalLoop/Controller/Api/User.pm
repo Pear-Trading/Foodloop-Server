@@ -145,6 +145,11 @@ sub post_account_update {
 
   return $c->api_validation_error if $validation->has_error;
 
+  my $location = $c->get_location_from_postcode(
+    $validation->param('postcode'),
+    $user->type,
+  );
+
   if ( $user->type eq 'customer' ){
 
     $c->schema->txn_do( sub {
@@ -152,6 +157,7 @@ sub post_account_update {
         full_name     => $validation->param('full_name'),
         display_name  => $validation->param('display_name'),
         postcode      => $validation->param('postcode'),
+        ( defined $location ? ( %$location ) : ( latitude => undef, longitude => undef ) ),
       });
       $user->update({
         email => $validation->param('email'),
@@ -169,6 +175,7 @@ sub post_account_update {
         town        => $validation->param('town'),
         sector      => $validation->param('sector'),
         postcode    => $validation->param('postcode'),
+        ( defined $location ? ( %$location ) : ( latitude => undef, longitude => undef ) ),
       });
       $user->update({
         email        => $validation->param('email'),
