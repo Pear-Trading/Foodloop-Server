@@ -39,6 +39,7 @@ sub startup {
   $self->plugin('Pear::LocalLoop::Plugin::BootstrapPagination', { bootstrap4 => 1 } );
   $self->plugin('Pear::LocalLoop::Plugin::Validators');
   $self->plugin('Pear::LocalLoop::Plugin::Datetime');
+  $self->plugin('Pear::LocalLoop::Plugin::Postcodes');
   $self->plugin('Pear::LocalLoop::Plugin::TemplateHelpers');
 
   $self->plugin('Authentication' => {

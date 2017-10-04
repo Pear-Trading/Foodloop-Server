@@ -40,7 +40,7 @@ my $expected_hours = {};
 sub increment_day {
   my ( $value, $day, $distance ) = @_;
   $value *= 100000;
-  $distance //= 0;
+  $distance //= 845;
   $expected_days->{$day} = {
     quantised         => $day,
     sum_value         => ($expected_days->{$day}->{sum_value} || 0) + $value,
@@ -52,7 +52,7 @@ sub increment_day {
 sub increment_hour {
   my ( $value, $day, $distance ) = @_;
   $value *= 100000;
-  $distance //= 0;
+  $distance //= 845;
   $expected_hours->{$day} = {
     quantised         => $day,
     sum_value         => ($expected_hours->{$day}->{sum_value} || 0) + $value,
