@@ -6,12 +6,10 @@ use Try::Tiny;
 sub list {
   my $c = shift;
 
-  my $valid_orgs_rs = $c->schema->resultset('Organisation')->search({ pending => 0 });
-  my $pending_orgs_rs = $c->schema->resultset('Organisation')->search({ pending => 1 });
+  my $orgs_rs = $c->schema->resultset('Organisation');
 
   $c->stash(
-    valid_orgs_rs => $valid_orgs_rs,
-    pending_orgs_rs => $pending_orgs_rs,
+    orgs_rs => $orgs_rs,
   );
 }
 
