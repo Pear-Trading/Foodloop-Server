@@ -18,11 +18,15 @@
         User Info
       </h4>
       <ul class="list-group list-group-flush">
-        <li class="list-group-item justify-content-between">
+        <li class="list-group-item d-flex justify-content-between">
+          <span>Feedback ID:</span>
+          <span><%= $feedback->id %></span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
           <span>Email Address:</span>
           <span><%= $feedback->user->email %></span>
         </li>
-        <li class="list-group-item justify-content-between">
+        <li class="list-group-item d-flex justify-content-between">
           <span>Submitted At:</span>
           <span><%= format_human_datetime $feedback->submitted_at %></span>
         </li>
@@ -47,19 +51,19 @@
         Debug Info
       </h4>
       <ul class="list-group list-group-flush">
-        <li class="list-group-item justify-content-between">
+        <li class="list-group-item d-flex justify-content-between">
           <span>App Name:</span>
           <span><%= $feedback->app_name %></span>
         </li>
-        <li class="list-group-item justify-content-between">
+        <li class="list-group-item d-flex justify-content-between">
           <span>Package Name:</span>
           <span><%= $feedback->package_name %></span>
         </li>
-        <li class="list-group-item justify-content-between">
+        <li class="list-group-item d-flex justify-content-between">
           <span>Version Code:</span>
           <span><%= $feedback->version_code %></span>
         </li>
-        <li class="list-group-item justify-content-between">
+        <li class="list-group-item d-flex justify-content-between">
           <span>Version Number:</span>
           <span><%= $feedback->version_number %></span>
         </li>
