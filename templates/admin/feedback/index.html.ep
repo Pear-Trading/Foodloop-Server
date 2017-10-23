@@ -22,7 +22,7 @@
         <h6 class="card-title">
           %= format_human_datetime $feedback->submitted_at;
         </h6>
-        <pre class="card-text"><%= truncate_text $feedback->feedbacktext => 50; %></pre>
+        <pre class="card-text feedback-text"><%= truncate_text $feedback->feedbacktext => 50; %></pre>
       </div>
       <div class="card-footer text-right">
         <a href="<%= url_for . '/' . $feedback->id %>" class="card-link">

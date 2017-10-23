@@ -15,3 +15,7 @@ body {
   height: 400px;
   background-color: grey;
 }
+
+.feedback-text {
+  white-space: pre-wrap;
+}

@@ -36,7 +36,7 @@
       </h4>
       <div class="card-body">
         <div class="card-text">
-        <pre><%= $feedback->feedbacktext %></pre>
+        <pre class="feedback-text"><%= $feedback->feedbacktext %></pre>
         </div>
       </div>
     </div>

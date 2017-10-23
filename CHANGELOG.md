@@ -2,6 +2,7 @@
 
 # Next Release
 
+* **Admin Feature** Feedback items now word wrap
 * Location is now updated on registration. Customers location is truncated to 2
   decimal places based on their postcode.
 * Location is also updated on changing a users postcode
