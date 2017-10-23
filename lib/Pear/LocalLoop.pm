@@ -191,6 +191,7 @@ sub startup {
 
   $admin_routes->get('/feedback')->to('admin-feedback#index');
   $admin_routes->get('/feedback/:id')->to('admin-feedback#read');
+  $admin_routes->get('/feedback/:id/actioned')->to('admin-feedback#actioned');
 
   $admin_routes->get('/transactions')->to('admin-transactions#index');
   $admin_routes->get('/transactions/:id')->to('admin-transactions#read');

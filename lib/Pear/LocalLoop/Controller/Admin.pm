@@ -18,6 +18,8 @@ sub home {
   my $token_rs = $c->schema->resultset('AccountToken');
   my $pending_orgs_rs = $c->schema->resultset('Organisation')->search({ pending => 1 });
   my $pending_transaction_rs = $pending_orgs_rs->entity->sales;
+  my $feedback_rs = $c->schema->resultset('Feedback');
+  my $pending_feedback_rs = $feedback_rs->search({ actioned => 0 });
   $c->stash(
     user_count => $user_rs->count,
     tokens => {
@@ -26,6 +28,10 @@ sub home {
     },
     pending_orgs => $pending_orgs_rs->count,
     pending_trans => $pending_transaction_rs->count,
+    feedback => {
+      total => $feedback_rs->count,
+      pending => $pending_feedback_rs->count,
+    },
   );
 }
 

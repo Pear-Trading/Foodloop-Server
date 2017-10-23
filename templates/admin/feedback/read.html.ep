@@ -30,6 +30,15 @@
           <span>Submitted At:</span>
           <span><%= format_human_datetime $feedback->submitted_at %></span>
         </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span>Actioned:</span>
+          <span>
+            <%= $feedback->actioned ? 'Done' : 'Needs Action' %>
+            <a class="btn btn-sm btn-success" href="<%= url_for . '/actioned' %>">
+              Toggle
+            </a>
+          </span>
+        </li>
       </ul>
     </div>
   </div>
