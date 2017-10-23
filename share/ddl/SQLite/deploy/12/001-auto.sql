@@ -1,6 +1,6 @@
 -- 
 -- Created by SQL::Translator::Producer::SQLite
--- Created on Wed Sep 13 15:24:20 2017
+-- Created on Mon Oct 23 15:37:04 2017
 -- 
 
 ;
@@ -22,6 +22,16 @@ CREATE TABLE entities (
   type varchar(255) NOT NULL
 );
 --
+-- Table: gb_postcodes
+--
+CREATE TABLE gb_postcodes (
+  outcode char(4) NOT NULL,
+  incode char(3) NOT NULL DEFAULT '',
+  latitude decimal(7,5),
+  longitude decimal(7,5),
+  PRIMARY KEY (outcode, incode)
+);
+--
 -- Table: leaderboards
 --
 CREATE TABLE leaderboards (
@@ -40,6 +50,8 @@ CREATE TABLE customers (
   full_name varchar(255) NOT NULL,
   year_of_birth integer NOT NULL,
   postcode varchar(16) NOT NULL,
+  latitude decimal(5,2),
+  longitude decimal(5,2),
   FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE
 );
 CREATE INDEX customers_idx_entity_id ON customers (entity_id);
@@ -67,6 +79,8 @@ CREATE TABLE organisations (
   sector varchar(1),
   pending boolean NOT NULL DEFAULT 0,
   submitted_by_id integer,
+  latitude decimal(8,5),
+  longitude decimal(8,5),
   FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE
 );
 CREATE INDEX organisations_idx_entity_id ON organisations (entity_id);
@@ -81,6 +95,7 @@ CREATE TABLE transactions (
   proof_image text,
   submitted_at datetime NOT NULL,
   purchase_time datetime NOT NULL,
+  distance numeric(15),
   FOREIGN KEY (buyer_id) REFERENCES entities(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
   FOREIGN KEY (seller_id) REFERENCES entities(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
@@ -112,9 +127,29 @@ CREATE TABLE feedback (
   package_name varchar(255) NOT NULL,
   version_code varchar(255) NOT NULL,
   version_number varchar(255) NOT NULL,
+  actioned boolean NOT NULL DEFAULT 0,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 CREATE INDEX feedback_idx_user_id ON feedback (user_id);
+--
+-- Table: organisation_payroll
+--
+CREATE TABLE organisation_payroll (
+  id INTEGER PRIMARY KEY NOT NULL,
+  org_id integer NOT NULL,
+  submitted_at datetime NOT NULL,
+  entry_period datetime NOT NULL,
+  employee_amount integer NOT NULL,
+  local_employee_amount integer NOT NULL,
+  gross_payroll numeric(100,0) NOT NULL,
+  payroll_income_tax numeric(100,0) NOT NULL,
+  payroll_employee_ni numeric(100,0) NOT NULL,
+  payroll_employer_ni numeric(100,0) NOT NULL,
+  payroll_total_pension numeric(100,0) NOT NULL,
+  payroll_other_benefit numeric(100,0) NOT NULL,
+  FOREIGN KEY (org_id) REFERENCES organisations(id)
+);
+CREATE INDEX organisation_payroll_idx_org_id ON organisation_payroll (org_id);
 --
 -- Table: session_tokens
 --
