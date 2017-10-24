@@ -2,6 +2,9 @@
 
 # Next Release
 
+* **Admin Feature** Paginated Organisation listings
+* **Admin Feature** Added flags to Organisations listings
+* **Admin Feature** Added `is_local` flag to Organisations to start categorising odd stores
 * **Admin Feature** Feedback items now word wrap
 * Location is now updated on registration. Customers location is truncated to 2
   decimal places based on their postcode.
