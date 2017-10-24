@@ -6,7 +6,14 @@ use Try::Tiny;
 sub list {
   my $c = shift;
 
-  my $orgs_rs = $c->schema->resultset('Organisation');
+  my $orgs_rs = $c->schema->resultset('Organisation')->search(
+    undef,
+    {
+      page => $c->param('page') || 1,
+      rows => 10,
+      order_by => { -asc => 'name' },
+    },
+  );
 
   $c->stash(
     orgs_rs => $orgs_rs,

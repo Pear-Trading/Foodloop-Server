@@ -11,7 +11,7 @@
     <strong>Success!</strong> <%= $success %>
   </div>
 % }
-<div class="row">
+<div class="row mb-3">
   <div class="col">
     <div class="card">
       <h3 class="card-header">
@@ -33,5 +33,10 @@
         % }
       </div>
     </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+      %= bootstrap_pagination( $c->param('page') || 1, $orgs_rs->pager->last_page, { class => 'justify-content-center' } );
   </div>
 </div>
