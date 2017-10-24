@@ -57,23 +57,32 @@ function initMap() {
             </div>
           </div>
           <div class="form-group row">
-            <label for="name" class="col-md-4 col-form-label">Sector</label>
+            <label for="sector" class="col-md-4 col-form-label">Sector</label>
             <div class="col-md-8">
-              <select class="form-control" name="sector">
+              <select id="sector" class="form-control" name="sector">
               %= include 'partials/sector_options', selected_sector => $valid_org->sector || '';
               </select>
             </div>
           </div>
           <div class="form-group row">
-            <label for="name" class="col-md-4 col-form-label">Postcode</label>
+            <label for="postcode" class="col-md-4 col-form-label">Postcode</label>
             <div class="col-md-8">
               <input id="postcode" type="text" class="form-control" placeholder="Postcode" name="postcode" value="<%= $valid_org->postcode %>">
             </div>
           </div>
           <div class="form-group row">
-            <label for="name" class="col-md-4 col-form-label">Validated</label>
+            <label for="pending" class="col-md-4 col-form-label">Validated</label>
             <div class="col-md-8">
               <input id="pending" type="checkbox" name="pending" value="0"<%= $valid_org->pending ? '' : ' checked' %>>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="local" class="col-md-4 col-form-label">Is Local</label>
+            <div class="col-md-8">
+              <select id="local" class="form-control" name="is_local">
+                <option value="0"<%= !$valid_org->is_local ? '' : ' selected' %>>Non Local</option>
+                <option value="1"<%= $valid_org->is_local ? ' selected' : '' %>>Local</option>
+              </select>
             </div>
           </div>
           <div class="form-group row">
