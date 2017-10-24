@@ -11,19 +11,37 @@
     <strong>Success!</strong> <%= $success %>
   </div>
 % }
-<div class="list-group">
-  % for my $transaction ( $transactions->all ) {
-      <a href="<%= url_for . '/' . $transaction->id %>" class="list-group-item list-group-item-action">
-        <div class="row text-center">
-          <div class="col">From: <%= $transaction->buyer->name %></div>
-          <div class="col">To: <%= $transaction->seller->name %></div>
-          <div class="col">Value: <%= $transaction->value %></div>
-          <div class="col">Submitted At: <%= $transaction->submitted_at %></div>
-          <div class="col">Purchase Time: <%= $transaction->purchase_time %></div>
-        </div>
-      </a>
-  % }
-  <div class="list-group-item">
+<div class="row mb-3">
+  <div class="col">
+    <div class="card">
+      <h3 class="card-header">
+        Transactions
+      </h3>
+      <div class="list-group list-group-flush">
+      % for my $transaction ( $transactions->all ) {
+          <a href="<%= url_for . '/' . $transaction->id %>" class="list-group-item list-group-item-action">
+            <div class="row">
+              <div class="col-md-4 row">
+                <div class="col my-auto">
+                  <div class="row">
+                    <div class="col">From: <%= $transaction->buyer->name %></div>
+                  </div>
+                  <div class="row">
+                    <div class="col">To: <%= $transaction->seller->name %></div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 text-center my-auto"><h3><%= sprintf('£%.2f', $transaction->value / 100000) %></h3></div>
+              <div class="col-md-4 text-right my-auto"><%= format_human_datetime $transaction->purchase_time %></div>
+            </div>
+          </a>
+      % }
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
       %= bootstrap_pagination( $c->param('page') || 1, $transactions->pager->last_page, { class => 'justify-content-center' } );
   </div>
 </div>
