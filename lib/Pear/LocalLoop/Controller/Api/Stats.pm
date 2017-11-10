@@ -129,7 +129,6 @@ sub post_leaderboards_paged {
   if ( !defined $validation->param('page') || $validation->param('page') < 1 ) {
     my $user_position = $today_board->values->find({ entity_id => $c->stash->{api_user}->entity->id });
     if { $user_position > 10 ) {
-      my $math1;
       int($user_position / 10) + 1 = $page;
     }
   }
@@ -171,6 +170,7 @@ sub post_leaderboards_paged {
     leaderboard => [ @leaderboard_array ],
     user_position => defined $current_user_position ? $current_user_position->{position} : 0,
     page => $validation->param('page') || $page,
+    page_no => $today_values->pager->total_entries,
   });
 }
 
