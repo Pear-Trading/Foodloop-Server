@@ -128,15 +128,15 @@ sub post_leaderboards_paged {
 
   if ( !defined $validation->param('page') || $validation->param('page') < 1 ) {
     my $user_position = $today_board->values->find({ entity_id => $c->stash->{api_user}->entity->id });
-    if { $user_position > 10 ) {
-      int($user_position / 10) + 1 = $page;
-    }
+    $page = int(defined $user_position ? $user_position->{position} : 0 / 10) + 1;
+  } else {
+    $page = $validation->param('page');
   }
 
   my $today_values = $today_board->values->search(
     {},
     {
-      page => $validation->param('page') || $page,
+      page => $page,
       rows => 10,
       order_by => { -asc => 'me.position' },
       columns => [
@@ -169,8 +169,8 @@ sub post_leaderboards_paged {
     success => Mojo::JSON->true,
     leaderboard => [ @leaderboard_array ],
     user_position => defined $current_user_position ? $current_user_position->{position} : 0,
-    page => $validation->param('page') || $page,
-    page_no => $today_values->pager->total_entries,
+    page => $page,
+    count => $today_values->pager->total_entries,
   });
 }
 
