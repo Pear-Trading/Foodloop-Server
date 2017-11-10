@@ -109,4 +109,69 @@ sub post_leaderboards {
   });
 }
 
+sub post_leaderboards_paged {
+  my $c = shift;
+
+  my $validation = $c->validation;
+  $validation->input( $c->stash->{api_json} );
+
+  my $leaderboard_rs = $c->schema->resultset('Leaderboard');
+
+  $validation->required('type')->in_resultset( 'type', $leaderboard_rs );
+  $validation->optional('page')->number;
+
+  return $c->api_validation_error if $validation->has_error;
+
+  my $page = 1;
+
+  my $today_board = $leaderboard_rs->get_latest( $validation->param('type') );
+
+  if ( !defined $validation->param('page') || $validation->param('page') < 1 ) {
+    my $user_position = $today_board->values->find({ entity_id => $c->stash->{api_user}->entity->id });
+    if { $user_position > 10 ) {
+      my $math1;
+      int($user_position / 10) + 1 = $page;
+    }
+  }
+
+  my $today_values = $today_board->values->search(
+    {},
+    {
+      page => $validation->param('page') || $page,
+      rows => 10,
+      order_by => { -asc => 'me.position' },
+      columns => [
+        qw/
+          me.value
+          me.trend
+          me.position
+        /,
+        { display_name => 'customer.display_name' },
+      ],
+      join => { entity => 'customer' },
+    },
+  );
+  $today_values->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
+
+  my @leaderboard_array = $today_values->all;
+
+  if ( $validation->param('type') =~ /total$/ ) {
+    @leaderboard_array = (map {
+      {
+        %$_,
+        value => $_->{value} / 100000,
+      }
+    } @leaderboard_array);
+  }
+
+  my $current_user_position = $today_values->find({ entity_id => $c->stash->{api_user}->entity->id });
+
+  return $c->render( json => {
+    success => Mojo::JSON->true,
+    leaderboard => [ @leaderboard_array ],
+    user_position => defined $current_user_position ? $current_user_position->{position} : 0,
+    page => $validation->param('page') || $page,
+  });
+}
+
 1;
