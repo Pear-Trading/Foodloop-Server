@@ -7,6 +7,7 @@ use base 'DBIx::Class::Core';
 
 __PACKAGE__->load_components( qw/
   InflateColumn::DateTime
+  TimeStamp
 /);
 
 __PACKAGE__->table("import_sets");
@@ -19,6 +20,7 @@ __PACKAGE__->add_columns(
   },
   "date" => {
     data_type => "datetime",
+    set_on_create => 1,
     is_nullable => 0,
   },
 );
@@ -28,6 +30,13 @@ __PACKAGE__->set_primary_key("id");
 __PACKAGE__->has_many(
   "values",
   "Pear::LocalLoop::Schema::Result::ImportValue",
+  { "foreign.set_id" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+__PACKAGE__->has_many(
+  "lookups",
+  "Pear::LocalLoop::Schema::Result::ImportLookup",
   { "foreign.set_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
