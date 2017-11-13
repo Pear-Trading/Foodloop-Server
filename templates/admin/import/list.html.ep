@@ -1,0 +1,102 @@
+% layout 'admin';
+% title 'Import';
+% content_for javascript => begin
+% end
+% if ( my $error = flash 'error' ) {
+  <div class="alert alert-danger" role="alert">
+    <strong>Error!</strong> <%= $error %>
+  </div>
+% } elsif ( my $success = flash 'success' ) {
+  <div class="alert alert-success" role="alert">
+    <strong>Success!</strong> <%= $success %>
+  </div>
+% }
+<div class="row">
+  <div class="col-12 col-md-6 mb-3">
+    <div class="card">
+      <h3 class="card-header">
+        User Assignments
+      </h3>
+      <div class="card-body">
+        Unique users in this Import, and their assigned entity
+      </div>
+      <div class="list-group list-group-flush">
+        % for my $user ( $import_users_rs->all ) {
+        <div class="list-group-item">
+          <div class="row">
+            <div class="col-4">
+              %= $user->user_name
+            </div>
+            <div class="col-4">
+              <span class="text-muted font-italic">Unassigned</span>
+            </div>
+            <div class="col-4">
+              <a class="btn btn-primary">Select</a>
+            </div>
+          </div>
+        </div>
+        % }
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-6 mb-3">
+    <div class="card">
+      <h3 class="card-header">
+        Org Assignments
+      </h3>
+      <div class="card-body">
+        Unique orgs in this Import, and their assigned entity
+      </div>
+      <div class="list-group list-group-flush">
+        % for my $org ( $import_org_rs->all ) {
+        <div class="list-group-item">
+          <div class="row">
+            <div class="col-4">
+              %= $org->org_name
+            </div>
+            <div class="col-4">
+              <span class="text-muted font-italic">Unassigned</span>
+            </div>
+            <div class="col-4">
+              <a class="btn btn-primary">Select</a>
+            </div>
+          </div>
+        </div>
+        % }
+      </div>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="card">
+      <h3 class="card-header">
+        %= format_human_datetime $import_set->date;
+      </h3>
+      <div class="card-body">
+        Content listed in original order of import
+      </div>
+      <div class="list-group list-group-flush">
+        % for my $import_value ( $import_value_rs->all ) {
+        <div class="list-group-item">
+          <div class="row">
+            <div class="col-2">
+              <%= $import_value->user_name %>
+            </div>
+            <div class="col-3">
+              <%= format_human_datetime $import_value->purchase_date %>
+            </div>
+            <div class="col-2">
+              <%= $import_value->purchase_value %>
+            </div>
+            <div class="col-3">
+              <%= $import_value->org_name %>
+            </div>
+            <div class="col-2">
+              <a href="#" class="btn btn-danger">Ignore</a>
+            </div>
+          </div>
+        </div>
+        % }
+      </div>
+    </div>
+  </div>
+</div>

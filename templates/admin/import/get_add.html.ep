@@ -1,0 +1,43 @@
+% layout 'admin';
+% title 'Import';
+% content_for javascript => begin
+% end
+% if ( my $error = flash 'error' ) {
+  <div class="alert alert-danger" role="alert">
+    <strong>Error!</strong> <%= $error %>
+  </div>
+% } elsif ( my $success = flash 'success' ) {
+  <div class="alert alert-success" role="alert">
+    <strong>Success!</strong> <%= $success %>
+  </div>
+% }
+<div class="row">
+  <div class="col-12">
+    <h3>Add CSV Import</h3>
+    <p>
+      Copy and paste a CSV in to import it. The first line should contain the
+      headers The following headers are recognised:
+    </p>
+    <ul>
+      <li>user</li>
+      <li>value</li>
+      <li>date</li>
+      <li>organisation</li>
+    </ul>
+    <p>
+      Any columns which are not in the list above will be ignored and can be
+      called anything you want, as long as they are not in the list above. They
+      must also be unique.
+    </p>
+    <p>
+    For date format, consult <a href="https://metacpan.org/pod/DateTime::Format::Strptime#STRPTIME-PATTERN-TOKENS">here</a> for the patterns
+    </p>
+  </div>
+  <div class="col-12">
+    <form action="<%= url_for %>" method="post">
+      <input type="text" class="form-control mb-3" name="date_format" required value="<%=flash 'date_format' %>"/>
+      <textarea class="form-control mb-3" rows="15" name="csv"><%= flash 'csv_data' %></textarea>
+      <button class="btn btn-success btn-block" type="submit">Save</button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,45 @@
+% layout 'admin';
+% title 'Import';
+% content_for javascript => begin
+% end
+% if ( my $error = flash 'error' ) {
+  <div class="alert alert-danger" role="alert">
+    <strong>Error!</strong> <%= $error %>
+  </div>
+% } elsif ( my $success = flash 'success' ) {
+  <div class="alert alert-success" role="alert">
+    <strong>Success!</strong> <%= $success %>
+  </div>
+% }
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <h3 class="card-header">
+        CSV Import
+        <a href="<%= url_for . '/add' %>" class="btn btn-success" style="float: right">Import Data</a>
+      </h3>
+    </div>
+  </div>
+  % for my $import ( $import_rs->all ) {
+  <div class="col col-md-4 mb-3">
+    <div class="card">
+      <div class="card-header">
+        <span class="font-bold"><%= $import->id %></span>
+        %= format_human_datetime $import->date;
+      </div>
+      <div class="card-body">
+      </div>
+      <div class="card-footer text-right">
+        <a href="<%= url_for . '/' . $import->id %>" class="card-link">
+          Edit Import
+        </a>
+      </div>
+    </div>
+  </div>
+  % }
+</div>
+<div class="row">
+  <div class="col">
+      %= bootstrap_pagination( $c->param('page') || 1, $import_rs->pager->last_page, { class => 'justify-content-center' } );
+  </div>
+</div>

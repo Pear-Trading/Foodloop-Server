@@ -200,6 +200,12 @@ sub startup {
 
   $admin_routes->get('/reports/transactions')->to('admin-reports#transaction_data');
 
+  $admin_routes->get('/import')->to('admin-import#index');
+  $admin_routes->get('/import/add')->to('admin-import#get_add');
+  $admin_routes->post('/import/add')->to('admin-import#post_add');
+  $admin_routes->get('/import/:set_id')->to('admin-import#list');
+  $admin_routes->get('/import/:set_id/:value_id')->to('admin-import#get_value');
+  $admin_routes->post('/import/:set_id/:value_id')->to('admin-import#post_value');
 #  my $user_routes = $r->under('/')->to('root#under');
 
 # $user_routes->get('/home')->to('root#home');
