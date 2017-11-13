@@ -28,10 +28,14 @@
               %= $user->user_name
             </div>
             <div class="col-4">
+              % if ( my $lookup = $import_lookup_rs->find({ name => $user->user_name }) ) {
+              <span class="text-muted"><%= $lookup->entity->name %></span>
+              % } else {
               <span class="text-muted font-italic">Unassigned</span>
+              % }
             </div>
             <div class="col-4">
-              <a class="btn btn-primary">Select</a>
+              <a href="<%= url_for(url_for . '/user')->query([ user => $user->user_name ]) %>" class="btn btn-primary">Select</a>
             </div>
           </div>
         </div>

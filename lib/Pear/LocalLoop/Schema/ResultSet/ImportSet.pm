@@ -13,7 +13,7 @@ sub get_values {
     'values',
     undef,
     {
-      order_by => { -asc => 'id' },
+      order_by => { '-asc' => 'id' },
     },
   );
 }
@@ -36,6 +36,19 @@ sub get_orgs {
   return $self->get_values($id)->search({},
     {
       group_by => 'org_name',
+    },
+  );
+}
+
+sub get_lookups {
+  my $self = shift;
+  my $id = shift;
+
+  return $self->find($id)->search_related(
+    'lookups',
+    undef,
+    {
+      order_by => { '-asc' => 'id' },
     },
   );
 }

@@ -31,12 +31,14 @@ sub list {
   my $import_value_rs = $c->result_set->get_values($set_id);
   my $import_users_rs = $c->result_set->get_users($set_id);
   my $import_org_rs   = $c->result_set->get_orgs($set_id);
+  my $import_lookup_rs = $c->result_set->get_lookups($set_id);
 
   $c->stash(
     import_set => $import_set,
     import_value_rs => $import_value_rs,
     import_users_rs => $import_users_rs,
     import_org_rs => $import_org_rs,
+    import_lookup_rs => $import_lookup_rs,
   );
 }
 
@@ -90,7 +92,6 @@ sub post_add {
   }
 
   for my $data ( @$csv_output ) {
-    Dwarn $data;
     for my $key ( qw/ user value organisation / ) {
       unless ( defined $data->{$key} ) {
         $c->flash( error => "Undefined [$key] data found", csv_data => $csv_data, date_format => $date_format );
@@ -132,6 +133,63 @@ sub post_add {
 
   $c->flash( success => 'Created Value Set' );
   $c->redirect_to( '/admin/import/' . $value_set->id );
+}
+
+sub get_user {
+  my $c = shift;
+  my $set_id = $c->param('set_id');
+  my $user_name = $c->param('user');
+
+  my $values_rs = $c->result_set->find($set_id)->values->search(
+    {
+      user_name => $user_name,
+      ignore_value => 0,
+    }
+  );
+
+  unless ( $values_rs->count > 0 ) {
+    $c->flash( error => 'User not found or all values are ignored' );
+    return $c->redirect_to( '/admin/import/' . $set_id );
+  }
+
+  my $lookup_result = $c->result_set->find($set_id)->lookups->find(
+    { name => $user_name },
+  );
+
+  my $entity_id = $c->param('entity');
+
+  my $users_rs = $c->schema->resultset('User');
+
+  if ( defined $entity_id && $users_rs->find({ entity_id => $entity_id }) ) {
+    if ( defined $lookup_result ) {
+      $lookup_result->update({ entity_id => $entity_id });
+    } else {
+      $lookup_result = $c->result_set->find($set_id)->lookups->create(
+        {
+          name => $user_name,
+          entity_id => $entity_id,
+        },
+      );
+    }
+  } elsif ( defined $entity_id ) {
+    $c->stash( error => "User does not exist" );
+  }
+
+  $c->stash(
+    users_rs => $users_rs,
+    lookup => $lookup_result,
+    user_name => $user_name,
+  );
+}
+
+sub get_org {
+  my $c = shift;
+
+}
+
+sub set_org {
+  my $c = shift;
+
 }
 
 sub get_value {

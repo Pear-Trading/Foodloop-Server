@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalLoop Admin - <%= title %></title>
+
+    <!-- Bootstrap and jQuery js -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+
+
+    %= stylesheet '/static/admin/css/main.css';
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-md fixed-top navbar-dark bg-danger">
+      <a class="navbar-brand" href="<%= url_for '/admin/home' %>">LocalLoop Admin</a>
+      <button class="navbar-toggler navbar-toggler-right"
+              type="button"
+              data-toggle="collapse"
+              data-target="#navbarNav"
+              aria-controls="navbarNav"
+              aria-expanded="false"
+              aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">
+              Reports
+            </a>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="<%= url_for '/admin/reports/transactions' %>">Transactions (Hourly)</a>
+              <a class="dropdown-item" href="<%= url_for('/admin/reports/transactions')->query(scale =>'days') %>">Transactions (Daily)</a>
+            </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link<%= title eq 'Feedback' ? ' active' : '' %>" href="<%= url_for '/admin/feedback' %>">Feedback</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link<%= title eq 'Tokens' ? ' active' : '' %>" href="<%= url_for '/admin/tokens' %>">Tokens</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link<%= title eq 'Transactions' ? ' active' : '' %>" href="<%= url_for '/admin/transactions' %>">Transactions</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link<%= title eq 'Users' ? ' active' : '' %>" href="<%= url_for '/admin/users' %>">Users</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link<%= title eq 'Organisations' ? ' active' : '' %>" href="<%= url_for '/admin/organisations' %>">Organisations</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link<%= title eq 'Import' ? ' active' : '' %>" href="<%= url_for '/admin/import' %>">Import</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="<%= url_for '/admin/logout' %>">Logout</a>
+          </li>
+        </div>
+      </div>
+    </nav>
+    <div class="container">
+      % if ( my $error = flash 'error' ) {
+        <div class="alert alert-danger" role="alert">
+          <strong>Error!</strong> <%= $error %>
+        </div>
+        % } elsif ( my $error = stash 'error' ) {
+        <div class="alert alert-danger" role="alert">
+          <strong>Error!</strong> <%= $error %>
+        </div>
+      % } elsif ( my $success = flash 'success' ) {
+        <div class="alert alert-success" role="alert">
+          <strong>Success!</strong> <%= $success %>
+        </div>
+      % }
+      <%= content %>
+    </div>
+    <div class="navbar bg-dark fixed-bottom">
+      <span class="navbar-text ml-auto text-muted">
+        Version: <%= $c->config->{version} %>
+      </span>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.5/umd/popper.min.js" integrity="sha256-jpW4gXAhFvqGDD5B7366rIPD7PDbAmqq4CO0ZnHbdM4=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+
+    %= content_for 'javascript';
+  </body>
+</html>

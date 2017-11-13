@@ -1,0 +1,48 @@
+% layout 'admin_errors';
+% title 'Import';
+<div class="row">
+  <div class="col-8">
+    <h3><%= $user_name %></h3>
+  </div>
+  <div class="col-4 mb-3">
+    <a href="<%= url_for '/admin/import/' . $c->param('set_id') %>"
+       class="btn btn-success">
+      Return to Import
+    </a>
+  </div>
+  <div class="col-12">
+    <div class="card">
+      <h4 class="card-header">
+        Users
+      </h4>
+      <div class="card-body text-muted">
+        Choose a user to assign to this name
+      </div>
+      <div class="list-group list-group-flush">
+        % for my $user ( $users_rs->all ) {
+        <a href="<%= url_with->query([ entity => $user->entity_id ]) %>"
+          class="list-group-item list-group-item-action<%= defined $lookup && $lookup->entity_id == $user->entity_id ? ' list-group-item-success' : '' %>">
+          <div class="row">
+            <div class="col-4">
+              %= $user->email
+            </div>
+            <div class="col-4">
+              %= $user->full_name
+            </div>
+            <div class="col-4">
+              % if ( $user->type eq 'customer' ) {
+              <span class="badge badge-success">Customer</span>
+              % } elsif ( $user->type eq 'organisation' ) {
+              <span class="badge badge-warning">Organisation</span>
+              % } else {
+              <span class="badge badge-danger">Unknown User Type</span>
+              % }
+            </div>
+          </div>
+        </a>
+        % }
+      </div>
+    </div>
+  </div>
+</div>
+

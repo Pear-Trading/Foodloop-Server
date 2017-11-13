@@ -204,6 +204,10 @@ sub startup {
   $admin_routes->get('/import/add')->to('admin-import#get_add');
   $admin_routes->post('/import/add')->to('admin-import#post_add');
   $admin_routes->get('/import/:set_id')->to('admin-import#list');
+  $admin_routes->get('/import/:set_id/user')->to('admin-import#get_user');
+  $admin_routes->get('/import/:set_id/org')->to('admin-import#get_org');
+  $admin_routes->post('/import/:set_id/org')->to('admin-import#set_org');
+
   $admin_routes->get('/import/:set_id/:value_id')->to('admin-import#get_value');
   $admin_routes->post('/import/:set_id/:value_id')->to('admin-import#post_value');
 #  my $user_routes = $r->under('/')->to('root#under');
