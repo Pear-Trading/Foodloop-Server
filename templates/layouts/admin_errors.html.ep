@@ -60,13 +60,13 @@
       </div>
     </nav>
     <div class="container">
-      % if ( my $error = flash 'error' ) {
+      % if ( my $f_error = flash 'error' ) {
         <div class="alert alert-danger" role="alert">
-          <strong>Error!</strong> <%= $error %>
+          <strong>Error!</strong> <%= $f_error %>
         </div>
-        % } elsif ( my $error = stash 'error' ) {
+        % } elsif ( my $s_error = stash 'error' ) {
         <div class="alert alert-danger" role="alert">
-          <strong>Error!</strong> <%= $error %>
+          <strong>Error!</strong> <%= $s_error %>
         </div>
       % } elsif ( my $success = flash 'success' ) {
         <div class="alert alert-success" role="alert">

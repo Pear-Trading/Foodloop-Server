@@ -8,10 +8,11 @@ use base 'DBIx::Class::ResultSet';
 sub get_values {
   my $self = shift;
   my $id = shift;
+  my $include_ignored = shift;
 
   return $self->find($id)->search_related(
     'values',
-    undef,
+    ( $include_ignored ? {} : { ignore_value => 0 } ),
     {
       order_by => { '-asc' => 'id' },
     },
@@ -21,8 +22,9 @@ sub get_values {
 sub get_users {
   my $self = shift;
   my $id = shift;
+  my $include_ignored = shift;
 
-  return $self->get_values($id)->search({},
+  return $self->get_values($id, $include_ignored)->search({},
     {
       group_by => 'user_name',
     },
@@ -32,8 +34,9 @@ sub get_users {
 sub get_orgs {
   my $self = shift;
   my $id = shift;
+  my $include_ignored = shift;
   
-  return $self->get_values($id)->search({},
+  return $self->get_values($id, $include_ignored)->search({},
     {
       group_by => 'org_name',
     },
