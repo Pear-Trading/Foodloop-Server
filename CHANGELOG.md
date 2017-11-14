@@ -7,6 +7,10 @@
 * **Admin Feature** Added `is_local` flag to Organisations to start categorising odd stores
 * **Admin Feature** Feedback items now word wrap
 * **Admin Feature** Rework transaction viewing
+
+# v0.9.5
+
+* Added leaderboard api for web-app with pagination
 * Location is now updated on registration. Customers location is truncated to 2
   decimal places based on their postcode.
 * Location is also updated on changing a users postcode
