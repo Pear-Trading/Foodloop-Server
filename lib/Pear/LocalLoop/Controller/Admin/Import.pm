@@ -69,7 +69,7 @@ sub post_add {
   };
 
   if ( defined $error ) {
-    $c->flash( error => $error, csv_data => $csv_data, date_format => $date_format );
+    $c->_csv_flash_error( $error );
     $c->redirect_to( '/admin/import/add' );
     return;
   }
@@ -78,7 +78,7 @@ sub post_add {
   my @required = grep {/^user$|^value$|^date$|^organisation$/} @csv_headers;
 
   unless ( scalar( @required ) == 4 ) {
-    $c->flash( error => 'Required columns not available', csv_data => $csv_data, date_format => $date_format );
+    $c->_csv_flash_error( 'Required columns not available' );
     $c->redirect_to( '/admin/import/add' );
     return;
   }
@@ -86,7 +86,7 @@ sub post_add {
   my $csv_output = $csv->getline_hr_all( $fh );
 
   unless ( scalar( @$csv_output ) ) {
-    $c->flash( error => "No data found", csv_data => $csv_data, date_format => $date_format );
+    $c->_csv_flash_error( "No data found" );
     $c->redirect_to( '/admin/import/add' );
     return;
   }
@@ -94,7 +94,7 @@ sub post_add {
   for my $data ( @$csv_output ) {
     for my $key ( qw/ user value organisation / ) {
       unless ( defined $data->{$key} ) {
-        $c->flash( error => "Undefined [$key] data found", csv_data => $csv_data, date_format => $date_format );
+        $c->_csv_flash_error( "Undefined [$key] data found" );
         $c->redirect_to( '/admin/import/add' );
         return;
       }
@@ -103,7 +103,7 @@ sub post_add {
       my $dtp = DateTime::Format::Strptime->new( pattern => $date_format );
       my $dt_obj = $dtp->parse_datetime($data->{date});
       unless ( defined $dt_obj ) {
-        $c->flash( error => "Undefined or incorrect format for [date] data found", csv_data => $csv_data, date_format => $date_format );
+        $c->_csv_flash_error( "Undefined or incorrect format for [date] data found" );
         $c->redirect_to( '/admin/import/add' );
         return;
       }
@@ -126,13 +126,24 @@ sub post_add {
   );
 
   unless ( defined $value_set ) {
-    $c->flash( error => 'Error creating new Value Set', csv_data => $csv_data, date_format => $date_format );
+    $c->_csv_flash_error( 'Error creating new Value Set' );
     $c->redirect_to( '/admin/import/add' );
     return;
   }
 
   $c->flash( success => 'Created Value Set' );
   $c->redirect_to( '/admin/import/' . $value_set->id );
+}
+
+sub _csv_flash_error {
+  my ( $c, $error ) = @_;
+  $error //= "An error occurred";
+
+  $c->flash(
+    error => $error,
+    csv_data => $c->param('csv'),
+    date_format => $c->param('date_format'),
+  );
 }
 
 sub get_user {
@@ -181,6 +192,8 @@ sub get_user {
     user_name => $user_name,
   );
 }
+
+
 
 sub get_org {
   my $c = shift;
