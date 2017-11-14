@@ -2,6 +2,19 @@
 
 # Next Release
 
+# v0.9.5
+
+* Added leaderboard api for web-app with pagination
+* Location is now updated on registration. Customers location is truncated to 2
+  decimal places based on their postcode.
+* Location is also updated on changing a users postcode
+* Distance is now calculated when a transaction is submitted
+
+## Bug Fixes
+
+* Updated Geo::UK::Postcode::Regex dependency to latest version. Fixes postcode
+  validation errors
+
 # v0.9.4
 
 * **Admin Feature:** Report of transaction data graphs

@@ -2,6 +2,8 @@ package Pear::LocalLoop::Controller::Api::Register;
 use Mojo::Base 'Mojolicious::Controller';
 use DateTime;
 
+use Geo::UK::Postcode::Regex;
+
 has error_messages => sub {
   return {
     token => {
@@ -80,6 +82,11 @@ sub post_register {
 
   return $c->api_validation_error if $validation->has_error;
 
+  my $location = $c->get_location_from_postcode(
+    $validation->param('postcode'),
+    $usertype,
+  );
+
   if ($usertype eq 'customer'){
 
     $c->schema->txn_do( sub {
@@ -94,6 +101,7 @@ sub post_register {
           display_name  => $validation->param('display_name'),
           year_of_birth => $validation->param('year_of_birth'),
           postcode      => $validation->param('postcode'),
+          ( defined $location ? ( %$location ) : () ),
         },
         user => {
           email    => $validation->param('email'),
@@ -118,6 +126,7 @@ sub post_register {
           town        => $validation->param('town'),
           sector      => $validation->param('sector'),
           postcode    => $validation->param('postcode'),
+          ( defined $location ? ( %$location ) : () ),
         },
         user => {
           email        => $validation->param('email'),

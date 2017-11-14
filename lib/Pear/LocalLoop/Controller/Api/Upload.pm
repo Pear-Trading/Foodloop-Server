@@ -173,6 +173,7 @@ sub post_upload {
   my $purchase_time = $c->parse_iso_datetime($validation->param('purchase_time') || '');
   $purchase_time ||= DateTime->now();
   my $file = defined $upload ? $c->store_file_from_upload( $upload ) : undef;
+  my $distance = $c->get_distance_from_coords( $user->entity->type_object, $organisation );
 
   my $new_transaction = $organisation->entity->create_related(
     'sales',
@@ -181,6 +182,7 @@ sub post_upload {
       value => $transaction_value * 100000,
       ( defined $file ? ( proof_image => $file ) : () ),
       purchase_time => $c->format_db_datetime($purchase_time),
+      distance => $distance,
     }
   );
 
