@@ -59,10 +59,14 @@
               %= $org->org_name
             </div>
             <div class="col-4">
+              % if ( my $lookup = $import_lookup_rs->find({ name => $org->org_name }) ) {
+              <span class="text-muted"><%= $lookup->entity->name %></span>
+              % } else {
               <span class="text-muted font-italic">Unassigned</span>
+              % }
             </div>
             <div class="col-4">
-              <a class="btn btn-primary">Select</a>
+              <a href="<%= url_for(url_for . '/org')->query([ org => $org->org_name ]) %>" class="btn btn-primary">Select</a>
             </div>
           </div>
         </div>
