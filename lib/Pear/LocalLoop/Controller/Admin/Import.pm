@@ -193,16 +193,51 @@ sub get_user {
   );
 }
 
-
-
 sub get_org {
   my $c = shift;
+  my $set_id = $c->param('set_id');
+  my $org_name = $c->param('org');
 
-}
+  my $values_rs = $c->result_set->find($set_id)->values->search(
+    {
+      org_name => $org_name,
+      ignore_value => 0,
+    }
+  );
 
-sub set_org {
-  my $c = shift;
+  unless ( $values_rs->count > 0 ) {
+    $c->flash( error => 'Organisation not found or all values are ignored' );
+    return $c->redirect_to( '/admin/import/' . $set_id );
+  }
 
+  my $lookup_result = $c->result_set->find($set_id)->lookups->find(
+    { name => $org_name },
+  );
+
+  my $entity_id = $c->param('entity');
+
+  my $orgs_rs = $c->schema->resultset('Organisation');
+
+  if ( defined $entity_id && $orgs_rs->find({ entity_id => $entity_id }) ) {
+    if ( defined $lookup_result ) {
+      $lookup_result->update({ entity_id => $entity_id });
+    } else {
+      $lookup_result = $c->result_set->find($set_id)->lookups->create(
+        {
+          name => $org_name,
+          entity_id => $entity_id,
+        },
+      );
+    }
+  } elsif ( defined $entity_id ) {
+    $c->stash( error => "Organisation does not exist" );
+  }
+
+  $c->stash(
+    orgs_rs => $orgs_rs,
+    lookup => $lookup_result,
+    org_name => $org_name,
+  );
 }
 
 sub get_value {
