@@ -27,10 +27,12 @@ sub list {
   my $c = shift;
   my $set_id = $c->param('set_id');
 
+  my $include_ignored = $c->param('ignored');
+
   my $import_set      = $c->result_set->find($set_id);
-  my $import_value_rs = $c->result_set->get_values($set_id);
-  my $import_users_rs = $c->result_set->get_users($set_id);
-  my $import_org_rs   = $c->result_set->get_orgs($set_id);
+  my $import_value_rs = $c->result_set->get_values($set_id, $include_ignored);
+  my $import_users_rs = $c->result_set->get_users($set_id, $include_ignored);
+  my $import_org_rs   = $c->result_set->get_orgs($set_id, $include_ignored);
   my $import_lookup_rs = $c->result_set->get_lookups($set_id);
 
   $c->stash(
@@ -240,14 +242,32 @@ sub get_org {
   );
 }
 
-sub get_value {
+sub ignore_value {
   my $c = shift;
   my $set_id = $c->param('set_id');
-}
+  my $value_id = $c->param('value_id');
 
-sub post_value {
-  my $c = shift;
-  my $set_id = $c->param('set_id');
+  my $set_result = $c->result_set->find($set_id);
+  unless ( defined $set_result ) {
+    $c->flash( error => "Set does not exist" );
+    return $c->redirect_to( '/admin/import' );
+  }
+
+  my $value_result = $set_result->values->find($value_id);
+  unless ( defined $value_result ) {
+    $c->flash( error => "Value does not exist" );
+    return $c->redirect_to( '/admin/import/' . $set_id );
+  }
+
+  $value_result->update({ ignore_value => $value_result->ignore_value ? 0 : 1 });
+
+  $c->flash( success => "Updated value" );
+  my $referer = $c->req->headers->header('Referer');
+  return $c->redirect_to(
+    defined $referer
+    ? $c->url_for($referer)->path_query
+    : '/admin/import/' . $set_id
+  );
 }
 
 1;

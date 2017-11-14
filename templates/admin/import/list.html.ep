@@ -78,6 +78,10 @@
     <div class="card">
       <h3 class="card-header">
         %= format_human_datetime $import_set->date;
+        <a href="<%= url_for->query({ignored => $c->param('ignored') ? 0 : 1 }) %>"
+           class="btn btn-primary float-right">
+           Toggle show Ignored
+        </a>
       </h3>
       <div class="card-body">
         Content listed in original order of import
@@ -99,7 +103,11 @@
               <%= $import_value->org_name %>
             </div>
             <div class="col-2">
-              <a href="#" class="btn btn-danger">Ignore</a>
+              % if ( $import_value->ignore_value ) {
+              <a href="<%= url_for . '/ignore/' . $import_value->id %>" class="btn btn-success">Un Ignore</a>
+              % } else {
+              <a href="<%= url_for . '/ignore/' . $import_value->id %>" class="btn btn-danger">Ignore</a>
+              % }
             </div>
           </div>
         </div>

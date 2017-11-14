@@ -208,8 +208,7 @@ sub startup {
   $admin_routes->get('/import/:set_id/user')->to('admin-import#get_user');
   $admin_routes->get('/import/:set_id/org')->to('admin-import#get_org');
 
-  $admin_routes->get('/import/:set_id/:value_id')->to('admin-import#get_value');
-  $admin_routes->post('/import/:set_id/:value_id')->to('admin-import#post_value');
+  $admin_routes->get('/import/:set_id/ignore/:value_id')->to('admin-import#ignore_value');
 #  my $user_routes = $r->under('/')->to('root#under');
 
 # $user_routes->get('/home')->to('root#home');
