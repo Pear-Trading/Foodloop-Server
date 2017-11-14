@@ -219,6 +219,8 @@ sub install_fixtures {
       {
         entities => 'entities_id_seq',
         organisations => 'organisations_id_seq',
+        users => 'users_id_seq',
+        customers => 'customers_id_seq',
       }
     );
   }
