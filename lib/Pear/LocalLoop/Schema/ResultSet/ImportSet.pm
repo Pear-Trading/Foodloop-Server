@@ -9,10 +9,14 @@ sub get_values {
   my $self = shift;
   my $id = shift;
   my $include_ignored = shift;
+  my $include_imported = shift;
 
   return $self->find($id)->search_related(
     'values',
-    ( $include_ignored ? {} : { ignore_value => 0 } ),
+    {
+      ( $include_ignored ? () : ( ignore_value => 0 ) ),
+      ( $include_imported ? () : ( transaction_id =>  undef ) ),
+    },
     {
       order_by => { '-asc' => 'id' },
     },
@@ -21,10 +25,8 @@ sub get_values {
 
 sub get_users {
   my $self = shift;
-  my $id = shift;
-  my $include_ignored = shift;
 
-  return $self->get_values($id, $include_ignored)->search({},
+  return $self->get_values(@_)->search({},
     {
       group_by => 'user_name',
     },
@@ -33,10 +35,8 @@ sub get_users {
 
 sub get_orgs {
   my $self = shift;
-  my $id = shift;
-  my $include_ignored = shift;
   
-  return $self->get_values($id, $include_ignored)->search({},
+  return $self->get_values(@_)->search({},
     {
       group_by => 'org_name',
     },
@@ -47,13 +47,23 @@ sub get_lookups {
   my $self = shift;
   my $id = shift;
 
-  return $self->find($id)->search_related(
+  my $lookup_rs = $self->find($id)->search_related(
     'lookups',
     undef,
     {
-      order_by => { '-asc' => 'id' },
+      prefetch => { entity => [ qw/ organisation customer / ] },
+      order_by => { '-asc' => 'me.id' },
     },
   );
+  my $lookup_map = {
+    map {
+      $_->name => {
+        entity_id => $_->entity->id,
+        name => $_->entity->name,
+      },
+    } $lookup_rs->all
+  };
+  return $lookup_map;
 }
 
 1;

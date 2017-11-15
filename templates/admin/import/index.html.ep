@@ -12,22 +12,31 @@
   </div>
 % }
 <div class="row">
-  <div class="col-12">
-    <div class="card">
-      <h3 class="card-header">
-        CSV Import
-        <a href="<%= url_for . '/add' %>" class="btn btn-success" style="float: right">Import Data</a>
-      </h3>
-    </div>
+  <div class="col-12 mb-3">
+    <h3 class="float-left">CSV Import</h3>
+    <a href="<%= url_for . '/add' %>" class="btn btn-success float-right">Import Data</a>
   </div>
   % for my $import ( $import_rs->all ) {
+    % my $total = $import_rs->get_values( $import->id, 1, 1 )->count;
+    % my $unimported = $import_rs->get_values( $import->id, undef, undef )->count;
+    % my $with_ignored = $import_rs->get_values( $import->id, 1, undef )->count;
+    % my $with_imported = $import_rs->get_values( $import->id, undef, 1 )->count;
+    % my $ignored_total = $with_ignored - $unimported;
+    % my $imported_total = $with_imported - $unimported;
   <div class="col col-md-4 mb-3">
     <div class="card">
-      <div class="card-header">
-        <span class="font-bold"><%= $import->id %></span>
-        %= format_human_datetime $import->date;
+      <div class="card-header text-white <%= $unimported ? 'bg-danger' : 'bg-success' %>">
+        <span><%= format_human_datetime $import->date %></span>
+        <span class=" float-right font-bold"><%= $import->id %></span>
       </div>
       <div class="card-body">
+        <span>Unimported: <%= $unimported %></span>
+        <br>
+        <span>Ignored: <%= $ignored_total %></span>
+        <br>
+        <span>Imported: <%= $imported_total %></span>
+        <br>
+        <span>Total: <%= $total %></span>
       </div>
       <div class="card-footer text-right">
         <a href="<%= url_for . '/' . $import->id %>" class="card-link">

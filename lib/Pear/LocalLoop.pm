@@ -39,6 +39,7 @@ sub startup {
   $self->plugin('Pear::LocalLoop::Plugin::BootstrapPagination', { bootstrap4 => 1 } );
   $self->plugin('Pear::LocalLoop::Plugin::Validators');
   $self->plugin('Pear::LocalLoop::Plugin::Datetime');
+  $self->plugin('Pear::LocalLoop::Plugin::Currency');
   $self->plugin('Pear::LocalLoop::Plugin::Postcodes');
   $self->plugin('Pear::LocalLoop::Plugin::TemplateHelpers');
 
@@ -209,6 +210,7 @@ sub startup {
   $admin_routes->get('/import/:set_id/org')->to('admin-import#get_org');
 
   $admin_routes->get('/import/:set_id/ignore/:value_id')->to('admin-import#ignore_value');
+  $admin_routes->get('/import/:set_id/import')->to('admin-import#run_import');
 #  my $user_routes = $r->under('/')->to('root#under');
 
 # $user_routes->get('/home')->to('root#home');
