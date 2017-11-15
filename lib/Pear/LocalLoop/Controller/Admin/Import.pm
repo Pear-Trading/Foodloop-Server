@@ -28,11 +28,12 @@ sub list {
   my $set_id = $c->param('set_id');
 
   my $include_ignored = $c->param('ignored');
+  my $include_imported = $c->param('imported');
 
   my $import_set      = $c->result_set->find($set_id);
-  my $import_value_rs = $c->result_set->get_values($set_id, $include_ignored);
-  my $import_users_rs = $c->result_set->get_users($set_id, $include_ignored);
-  my $import_org_rs   = $c->result_set->get_orgs($set_id, $include_ignored);
+  my $import_value_rs = $c->result_set->get_values($set_id, $include_ignored, $include_imported);
+  my $import_users_rs = $c->result_set->get_users($set_id, $include_ignored, $include_imported);
+  my $import_org_rs   = $c->result_set->get_orgs($set_id, $include_ignored, $include_imported);
   my $import_lookup_rs = $c->result_set->get_lookups($set_id);
 
   $c->stash(
@@ -262,6 +263,57 @@ sub ignore_value {
   $value_result->update({ ignore_value => $value_result->ignore_value ? 0 : 1 });
 
   $c->flash( success => "Updated value" );
+  my $referer = $c->req->headers->header('Referer');
+  return $c->redirect_to(
+    defined $referer
+    ? $c->url_for($referer)->path_query
+    : '/admin/import/' . $set_id
+  );
+}
+
+sub run_import {
+  my $c = shift;
+  my $set_id = $c->param('set_id');
+
+  my $set_result = $c->result_set->find($set_id);
+  unless ( defined $set_result ) {
+    $c->flash( error => "Set does not exist" );
+    return $c->redirect_to( '/admin/import' );
+  }
+
+  my $import_value_rs = $c->result_set->get_values($set_id, undef, undef);
+  my $import_lookup = $c->result_set->get_lookups($set_id);
+  my $entity_rs = $c->schema->resultset('Entity');
+
+  $c->schema->txn_do(
+    sub {
+      for my $value_result ( $import_value_rs->all ) {
+        my $user_lookup = $import_lookup->{ $value_result->user_name };
+        my $org_lookup = $import_lookup->{ $value_result->org_name };
+        my $value_lookup = $c->parse_currency( $value_result->purchase_value );
+
+        if ( defined $user_lookup && defined $org_lookup && $value_lookup ) {
+          my $user_entity = $entity_rs->find($user_lookup->{entity_id});
+          my $org_entity = $entity_rs->find($org_lookup->{entity_id});
+          my $distance = $c->get_distance_from_coords( $user_entity->type_object, $org_entity->type_object );
+          my $transaction = $c->schema->resultset('Transaction')->create(
+            {
+              buyer => $user_entity,
+              seller => $org_entity,
+              value => $value_lookup * 100000,
+              purchase_time => $value_result->purchase_date,
+              distance => $distance,
+            }
+          );
+          $value_result->update({transaction_id => $transaction->id });
+        } else {
+          $c->app->log->warn("Failed value import for value id [" . $value_result->id . "], ignoring");
+        }
+      }
+    }
+  );
+
+  $c->flash( success => "Import completed for ready values" );
   my $referer = $c->req->headers->header('Referer');
   return $c->redirect_to(
     defined $referer
