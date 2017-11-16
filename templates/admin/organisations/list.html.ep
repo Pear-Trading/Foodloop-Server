@@ -33,7 +33,7 @@
             % } elsif ( $org_result->is_local ) {
             <span class="badge badge-success">Local Org</span>
             % } else {
-            <span class="badge badge-warning">Non Local Org</span>
+            <span class="badge badge-secondary">Non Local Org</span>
             % }
           </div>
         </a>
