@@ -12,6 +12,11 @@ sub register {
     }
     return $value;
   });
+
+  $app->helper( format_currency_from_db => sub {
+    my ( $c, $value ) = @_;
+    return sprintf( '£%.2f', $value / 100000 );
+  });
 }
 
 1;

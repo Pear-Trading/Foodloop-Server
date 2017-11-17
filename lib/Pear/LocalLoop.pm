@@ -190,6 +190,9 @@ sub startup {
   $admin_routes->post('/organisations/add')->to('admin-organisations#add_org_submit');
   $admin_routes->get('/organisations/:id')->to('admin-organisations#valid_read');
   $admin_routes->post('/organisations/:id')->to('admin-organisations#valid_edit');
+  $admin_routes->get('/organisations/:id/merge')->to('admin-organisations#merge_list');
+  $admin_routes->get('/organisations/:id/merge/:target_id')->to('admin-organisations#merge_detail');
+  $admin_routes->post('/organisations/:id/merge/:target_id')->to('admin-organisations#merge_confirm');
 
   $admin_routes->get('/feedback')->to('admin-feedback#index');
   $admin_routes->get('/feedback/:id')->to('admin-feedback#read');
