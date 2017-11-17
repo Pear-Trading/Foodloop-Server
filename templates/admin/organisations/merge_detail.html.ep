@@ -1,0 +1,81 @@
+% layout 'admin_errors';
+% title 'Organisations';
+<div class="row">
+  <div class="col-12">
+    <h3 class="float-left">Merging <%= $org_result->name %> into <%= $target_result->name %></h3>
+      <a href="<%= url_for '/admin/organisations/' . $org_result->id . '/merge' %>" class="btn btn-success float-right">Back</a>
+  </div>
+  % for my $org ( $org_result, $target_result ) {
+  <div class="col-6">
+    <div class="card">
+      <h3 class="card-header">
+        <%= $org->name %>
+      </h3>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-6">
+            Street Name
+          </div>
+          <div class="col-6">
+            %= $org->street_name
+          </div>
+          <div class="col-6">
+            Town/City
+          </div>
+          <div class="col-6">
+            %= $org->town
+          </div>
+          <div class="col-6">
+            Sector
+          </div>
+          <div class="col-6">
+            %= $org->sector
+          </div>
+          <div class="col-6">
+            Postcode
+          </div>
+          <div class="col-6">
+            %= $org->postcode
+          </div>
+          <div class="col-6">
+            Validated
+          </div>
+          <div class="col-6">
+            %= $org->pending ? 'no' : 'yes'
+          </div>
+          <div class="col-6">
+            Is Local
+          </div>
+          <div class="col-6">
+            %= $org->is_local ? 'yes' : 'no'
+          </div>
+        </div>
+      </div>
+      <div class="list-group list-group-flush">
+        <div class="list-group-item">
+          Transaction Count: <%= $org->entity->sales->count %>
+        </div>
+      </div>
+    </div>
+  </div>
+  % }
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h1 class="card-title">
+          Warning: Cannot be undone!
+        </h1>
+        <p>
+          This will discard all basic information about this organisation, and
+          merge all transactions into the target organisation. This process has
+          no way of being undone.
+        </p>
+        <form action="<%= url_for %>" method="POST">
+          <input type="checkbox" name="confirm" value="checked">
+          <label>I confirm that I want this to happen</label>
+          <button type="submit" class="btn btn-danger">Confirm Merge</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
