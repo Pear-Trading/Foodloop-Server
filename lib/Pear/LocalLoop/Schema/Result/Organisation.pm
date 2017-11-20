@@ -123,4 +123,10 @@ sub to_bool {
   }
 }
 
+sub user {
+  my $self = shift;
+
+  return $self->entity->user;
+}
+
 1;

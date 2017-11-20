@@ -28,6 +28,9 @@
             % if ( $org_result->pending ) {
             <span class="badge badge-warning">Unvalidated</span>
             % }
+            % if ( defined $org_result->user ) {
+            <span class="badge badge-info">User</span>
+            % }
             % if ( !defined $org_result->is_local ) {
             <span class="badge badge-danger">Locality Not Set</span>
             % } elsif ( $org_result->is_local ) {
