@@ -128,6 +128,18 @@ sub name {
   }
 }
 
+sub full_name {
+  my $self = shift;
+
+  if ( defined $self->entity->customer ) {
+    return $self->entity->customer->full_name;
+  } elsif ( defined $self->entity->organisation ) {
+    return $self->entity->organisation->name;
+  } else {
+    return;
+  }
+}
+
 # TODO Deprecate this sub?
 sub type {
   my $self = shift;

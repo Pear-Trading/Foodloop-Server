@@ -54,6 +54,11 @@ __PACKAGE__->add_columns(
     default => \"false",
     is_nullable => 0,
   },
+  is_local => {
+    data_type => 'boolean',
+    default => undef,
+    is_nullable => 1,
+  },
   submitted_by_id => {
     data_type => 'integer',
     is_nullable => 1,
@@ -87,9 +92,14 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
-__PACKAGE__->filter_column( pending => {
-  filter_to_storage => 'to_bool',
-});
+__PACKAGE__->filter_column(
+  pending => {
+    filter_to_storage => 'to_bool',
+  },
+  is_local => {
+    filter_to_storage => 'to_bool',
+  }
+);
 
 # Only works when calling ->deploy, but atleast helps for tests
 sub sqlt_deploy_hook {
@@ -104,12 +114,19 @@ sub sqlt_deploy_hook {
 
 sub to_bool {
   my ( $self, $val ) = @_;
+  return if ! defined $val;
   my $driver_name = $self->result_source->schema->storage->dbh->{Driver}->{Name};
   if ( $driver_name eq 'SQLite' ) {
     return $val ? 1 : 0;
   } else {
     return $val ? 'true' : 'false';
   }
+}
+
+sub user {
+  my $self = shift;
+
+  return $self->entity->user;
 }
 
 1;

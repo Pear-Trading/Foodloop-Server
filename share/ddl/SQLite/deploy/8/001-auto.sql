@@ -65,7 +65,7 @@ CREATE TABLE organisations (
   postcode varchar(16),
   country varchar(255),
   sector varchar(1),
-  pending boolean NOT NULL DEFAULT false,
+  pending boolean NOT NULL DEFAULT 0,
   submitted_by_id integer,
   FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE
 );
@@ -95,7 +95,7 @@ CREATE TABLE users (
   email text NOT NULL,
   join_date datetime NOT NULL,
   password varchar(100) NOT NULL,
-  is_admin boolean NOT NULL DEFAULT false,
+  is_admin boolean NOT NULL DEFAULT 0,
   FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE
 );
 CREATE INDEX users_idx_entity_id ON users (entity_id);

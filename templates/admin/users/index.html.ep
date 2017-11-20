@@ -12,11 +12,30 @@
   </div>
 % }
 <div class="list-group">
-  % for my $user (@$users) {
-  <a href="<%= url_for . '/' . $user->{id} %>" class="list-group-item list-group-item-action">
-    <div>
-      %= $user->{email}
+  % for my $user ($user_rs->all) {
+  <a href="<%= url_for . '/' . $user->id %>" class="list-group-item list-group-item-action">
+    <div class="row">
+      <div class="col-4">
+        %= $user->name
+      </div>
+      <div class="col-4 text-center">
+        %= $user->email
+      </div>
+      <div class="col-4 text-right">
+        % if ( $user->type eq 'customer' ) {
+        <span class="badge badge-success">Customer</span>
+        % } elsif ( $user->type eq 'organisation' ) {
+        <span class="badge badge-info">Organisation</span>
+        % } else {
+        <span class="badge badge-danger">Unknown</span>
+        % }
+      </div>
     </div>
   </a>
   % }
+</div>
+<div class="row">
+  <div class="col">
+      %= bootstrap_pagination( $c->param('page') || 1, $user_rs->pager->last_page, { class => 'justify-content-center' } );
+  </div>
 </div>

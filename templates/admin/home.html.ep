@@ -3,7 +3,7 @@
 % content_for javascript => begin
 % end
 <div class="card-deck">
-  <div class="card text-center text-white bg-primary">
+  <div class="card mb-3 text-center text-white bg-primary">
     <div class="card-header card-inverse">
       User Count
     </div>
@@ -13,7 +13,7 @@
       </h2>
     </div>
   </div>
-  <div class="card text-center text-white bg-success">
+  <div class="card mb-3 text-center text-white bg-success">
     <div class="card-header card-inverse">
       Unused Tokens
     </div>
@@ -23,7 +23,9 @@
       </h2>
     </div>
   </div>
-  <div class="card text-center text-white bg-danger">
+</div>
+<div class="card-deck">
+  <div class="card mb-3 text-center text-white bg-danger">
     <div class="card-header card-inverse">
       Pending Organisations
     </div>
@@ -33,13 +35,25 @@
       </h2>
     </div>
   </div>
-  <div class="card text-center text-white bg-danger">
+  <div class="card mb-3 text-center text-white bg-danger">
     <div class="card-header card-inverse">
       Pending Transactions
     </div>
     <div class="card-body">
       <h2 class="card-title">
         %= $pending_trans
+      </h2>
+    </div>
+  </div>
+</div>
+<div class="card-deck">
+  <div class="card mb-3 text-center text-white bg-danger">
+    <div class="card-header card-inverse">
+      Unactioned Feedback
+    </div>
+    <div class="card-body">
+      <h2 class="card-title">
+        <%= $feedback->{pending} %> / <%= $feedback->{total} %>
       </h2>
     </div>
   </div>
