@@ -1,0 +1,25 @@
+% layout 'admin_errors';
+% title 'Organisations';
+<div class="row">
+  <div class="col-12">
+    <h3>Target to merge into for <%= $org_result->name %></h3>
+  </div>
+  <div class="col-12">
+    <div class="card">
+      <h3 class="card-header">
+        Organisations
+        <a href="<%= url_for '/admin/organisations/' . $org_result->id %>" class="btn btn-success float-right">Back</a>
+      </h3>
+      <div class="list-group list-group-flush">
+        % for my $org ( $org_rs->all ) {
+        <a href="<%= url_for . '/' . $org->id %>" class="list-group-item list-group-item-action">
+          %= $org->name
+        </a>
+        % }
+      </div>
+    </div>
+  </div>
+  <div class="col-12">
+      %= bootstrap_pagination( $c->param('page') || 1, $org_rs->pager->last_page, { class => 'justify-content-center' } );
+  </div>
+</div>

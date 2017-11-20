@@ -10,6 +10,7 @@ __PACKAGE__->table("feedback");
 __PACKAGE__->load_components(qw/
   InflateColumn::DateTime
   TimeStamp
+  FilterColumn
 /);
 
 __PACKAGE__->add_columns(
@@ -53,6 +54,11 @@ __PACKAGE__->add_columns(
     size => 255,
     is_nullable => 0,
   },
+  "actioned" => {
+    data_type => "boolean",
+    default_value => \"false",
+    is_nullable => 0,
+  },
 );
 
 __PACKAGE__->set_primary_key("id");
@@ -63,5 +69,19 @@ __PACKAGE__->belongs_to(
   { id => "user_id" },
   { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },
 );
+
+__PACKAGE__->filter_column( actioned => {
+  filter_to_storage => 'to_bool',
+});
+
+sub to_bool {
+  my ( $self, $val ) = @_;
+  my $driver_name = $self->result_source->schema->storage->dbh->{Driver}->{Name};
+  if ( $driver_name eq 'SQLite' ) {
+    return $val ? 1 : 0;
+  } else {
+    return $val ? 'true' : 'false';
+  }
+}
 
 1;

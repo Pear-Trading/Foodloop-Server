@@ -22,6 +22,8 @@ requires 'Module::Runtime';
 requires 'DBIx::Class::DeploymentHandler';
 requires 'DBIx::Class::Fixtures';
 requires 'GIS::Distance';
+requires 'Text::CSV';
+requires 'Try::Tiny';
 
 feature 'schema-graph', 'Draw diagrams of Schema' => sub {
   requires 'GraphViz';

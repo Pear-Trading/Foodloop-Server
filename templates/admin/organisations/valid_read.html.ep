@@ -41,39 +41,71 @@ function initMap() {
           <div class="form-group row">
             <label for="name" class="col-md-4 col-form-label">Organisation Name</label>
             <div class="col-md-8">
-              <input id="name" type="text" class="form-control" placeholder="Organisation Name" name="name" value="<%= $valid_org->name %>">
+              <input  id="name"
+                      type="text"
+                      class="form-control"
+                      placeholder="Organisation Name"
+                      name="name"
+                      value="<%= $valid_org->name %>">
             </div>
           </div>
           <div class="form-group row">
             <label for="name" class="col-md-4 col-form-label">Street Name</label>
             <div class="col-md-8">
-              <input id="street_name" type="text" class="form-control" placeholder="Street Name" name="street_name" value="<%= $valid_org->street_name %>">
+              <input  id="street_name"
+                      type="text"
+                      class="form-control"
+                      placeholder="Street Name"
+                      name="street_name"
+                      value="<%= $valid_org->street_name %>">
             </div>
           </div>
           <div class="form-group row">
             <label for="name" class="col-md-4 col-form-label">Town/City</label>
             <div class="col-md-8">
-              <input id="town" type="text" class="form-control" placeholder="Town" name="town" value="<%= $valid_org->town %>">
+              <input  id="town"
+                      type="text"
+                      class="form-control"
+                      placeholder="Town"
+                      name="town"
+                      value="<%= $valid_org->town %>">
             </div>
           </div>
           <div class="form-group row">
-            <label for="name" class="col-md-4 col-form-label">Sector</label>
+            <label for="sector" class="col-md-4 col-form-label">Sector</label>
             <div class="col-md-8">
-              <select class="form-control" name="sector">
+              <select id="sector" class="form-control" name="sector">
               %= include 'partials/sector_options', selected_sector => $valid_org->sector || '';
               </select>
             </div>
           </div>
           <div class="form-group row">
-            <label for="name" class="col-md-4 col-form-label">Postcode</label>
+            <label for="postcode" class="col-md-4 col-form-label">Postcode</label>
             <div class="col-md-8">
-              <input id="postcode" type="text" class="form-control" placeholder="Postcode" name="postcode" value="<%= $valid_org->postcode %>">
+              <input  id="postcode"
+                      type="text"
+                      class="form-control"
+                      placeholder="Postcode"
+                      name="postcode"
+                      value="<%= $valid_org->postcode %>">
             </div>
           </div>
           <div class="form-group row">
-            <label for="name" class="col-md-4 col-form-label">Validated</label>
+            <label for="pending" class="col-md-4 col-form-label">Validated</label>
             <div class="col-md-8">
-              <input id="pending" type="checkbox" name="pending" value="0"<%= $valid_org->pending ? '' : ' checked' %>>
+              <input  id="pending"
+                      type="checkbox"
+                      name="pending"
+                      value="0"<%= $valid_org->pending ? '' : ' checked' %>>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="local" class="col-md-4 col-form-label">Is Local</label>
+            <div class="col-md-8">
+              <select id="local" class="form-control" name="is_local">
+                <option value="0"<%= !$valid_org->is_local ? '' : ' selected' %>>Non Local</option>
+                <option value="1"<%= $valid_org->is_local ? ' selected' : '' %>>Local</option>
+              </select>
             </div>
           </div>
           <div class="form-group row">
@@ -82,6 +114,9 @@ function initMap() {
             </div>
           </div>
         </form>
+      </div>
+      <div class="card-footer">
+        <a href="<%= url_for . '/merge' %>" class="btn btn-warning">Merge Org</a>
       </div>
     </div>
   </div>
@@ -108,9 +143,9 @@ function initMap() {
             <div class="row text-center">
               <div class="col">From: <%= $transaction->buyer->name %></div>
               <div class="col">To: <%= $transaction->seller->name %></div>
-              <div class="col">Value: <%= $transaction->value %></div>
-              <div class="col">Submitted At: <%= $transaction->submitted_at %></div>
-              <div class="col">Purchase Time: <%= $transaction->purchase_time %></div>
+              <div class="col">Value: <%= format_currency_from_db $transaction->value %></div>
+              <div class="col">Submitted At: <%= format_human_datetime $transaction->submitted_at %></div>
+              <div class="col">Purchase Time: <%= format_human_datetime $transaction->purchase_time %></div>
             </div>
           </a>
         % }

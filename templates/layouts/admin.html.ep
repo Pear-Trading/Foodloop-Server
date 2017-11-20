@@ -51,6 +51,9 @@
             <a class="nav-link<%= title eq 'Organisations' ? ' active' : '' %>" href="<%= url_for '/admin/organisations' %>">Organisations</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link<%= title eq 'Import' ? ' active' : '' %>" href="<%= url_for '/admin/import' %>">Import</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" href="<%= url_for '/admin/logout' %>">Logout</a>
           </li>
         </div>
