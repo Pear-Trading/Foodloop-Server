@@ -2,6 +2,8 @@
 
 # Next Release
 
+# v0.9.6
+
 * **Admin Feature** Merged organisation lists into one list
 * **Admin Feature** Paginated Organisation listings
 * **Admin Feature** Added flags to Organisations listings
@@ -13,6 +15,7 @@
 * **Admin Feature** Enabled merging of organisations to reduce duplicates
 * **Admin Feature** Added badges to user listing to show whether customer or organisation
 * **Admin Feature** Added pagination to user listings
+* Improved logging for debugging issues with login
 
 # v0.9.5
 
