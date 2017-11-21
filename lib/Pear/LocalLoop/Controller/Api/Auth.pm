@@ -74,6 +74,8 @@ sub post_login {
   my $email = $validation->param('email');
   my $password = $validation->param('password');
 
+  $c->app->log->debug( __PACKAGE__ . " login attempt for [" . $email . "]" );
+
   my $user_result = $c->schema->resultset('User')->find({ email => $email });
 
   if ( defined $user_result ) {
@@ -86,6 +88,8 @@ sub post_login {
         display_name => $user_result->name,
         user_type => $user_result->type,
       });
+    } else {
+      $c->app->log->info( __PACKAGE__ . " failed login for [" . $email . "]" );
     }
   }
   return $c->render(
