@@ -38,9 +38,12 @@ sub home {
 sub auth_login {
   my $c = shift;
 
+  $c->app->log->debug( __PACKAGE__ . " admin login attempt for [" . $c->param('email') . "]" );
+
   if ( $c->authenticate($c->param('email'), $c->param('password')) ) {
     $c->redirect_to('/admin/home');
   } else {
+    $c->app->log->info( __PACKAGE__ . " failed admin login for [" . $c->param('email') . "]" );
     $c->redirect_to('/admin');
   }
 }
