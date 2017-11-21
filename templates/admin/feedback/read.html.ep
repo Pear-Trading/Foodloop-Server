@@ -12,54 +12,67 @@
   </div>
 % }
 <div class="row">
-  <div class="col col-md-6 mb-3">
+  <div class="col-md-6 mb-3 col-sm-12">
     <div class="card">
       <h4 class="card-header">
         User Info
       </h4>
       <ul class="list-group list-group-flush">
-        <li class="list-group-item justify-content-between">
+        <li class="list-group-item d-flex justify-content-between">
+          <span>Feedback ID:</span>
+          <span><%= $feedback->id %></span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
           <span>Email Address:</span>
           <span><%= $feedback->user->email %></span>
         </li>
-        <li class="list-group-item justify-content-between">
+        <li class="list-group-item d-flex justify-content-between">
           <span>Submitted At:</span>
           <span><%= format_human_datetime $feedback->submitted_at %></span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span>Actioned:</span>
+          <span>
+            <%= $feedback->actioned ? 'Done' : 'Needs Action' %>
+            <a class="btn btn-sm btn-success" href="<%= url_for . '/actioned' %>">
+              Toggle
+            </a>
+          </span>
         </li>
       </ul>
     </div>
   </div>
-  <div class="col col-md-6 mb-3">
+  <div class="col-md-6 mb-3 col-sm-12">
     <div class="card">
       <h4 class="card-header">
         Feedback Message
       </h4>
       <div class="card-body">
         <div class="card-text">
-        <pre><%= $feedback->feedbacktext %></pre>
+        <pre class="feedback-text"><%= $feedback->feedbacktext %></pre>
         </div>
       </div>
     </div>
   </div>
-  <div class="col col-md-6 mb-3">
+  <div class="col-md-6 mb-3 col-sm-12">
     <div class="card">
       <h4 class="card-header">
         Debug Info
       </h4>
       <ul class="list-group list-group-flush">
-        <li class="list-group-item justify-content-between">
+        <li class="list-group-item d-flex justify-content-between">
           <span>App Name:</span>
           <span><%= $feedback->app_name %></span>
         </li>
-        <li class="list-group-item justify-content-between">
+        <li class="list-group-item d-flex justify-content-between">
           <span>Package Name:</span>
           <span><%= $feedback->package_name %></span>
         </li>
-        <li class="list-group-item justify-content-between">
+        <li class="list-group-item d-flex justify-content-between">
           <span>Version Code:</span>
           <span><%= $feedback->version_code %></span>
         </li>
-        <li class="list-group-item justify-content-between">
+        <li class="list-group-item d-flex justify-content-between">
           <span>Version Number:</span>
           <span><%= $feedback->version_number %></span>
         </li>

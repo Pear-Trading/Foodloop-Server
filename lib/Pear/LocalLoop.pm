@@ -39,6 +39,7 @@ sub startup {
   $self->plugin('Pear::LocalLoop::Plugin::BootstrapPagination', { bootstrap4 => 1 } );
   $self->plugin('Pear::LocalLoop::Plugin::Validators');
   $self->plugin('Pear::LocalLoop::Plugin::Datetime');
+  $self->plugin('Pear::LocalLoop::Plugin::Currency');
   $self->plugin('Pear::LocalLoop::Plugin::Postcodes');
   $self->plugin('Pear::LocalLoop::Plugin::TemplateHelpers');
 
@@ -189,9 +190,13 @@ sub startup {
   $admin_routes->post('/organisations/add')->to('admin-organisations#add_org_submit');
   $admin_routes->get('/organisations/:id')->to('admin-organisations#valid_read');
   $admin_routes->post('/organisations/:id')->to('admin-organisations#valid_edit');
+  $admin_routes->get('/organisations/:id/merge')->to('admin-organisations#merge_list');
+  $admin_routes->get('/organisations/:id/merge/:target_id')->to('admin-organisations#merge_detail');
+  $admin_routes->post('/organisations/:id/merge/:target_id')->to('admin-organisations#merge_confirm');
 
   $admin_routes->get('/feedback')->to('admin-feedback#index');
   $admin_routes->get('/feedback/:id')->to('admin-feedback#read');
+  $admin_routes->get('/feedback/:id/actioned')->to('admin-feedback#actioned');
 
   $admin_routes->get('/transactions')->to('admin-transactions#index');
   $admin_routes->get('/transactions/:id')->to('admin-transactions#read');
@@ -200,6 +205,15 @@ sub startup {
 
   $admin_routes->get('/reports/transactions')->to('admin-reports#transaction_data');
 
+  $admin_routes->get('/import')->to('admin-import#index');
+  $admin_routes->get('/import/add')->to('admin-import#get_add');
+  $admin_routes->post('/import/add')->to('admin-import#post_add');
+  $admin_routes->get('/import/:set_id')->to('admin-import#list');
+  $admin_routes->get('/import/:set_id/user')->to('admin-import#get_user');
+  $admin_routes->get('/import/:set_id/org')->to('admin-import#get_org');
+
+  $admin_routes->get('/import/:set_id/ignore/:value_id')->to('admin-import#ignore_value');
+  $admin_routes->get('/import/:set_id/import')->to('admin-import#run_import');
 #  my $user_routes = $r->under('/')->to('root#under');
 
 # $user_routes->get('/home')->to('root#home');

@@ -33,4 +33,19 @@ sub read {
   }
 }
 
+sub actioned {
+  my $c = shift;
+
+  my $id = $c->param('id');
+
+  if ( my $feedback = $c->result_set->find($id) ) {
+    $feedback->actioned( ! $feedback->actioned );
+    $feedback->update;
+    $c->redirect_to( '/admin/feedback/' . $id );
+  } else {
+    $c->flash( error => 'No Feedback found' );
+    $c->redirect_to( '/admin/feedback' );
+  }
+}
+
 1;
