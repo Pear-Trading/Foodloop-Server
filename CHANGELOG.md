@@ -2,6 +2,21 @@
 
 # Next Release
 
+# v0.9.6
+
+* **Admin Feature** Merged organisation lists into one list
+* **Admin Feature** Paginated Organisation listings
+* **Admin Feature** Added flags to Organisations listings
+* **Admin Feature** Added `is_local` flag to Organisations to start categorising odd stores
+* **Admin Feature** Feedback items now word wrap
+* **Admin Feature** Rework transaction viewing
+* **Admin Feature** Implemented import method for importing previous data from csv
+* **Admin Feature** Added badges for various organisation flags eg. local, user, validated
+* **Admin Feature** Enabled merging of organisations to reduce duplicates
+* **Admin Feature** Added badges to user listing to show whether customer or organisation
+* **Admin Feature** Added pagination to user listings
+* Improved logging for debugging issues with login
+
 # v0.9.5
 
 * Added leaderboard api for web-app with pagination

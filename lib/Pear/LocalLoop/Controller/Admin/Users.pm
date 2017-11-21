@@ -22,9 +22,15 @@ has organisation_result_set => sub {
 sub index {
   my $c = shift;
 
-  my $user_rs = $c->user_result_set;
-  $user_rs->result_class('DBIx::Class::ResultClass::HashRefInflator');
-  $c->stash( users => [ $user_rs->all ] );
+  my $user_rs = $c->user_result_set->search(
+    undef, {
+      prefech => { entity => [ qw/ customer organisation / ] },
+      page => $c->param('page') || 1,
+      rows => 10,
+      order_by => { -asc => 'email' },
+    }
+  );
+  $c->stash( user_rs => $user_rs );
 }
 
 sub read {

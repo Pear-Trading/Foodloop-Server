@@ -1,0 +1,146 @@
+% layout 'admin';
+% title 'Import';
+% content_for javascript => begin
+% end
+% if ( my $error = flash 'error' ) {
+  <div class="alert alert-danger" role="alert">
+    <strong>Error!</strong> <%= $error %>
+  </div>
+% } elsif ( my $success = flash 'success' ) {
+  <div class="alert alert-success" role="alert">
+    <strong>Success!</strong> <%= $success %>
+  </div>
+% }
+<div class="row">
+  <div class="col-12 col-md-6 mb-3">
+    <div class="card">
+      <h3 class="card-header">
+        User Assignments
+      </h3>
+      <div class="card-body">
+        Unique users in this Import, and their assigned entity
+      </div>
+      <div class="list-group list-group-flush">
+        % for my $user ( $import_users_rs->all ) {
+        <div class="list-group-item">
+          <div class="row">
+            <div class="col-4">
+              %= $user->user_name
+            </div>
+            <div class="col-4">
+              % if ( defined $import_lookup_rs->{ $user->user_name } ) {
+              <span class="text-muted"><%= $import_lookup_rs->{ $user->user_name }->{name} %></span>
+              % } else {
+              <span class="text-muted font-italic">Unassigned</span>
+              % }
+            </div>
+            <div class="col-4">
+              <a href="<%= url_for(url_for . '/user')->query([ user => $user->user_name ]) %>" class="btn btn-primary">Select</a>
+            </div>
+          </div>
+        </div>
+        % }
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-6 mb-3">
+    <div class="card">
+      <h3 class="card-header">
+        Org Assignments
+      </h3>
+      <div class="card-body">
+        Unique orgs in this Import, and their assigned entity
+      </div>
+      <div class="list-group list-group-flush">
+        % for my $org ( $import_org_rs->all ) {
+        <div class="list-group-item">
+          <div class="row">
+            <div class="col-4">
+              %= $org->org_name
+            </div>
+            <div class="col-4">
+              % if ( defined $import_lookup_rs->{ $org->org_name } ) {
+              <span class="text-muted"><%= $import_lookup_rs->{ $org->org_name }->{name} %></span>
+              % } else {
+              <span class="text-muted font-italic">Unassigned</span>
+              % }
+            </div>
+            <div class="col-4">
+              <a href="<%= url_for(url_for . '/org')->query([ org => $org->org_name ]) %>" class="btn btn-primary">Select</a>
+            </div>
+          </div>
+        </div>
+        % }
+      </div>
+    </div>
+  </div>
+  <div class="col-12 mb-3">
+    <div class="card">
+      <h3 class="card-header">
+        %= format_human_datetime $import_set->date;
+        <a href="<%= url_for->query({ignored => $c->param('ignored') ? 0 : 1 }) %>"
+           class="btn btn-primary float-right">
+           <%= $c->param('ignored') ? 'Hide' : 'Show' %> Ignored
+        </a>
+        <a href="<%= url_for->query({imported => $c->param('imported') ? 0 : 1 }) %>"
+           class="btn btn-secondary float-right">
+           <%= $c->param('imported') ? 'Hide' : 'Show' %> Imported
+        </a>
+
+      </h3>
+      <div class="card-body">
+        Content listed in original order of import
+      </div>
+      <div class="list-group list-group-flush">
+        % for my $import_value ( $import_value_rs->all ) {
+          % my $user_lookup = $import_lookup_rs->{ $import_value->user_name };
+          % my $purchase_lookup = parse_currency $import_value->purchase_value;
+          % my $org_lookup = $import_lookup_rs->{ $import_value->org_name };
+        <div class="list-group-item">
+          <div class="row">
+            <div class="col-2">
+              <%= $import_value->user_name %>
+              % if ( defined $user_lookup ) {
+              <br>
+              <span class="text-muted"><%= $user_lookup->{name} %></span>
+              % }
+            </div>
+            <div class="col-3">
+              <%= format_human_datetime $import_value->purchase_date %>
+            </div>
+            <div class="col-2">
+              <%= $import_value->purchase_value %>
+              <br>
+              <span class="text-muted"><%= $purchase_lookup %></span>
+            </div>
+            <div class="col-3">
+              <%= $import_value->org_name %>
+              % if ( defined $org_lookup ) {
+              <br>
+              <span class="text-muted"><%= $org_lookup->{name} %></span>
+              % }
+            </div>
+            <div class="col-2">
+              % if ( defined $import_value->transaction_id ) {
+              <button class="btn btn-primary">Imported</button>
+              % } else {
+                % if ( defined $user_lookup && defined $org_lookup && $purchase_lookup ) {
+                <button class="btn btn-success">Ready</button>
+                % }
+                % if ( $import_value->ignore_value ) {
+                <a href="<%= url_for . '/ignore/' . $import_value->id %>" class="btn btn-success">Un Ignore</a>
+                % } else {
+                <a href="<%= url_for . '/ignore/' . $import_value->id %>" class="btn btn-danger">Ignore</a>
+                % }
+              % }
+            </div>
+          </div>
+        </div>
+        % }
+      </div>
+    </div>
+  </div>
+  <div class="col-12">
+    <a href="<%= url_for . '/import' %>" class="btn btn-info float-right">Import Ready Items</a>
+  </div>
+</div>

@@ -11,43 +11,42 @@
     <strong>Success!</strong> <%= $success %>
   </div>
 % }
-<div class="row">
+<div class="row mb-3">
   <div class="col">
     <div class="card">
       <h3 class="card-header">
-        Valid Organisations
+        Organisations
         <a href="<%= url_for . '/add' %>" class="btn btn-success" style="float: right">Add Organisation</a>
       </h3>
       <div class="list-group list-group-flush">
-        % for my $valid_org ($valid_orgs_rs->all) {
-        <a href="<%= url_for . '/' . $valid_org->id %>" class="list-group-item list-group-item-action">
+        % for my $org_result ($orgs_rs->all) {
+        <a href="<%= url_for . '/' . $org_result->id %>" class="list-group-item list-group-item-action d-flex justify-content-between">
           <div>
-            %= $valid_org->name
+            %= $org_result->name
+          </div>
+          <div>
+            % if ( $org_result->pending ) {
+            <span class="badge badge-warning">Unvalidated</span>
+            % }
+            % if ( defined $org_result->user ) {
+            <span class="badge badge-info">User</span>
+            % }
+            % if ( !defined $org_result->is_local ) {
+            <span class="badge badge-danger">Locality Not Set</span>
+            % } elsif ( $org_result->is_local ) {
+            <span class="badge badge-success">Local Org</span>
+            % } else {
+            <span class="badge badge-secondary">Non Local Org</span>
+            % }
           </div>
         </a>
         % }
       </div>
     </div>
   </div>
+</div>
+<div class="row">
   <div class="col">
-    <div class="card">
-      <h3 class="card-header">
-        Pending Organisations
-      </h3>
-      <div class="list-group list-group-flush">
-        % if ( $pending_orgs_rs->count == 0 ) {
-        <div class="list-group-item">
-          No Pending Organisations!
-        </div>
-        % } else {
-        % for my $pending_org ($pending_orgs_rs->all) {
-        <a href="<%= url_for . '/' . $pending_org->id %>" class="list-group-item list-group-item-action">
-          <div>
-            %= $pending_org->name
-          </div>
-        </a>
-        % }}
-      </div>
-    </div>
+      %= bootstrap_pagination( $c->param('page') || 1, $orgs_rs->pager->last_page, { class => 'justify-content-center' } );
   </div>
 </div>
