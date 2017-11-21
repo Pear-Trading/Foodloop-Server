@@ -18,7 +18,7 @@ CREATE TABLE "import_values" (
   "purchase_date" timestamp NOT NULL,
   "purchase_value" character varying(255) NOT NULL,
   "org_name" character varying(255) NOT NULL,
-  "transaction_id" character varying,
+  "transaction_id" integer,
   PRIMARY KEY ("id")
 );
 CREATE INDEX "import_values_idx_set_id" on "import_values" ("set_id");
