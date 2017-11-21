@@ -128,7 +128,7 @@ CREATE TABLE feedback (
   package_name varchar(255) NOT NULL,
   version_code varchar(255) NOT NULL,
   version_number varchar(255) NOT NULL,
-  actioned boolean NOT NULL DEFAULT false,
+  actioned boolean NOT NULL DEFAULT 0,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 CREATE INDEX feedback_idx_user_id ON feedback (user_id);
