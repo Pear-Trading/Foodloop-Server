@@ -220,7 +220,7 @@ CREATE TABLE "import_values" (
   "purchase_date" timestamp NOT NULL,
   "purchase_value" character varying(255) NOT NULL,
   "org_name" character varying(255) NOT NULL,
-  "transaction_id" character varying,
+  "transaction_id" integer,
   "ignore_value" boolean DEFAULT false NOT NULL,
   PRIMARY KEY ("id")
 );

@@ -39,7 +39,7 @@ __PACKAGE__->add_columns(
     size => 255,
   },
   transaction_id => {
-    data_type => 'varchar',
+    data_type => 'integer',
     is_foreign_key => 1,
     is_nullable => 1,
   },
