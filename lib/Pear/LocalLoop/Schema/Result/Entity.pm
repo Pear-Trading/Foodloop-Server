@@ -45,6 +45,13 @@ __PACKAGE__->has_many(
 );
 
 __PACKAGE__->has_many(
+  "associations",
+  "Pear::LocalLoop::Schema::Result::EntityAssociation",
+  { "foreign.entity_id" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+__PACKAGE__->has_many(
   "sales",
   "Pear::LocalLoop::Schema::Result::Transaction",
   { "foreign.seller_id" => "self.id" },
