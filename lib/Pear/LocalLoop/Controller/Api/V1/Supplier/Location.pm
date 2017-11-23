@@ -126,10 +126,14 @@ sub lis_load {
 
   my $entity = $c->stash->{api_user}->entity;
   my $entity_type_object = $entity->type_object;
-  my $orgs_lis = $valid_org = $c->schema->resultset('Entity')->find( $c->param('lis') );
+  my $orgs_lis = $c->schema->resultset('EntityAssociation')->search(
+  {
+    'lis' => 1,
+  },
+  );
 
   # need: organisations only, with name, latitude, and longitude
-  my $org_rs = $orgs_lis->associations->search_related('entity',
+  my $org_rs = $orgs_lis->search_related('entity',
     {
       'entity.type' => 'organisation',
       'organisation.latitude' => { -between => [
@@ -154,7 +158,7 @@ sub lis_load {
 
   $org_rs->result_class('DBIx::Class::ResultClass::HashRefInflator');
 
-  my $suppliers = [ map {
+  my $locations = [ map {
     {
       latitude => $_->{organisation}->{latitude} * 1,
       longitude => $_->{organisation}->{longitude} * 1,
