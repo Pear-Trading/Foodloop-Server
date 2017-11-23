@@ -86,7 +86,7 @@ sub index {
 
   $org_rs->result_class('DBIx::Class::ResultClass::HashRefInflator');
 
-  my $suppliers = [ map { 
+  my $suppliers = [ map {
     {
       latitude => $_->{organisation}->{latitude} * 1,
       longitude => $_->{organisation}->{longitude} * 1,
@@ -98,6 +98,74 @@ sub index {
     json => {
       success => Mojo::JSON->true,
       suppliers => $suppliers,
+      self => {
+        latitude => $entity_type_object->latitude,
+        longitude => $entity_type_object->longitude,
+      }
+    },
+  );
+}
+
+sub lis_load {
+  my $c = shift;
+
+  return if $c->validation_error('index');
+
+  my $json = $c->stash->{api_json};
+
+  # Extra custom error, because its funny
+  if ( $json->{north_east}->{latitude} < $json->{south_west}->{latitude} ) {
+    return $c->render(
+      json => {
+        success => Mojo::JSON->false,
+        errors => [ 'upside_down' ],
+      },
+      status => 400,
+    );
+  }
+
+  my $entity = $c->stash->{api_user}->entity;
+  my $entity_type_object = $entity->type_object;
+  my $orgs_lis = $valid_org = $c->schema->resultset('Entity')->find( $c->param('lis') );
+
+  # need: organisations only, with name, latitude, and longitude
+  my $org_rs = $orgs_lis->associations->search_related('entity',
+    {
+      'entity.type' => 'organisation',
+      'organisation.latitude' => { -between => [
+        $json->{south_west}->{latitude},
+        $json->{north_east}->{latitude},
+      ] },
+      'organisation.longitude' => { -between => [
+        $json->{south_west}->{longitude},
+        $json->{north_east}->{longitude},
+      ] },
+    },
+    {
+      join => [ qw/ organisation / ],
+      columns => [
+        'organisation.name',
+        'organisation.latitude',
+        'organisation.longitude',
+      ],
+      group_by => [ qw/ organisation.id / ],
+    },
+  );
+
+  $org_rs->result_class('DBIx::Class::ResultClass::HashRefInflator');
+
+  my $suppliers = [ map {
+    {
+      latitude => $_->{organisation}->{latitude} * 1,
+      longitude => $_->{organisation}->{longitude} * 1,
+      name => $_->{organisation}->{name},
+    }
+  } $org_rs->all ];
+
+  $c->render(
+    json => {
+      success => Mojo::JSON->true,
+      locations => $locations,
       self => {
         latitude => $entity_type_object->latitude,
         longitude => $entity_type_object->longitude,
