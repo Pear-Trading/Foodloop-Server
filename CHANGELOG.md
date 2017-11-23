@@ -2,6 +2,8 @@
 
 # Next Release
 
+* **Admin Fix**: Fix error in Importing under Postgres
+
 # v0.9.6
 
 * **Admin Feature** Merged organisation lists into one list
