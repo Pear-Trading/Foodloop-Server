@@ -85,9 +85,11 @@ sub valid_read {
       order_by => { -desc => 'submitted_at' },
     },
   );
+  my $associations = $valid_org->entity->associations;
   $c->stash(
     valid_org => $valid_org,
     transactions => $transactions,
+    associations => $associations,
   );
 }
 
@@ -143,7 +145,7 @@ sub merge_list {
     $c->redirect_to( '/admin/organisations/' . $org_id );
     return;
   }
-  
+
   my $org_rs = $c->result_set->search(
     {
       id => { '!=' => $org_id },
