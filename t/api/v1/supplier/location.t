@@ -49,6 +49,9 @@ $t->post_ok('/api/v1/supplier/location' => json => {
       name => 'Test Org 2',
       latitude => 54.04679,
       longitude => -2.7963,
+      street_name => 'Test Street',
+      town => 'Lancaster',
+      postcode => 'LA1 1AG',
     },
   ])
   ->json_is('/self', {
