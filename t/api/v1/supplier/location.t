@@ -49,11 +49,42 @@ $t->post_ok('/api/v1/supplier/location' => json => {
       name => 'Test Org 2',
       latitude => 54.04679,
       longitude => -2.7963,
+      street_name => 'Test Street',
+      town => 'Lancaster',
+      postcode => 'LA1 1AG',
     },
   ])
   ->json_is('/self', {
       latitude => 54.04725,
       longitude => -2.79611,
   });
+
+  $t->post_ok('/api/v1/supplier/location/lis' => json => {
+      session_key => $session_key,
+      north_east => {
+        latitude => 54.077665,
+        longitude => -2.761860,
+      },
+      south_west => {
+        latitude => 54.013361,
+        longitude => -2.857647,
+      },
+    })
+    ->status_is(200)->or($framework->dump_error)
+    ->json_is('/success', Mojo::JSON->true)
+    ->json_is('/locations', [
+      {
+        name => 'Test Org 2',
+        latitude => 54.04679,
+        longitude => -2.7963,
+        street_name => 'Test Street',
+        town => 'Lancaster',
+        postcode => 'LA1 1AG',
+      },
+    ])
+    ->json_is('/self', {
+        latitude => 54.04725,
+        longitude => -2.79611,
+    });
 
 done_testing;
