@@ -91,6 +91,9 @@ sub index {
       latitude => $_->{organisation}->{latitude} * 1,
       longitude => $_->{organisation}->{longitude} * 1,
       name => $_->{organisation}->{name},
+      street_name => $_->{organisation}->{street_name},
+      town => $_->{organisation}->{town},
+      postcode => $_->{organisation}->{postcode},
     }
   } $org_rs->all ];
 
