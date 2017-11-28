@@ -1,0 +1,6 @@
+$HASH1 = {
+           entity_id
+                 => 6,
+           id    => 1,
+           lis   => 1
+         };

@@ -2,6 +2,13 @@
 
 # Next Release
 
+# v0.9.7
+
+* **Admin Fix**: Fix error in Importing under Postgres
+* **Admin Feature** Ability to add entity to LIS Added
+* Added code endpoint for LIS organisations for web app use
+* Schema updated to account for these changes
+
 # v0.9.6
 
 * **Admin Feature** Merged organisation lists into one list
