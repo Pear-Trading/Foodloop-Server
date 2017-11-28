@@ -99,8 +99,8 @@ my $org1 = {
     street_name => 'Test Street',
     town        => 'Lancaster',
     postcode    => 'LA1 1AF',
-    latitude     => 54.04725,
-    longitude    => -2.79611,
+    latitude    => 54.04725,
+    longitude   => -2.79611,
   },
   user => {
     email    => 'org1@example.com',
@@ -115,12 +115,15 @@ my $org2 = {
     street_name => 'Test Street',
     town        => 'Lancaster',
     postcode    => 'LA1 1AG',
-    latitude     => 54.04679,
-    longitude    => -2.7963,
+    latitude    => 54.04679,
+    longitude   => -2.7963,
   },
   user => {
     email    => 'org2@example.com',
     password => 'abc123',
+  },
+  associations => {
+    lis => 1,
   },
   type => "organisation",
 };
@@ -207,4 +210,3 @@ $fixtures->dump({
   schema => $schema,
   directory => "$Bin/../data/" . $data_set,
 });
-
