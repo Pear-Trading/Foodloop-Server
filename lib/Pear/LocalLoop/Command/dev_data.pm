@@ -28,45 +28,57 @@ sub run {
   $schema->resultset('User')->create({
     email => 'test@example.com',
     password => 'abc123',
-    customer => {
-      full_name => 'Test User',
-      display_name => 'Test User',
-      year_of_birth => 2006,
-      postcode => 'LA1 1AA',
+    entity => {
+      type => 'customer',
+      customer => {
+        full_name => 'Test User',
+        display_name => 'Test User',
+        year_of_birth => 2006,
+        postcode => 'LA1 1AA',
+      }
     },
-    administrator => {},
+    is_admin => 1,
   });
 
   $schema->resultset('User')->create({
     email => 'test2@example.com',
     password => 'abc123',
-    customer => {
-      full_name => 'Test User 2',
-      display_name => 'Test User 2',
-      year_of_birth => 2006,
-      postcode => 'LA1 1AA',
+    entity => {
+      type => 'customer',
+      customer => {
+        full_name => 'Test User 2',
+        display_name => 'Test User 2',
+        year_of_birth => 2006,
+        postcode => 'LA1 1AA',
+      },
     },
   });
 
   $schema->resultset('User')->create({
     email => 'test3@example.com',
     password => 'abc123',
-    customer => {
-      full_name => 'Test User 3',
-      display_name => 'Test User 3',
-      year_of_birth => 2006,
-      postcode => 'LA1 1AA',
+    entity => {
+      type => 'customer',
+      customer => {
+        full_name => 'Test User 3',
+        display_name => 'Test User 3',
+        year_of_birth => 2006,
+        postcode => 'LA1 1AA',
+      },
     },
   });
 
   $schema->resultset('User')->create({
     email       => 'testorg@example.com',
     password    => 'abc123',
-    organisation => {
-      name        => 'Test Org',
-      street_name => 'Test Street',
-      town        => 'Lancaster',
-      postcode    => 'LA1 1AA',
+    entity => {
+      type => 'organisation',
+      organisation => {
+        name        => 'Test Org',
+        street_name => 'Test Street',
+        town        => 'Lancaster',
+        postcode    => 'LA1 1AA',
+      },
     },
   });
 }
