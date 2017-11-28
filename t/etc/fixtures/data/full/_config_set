@@ -2,46 +2,36 @@ $VAR1 = {
           'has_many' => {
                           'fetch' => 0
                         },
+          'belongs_to' => {
+                            'fetch' => 0
+                          },
+          'might_have' => {
+                            'fetch' => 0
+                          },
           'sets' => [
+                      {
+                        'class' => 'EntityAssociation',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'ViewQuantisedTransactionPg'
+                      },
                       {
                         'class' => 'OrganisationPayroll',
                         'quantity' => 'all'
                       },
                       {
                         'quantity' => 'all',
-                        'class' => 'User'
-                      },
-                      {
-                        'quantity' => 'all',
-                        'class' => 'Customer'
-                      },
-                      {
-                        'class' => 'Entity',
-                        'quantity' => 'all'
-                      },
-                      {
-                        'quantity' => 'all',
-                        'class' => 'LeaderboardValue'
-                      },
-                      {
-                        'quantity' => 'all',
                         'class' => 'Feedback'
                       },
                       {
-                        'class' => 'Organisation',
-                        'quantity' => 'all'
-                      },
-                      {
-                        'class' => 'GbPostcode',
+                        'class' => 'LeaderboardValue',
                         'quantity' => 'all'
                       },
                       {
                         'quantity' => 'all',
-                        'class' => 'LeaderboardSet'
-                      },
-                      {
-                        'quantity' => 'all',
-                        'class' => 'AccountToken'
+                        'class' => 'GbPostcode'
                       },
                       {
                         'quantity' => 'all',
@@ -49,17 +39,51 @@ $VAR1 = {
                       },
                       {
                         'quantity' => 'all',
+                        'class' => 'ViewQuantisedTransactionSQLite'
+                      },
+                      {
+                        'class' => 'LeaderboardSet',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'class' => 'ImportSet',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'ImportValue'
+                      },
+                      {
+                        'class' => 'AccountToken',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'Leaderboard'
+                      },
+                      {
+                        'quantity' => 'all',
                         'class' => 'Transaction'
                       },
                       {
-                        'class' => 'Leaderboard',
+                        'quantity' => 'all',
+                        'class' => 'Organisation'
+                      },
+                      {
+                        'class' => 'Customer',
                         'quantity' => 'all'
+                      },
+                      {
+                        'class' => 'ImportLookup',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'class' => 'Entity',
+                        'quantity' => 'all'
+                      },
+                      {
+                        'quantity' => 'all',
+                        'class' => 'User'
                       }
-                    ],
-          'belongs_to' => {
-                            'fetch' => 0
-                          },
-          'might_have' => {
-                            'fetch' => 0
-                          }
+                    ]
         };

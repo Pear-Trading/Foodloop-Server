@@ -3,6 +3,7 @@ $HASH1 = {
            entity_id
                     => 5,
            id       => 1,
+           is_local => undef,
            latitude => 54.04725,
            longitude
                     => -2.79611,

@@ -85,9 +85,15 @@ sub valid_read {
       order_by => { -desc => 'submitted_at' },
     },
   );
+  my $associations = $valid_org->entity->associations;
+  my $assoc = {
+    lis => defined $associations ? $associations->lis : 0,
+  };
+
   $c->stash(
     valid_org => $valid_org,
     transactions => $transactions,
+    associations => $assoc,
   );
 }
 
@@ -102,6 +108,7 @@ sub valid_edit {
   $validation->required('postcode')->postcode;
   $validation->optional('pending');
   $validation->optional('is_local');
+  $validation->optional('is_lis');
 
   if ( $validation->has_error ) {
     $c->flash( error => 'The validation has failed' );
@@ -121,9 +128,12 @@ sub valid_edit {
         pending     => defined $validation->param('pending') ? 0 : 1,
         is_local    => $validation->param('is_local'),
       });
+      $valid_org->entity->update_or_create_related( 'associations', {
+        lis         => $validation->param('is_lis'),
+      });
     } );
   } finally {
-    if ( @_ ) {
+    if ( @_ ) {use Devel::Dwarn; Dwarn \@_;
       $c->flash( error => 'Something went wrong Updating the Organisation' );
     } else {
       $c->flash( success => 'Updated Organisation' );
@@ -143,7 +153,7 @@ sub merge_list {
     $c->redirect_to( '/admin/organisations/' . $org_id );
     return;
   }
-  
+
   my $org_rs = $c->result_set->search(
     {
       id => { '!=' => $org_id },
