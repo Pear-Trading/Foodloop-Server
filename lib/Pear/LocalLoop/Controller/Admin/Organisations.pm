@@ -102,7 +102,7 @@ sub valid_edit {
 
   my $validation = $c->validation;
   $validation->required('name');
-  $validation->required('street_name');
+  $validation->optional('street_name');
   $validation->required('town');
   $validation->optional('sector');
   $validation->required('postcode')->postcode;
