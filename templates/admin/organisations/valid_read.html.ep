@@ -148,7 +148,7 @@ function initMap() {
       </h3>
       <div class="list-group list-group-flush">
         % for my $transaction ( $transactions->all ) {
-          <a href="<%= url_for '/admin/transactions/' . $transaction->id %>" class="list-group-item list-group-item-action" target="_blank">
+          <a href="<%= url_for '/admin/transactions/' . $transaction->id %>" class="list-group-item list-group-item-action">
             <div class="row text-center">
               <div class="col">From: <%= $transaction->buyer->name %></div>
               <div class="col">To: <%= $transaction->seller->name %></div>
