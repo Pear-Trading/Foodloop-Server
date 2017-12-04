@@ -13,7 +13,7 @@
 % }
 <div class="list-group">
   % for my $user ($user_rs->all) {
-  <a href="<%= url_for . '/' . $user->id %>" class="list-group-item list-group-item-action" target="_blank">
+  <a href="<%= url_for . '/' . $user->id %>" class="list-group-item list-group-item-action">
     <div class="row">
       <div class="col-4">
         %= $user->name

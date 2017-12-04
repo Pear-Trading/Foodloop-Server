@@ -139,7 +139,7 @@ sub valid_edit {
       $c->flash( success => 'Updated Organisation' );
     }
   };
-  $c->redirect_to( '/admin/organisations/' . $c->param('id') );
+  $c->redirect_to( '/admin/organisations/');
 }
 
 sub merge_list {
