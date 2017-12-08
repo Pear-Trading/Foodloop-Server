@@ -88,6 +88,7 @@ sub valid_read {
   my $associations = $valid_org->entity->associations;
   my $assoc = {
     lis => defined $associations ? $associations->lis : 0,
+    esta => defined $associations ? $associations->esta : 0,
   };
 
   $c->stash(
@@ -109,6 +110,7 @@ sub valid_edit {
   $validation->optional('pending');
   $validation->optional('is_local');
   $validation->optional('is_lis');
+  $validation->optional('is_esta');
 
   if ( $validation->has_error ) {
     $c->flash( error => 'The validation has failed' );
@@ -130,6 +132,7 @@ sub valid_edit {
       });
       $valid_org->entity->update_or_create_related( 'associations', {
         lis         => $validation->param('is_lis'),
+        esta        => $validation->param('is_esta')
       });
     } );
   } finally {
