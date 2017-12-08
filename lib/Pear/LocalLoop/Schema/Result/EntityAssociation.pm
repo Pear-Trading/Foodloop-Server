@@ -23,6 +23,11 @@ __PACKAGE__->add_columns(
     default => undef,
     is_nullable => 1,
   },
+  "esta" => {
+    data_type => 'boolean',
+    default => undef,
+    is_nullable => 1,
+  },
 );
 
 __PACKAGE__->set_primary_key("id");
