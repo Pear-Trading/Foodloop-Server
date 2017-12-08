@@ -2,6 +2,9 @@
 
 # Next Release
 
+* **Admin Feature** Improved links in relevant places to automatically open in
+  a new tab
+
 # v0.9.7
 
 * **Admin Fix**: Fix error in Importing under Postgres
