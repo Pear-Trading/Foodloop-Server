@@ -16,11 +16,11 @@
     <div class="card">
       <h3 class="card-header">
         Organisations
-        <a href="<%= url_for . '/add' %>" class="btn btn-success" style="float: right">Add Organisation</a>
+        <a href="<%= url_for . '/add' %>" class="btn btn-success" style="float: right" target="_blank">Add Organisation</a>
       </h3>
       <div class="list-group list-group-flush">
         % for my $org_result ($orgs_rs->all) {
-        <a href="<%= url_for . '/' . $org_result->id %>" class="list-group-item list-group-item-action d-flex justify-content-between">
+        <a href="<%= url_for . '/' . $org_result->id %>" class="list-group-item list-group-item-action d-flex justify-content-between" target="_blank">
           <div>
             %= $org_result->name
           </div>
