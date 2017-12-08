@@ -88,6 +88,7 @@ sub valid_read {
   my $associations = $valid_org->entity->associations;
   my $assoc = {
     lis => defined $associations ? $associations->lis : 0,
+    esta => defined $associations ? $associations->esta : 0,
   };
 
   $c->stash(
@@ -102,13 +103,14 @@ sub valid_edit {
 
   my $validation = $c->validation;
   $validation->required('name');
-  $validation->required('street_name');
+  $validation->optional('street_name');
   $validation->required('town');
   $validation->optional('sector');
   $validation->required('postcode')->postcode;
   $validation->optional('pending');
   $validation->optional('is_local');
   $validation->optional('is_lis');
+  $validation->optional('is_esta');
 
   if ( $validation->has_error ) {
     $c->flash( error => 'The validation has failed' );
@@ -130,6 +132,7 @@ sub valid_edit {
       });
       $valid_org->entity->update_or_create_related( 'associations', {
         lis         => $validation->param('is_lis'),
+        esta        => $validation->param('is_esta')
       });
     } );
   } finally {
@@ -139,7 +142,7 @@ sub valid_edit {
       $c->flash( success => 'Updated Organisation' );
     }
   };
-  $c->redirect_to( '/admin/organisations/');
+  $c->redirect_to( '/admin/organisations/' . $c->param('id') );
 }
 
 sub merge_list {
