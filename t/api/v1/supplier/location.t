@@ -59,7 +59,8 @@ $t->post_ok('/api/v1/supplier/location' => json => {
       longitude => -2.79611,
   });
 
-  $t->post_ok('/api/v1/supplier/location/lis' => json => {
+  # Association pin
+  $t->post_ok('/api/v1/supplier/location/trail' => json => {
       session_key => $session_key,
       north_east => {
         latitude => 54.077665,
@@ -69,6 +70,7 @@ $t->post_ok('/api/v1/supplier/location' => json => {
         latitude => 54.013361,
         longitude => -2.857647,
       },
+      association => 'lis',
     })
     ->status_is(200)->or($framework->dump_error)
     ->json_is('/success', Mojo::JSON->true)

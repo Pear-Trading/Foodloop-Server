@@ -103,8 +103,17 @@ function initMap() {
             <label for="lis" class="col-md-4 col-form-label">Part of LIS</label>
             <div class="col-md-8">
               <select id="lis" class="form-control" name="is_lis">
-                <option value="0"<%= !$associations->{lis} ? '' : ' selected' %>>Not In Story</option>
-                <option value="1"<%= $associations->{lis} ? ' selected' : '' %>>In Story</option>
+                <option value="0"<%= !$associations->{lis} ? '' : ' selected' %>>Not In Association</option>
+                <option value="1"<%= $associations->{lis} ? ' selected' : '' %>>In Association</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="lis" class="col-md-4 col-form-label">Part of Esta</label>
+            <div class="col-md-8">
+              <select id="lis" class="form-control" name="is_esta">
+                <option value="0"<%= !$associations->{esta} ? '' : ' selected' %>>Not In Association</option>
+                <option value="1"<%= $associations->{esta} ? ' selected' : '' %>>In Association</option>
               </select>
             </div>
           </div>

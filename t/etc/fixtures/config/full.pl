@@ -124,6 +124,7 @@ my $org2 = {
   },
   associations => {
     lis => 1,
+    esta => 1,
   },
   type => "organisation",
 };

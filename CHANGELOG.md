@@ -2,6 +2,11 @@
 
 # Next Release
 
+* **Admin Feature** Improved links in relevant places to automatically open in
+  a new tab
+* **Admin Feature** Ability to add ESTA to entity Added
+* Trail map code updated
+
 # v0.9.7
 
 * **Admin Fix**: Fix error in Importing under Postgres
