@@ -112,7 +112,7 @@ sub index {
   );
 }
 
-sub lis_load {
+sub trail_load {
   my $c = shift;
 
   return if $c->validation_error('index');
@@ -134,7 +134,7 @@ sub lis_load {
   my $entity_type_object = $entity->type_object;
   my $orgs_lis = $c->schema->resultset('EntityAssociation')->search(
   {
-    'lis' => 1,
+    $json->{association} => 1,
   },
   );
 
