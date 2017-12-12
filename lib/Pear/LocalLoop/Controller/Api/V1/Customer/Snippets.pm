@@ -16,9 +16,10 @@ sub index {
 
   my $leaderboard_rs = $c->schema->resultset('Leaderboard');
   my $monthly_board = $leaderboard_rs->get_latest( 'monthly_total' );
-  my $monthly_values = $monthly_board->values;
-  $data->{ user_position } = $monthly_values ? $monthly_values->find({ entity_id => $entity->id })->position : 0;
-
+  if (defined $monthly_board) {
+    my $monthly_values = $monthly_board->values;
+    $data->{ user_position } = $monthly_values ? $monthly_values->find({ entity_id => $entity->id })->position : 0;
+  }
   return $c->render(
     json => {
       success => Mojo::JSON->true,
