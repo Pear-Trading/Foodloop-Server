@@ -16,13 +16,14 @@ sub index {
   my $validation = $c->validation;
   $validation->input( $c->stash->{api_json} );
   $validation->required('graph')->in( qw/
-    customers_last_7_days
-    customers_last_30_days
-    sales_last_7_days
-    sales_last_30_days
-    purchases_last_7_days
-    purchases_last_30_days
-    customers_range
+    total_today
+    avg_spend_today
+    total_last_week
+    avg_spend_last_week
+    total_last_month
+    avg_spend_last_month
+    total_user
+    avg_spend_user
   / );
 
   return $c->api_validation_error if $validation->has_error;

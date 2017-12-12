@@ -173,7 +173,8 @@ sub startup {
 
   my $api_v1_cust = $api_v1->under('/customer')->to('api-v1-customer#auth');
 
-  $api_v1_org->post('/graphs')->to('api-v1-customer-graphs#index');
+  $api_v1_cust->post('/graphs')->to('api-v1-customer-graphs#index');
+  $api_v1_cust->post('/snippets')->to('api-v1-customer-snippets#index');
 
   my $admin_routes = $r->under('/admin')->to('admin#under');
 
