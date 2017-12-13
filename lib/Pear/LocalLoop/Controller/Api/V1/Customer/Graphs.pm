@@ -83,8 +83,9 @@ sub graph_total_last_week { return shift->_purchases_total_duration( 7 ) }
 sub graph_total_last_month { return shift->_purchases_total_duration( 30 ) }
 
 sub _purchases_total_duration {
-  my ( $c, $duration ) = @_;
+  my ( $c, $day_duration ) = @_;
 
+  my $duration = DateTime::Duration->new( days => $day_duration );
   my $entity = $c->stash->{api_user}->entity;
 
   my $data = { labels => [], data => [] };
@@ -96,8 +97,8 @@ sub _purchases_total_duration {
     my $transactions = $entity->purchases
       ->search_between( $start, $next_end )
       ->get_column('value')
-      ->sum || 0 + 0;
-    push @{ $data->{ labels } }, $start->day_name;
+      ->sum || 0 * 1;
+    push @{ $data->{ labels } }, $c->format_iso_datetime( $start );
     push @{ $data->{ data } }, $transactions / 100000;
     $start->add( days => 1 );
   }
@@ -154,14 +155,9 @@ sub _purchases_avg_spend_duration {
     }
   );
 
-my $data = {
-  labels => [],
-  data => [],
-};
-
   for ( $transaction_rs->all ) {
     my $quantised = $c->db_datetime_parser->parse_datetime($_->get_column('quantised'));
-    push @{ $data->{ labels } }, $quantised->day_name;
+    push @{ $data->{ labels } }, $c->format_iso_datetime( $quantised );
     push @{ $data->{ data } }, ($_->get_column('average_value') || 0) / 100000;
   }
 
