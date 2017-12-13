@@ -44,7 +44,9 @@ $t->post_ok('/api/v1/customer/graphs' => json => {
   })
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/graph', {
-    labels => [ map { $start->clone->subtract( days => $_ )->day_name } reverse ( 0 .. 6 ) ],
+    labels => [ map { $t->app->format_iso_datetime(
+    $start->clone->subtract( days => $_ )->subtract( hours => 12 )
+    ) } reverse ( 0 .. 6 ) ],
     data => [ 10, 10, 10, 10, 10, 10, 10 ],
   });
 
