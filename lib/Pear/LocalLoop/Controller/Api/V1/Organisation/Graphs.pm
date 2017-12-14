@@ -127,10 +127,10 @@ sub _sales_last_duration {
 
   my ( $start, $end ) = $c->_get_start_end_duration( $duration );
 
-  $data->{bounds} = (
+  $data->{bounds} = {
     min => $c->format_iso_datetime( $start ),
     max => $c->format_iso_datetime( $end ),
-  );
+  };
 
   while ( $start < $end ) {
     my $next_end = $start->clone->add( days => 1 );

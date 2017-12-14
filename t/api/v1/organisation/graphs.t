@@ -64,7 +64,7 @@ $t->post_ok('/api/v1/organisation/graphs' => json => {
     $start->clone->subtract( days => $_ )->subtract( hours => 12 )
     ) } reverse ( 0 .. 29 ) ],
     bounds => {
-      min => $t->app->format_iso_datetime($start->clone->subtract( days => 6 )->subtract( hours => 12 ) ),
+      min => $t->app->format_iso_datetime($start->clone->subtract( days => 29 )->subtract( hours => 12 ) ),
       max => $t->app->format_iso_datetime($start->clone->add( hours => 12 )),
     },
     data => [ 4, 2, 3, 3, 4, 1, 4, 3, 3, 2, 4, 2, 4, 2, 3, 3, 4, 1, 4, 3, 3, 2, 4, 2, 4, 2, 3, 3, 4, 1 ],
@@ -96,7 +96,7 @@ $t->post_ok('/api/v1/organisation/graphs' => json => {
     $start->clone->subtract( days => $_ )->subtract( hours => 12 )
     ) } reverse ( 0 .. 29 ) ],
     bounds => {
-      min => $t->app->format_iso_datetime($start->clone->subtract( days => 6 )->subtract( hours => 12 ) ),
+      min => $t->app->format_iso_datetime($start->clone->subtract( days => 29 )->subtract( hours => 12 ) ),
       max => $t->app->format_iso_datetime($start->clone->add( hours => 12 )),
     },
     data => [ 40, 20, 30, 30, 40, 10, 40, 30, 30, 20, 40, 20, 40, 20, 30, 30, 40, 10, 40, 30, 30, 20, 40, 20, 40, 20, 30, 30, 40, 10 ],
