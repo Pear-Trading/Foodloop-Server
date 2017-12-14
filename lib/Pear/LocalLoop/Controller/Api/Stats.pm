@@ -17,44 +17,42 @@ sub post_index {
 
   my $user = $c->stash->{api_user}->entity;
 
-  my $today_rs = $user->purchases->today_rs;
-  my $today_sum = $today_rs->get_column('value')->sum || 0;
-  my $today_count = $today_rs->count;
+  my $duration = DateTime::Duration->new( weeks => 7 );
+  my $end = DateTime->today;
+  my $start = $end->clone->subtract_duration( $duration );
 
-  my $week_rs = $user->purchases->week_rs;
-  my $week_sum = $week_rs->get_column('value')->sum || 0;
-  my $week_count = $week_rs->count;
+  my $data = { purchases => [] };
 
-  my $month_rs = $user->purchases->month_rs;
-  my $month_sum = $month_rs->get_column('value')->sum || 0;
-  my $month_count = $month_rs->count;
+  my $dtf = $c->schema->storage->datetime_parser;
+  my $driver = $c->schema->storage->dbh->{Driver}->{Name};
+  my $transaction_rs = $c->schema->resultset('ViewQuantisedTransaction' . $driver)->search(
+    {
+      purchase_time => {
+        -between => [
+          $dtf->format_datetime($start),
+          $dtf->format_datetime($end),
+        ],
+      },
+    },
+    {
+      columns => [
+        {
+          quantised        => 'quantised_weeks',
+          count            => \"COUNT(*)",
+        }
+      ],
+      group_by => 'quantised_weeks',
+      order_by => { '-asc' => 'quantised_weeks' },
+    }
+  );
 
-  my $user_rs = $user->purchases;
-  my $user_sum = $user_rs->get_column('value')->sum || 0;
-  my $user_count = $user_rs->count;
-
-  my $global_rs = $c->schema->resultset('Transaction');
-  my $global_sum = $global_rs->get_column('value')->sum || 0;
-  my $global_count = $global_rs->count;
-
-  my $leaderboard_rs = $c->schema->resultset('Leaderboard');
-  my $monthly_board = $leaderboard_rs->get_latest( 'monthly_total' );
-  my $monthly_values = $monthly_board->values;
-  my $current_user_position = $monthly_values ? $monthly_values->find({ entity_id => $user->id }) : undef;
+  for ( $transaction_rs->all ) {
+    push @{ $data->{ purchases } }, ($_->get_column('count') || 0);
+  }
 
   return $c->render( json => {
     success => Mojo::JSON->true,
-    today_sum => $today_sum / 100000,
-    today_count => $today_count,
-    week_sum => $week_sum / 100000,
-    week_count => $week_count,
-    month_sum => $month_sum / 100000,
-    month_count => $month_count,
-    user_sum => $user_sum / 100000,
-    user_count => $user_count,
-    global_sum => $global_sum / 100000,
-    global_count => $global_count,
-    user_position => defined $current_user_position ? $current_user_position->position : 0,
+    data => $data,
   });
 }
 
