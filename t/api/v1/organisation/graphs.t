@@ -44,7 +44,13 @@ $t->post_ok('/api/v1/organisation/graphs' => json => {
   })
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/graph', {
-    labels => [ map { $start->clone->subtract( days => $_ )->day_name } reverse ( 0 .. 6 ) ],
+    labels => [ map { $t->app->format_iso_datetime(
+    $start->clone->subtract( days => $_ )->subtract( hours => 12 )
+    ) } reverse ( 0 .. 6 ) ],
+    bounds => {
+      min => $t->app->format_iso_datetime($start->clone->subtract( days => 6 )->subtract( hours => 12 ) ),
+      max => $t->app->format_iso_datetime($start->clone->add( hours => 12 )),
+    },
     data => [ 2, 4, 2, 3, 3, 4, 1 ],
   });
 
@@ -54,7 +60,13 @@ $t->post_ok('/api/v1/organisation/graphs' => json => {
   })
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/graph', {
-    labels => [ map { $start->clone->subtract( days => $_ )->day_name } reverse ( 0 .. 29 ) ],
+    labels => [ map { $t->app->format_iso_datetime(
+    $start->clone->subtract( days => $_ )->subtract( hours => 12 )
+    ) } reverse ( 0 .. 29 ) ],
+    bounds => {
+      min => $t->app->format_iso_datetime($start->clone->subtract( days => 6 )->subtract( hours => 12 ) ),
+      max => $t->app->format_iso_datetime($start->clone->add( hours => 12 )),
+    },
     data => [ 4, 2, 3, 3, 4, 1, 4, 3, 3, 2, 4, 2, 4, 2, 3, 3, 4, 1, 4, 3, 3, 2, 4, 2, 4, 2, 3, 3, 4, 1 ],
   });
 
@@ -64,7 +76,13 @@ $t->post_ok('/api/v1/organisation/graphs' => json => {
   })
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/graph', {
-    labels => [ map { $start->clone->subtract( days => $_ )->day_name } reverse ( 0 .. 6 ) ],
+    labels => [ map { $t->app->format_iso_datetime(
+    $start->clone->subtract( days => $_ )->subtract( hours => 12 )
+    ) } reverse ( 0 .. 6 ) ],
+    bounds => {
+      min => $t->app->format_iso_datetime($start->clone->subtract( days => 6 )->subtract( hours => 12 ) ),
+      max => $t->app->format_iso_datetime($start->clone->add( hours => 12 )),
+    },
     data => [ 20, 40, 20, 30, 30, 40, 10 ],
   });
 
@@ -74,7 +92,13 @@ $t->post_ok('/api/v1/organisation/graphs' => json => {
   })
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/graph', {
-    labels => [ map { $start->clone->subtract( days => $_ )->day_name } reverse ( 0 .. 29 ) ],
+    labels => [ map { $t->app->format_iso_datetime(
+    $start->clone->subtract( days => $_ )->subtract( hours => 12 )
+    ) } reverse ( 0 .. 29 ) ],
+    bounds => {
+      min => $t->app->format_iso_datetime($start->clone->subtract( days => 6 )->subtract( hours => 12 ) ),
+      max => $t->app->format_iso_datetime($start->clone->add( hours => 12 )),
+    },
     data => [ 40, 20, 30, 30, 40, 10, 40, 30, 30, 20, 40, 20, 40, 20, 30, 30, 40, 10, 40, 30, 30, 20, 40, 20, 40, 20, 30, 30, 40, 10 ],
   });
 
