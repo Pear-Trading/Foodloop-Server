@@ -62,7 +62,7 @@ $t->post_ok('/api/v1/customer/graphs' => json => {
   ->json_is('/graph', {
     labels => [ map { $t->app->format_iso_datetime(
     $start->clone->subtract( days => $_ )->subtract( hours => 12 )
-    ) } reverse ( 0 .. 29 ) ],
+    ) } reverse ( 0 .. 6 ) ],
     bounds => {
       min => $t->app->format_iso_datetime($start->clone->subtract( days => 6 )->subtract( hours => 12 ) ),
       max => $t->app->format_iso_datetime($start->clone->add( hours => 12 )),
