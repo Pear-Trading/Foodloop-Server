@@ -41,44 +41,6 @@ sub index {
   return $c->$graph_sub;
 }
 
-
-# Replace with code for doughnut
-=pod
-sub graph_customers_range {
-  my $c = shift;
-
-  my $validation = $c->validation;
-  $validation->input( $c->stash->{api_json} );
-  $validation->required('start')->is_iso_date;
-  $validation->required('end')->is_iso_date;
-
-  return $c->api_validation_error if $validation->has_error;
-
-  my $entity = $c->stash->{api_user}->entity;
-
-  my $data = { labels => [], data => [] };
-  my $start = $c->parse_iso_date( $validation->param('start') );
-  my $end = $c->parse_iso_date( $validation->param('end') );
-
-  while ( $start <= $end ) {
-    my $next_end = $start->clone->add( days => 1 );
-    my $transactions = $entity->sales
-      ->search_between( $start, $next_end )
-      ->count;
-    push @{ $data->{ labels } }, $c->format_iso_date( $start );
-    push @{ $data->{ data } }, $transactions;
-    $start->add( days => 1 );
-  }
-
-  return $c->render(
-    json => {
-      success => Mojo::JSON->true,
-      graph => $data,
-    }
-  );
-}
-=cut
-
 sub graph_total_last_week { return shift->_purchases_total_duration( 7 ) }
 sub graph_total_last_month { return shift->_purchases_total_duration( 30 ) }
 
@@ -91,6 +53,11 @@ sub _purchases_total_duration {
   my $data = { labels => [], data => [] };
 
   my ( $start, $end ) = $c->_get_start_end_duration( $duration );
+
+  $data->{bounds} = {
+    min => $c->format_iso_datetime( $start ),
+    max => $c->format_iso_datetime( $end ),
+  };
 
   while ( $start < $end ) {
     my $next_end = $start->clone->add( days => 1 );
@@ -123,6 +90,11 @@ sub _purchases_avg_spend_duration {
   my $data = { labels => [], data => [] };
 
   my ( $start, $end ) = $c->_get_start_end_duration( $duration );
+
+  $data->{bounds} = {
+    min => $c->format_iso_datetime( $start ),
+    max => $c->format_iso_datetime( $end ),
+  };
 
   my $dtf = $c->schema->storage->datetime_parser;
   my $driver = $c->schema->storage->dbh->{Driver}->{Name};

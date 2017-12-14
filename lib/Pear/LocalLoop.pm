@@ -175,6 +175,7 @@ sub startup {
 
   $api_v1_cust->post('/graphs')->to('api-v1-customer-graphs#index');
   $api_v1_cust->post('/snippets')->to('api-v1-customer-snippets#index');
+  $api_v1_cust->post('/pies')->to('api-v1-customer-pies#index');
 
   my $admin_routes = $r->under('/admin')->to('admin#under');
 
