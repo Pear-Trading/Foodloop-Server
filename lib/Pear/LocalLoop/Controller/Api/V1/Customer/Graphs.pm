@@ -106,6 +106,7 @@ sub _purchases_avg_spend_duration {
           $dtf->format_datetime($end),
         ],
       },
+      buyer_id => $entity->id,
     },
     {
       columns => [

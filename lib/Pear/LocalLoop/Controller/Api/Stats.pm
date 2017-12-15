@@ -15,7 +15,7 @@ has error_messages => sub {
 sub post_index {
   my $c = shift;
 
-  my $user = $c->stash->{api_user}->entity;
+  my $entity = $c->stash->{api_user}->entity;
 
   my $duration = DateTime::Duration->new( weeks => 7 );
   my $end = DateTime->today;
@@ -26,7 +26,7 @@ sub post_index {
 
   my $dtf = $c->schema->storage->datetime_parser;
   my $driver = $c->schema->storage->dbh->{Driver}->{Name};
-  my $transaction_rs = $c->schema->resultset('ViewQuantisedTransaction' . $driver)->search(
+  my $week_transaction_rs = $c->schema->resultset('ViewQuantisedTransaction' . $driver)->search(
     {
       purchase_time => {
         -between => [
@@ -34,6 +34,7 @@ sub post_index {
           $dtf->format_datetime($end),
         ],
       },
+      buyer_id => $entity->id,
     },
     {
       columns => [
@@ -47,8 +48,25 @@ sub post_index {
     }
   );
 
-  for ( $transaction_rs->all ) {
+  for ( $week_transaction_rs->all ) {
     push @{ $weeks->{ purchases } }, ($_->get_column('count') || 0);
+  }
+
+  my $sector_purchase_rs = $entity->purchases->search({},
+  {
+    join => { 'seller' => 'organisation' },
+    columns => {
+      sector => "organisation.sector",
+      count            => \"COUNT(*)",
+    },
+    group_by => "organisation.sector",
+    order_by => { '-desc' => "COUNT(*)" },
+  }
+  );
+
+  for ( $sector_purchase_rs->all ) {
+    push @{ $sectors->{ sectors } }, $_->get_column('sector');
+    push @{ $sectors->{ purchases } }, ($_->get_column('count') || 0);
   }
 
   return $c->render( json => {
