@@ -42,8 +42,8 @@ $t->post_ok('/api/stats' => json => {
     session_key => $session_key,
   })
   ->status_is(200)->or($framework->dump_error)
-  ->json_is('/data', {
-    purchases => [ 12, 19, 21, 20, 21, 20, 5 ],
+  ->json_is('/weeks', {
+    purchases => [ 8, 21, 19, 22, 20, 20, 8 ],
   });
 
 sub create_random_transaction {
