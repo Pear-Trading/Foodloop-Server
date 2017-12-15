@@ -91,6 +91,7 @@ my $entity5 = {
     street_name => 'Test Street',
     town        => 'Lancaster',
     postcode    => 'LA1 1AA',
+    sector      => 'A',
   },
   user => {
     email    => 'org@example.com',
@@ -124,4 +125,3 @@ $fixtures->dump({
   schema => $schema,
   directory => "$Bin/../data/" . $data_set,
 });
-

@@ -78,35 +78,30 @@ sub graph_customers_range {
   );
 }
 
-sub graph_customers_last_7_days {
-  my $c = shift;
-
-  my $duration = DateTime::Duration->new( days => 7 );
-  return $c->_customers_last_duration( $duration );
-}
-
-sub graph_customers_last_30_days {
-  my $c = shift;
-
-  my $duration = DateTime::Duration->new( days => 30 );
-  return $c->_customers_last_duration( $duration );
-}
+sub graph_customers_last_7_days { return shift->_customers_last_duration( 7 ) }
+sub graph_customers_last_30_days { return shift->_customers_last_duration( 30 ) }
 
 sub _customers_last_duration {
-  my ( $c, $duration ) = @_;
+  my ( $c, $day_duration ) = @_;
 
+  my $duration = DateTime::Duration->new( days => $day_duration );
   my $entity = $c->stash->{api_user}->entity;
 
   my $data = { labels => [], data => [] };
 
   my ( $start, $end ) = $c->_get_start_end_duration( $duration );
 
+  $data->{bounds} = {
+    min => $c->format_iso_datetime( $start ),
+    max => $c->format_iso_datetime( $end ),
+  };
+
   while ( $start < $end ) {
     my $next_end = $start->clone->add( days => 1 );
     my $transactions = $entity->sales
       ->search_between( $start, $next_end )
       ->count;
-    push @{ $data->{ labels } }, $start->day_name;
+    push @{ $data->{ labels } }, $c->format_iso_datetime( $start );
     push @{ $data->{ data } }, $transactions;
     $start->add( days => 1 );
   }
@@ -132,13 +127,18 @@ sub _sales_last_duration {
 
   my ( $start, $end ) = $c->_get_start_end_duration( $duration );
 
+  $data->{bounds} = {
+    min => $c->format_iso_datetime( $start ),
+    max => $c->format_iso_datetime( $end ),
+  };
+
   while ( $start < $end ) {
     my $next_end = $start->clone->add( days => 1 );
     my $transactions = $entity->sales
       ->search_between( $start, $next_end )
       ->get_column('value')
       ->sum || 0 + 0;
-    push @{ $data->{ labels } }, $start->day_name;
+    push @{ $data->{ labels } }, $c->format_iso_datetime( $start );
     push @{ $data->{ data } }, $transactions / 100000;
     $start->add( days => 1 );
   }
@@ -164,13 +164,18 @@ sub _purchases_last_duration {
 
   my ( $start, $end ) = $c->_get_start_end_duration( $duration );
 
+  $data->{bounds} = {
+    min => $c->format_iso_datetime( $start ),
+    max => $c->format_iso_datetime( $end ),
+  };
+
   while ( $start < $end ) {
     my $next_end = $start->clone->add( days => 1 );
     my $transactions = $entity->purchases
       ->search_between( $start, $next_end )
       ->get_column('value')
       ->sum || 0 + 0;
-    push @{ $data->{ labels } }, $start->day_name;
+    push @{ $data->{ labels } }, $c->format_iso_datetime( $start );
     push @{ $data->{ data } }, $transactions / 100000;
     $start->add( days => 1 );
   }
