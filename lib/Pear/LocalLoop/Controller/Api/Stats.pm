@@ -21,7 +21,8 @@ sub post_index {
   my $end = DateTime->today;
   my $start = $end->clone->subtract_duration( $duration );
 
-  my $data = { purchases => [] };
+  my $weeks = { purchases => [] };
+  my $sectors = { sectors => [], purchases => [] };
 
   my $dtf = $c->schema->storage->datetime_parser;
   my $driver = $c->schema->storage->dbh->{Driver}->{Name};
@@ -47,12 +48,13 @@ sub post_index {
   );
 
   for ( $transaction_rs->all ) {
-    push @{ $data->{ purchases } }, ($_->get_column('count') || 0);
+    push @{ $weeks->{ purchases } }, ($_->get_column('count') || 0);
   }
 
   return $c->render( json => {
     success => Mojo::JSON->true,
-    data => $data,
+    weeks => $weeks,
+    sectors => $sectors,
   });
 }
 
