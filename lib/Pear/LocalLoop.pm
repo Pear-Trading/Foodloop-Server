@@ -171,6 +171,12 @@ sub startup {
   $api_v1_org->post('/employee')->to('api-organisation#post_employee_read');
   $api_v1_org->post('/employee/add')->to('api-organisation#post_employee_add');
 
+  my $api_v1_cust = $api_v1->under('/customer')->to('api-v1-customer#auth');
+
+  $api_v1_cust->post('/graphs')->to('api-v1-customer-graphs#index');
+  $api_v1_cust->post('/snippets')->to('api-v1-customer-snippets#index');
+  $api_v1_cust->post('/pies')->to('api-v1-customer-pies#index');
+
   my $admin_routes = $r->under('/admin')->to('admin#under');
 
   $admin_routes->get('/home')->to('admin#home');
