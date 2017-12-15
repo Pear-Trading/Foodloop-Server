@@ -38,12 +38,18 @@ my $session_key = $framework->login({
   password => 'abc123',
 });
 
+#TODO be able to define start and end below in request
+
 $t->post_ok('/api/stats' => json => {
     session_key => $session_key,
   })
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/weeks', {
     purchases => [ 8, 21, 19, 22, 20, 20, 8 ],
+    })
+  ->json_is('/sectors', {
+    sectors => ['A'],
+    purchases => [118],
   });
 
 sub create_random_transaction {
