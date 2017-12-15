@@ -146,12 +146,18 @@ sub post_upload {
 
     return $c->api_validation_error if $validation->has_error;
 
+    my $location = $c->get_location_from_postcode(
+      $validation->param('postcode'),
+      'organisation',
+    );
+
     my $entity = $c->schema->resultset('Entity')->create_org({
       submitted_by_id => $user->id,
       name            => $validation->param('organisation_name'),
       street_name     => $validation->param('street_name'),
       town            => $validation->param('town'),
       postcode        => $validation->param('postcode'),
+      ( defined $location ? ( %$location ) : ( latitude => undef, longitude => undef ) ),
       pending         => 1,
     });
     $organisation = $entity->organisation;
