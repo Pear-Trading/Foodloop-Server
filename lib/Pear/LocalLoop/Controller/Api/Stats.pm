@@ -244,4 +244,19 @@ sub post_leaderboards_paged {
   });
 }
 
+sub pg_or_sqlite {
+  my ( $c, $pg_sql, $sqlite_sql ) = @_;
+
+  my $driver = $c->schema->storage->dbh->{Driver}->{Name};
+
+  if ( $driver eq 'Pg' ) {
+    return \$pg_sql;
+  } elsif ( $driver eq 'SQLite' ) {
+    return \$sqlite_sql;
+  } else {
+    $c->app->log->warn('Unknown Driver Used');
+    return undef;
+  }
+}
+
 1;
