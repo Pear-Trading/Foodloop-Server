@@ -18,7 +18,10 @@ sub transaction_data {
       columns => [
         {
           quantised        => $quantised_column,
-          count            => \"COUNT(*)",
+          count            => $c->pg_or_sqlite(
+                                'count',
+                                "COUNT(*)",
+                              ),
           sum_distance     => $c->pg_or_sqlite(
                                 'SUM("me"."distance")',
                                 'SUM("me"."distance")',
