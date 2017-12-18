@@ -40,7 +40,7 @@ my $session_key = $framework->login({
 
 #TODO be able to define start and end below in request
 
-$t->post_ok('/api/stats' => json => {
+$t->post_ok('/api/stats/customer' => json => {
     session_key => $session_key,
   })
   ->status_is(200)->or($framework->dump_error)
