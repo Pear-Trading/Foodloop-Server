@@ -1,5 +1,9 @@
 use Mojo::Base -strict;
 
+BEGIN {
+  use Test::MockTime qw/ set_absolute_time /;
+}
+
 use FindBin qw/ $Bin /;
 
 use Test::More;
@@ -14,6 +18,8 @@ $framework->install_fixtures('users');
 
 my $t = $framework->framework;
 my $schema = $t->app->schema;
+
+set_absolute_time('2017-01-01T00:00:00Z');
 
 my $start = DateTime->today->subtract( hours => 12 );
 
@@ -40,12 +46,12 @@ my $session_key = $framework->login({
 
 #TODO be able to define start and end below in request
 
-$t->post_ok('/api/stats' => json => {
+$t->post_ok('/api/stats/customer' => json => {
     session_key => $session_key,
   })
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/weeks', {
-    purchases => [ 8, 21, 19, 22, 20, 20, 8 ],
+    purchases => [ 2, 21, 20, 21, 19, 22, 13 ],
     })
   ->json_is('/sectors', {
     sectors => ['A'],
