@@ -19,3 +19,4 @@
 <option value='R'<%= $selected_sector eq 'R' ? ' selected' : '' %>>Arts, Entertainment & Recreation</option>
 <option value='S'<%= $selected_sector eq 'S' ? ' selected' : '' %>>Other Service Activities</option>
 <option value='T'<%= $selected_sector eq 'T' ? ' selected' : '' %>>Household Domestic Business</option>
+<option value='U'<%= $selected_sector eq 'U' ? ' selected' : '' %>>Extraterritorial Organisations and bodies</option>
