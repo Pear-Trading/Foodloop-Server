@@ -11,7 +11,8 @@
 * Added API for customer local purchase pie charts
 * Added API for customer snippets
 * Added API for sector purchase list for customer dashboard
-* **Admin Feature** Fixed org sector on user edit layout and text
+* **Admin Fix** Fixed org sector on user edit layout and text
+* **Admin Feature** Added Sector U
 
 # v0.9.7
 
