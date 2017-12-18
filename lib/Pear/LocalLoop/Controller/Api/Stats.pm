@@ -86,7 +86,10 @@ sub post_customer {
       columns => [
         {
           quantised        => 'quantised_weeks',
-          count            => \"COUNT(*)",
+          count            => $c->pg_or_sqlite(
+                                'count',
+                                "COUNT(*)",
+                              ),
         }
       ],
       group_by => 'quantised_weeks',
@@ -103,7 +106,10 @@ sub post_customer {
     join => { 'seller' => 'organisation' },
     columns => {
       sector => "organisation.sector",
-      count            => \"COUNT(*)",
+      count            => $c->pg_or_sqlite(
+                            'count',
+                            "COUNT(*)",
+                          ),
     },
     group_by => "organisation.sector",
     order_by => { '-desc' => "COUNT(*)" },
@@ -236,6 +242,21 @@ sub post_leaderboards_paged {
     page => $page,
     count => $today_values->pager->total_entries,
   });
+}
+
+sub pg_or_sqlite {
+  my ( $c, $pg_sql, $sqlite_sql ) = @_;
+
+  my $driver = $c->schema->storage->dbh->{Driver}->{Name};
+
+  if ( $driver eq 'Pg' ) {
+    return \$pg_sql;
+  } elsif ( $driver eq 'SQLite' ) {
+    return \$sqlite_sql;
+  } else {
+    $c->app->log->warn('Unknown Driver Used');
+    return undef;
+  }
 }
 
 1;
