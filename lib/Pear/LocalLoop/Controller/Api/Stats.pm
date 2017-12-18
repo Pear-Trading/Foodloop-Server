@@ -86,10 +86,7 @@ sub post_customer {
       columns => [
         {
           quantised        => 'quantised_weeks',
-          count            => $c->pg_or_sqlite(
-                                'count',
-                                "COUNT(*)",
-                              ),
+          count            => \"COUNT(*)",
         }
       ],
       group_by => 'quantised_weeks',
@@ -106,13 +103,10 @@ sub post_customer {
     join => { 'seller' => 'organisation' },
     columns => {
       sector => "organisation.sector",
-      count            => $c->pg_or_sqlite(
-                            'count',
-                            "COUNT(*)",
-                          ),
+      count            => \"COUNT(*)",
     },
     group_by => "organisation.sector",
-    order_by => { '-desc' => "COUNT(*)" },
+    order_by => { '-desc' => $c->pg_or_sqlite('count',"COUNT(*)",)},
   }
   );
 
