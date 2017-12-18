@@ -112,10 +112,7 @@ sub _purchases_avg_spend_duration {
       columns => [
         {
           quantised        => 'quantised_days',
-          count            => $c->pg_or_sqlite(
-                                'count',
-                                "COUNT(*)",
-                              ),
+          count            => \"COUNT(*)",
           sum_value        => $c->pg_or_sqlite(
                                 'SUM("me"."value")',
                                 'SUM("me"."value")',
