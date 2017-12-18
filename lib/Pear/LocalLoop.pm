@@ -148,6 +148,7 @@ sub startup {
   $api->post('/user/account')->to('api-user#post_account_update');
   $api->post('/user-history')->to('api-user#post_user_history');
   $api->post('/stats')->to('api-stats#post_index');
+  $api->post('/stats/customer')->to('api-stats#post_customer');
   $api->post('/stats/leaderboard')->to('api-stats#post_leaderboards');
   $api->post('/stats/leaderboard/paged')->to('api-stats#post_leaderboards_paged');
   $api->post('/outgoing-transactions')->to('api-transactions#post_transaction_list_purchases');
