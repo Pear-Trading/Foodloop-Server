@@ -44,14 +44,16 @@ my $session_key = $framework->login({
   password => 'abc123',
 });
 
-#TODO be able to define start and end below in request
-
 $t->post_ok('/api/stats/customer' => json => {
     session_key => $session_key,
   })
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/weeks', {
-    purchases => [ 2, 21, 20, 21, 19, 22, 13 ],
+    first => 2,
+    second => 21,
+    max => 22,
+    sum => 118,
+    count => 7,
     })
   ->json_is('/sectors', {
     sectors => ['A'],
