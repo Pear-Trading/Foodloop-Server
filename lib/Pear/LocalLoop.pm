@@ -148,6 +148,7 @@ sub startup {
   $api->post('/user/account')->to('api-user#post_account_update');
   $api->post('/user-history')->to('api-user#post_user_history');
   $api->post('/stats')->to('api-stats#post_index');
+  $api->post('/stats/customer')->to('api-stats#post_customer');
   $api->post('/stats/leaderboard')->to('api-stats#post_leaderboards');
   $api->post('/stats/leaderboard/paged')->to('api-stats#post_leaderboards_paged');
   $api->post('/outgoing-transactions')->to('api-transactions#post_transaction_list_purchases');
@@ -170,6 +171,12 @@ sub startup {
   $api_v1_org->post('/supplier/add')->to('api-organisation#post_supplier_add');
   $api_v1_org->post('/employee')->to('api-organisation#post_employee_read');
   $api_v1_org->post('/employee/add')->to('api-organisation#post_employee_add');
+
+  my $api_v1_cust = $api_v1->under('/customer')->to('api-v1-customer#auth');
+
+  $api_v1_cust->post('/graphs')->to('api-v1-customer-graphs#index');
+  $api_v1_cust->post('/snippets')->to('api-v1-customer-snippets#index');
+  $api_v1_cust->post('/pies')->to('api-v1-customer-pies#index');
 
   my $admin_routes = $r->under('/admin')->to('admin#under');
 

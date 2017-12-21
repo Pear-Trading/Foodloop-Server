@@ -13,8 +13,11 @@ __PACKAGE__->result_source_instance->view_definition( qq/
 SELECT "value",
        "distance",
        "purchase_time",
+       "buyer_id",
+       "seller_id",
        DATETIME(STRFTIME('%Y-%m-%d %H:00:00',"purchase_time")) AS "quantised_hours",
-       DATETIME(STRFTIME('%Y-%m-%d 00:00:00',"purchase_time")) AS "quantised_days"
+       DATETIME(STRFTIME('%Y-%m-%d 00:00:00',"purchase_time")) AS "quantised_days",
+       DATETIME(STRFTIME('%Y-%m-%d 00:00:00',"purchase_time", 'weekday 1')) AS "quantised_weeks"
   FROM "transactions"
 /);
 

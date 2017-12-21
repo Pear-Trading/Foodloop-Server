@@ -6,7 +6,6 @@ requires 'Mojo::JSON';
 requires 'Email::Valid';
 requires 'Geo::UK::Postcode::Regex' => '0.017';
 requires 'Authen::Passphrase::BlowfishCrypt';
-requires 'Time::Fake';
 requires 'Scalar::Util';
 requires 'DBIx::Class';
 requires 'DBIx::Class::PassphraseColumn';
@@ -25,6 +24,11 @@ requires 'GIS::Distance';
 requires 'Text::CSV';
 requires 'Try::Tiny';
 
+on 'test' => sub {
+  requires 'Test::More';
+  requires 'Test::MockTime';
+};
+
 feature 'schema-graph', 'Draw diagrams of Schema' => sub {
   requires 'GraphViz';
   requires 'SQL::Translator';
@@ -38,4 +42,3 @@ feature 'postgres', 'PostgreSQL Support' => sub {
 feature 'codepoint-open', 'Code Point Open manipulation' => sub {
   requires 'Geo::UK::Postcode::CodePointOpen';
 };
-

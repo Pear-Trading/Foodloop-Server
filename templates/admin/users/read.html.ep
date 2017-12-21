@@ -81,8 +81,10 @@
         <input id="town" type="text" class="form-control" placeholder="Town" name="town" value="<%= $org_rs->town %>">
       </div>
       <div class="form-group">
-        <label for="town">Town</label>
-        <input id="town" type="sector" class="form-control" placeholder="Sector Area Code" name="sector" value="<%= $org_rs->sector %>">
+        <label for="town">Sector</label>
+        <select id="sector"  type="sector" class="form-control" placeholder="Sector Area Code" name="sector">
+          %= include 'partials/sector_options', selected_sector => $org_rs->sector || '';
+        </select>
       </div>
     </div>
     % } else {

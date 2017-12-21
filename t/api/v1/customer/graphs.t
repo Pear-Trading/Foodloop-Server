@@ -23,56 +23,24 @@ for my $count ( 0 .. 29 ) {
 
   create_random_transaction( 'test1@example.com', $trans_day );
   if ( $count % 2 ) {
-    create_random_transaction( 'test2@example.com', $trans_day );
+    create_random_transaction( 'test1@example.com', $trans_day );
   }
   if ( $count % 3 ) {
-    create_random_transaction( 'test3@example.com', $trans_day );
+    create_random_transaction( 'test1@example.com', $trans_day );
   }
   if ( $count % 4 ) {
-    create_random_transaction( 'test4@example.com', $trans_day );
+    create_random_transaction( 'test1@example.com', $trans_day );
   }
 }
 
 my $session_key = $framework->login({
-  email => 'org@example.com',
+  email => 'test1@example.com',
   password => 'abc123',
 });
 
-$t->post_ok('/api/v1/organisation/graphs' => json => {
+$t->post_ok('/api/v1/customer/graphs' => json => {
     session_key => $session_key,
-    graph => 'customers_last_7_days',
-  })
-  ->status_is(200)->or($framework->dump_error)
-  ->json_is('/graph', {
-    labels => [ map { $t->app->format_iso_datetime(
-    $start->clone->subtract( days => $_ )->subtract( hours => 12 )
-    ) } reverse ( 0 .. 6 ) ],
-    bounds => {
-      min => $t->app->format_iso_datetime($start->clone->subtract( days => 6 )->subtract( hours => 12 ) ),
-      max => $t->app->format_iso_datetime($start->clone->add( hours => 12 )),
-    },
-    data => [ 2, 4, 2, 3, 3, 4, 1 ],
-  });
-
-$t->post_ok('/api/v1/organisation/graphs' => json => {
-    session_key => $session_key,
-    graph => 'customers_last_30_days',
-  })
-  ->status_is(200)->or($framework->dump_error)
-  ->json_is('/graph', {
-    labels => [ map { $t->app->format_iso_datetime(
-    $start->clone->subtract( days => $_ )->subtract( hours => 12 )
-    ) } reverse ( 0 .. 29 ) ],
-    bounds => {
-      min => $t->app->format_iso_datetime($start->clone->subtract( days => 29 )->subtract( hours => 12 ) ),
-      max => $t->app->format_iso_datetime($start->clone->add( hours => 12 )),
-    },
-    data => [ 4, 2, 3, 3, 4, 1, 4, 3, 3, 2, 4, 2, 4, 2, 3, 3, 4, 1, 4, 3, 3, 2, 4, 2, 4, 2, 3, 3, 4, 1 ],
-  });
-
-$t->post_ok('/api/v1/organisation/graphs' => json => {
-    session_key => $session_key,
-    graph => 'sales_last_7_days',
+    graph => 'total_last_week',
   })
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/graph', {
@@ -86,9 +54,25 @@ $t->post_ok('/api/v1/organisation/graphs' => json => {
     data => [ 20, 40, 20, 30, 30, 40, 10 ],
   });
 
-$t->post_ok('/api/v1/organisation/graphs' => json => {
+$t->post_ok('/api/v1/customer/graphs' => json => {
     session_key => $session_key,
-    graph => 'sales_last_30_days',
+    graph => 'avg_spend_last_week',
+  })
+  ->status_is(200)->or($framework->dump_error)
+  ->json_is('/graph', {
+    labels => [ map { $t->app->format_iso_datetime(
+    $start->clone->subtract( days => $_ )->subtract( hours => 12 )
+    ) } reverse ( 0 .. 6 ) ],
+    bounds => {
+      min => $t->app->format_iso_datetime($start->clone->subtract( days => 6 )->subtract( hours => 12 ) ),
+      max => $t->app->format_iso_datetime($start->clone->add( hours => 12 )),
+    },
+    data => [ 10, 10, 10, 10, 10, 10, 10 ],
+  });
+
+$t->post_ok('/api/v1/customer/graphs' => json => {
+    session_key => $session_key,
+    graph => 'total_last_month',
   })
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/graph', {
@@ -102,32 +86,36 @@ $t->post_ok('/api/v1/organisation/graphs' => json => {
     data => [ 40, 20, 30, 30, 40, 10, 40, 30, 30, 20, 40, 20, 40, 20, 30, 30, 40, 10, 40, 30, 30, 20, 40, 20, 40, 20, 30, 30, 40, 10 ],
   });
 
-$t->post_ok('/api/v1/organisation/graphs' => json => {
+$t->post_ok('/api/v1/customer/graphs' => json => {
     session_key => $session_key,
-    graph => 'customers_range',
-    start => $start->clone->subtract( days => 8 )->ymd,
-    end => $start->clone->ymd,
+    graph => 'avg_spend_last_month',
   })
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/graph', {
-    labels => [ map { $start->clone->subtract( days => $_ )->ymd } reverse ( 0 .. 8 ) ],
-    data => [ 2, 4, 2, 4, 2, 3, 3, 4, 1 ],
+    labels => [ map { $t->app->format_iso_datetime(
+    $start->clone->subtract( days => $_ )->subtract( hours => 12 )
+    ) } reverse ( 0 .. 29 ) ],
+    bounds => {
+      min => $t->app->format_iso_datetime($start->clone->subtract( days => 29 )->subtract( hours => 12 ) ),
+      max => $t->app->format_iso_datetime($start->clone->add( hours => 12 )),
+    },
+    data => [ 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 ],
   });
 
 $framework->logout( $session_key );
 
 $session_key = $framework->login({
-  email => 'test1@example.com',
+  email => 'org@example.com',
   password => 'abc123',
 });
 
-$t->post_ok('/api/v1/organisation/graphs' => json => {
+$t->post_ok('/api/v1/customer/graphs' => json => {
     session_key => $session_key,
-    graph => 'customers_last_7_days',
+    graph => 'avg_spend_last_week',
   })
   ->status_is(403)
   ->json_is('/success', Mojo::JSON->false)
-  ->json_is('/error', 'user_not_org');
+  ->json_is('/error', 'user_not_cust');
 
 
 sub create_random_transaction {
