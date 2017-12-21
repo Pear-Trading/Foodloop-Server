@@ -2,6 +2,9 @@
 
 # Next Release
 
+# v0.10.0
+
+* **API Change** Updated API for story trail maps
 * **Admin Feature** Improved links in relevant places to automatically open in
   a new tab
 * **Admin Feature** Ability to add ESTA to entity Added
