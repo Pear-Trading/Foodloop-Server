@@ -2,13 +2,8 @@
 
 # Next Release
 
-# v0.10.0
+# v0.10.1
 
-* **API Change** Updated API for story trail maps
-* **Admin Feature** Improved links in relevant places to automatically open in
-  a new tab
-* **Admin Feature** Ability to add ESTA to entity Added
-* Trail map code updated
 * Added API for customer graphs
 * Revamped graphs code
 * Added API for customer local purchase pie charts
@@ -16,6 +11,14 @@
 * Added API for sector purchase list for customer dashboard
 * **Admin Fix** Fixed org sector on user edit layout and text
 * **Admin Feature** Added Sector U
+
+# v0.10.0
+
+* **API Change** Updated API for story trail maps
+* **Admin Feature** Improved links in relevant places to automatically open in
+  a new tab
+* **Admin Feature** Ability to add ESTA to entity Added
+* Trail map code updated
 
 # v0.9.7
 
