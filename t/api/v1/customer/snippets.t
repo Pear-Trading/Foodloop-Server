@@ -1,9 +1,5 @@
 use Mojo::Base -strict;
 
-BEGIN {
-  use Test::MockTime qw/ set_absolute_time /;
-}
-
 use FindBin qw/ $Bin /;
 
 use Test::More;
@@ -12,30 +8,30 @@ use Test::Pear::LocalLoop;
 use DateTime;
 
 my $framework = Test::Pear::LocalLoop->new(
-  etc_dir => "$Bin/../etc",
+  etc_dir => "$Bin/../../../etc",
 );
 $framework->install_fixtures('users');
 
 my $t = $framework->framework;
 my $schema = $t->app->schema;
 
-set_absolute_time('2017-01-01T00:00:00Z');
+$t->app->schema->resultset('Leaderboard')->create_new( 'monthly_total', DateTime->now->truncate(to => 'month' )->subtract( months => 1) );
 
 my $start = DateTime->today->subtract( hours => 12 );
 
-# create 40 days worth of data
-for my $count ( 0 .. 40 ) {
+# create 30 days worth of data
+for my $count ( 0 .. 60 ) {
   my $trans_day = $start->clone->subtract( days => $count );
 
   create_random_transaction( 'test1@example.com', $trans_day );
   if ( $count % 2 ) {
-    create_random_transaction( 'test1@example.com', $trans_day );
+    create_random_transaction( 'test2@example.com', $trans_day );
   }
   if ( $count % 3 ) {
-    create_random_transaction( 'test1@example.com', $trans_day );
+    create_random_transaction( 'test3@example.com', $trans_day );
   }
   if ( $count % 4 ) {
-    create_random_transaction( 'test1@example.com', $trans_day );
+    create_random_transaction( 'test4@example.com', $trans_day );
   }
 }
 
@@ -44,21 +40,21 @@ my $session_key = $framework->login({
   password => 'abc123',
 });
 
-$t->post_ok('/api/stats/customer' => json => {
+$t->post_ok('/api/v1/customer/snippets' => json => {
     session_key => $session_key,
   })
   ->status_is(200)->or($framework->dump_error)
-  ->json_is('/weeks', {
-    first => 2,
-    second => 21,
-    max => 22,
-    sum => 118,
-    count => 7,
-    })
-  ->json_is('/sectors', {
-    sectors => ['A'],
-    purchases => [118],
+  ->json_is('/snippets', {
+      user_sum => 610,
+      user_position => 1,
   });
+
+$framework->logout( $session_key );
+
+$session_key = $framework->login({
+  email => 'test1@example.com',
+  password => 'abc123',
+});
 
 sub create_random_transaction {
   my $buyer = shift;
