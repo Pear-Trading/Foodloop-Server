@@ -50,6 +50,11 @@ sub add_org_submit {
 
   my $organisation;
 
+  my $location = $c->get_location_from_postcode(
+    $validation->param('postcode'),
+    'organisation',
+  );
+
   try {
     my $entity = $c->schema->resultset('Entity')->create({
       organisation => {
@@ -58,6 +63,7 @@ sub add_org_submit {
         town         => $validation->param('town'),
         sector       => $validation->param('sector'),
         postcode     => $validation->param('postcode'),
+        ( defined $location ? ( %$location ) : ( latitude => undef, longitude => undef ) ),
         submitted_by_id => $c->current_user->id,
         pending     => defined $validation->param('pending') ? 0 : 1,
         is_local     => $validation->param('is_local'),
@@ -122,6 +128,11 @@ sub valid_edit {
 
   my $valid_org = $c->schema->resultset('Organisation')->find( $c->param('id') );
 
+  my $location = $c->get_location_from_postcode(
+    $validation->param('postcode'),
+    'organisation',
+  );
+
   try {
     $c->schema->storage->txn_do( sub {
       $valid_org->update({
@@ -130,6 +141,7 @@ sub valid_edit {
         town        => $validation->param('town'),
         sector      => $validation->param('sector'),
         postcode    => $validation->param('postcode'),
+        ( defined $location ? ( %$location ) : ( latitude => undef, longitude => undef ) ),
         pending     => defined $validation->param('pending') ? 0 : 1,
         is_local    => $validation->param('is_local'),
         is_fair     => $validation->param('is_fair'),
