@@ -1,13 +1,18 @@
 sudo: false
 
 language: perl
+
+addons:
+  postgresql: "9.6"
+
 perl:
   - "5.20"
 env:
   - HARNESS_PERL_SWITCHES="-MDevel::Cover"
 install:
-  - cpanm --quiet --notest --installdeps .
+  - cpanm --quiet --notest --installdeps --with-feature=postgres .
   - cpanm Devel::Cover
 script:
   - prove -lr
+  - PEAR_TEST_PG=1 prove -lr
   - cover
