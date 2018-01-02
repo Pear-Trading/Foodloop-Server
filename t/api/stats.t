@@ -55,6 +55,7 @@ $t->post_ok('/api/stats/customer' => json => {
     sum => 118,
     count => 7,
     })
+  ->or($framework->dump_error)
   ->json_is('/sectors', {
     sectors => ['A'],
     purchases => [118],
