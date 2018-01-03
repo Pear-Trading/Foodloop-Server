@@ -59,6 +59,11 @@ __PACKAGE__->add_columns(
     default => undef,
     is_nullable => 1,
   },
+  is_fair => {
+    data_type => 'boolean',
+    default => undef,
+    is_nullable => 1,
+  },
   submitted_by_id => {
     data_type => 'integer',
     is_nullable => 1,
