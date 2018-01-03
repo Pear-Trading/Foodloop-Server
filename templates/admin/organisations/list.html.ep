@@ -38,6 +38,13 @@
             % } else {
             <span class="badge badge-secondary">Non Local Org</span>
             % }
+            % if ( !defined $org_result->is_fair ) {
+            <span class="badge badge-danger">Fair Trading Status Not Set</span>
+            % } elsif ( $org_result->is_fair ) {
+            <span class="badge badge-success">Fairly Trading Org</span>
+            % } else {
+            <span class="badge badge-secondary">Non Fairly Trading Org</span>
+            % }
           </div>
         </a>
         % }
