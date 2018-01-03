@@ -1,6 +1,6 @@
 -- 
 -- Created by SQL::Translator::Producer::SQLite
--- Created on Fri Dec  8 13:18:16 2017
+-- Created on Tue Jan  2 19:51:55 2018
 -- 
 
 ;
@@ -97,6 +97,7 @@ CREATE TABLE organisations (
   sector varchar(1),
   pending boolean NOT NULL DEFAULT 0,
   is_local boolean,
+  is_fair boolean,
   submitted_by_id integer,
   latitude decimal(8,5),
   longitude decimal(8,5),

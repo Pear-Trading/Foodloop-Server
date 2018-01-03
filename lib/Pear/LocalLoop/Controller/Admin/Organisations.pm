@@ -41,6 +41,7 @@ sub add_org_submit {
   $validation->optional('postcode')->postcode;
   $validation->optional('pending');
   $validation->optional('is_local');
+  $validation->optional('is_fair');
 
   if ( $validation->has_error ) {
     $c->flash( error => 'The validation has failed' );
@@ -48,6 +49,11 @@ sub add_org_submit {
   }
 
   my $organisation;
+
+  my $location = $c->get_location_from_postcode(
+    $validation->param('postcode'),
+    'organisation',
+  );
 
   try {
     my $entity = $c->schema->resultset('Entity')->create({
@@ -57,9 +63,11 @@ sub add_org_submit {
         town         => $validation->param('town'),
         sector       => $validation->param('sector'),
         postcode     => $validation->param('postcode'),
+        ( defined $location ? ( %$location ) : ( latitude => undef, longitude => undef ) ),
         submitted_by_id => $c->current_user->id,
         pending     => defined $validation->param('pending') ? 0 : 1,
         is_local     => $validation->param('is_local'),
+        is_fair      => $validation->param('is_fair'),
       },
       type => 'organisation',
     });
@@ -78,7 +86,7 @@ sub add_org_submit {
 sub valid_read {
   my $c = shift;
   my $valid_org = $c->schema->resultset('Organisation')->find( $c->param('id') );
-  my $transactions = $valid_org->entity->sales->search(
+  my $transactions = $valid_org->entity->purchases->search(
     undef, {
       page => $c->param('page') || 1,
       rows => 10,
@@ -109,6 +117,7 @@ sub valid_edit {
   $validation->required('postcode')->postcode;
   $validation->optional('pending');
   $validation->optional('is_local');
+  $validation->optional('is_fair');
   $validation->optional('is_lis');
   $validation->optional('is_esta');
 
@@ -119,6 +128,11 @@ sub valid_edit {
 
   my $valid_org = $c->schema->resultset('Organisation')->find( $c->param('id') );
 
+  my $location = $c->get_location_from_postcode(
+    $validation->param('postcode'),
+    'organisation',
+  );
+
   try {
     $c->schema->storage->txn_do( sub {
       $valid_org->update({
@@ -127,8 +141,10 @@ sub valid_edit {
         town        => $validation->param('town'),
         sector      => $validation->param('sector'),
         postcode    => $validation->param('postcode'),
+        ( defined $location ? ( %$location ) : ( latitude => undef, longitude => undef ) ),
         pending     => defined $validation->param('pending') ? 0 : 1,
         is_local    => $validation->param('is_local'),
+        is_fair     => $validation->param('is_fair'),
       });
       $valid_org->entity->update_or_create_related( 'associations', {
         lis         => $validation->param('is_lis'),
