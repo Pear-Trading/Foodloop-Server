@@ -2,6 +2,11 @@
 
 # Next Release
 
+# v0.10.2
+
+* Added fairly traded column for organisations
+* **Admin Fix** Fix issue with setting location on Admin side
+
 # v0.10.1
 
 * Added API for customer graphs
