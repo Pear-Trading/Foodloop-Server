@@ -188,6 +188,12 @@ sub startup {
   $admin_routes->post('/tokens/:id')->to('admin-tokens#update');
   $admin_routes->post('/tokens/:id/delete')->to('admin-tokens#delete');
 
+  $admin_routes->get('/categories')->to('admin-categories#index');
+  $admin_routes->post('/categories')->to('admin-categories#create');
+  $admin_routes->get('/categories/:id')->to('admin-categories#read');
+  $admin_routes->post('/categories/:id')->to('admin-categories#update');
+  $admin_routes->post('/categories/:id/delete')->to('admin-categories#delete');
+
   $admin_routes->get('/users')->to('admin-users#index');
   $admin_routes->get('/users/:id')->to('admin-users#read');
   $admin_routes->post('/users/:id')->to('admin-users#update');
