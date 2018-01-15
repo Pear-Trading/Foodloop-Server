@@ -209,6 +209,20 @@ sub post_upload {
   });
 }
 
+sub post_category {
+  my $c = shift;
+  my $self = $c;
+
+  my $category_rs = $c->schema->resultset('Category');
+  $category_rs->result_class('DBIx::Class::ResultClass::HashRefInflator');
+  $categories => [ $category_rs->all ] );
+
+  return $self->render( json => {
+    success => Mojo::JSON->true,
+    categories => $categories,
+  });
+}
+
 # TODO Limit search results, possibly paginate them?
 # TODO Search by location as well
 sub post_search {
