@@ -215,7 +215,7 @@ sub post_category {
 
   my $category_rs = $c->schema->resultset('Category');
   $category_rs->result_class('DBIx::Class::ResultClass::HashRefInflator');
-  $categories => [ $category_rs->all ] );
+  my $categories => $category_rs->all;
 
   return $self->render( json => {
     success => Mojo::JSON->true,
