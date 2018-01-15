@@ -209,7 +209,7 @@ sub post_upload {
   }
 
   if ( defined $category ) {
-    my $c->schema->resultset('TransactionCategory')->create({
+    $c->schema->resultset('TransactionCategory')->create({
       category_id => $category,
       transaction_id => $new_transaction->id,
     });
