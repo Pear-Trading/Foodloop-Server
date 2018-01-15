@@ -104,6 +104,7 @@ sub post_upload {
 
   #Check a proper purchase time was submitted
   $validation->optional('purchase_time')->is_full_iso_datetime;
+  $validation->optional('category');
 
   # First pass of required items
   return $c->api_validation_error if $validation->has_error;
@@ -179,6 +180,7 @@ sub post_upload {
   my $purchase_time = $c->parse_iso_datetime($validation->param('purchase_time') || '');
   $purchase_time ||= DateTime->now();
   my $file = defined $upload ? $c->store_file_from_upload( $upload ) : undef;
+  my $category = defined $validation->param('category') ? $validation->param('category') : undef;
   my $distance = $c->get_distance_from_coords( $user->entity->type_object, $organisation );
 
   my $new_transaction = $organisation->entity->create_related(
@@ -203,6 +205,13 @@ sub post_upload {
     );
   }
 
+  if ( defined $category ) {
+    my $c->schema->resultset('TransactionCategory')->create({
+      category_id => $category,
+      transaction_id => $new_transaction->id,
+    });
+  }
+
   return $c->render( json => {
     success => Mojo::JSON->true,
     message => 'Upload Successful',
@@ -213,9 +222,14 @@ sub post_category {
   my $c = shift;
   my $self = $c;
 
+  my $categories = { ids => [], names => [] };
+
   my $category_rs = $c->schema->resultset('Category');
-  $category_rs->result_class('DBIx::Class::ResultClass::HashRefInflator');
-  my $categories => $category_rs->all;
+
+  for ( $category_rs->all ) {
+    push @{ $categories->{ ids } }, $_->get_column('id');
+    push @{ $categories->{ names } }, $_->get_column('name');
+  }
 
   return $self->render( json => {
     success => Mojo::JSON->true,
