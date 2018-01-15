@@ -144,6 +144,7 @@ sub startup {
   });
   $api->post('/upload')->to('api-upload#post_upload');
   $api->post('/search')->to('api-upload#post_search');
+  $api->post('/search/category')->to('api-upload#post_category');
   $api->post('/user')->to('api-user#post_account');
   $api->post('/user/account')->to('api-user#post_account_update');
   $api->post('/user-history')->to('api-user#post_user_history');
