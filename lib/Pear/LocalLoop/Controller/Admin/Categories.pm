@@ -84,6 +84,7 @@ sub delete {
   my $id = $c->param('id');
 
   if ( my $category = $c->result_set->find($id) ) {
+    $category->transaction_category->delete;
     $category->delete;
     $c->flash( success => 'Category Deleted' );
   } else {

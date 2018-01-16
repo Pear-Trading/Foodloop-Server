@@ -54,6 +54,7 @@ sub delete {
   my $id = $c->param('id');
 
 if ( my $transaction = $c->result_set->find($id) ) {
+    $transaction->category->delete;
     $transaction->delete;
     $c->flash( success => 'Successfully deleted transaction' );
     $c->redirect_to( '/admin/transactions' );
