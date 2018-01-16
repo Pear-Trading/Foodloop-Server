@@ -36,7 +36,7 @@
       </div>
       <div class="form-group">
         <label for="text">Category</label>
-        <input id="category" type="text" class="form-control" placeholder="No Category" name="category" value="<%= $transaction->category->category->name %>" disabled>
+        <input id="category" type="text" class="form-control" placeholder="Uncategorised" name="category" value="<%= defined $transaction->category ? $transaction->category->category->name : 'Uncategorised' %>" disabled>
       </div>
       <div class="form-group">
         <label for="submitted_at">Submitted At</label>
