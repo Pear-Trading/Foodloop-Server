@@ -35,6 +35,11 @@ is $org_rs->count, 1, "1 testing organisation";
 
 my $org_id_shinra = $shinra_entity->organisation->id;
 
+$schema->resultset('Category')->create({
+  id => 1,
+  name => "Test Category",
+});
+
 #Valid customer, this also tests that redirects are disabled for register.
 print "test 1 - Create customer user account (Rufus)\n";
 my $emailRufus = 'test1@example.com';
@@ -244,6 +249,7 @@ $json = {
   purchase_time => $test_purchase_time,
   organisation_id => $org_id_shinra,
   session_key => $session_key,
+  category => 1,
 };
 $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
@@ -282,6 +288,7 @@ $json = {
   street_name => "Slums, Sector 7",
   town => "Midgar",
   postcode => "E1 0AA",
+  category => 1,
   session_key => $session_key,
 };
 $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
@@ -380,6 +387,7 @@ $json = {
   purchase_time => $test_purchase_time,
   organisation_id => $unvalidatedOrganisationId,
   session_key => $session_key,
+  category => 1,
 };
 $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )

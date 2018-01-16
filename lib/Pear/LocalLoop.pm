@@ -144,6 +144,7 @@ sub startup {
   });
   $api->post('/upload')->to('api-upload#post_upload');
   $api->post('/search')->to('api-upload#post_search');
+  $api->post('/search/category')->to('api-upload#post_category');
   $api->post('/user')->to('api-user#post_account');
   $api->post('/user/account')->to('api-user#post_account_update');
   $api->post('/user-history')->to('api-user#post_user_history');
@@ -187,6 +188,12 @@ sub startup {
   $admin_routes->get('/tokens/:id')->to('admin-tokens#read');
   $admin_routes->post('/tokens/:id')->to('admin-tokens#update');
   $admin_routes->post('/tokens/:id/delete')->to('admin-tokens#delete');
+
+  $admin_routes->get('/categories')->to('admin-categories#index');
+  $admin_routes->post('/categories')->to('admin-categories#create');
+  $admin_routes->get('/categories/:id')->to('admin-categories#read');
+  $admin_routes->post('/categories/:id')->to('admin-categories#update');
+  $admin_routes->post('/categories/:id/delete')->to('admin-categories#delete');
 
   $admin_routes->get('/users')->to('admin-users#index');
   $admin_routes->get('/users/:id')->to('admin-users#read');
