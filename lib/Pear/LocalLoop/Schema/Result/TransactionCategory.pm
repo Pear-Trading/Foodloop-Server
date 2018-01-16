@@ -26,10 +26,12 @@ __PACKAGE__->belongs_to(
   "category",
   "Pear::LocalLoop::Schema::Result::Category",
   "category_id",
+  { cascade_delete => 0 },
 );
 
 __PACKAGE__->belongs_to(
   "transaction",
   "Pear::LocalLoop::Schema::Result::Transaction",
   "transaction_id",
+  { cascade_delete => 0 },
 );

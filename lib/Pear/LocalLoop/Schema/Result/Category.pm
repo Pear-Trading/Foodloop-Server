@@ -28,7 +28,7 @@ __PACKAGE__->has_many(
   "transaction_category",
   "Pear::LocalLoop::Schema::Result::TransactionCategory",
   { "foreign.category_id" => "self.id" },
-  { cascade_copy => 0, cascade_delete => 0 },
+  { cascade_copy => 0, cascade_delete => 1 },
 );
 
 __PACKAGE__->many_to_many(
