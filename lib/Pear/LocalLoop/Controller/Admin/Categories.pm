@@ -72,7 +72,7 @@ sub update {
       name => $validation->param('category'),
     });
     $c->flash( success => 'Category Updated' );
-    $c->redirect_to( '/admin/categories/' . $id );
+    $c->redirect_to( '/admin/categories/' . $validation->param('id') );
   } else {
     $c->flash( error => 'No Category found' );
     $c->redirect_to( '/admin/categories' );
