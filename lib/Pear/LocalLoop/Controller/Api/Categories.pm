@@ -3,15 +3,6 @@ use Mojo::Base 'Mojolicious::Controller';
 
 use List::Util qw/ max sum /;
 
-has error_messages => sub {
-  return {
-    type => {
-      required => { message => 'Type of Leaderboard Required', status => 400 },
-      in_resultset => { message => 'Unrecognised Leaderboard Type', status => 400 },
-    },
-  };
-};
-
 sub post_category_list {
   my $c = shift;
 
@@ -47,7 +38,7 @@ sub post_category_list {
     }
   );
 
-  for ( $transaction_rs->all ) {
+  for ( $month_transaction_rs->all ) {
     my $quantised = $c->db_datetime_parser->parse_datetime($_->get_column('quantised'));
     push @{ $data->{ days } }, ($c->format_iso_datetime( $quantised ) || 0);
     push @{ $data->{ category } }, ($_->get_column('category_id') || 0);
