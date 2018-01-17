@@ -9,8 +9,8 @@ sub post_category_list {
   my $entity = $c->stash->{api_user}->entity;
 
   my $duration = DateTime::Duration->new( days => 30 );
-  my $end = DateTime->today;
-  my $start = $end->clone->subtract_duration( $duration );
+  my $start = DateTime->today;
+  my $end = $start->clone->subtract_duration( $duration );
 
   my $data = { days => [], category => [], value => [] };
 
