@@ -57,6 +57,7 @@ sub read {
 sub update {
   my $c = shift;
   my $validation = $c->validation;
+  $validation->required('id');
   $validation->required('category', 'trim')->like(qr/^[\w]*$/);
 
   my $id = $c->param('id');
@@ -67,6 +68,7 @@ sub update {
     $c->redirect_to( '/admin/categories/' . $id );
   } elsif ( my $category = $c->result_set->find($id) ) {
     $category->update({
+      id => $validation->param('id'),
       name => $validation->param('category'),
     });
     $c->flash( success => 'Category Updated' );
