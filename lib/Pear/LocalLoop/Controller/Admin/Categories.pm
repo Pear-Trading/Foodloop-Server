@@ -19,7 +19,7 @@ sub create {
   my $c = shift;
 
   my $validation = $c->validation;
-  $validation->required('category', 'trim')->like(qr/^[\w]*$/)->not_in_resultset('name', $c->result_set);
+  $validation->required('category', 'trim')->not_in_resultset('name', $c->result_set);
 
   my $category_name = $validation->param('category');
 
