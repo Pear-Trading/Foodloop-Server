@@ -2,6 +2,8 @@
 
 # Next Release
 
+# v0.10.3
+
 * Added Category and Transaction Category tables to DB
 * Added API for categories in Transactions
 * **Admin Feature** Added ability to add and delete categories
