@@ -95,6 +95,11 @@ my $dtf = $schema->storage->datetime_parser;
 # Number of hours in 90 days
 my $time_count = 24 * 90;
 
+$schema->resultset('Category')->create({
+  id => 1,
+  name => "Test Category",
+});
+
 for my $user ( $user1, $user2, $user3, $user4 ) {
 
   my $start = DateTime->new(
@@ -109,11 +114,15 @@ for my $user ( $user1, $user2, $user3, $user4 ) {
 
   my $user_result = $schema->resultset('User')->find({ email => $user->{email} });
   for ( 0 .. $time_count ) {
-    $user_result->create_related( 'transactions', {
+    my $test_transaction = $user_result->create_related( 'transactions', {
       seller_id => $org_result->id,
       value => ( int( rand( 10000 ) ) / 100 ),
       proof_image => 'a',
       purchase_time => $start->clone->subtract( hours => $_ ),
+    });
+    $schema->resultset('TransactionCategory')->create({
+      category_id => 1,
+      transaction_id => $test_transaction->id,
     });
   }
 }
@@ -125,4 +134,3 @@ $fixtures->dump({
   schema => $schema,
   directory => "$Bin/../data/" . $data_set,
 });
-

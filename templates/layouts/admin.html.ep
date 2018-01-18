@@ -41,8 +41,14 @@
           <li class="nav-item">
             <a class="nav-link<%= title eq 'Tokens' ? ' active' : '' %>" href="<%= url_for '/admin/tokens' %>">Tokens</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link<%= title eq 'Transactions' ? ' active' : '' %>" href="<%= url_for '/admin/transactions' %>">Transactions</a>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">
+              Transactions
+            </a>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="<%= url_for '/admin/transactions' %>">Transaction List</a>
+              <a class="dropdown-item" href="<%= url_for '/admin/categories' %>">Categories</a>
+            </div>
           </li>
           <li class="nav-item">
             <a class="nav-link<%= title eq 'Users' ? ' active' : '' %>" href="<%= url_for '/admin/users' %>">Users</a>
