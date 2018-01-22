@@ -8,11 +8,9 @@ sub post_category_list {
 
   my $entity = $c->stash->{api_user}->entity;
 
-  my $duration = DateTime::Duration->new( days => 30 );
-  my $start = DateTime->today;
-  my $end = $start->clone->subtract_duration( $duration );
-
-  my $data = { days => [], category => [], value => [] };
+  my $duration = DateTime::Duration->new( days => 28 );
+  my $end = DateTime->today;
+  my $start = $end->clone->subtract_duration( $duration );
 
   my $dtf = $c->schema->storage->datetime_parser;
   my $driver = $c->schema->storage->dbh->{Driver}->{Name};
@@ -29,26 +27,34 @@ sub post_category_list {
     {
       columns => [
         {
-          quantised        => 'quantised_days',
-          count            => \"COUNT(*)",
+          quantised        => 'quantised_weeks',
+          value            => 'value',
+          category_id      => 'category_id',
         }
       ],
-      group_by => 'quantised_days',
-      order_by => { '-asc' => 'quantised_days' },
+      order_by => { '-desc' => 'quantised_weeks' },
     }
   );
 
+  my $data = {};
+
   for ( $month_transaction_rs->all ) {
     my $quantised = $c->db_datetime_parser->parse_datetime($_->get_column('quantised'));
-    push @{ $data->{ days } }, ($c->format_iso_datetime( $quantised ) || 0);
-    push @{ $data->{ category } }, ($_->get_column('category_id') || 0);
-    push @{ $data->{ value } }, ($_->get_column('value') || 0) / 100000;
+    my $days = $c->format_iso_date( $quantised ) || 0;
+    my $category = $_->get_column('category_id') || 0;
+    my $value = ($_->get_column('value') || 0) / 100000;
+    $data->{$days} = [] unless exists $data->{$days};
+    push @{ $data->{$days} }, {
+      days => $days,
+      value => $value,
+      category => $category,
+    };
   }
 
   return $c->render(
     json => {
       success => Mojo::JSON->true,
-      graph => $data,
+      data => $data,
     }
   );
 }
