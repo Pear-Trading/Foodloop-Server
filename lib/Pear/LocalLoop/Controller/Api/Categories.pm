@@ -1,7 +1,7 @@
 package Pear::LocalLoop::Controller::Api::Categories;
 use Mojo::Base 'Mojolicious::Controller';
 
-use List::Util qw/ max sum /;
+use List::Util qw/ max /;
 
 sub post_category_list {
   my $c = shift;
@@ -32,6 +32,7 @@ sub post_category_list {
           category_id      => 'category_id',
         }
       ],
+      group_by => [ qw/ category_id quantised_weeks / ],
       order_by => { '-desc' => 'quantised_weeks' },
     }
   );
