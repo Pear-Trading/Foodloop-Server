@@ -2,6 +2,9 @@
 
 # Next Release
 
+* Added API for category budget
+* Added working test for the new API
+
 # v0.10.3
 
 * Added Category and Transaction Category tables to DB

@@ -33,7 +33,7 @@ sub post_category_list {
         }
       ],
       group_by => [ qw/ category_id quantised_weeks / ],
-      order_by => { '-desc' => 'quantised_weeks' },
+      order_by => { '-desc' => 'value' },
     }
   );
 
