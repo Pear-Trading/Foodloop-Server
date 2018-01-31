@@ -8,7 +8,8 @@ sub index {
   my $validation = $c->validation;
   $validation->input( $c->stash->{api_json} );
 
-  my $global = {
+  # Placeholder data
+  my $global_placeholder = {
     group_name => {
       threshold => {
         awarded => true,
@@ -19,7 +20,7 @@ sub index {
       total => 1,
     },
   };
-  my $organisation = {
+  my $organisation_placeholder = {
     org_id => {
       group_name => {
         threshold => {
@@ -38,8 +39,8 @@ sub index {
   return $c->render(
     json => {
       success => Mojo::JSON->true,
-      global => $global,
-      organisation => $organisation,
+      global => $global_placeholder,
+      organisation => $organisation_placeholder,
     }
   );
 }
