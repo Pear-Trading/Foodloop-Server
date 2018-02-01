@@ -158,6 +158,10 @@ sub startup {
 
   my $api_v1 = $api->under('/v1');
 
+  my $api_v1_user = $api_v1->under('/user');
+
+  $api_v1_user->post('/medals')->to('api-v1-user-medals#index');
+
   my $api_v1_supplier = $api_v1->under('/supplier');
 
   $api_v1_supplier->post('/location')->to('api-v1-supplier-location#index');
