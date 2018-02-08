@@ -161,6 +161,7 @@ sub startup {
   my $api_v1_user = $api_v1->under('/user');
 
   $api_v1_user->post('/medals')->to('api-v1-user-medals#index');
+  $api_v1_user->post('/points')->to('api-v1-user-points#index');
 
   my $api_v1_supplier = $api_v1->under('/supplier');
 
