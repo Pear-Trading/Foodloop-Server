@@ -56,6 +56,20 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+__PACKAGE__->has_many(
+  "global_user_medals",
+  "Pear::LocalLoop::Schema::Result::GlobalUserMedals",
+  { "foreign.entity_id" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+__PACKAGE__->has_many(
+  "global_user_medal_progress",
+  "Pear::LocalLoop::Schema::Result::GlobalUserMedalProgress",
+  { "foreign.entity_id" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 sub name {
   my $self = shift;
 
