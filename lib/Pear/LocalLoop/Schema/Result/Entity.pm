@@ -70,6 +70,20 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+__PACKAGE__->has_many(
+  "org_user_medals",
+  "Pear::LocalLoop::Schema::Result::OrgUserMedals",
+  { "foreign.entity_id" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+__PACKAGE__->has_many(
+  "org_user_medal_progress",
+  "Pear::LocalLoop::Schema::Result::OrgUserMedalProgress",
+  { "foreign.entity_id" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 sub name {
   my $self = shift;
 
