@@ -1,11 +1,16 @@
-package Pear::LocalLoop::Schema::Result::GlobalUserMedals;
+package Pear::LocalLoop::Schema::Result::OrgUserMedals;
 
 use strict;
 use warnings;
 
 use base 'DBIx::Class::Core';
 
-__PACKAGE__->table("global_user_medal_progress");
+__PACKAGE__->load_components(qw/
+  InflateColumn::DateTime
+  TimeStamp
+/);
+
+__PACKAGE__->table("org_user_medals");
 
 __PACKAGE__->add_columns(
   "id" => {
@@ -23,7 +28,16 @@ __PACKAGE__->add_columns(
     size => 255,
     is_nullable => 0,
   },
-  "total" => {
+  "points" => {
+    data_type => "integer",
+    is_nullable => 0,
+  },
+  "awarded_at" => {
+    data_type => "datetime",
+    is_nullable => 0,
+    set_on_create => 1,
+  },
+  "threshold" => {
     data_type => "integer",
     is_nullable => 0,
   },
@@ -39,7 +53,7 @@ __PACKAGE__->belongs_to(
 
 __PACKAGE__->belongs_to(
   "group",
-  "Pear::LocalLoop::Schema::Result::GlobalMedalGroup",
+  "Pear::LocalLoop::Schema::Result::OrgMedalGroup",
   { id => "group_id" },
   { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },
 );
