@@ -1,4 +1,4 @@
-package Pear::LocalLoop::Schema::Result::OrgUserMedals;
+package Pear::LocalLoop::Schema::Result::OrgUserMedalProgress;
 
 use strict;
 use warnings;
