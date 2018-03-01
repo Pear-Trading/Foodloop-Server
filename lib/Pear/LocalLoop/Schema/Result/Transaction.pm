@@ -48,6 +48,11 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
     set_on_create => 1,
   },
+  "essential" => {
+    data_type => "boolean",
+    default_value => \"false",
+    is_nullable => 0,
+  },
   distance => {
     data_type => 'numeric',
     size => [15],
