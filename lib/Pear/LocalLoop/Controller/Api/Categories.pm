@@ -14,7 +14,31 @@ sub post_category_list {
 
   my $dtf = $c->schema->storage->datetime_parser;
   my $driver = $c->schema->storage->dbh->{Driver}->{Name};
-  my $month_transaction_rs = $c->schema->resultset('ViewQuantisedTransactionCategory' . $driver)->search(
+  my $month_transaction_category_rs = $c->schema->resultset('ViewQuantisedTransactionCategory' . $driver)->search(
+    {
+      purchase_time => {
+        -between => [
+          $dtf->format_datetime($start),
+          $dtf->format_datetime($end),
+        ],
+      },
+      buyer_id => $entity->id,
+    },
+    {
+      columns => [
+        {
+          quantised        => 'quantised_weeks',
+          value            => { sum => 'value' },
+          category_id      => 'category_id',
+          essential        => 'essential',
+        }
+      ],
+      group_by => [ qw/ category_id quantised_weeks / ],
+      order_by => { '-desc' => 'value' },
+    }
+  );
+
+  my $month_transaction_rs = $c->schema->resultset('ViewQuantisedTransaction' . $driver)->search(
     {
       purchase_time => {
         -between => [
@@ -29,27 +53,34 @@ sub post_category_list {
         {
           quantised        => 'quantised_weeks',
           value            => 'value',
-          category_id      => 'category_id',
+          essential        => 'essential',
         }
       ],
-      group_by => [ qw/ category_id quantised_weeks / ],
+      group_by => [ qw/ essential quantised_weeks / ],
       order_by => { '-desc' => 'value' },
     }
   );
 
-  my $data = {};
+  my $data = { categories => {}, essentials => {} };
 
-  for ( $month_transaction_rs->all ) {
-    my $quantised = $c->db_datetime_parser->parse_datetime($_->get_column('quantised'));
+  for my $cat_trans ( $month_transaction_category_rs->all ) {
+    use Devel::Dwarn; Dwarn {$cat_trans->get_columns};
+    my $quantised = $c->db_datetime_parser->parse_datetime($cat_trans->get_column('quantised'));
     my $days = $c->format_iso_date( $quantised ) || 0;
-    my $category = $_->get_column('category_id') || 0;
-    my $value = ($_->get_column('value') || 0) / 100000;
-    $data->{$days} = [] unless exists $data->{$days};
-    push @{ $data->{$days} }, {
+    my $category = $cat_trans->get_column('category_id') || 0;
+    my $value = ($cat_trans->get_column('value') || 0) / 100000;
+    $data->{categories}->{$days} = [] unless exists $data->{categories}->{$days};
+    push @{ $data->{categories}->{$days} }, {
       days => $days,
       value => $value,
       category => $category,
     };
+    next unless $cat_trans->get_column('essential');
+    $data->{essentials}->{$days}->{value} += $value;
+  }
+
+  for my $day ( keys $data->{categories} ) {
+    $data->{categories}->{$day} = [ sort { $b->{value} <=> $a->{value} } @{ $data->{categories}->{$day} } ];
   }
 
   return $c->render(
