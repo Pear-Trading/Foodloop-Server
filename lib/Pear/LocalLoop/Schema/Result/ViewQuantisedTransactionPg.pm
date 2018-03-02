@@ -15,7 +15,6 @@ SELECT "value",
        "purchase_time",
        "buyer_id",
        "seller_id",
-       "essential",
        DATE_TRUNC('hour', "purchase_time") AS "quantised_hours",
        DATE_TRUNC('day', "purchase_time") AS "quantised_days",
        DATE_TRUNC('week', "purchase_time") AS "quantised_weeks"
