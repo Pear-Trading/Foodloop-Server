@@ -196,7 +196,7 @@ sub post_upload {
       ( defined $file ? ( proof_image => $file ) : () ),
       purchase_time => $c->format_db_datetime($purchase_time),
       distance => $distance,
-      essential => ( defined $essential ? $essential : undef ),
+      essential => ( defined $essential ? $essential : 0 ),
     }
   );
 
