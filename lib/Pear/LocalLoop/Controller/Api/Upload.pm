@@ -108,6 +108,7 @@ sub post_upload {
   #Check a proper purchase time was submitted
   $validation->optional('purchase_time')->is_full_iso_datetime;
   $validation->optional('category')->in_resultset( 'id', $c->schema->resultset('Category'));
+  $validation->optional('essential');
 
   # First pass of required items
   return $c->api_validation_error if $validation->has_error;
@@ -184,6 +185,7 @@ sub post_upload {
   $purchase_time ||= DateTime->now();
   my $file = defined $upload ? $c->store_file_from_upload( $upload ) : undef;
   my $category = $validation->param('category');
+  my $essential = $validation->param('essential');
   my $distance = $c->get_distance_from_coords( $user->entity->type_object, $organisation );
 
   my $new_transaction = $organisation->entity->create_related(
@@ -194,6 +196,7 @@ sub post_upload {
       ( defined $file ? ( proof_image => $file ) : () ),
       purchase_time => $c->format_db_datetime($purchase_time),
       distance => $distance,
+      essential => ( defined $essential ? $essential : 0 ),
     }
   );
 
