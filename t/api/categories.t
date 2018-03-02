@@ -49,31 +49,50 @@ $t->post_ok('/api/stats/category' => json => {
   })
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/data', {
-    "2016-12-05" => [{
-      days => "2016-12-05",
-      value => 10,
-      category => 1,
-    }],
-    "2016-12-12" => [{
-      days => "2016-12-12",
-      value => 10,
-      category => 1,
-    }],
-    "2016-12-19" => [{
-      days => "2016-12-19",
-      value => 10,
-      category => 1,
-    }],
-    "2016-12-26" => [{
-      days => "2016-12-26",
-      value => 10,
-      category => 1,
-    }],
-    "2017-01-02" => [{
-      days => "2017-01-02",
-      value => 10,
-      category => 1,
-    }]
+    categories => {
+      "2016-12-05" => [{
+        days => "2016-12-05",
+        value => 30,
+        category => 1,
+      }],
+      "2016-12-12" => [{
+        days => "2016-12-12",
+        value => 200,
+        category => 1,
+      }],
+      "2016-12-19" => [{
+        days => "2016-12-19",
+        value => 220,
+        category => 1,
+      }],
+      "2016-12-26" => [{
+        days => "2016-12-26",
+        value => 190,
+        category => 1,
+      }],
+      "2017-01-02" => [{
+        days => "2017-01-02",
+        value => 170,
+        category => 1,
+      }],
+    },
+    essentials => {
+      "2016-12-05" => {
+        value => 30,
+      },
+      "2016-12-12" => {
+        value => 200,
+      },
+      "2016-12-19" => {
+        value => 220,
+      },
+      "2016-12-26" => {
+        value => 190,
+      },
+      "2017-01-02" => {
+        value => 170,
+      },
+    }
   })->or($framework->dump_error);
 
 sub create_random_transaction {
@@ -88,6 +107,7 @@ sub create_random_transaction {
     value => 10 * 100000,
     proof_image => 'a',
     purchase_time => $time,
+    essential => 1,
   });
   $schema->resultset('TransactionCategory')->create({
     category_id => 1,
