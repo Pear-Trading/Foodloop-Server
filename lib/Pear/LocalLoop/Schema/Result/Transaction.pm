@@ -81,4 +81,14 @@ __PACKAGE__->might_have(
   "Pear::LocalLoop::Schema::Result::TransactionCategory" => "transaction_id",
 );
 
+sub sqlt_deploy_hook {
+  my ( $source_instance, $sqlt_table ) = @_;
+  my $pending_field = $sqlt_table->get_field('essential');
+  if ( $sqlt_table->schema->translator->producer_type =~ /SQLite$/ ) {
+    $pending_field->{default_value} = 0;
+  } else {
+    $pending_field->{default_value} = \"false";
+  }
+}
+
 1;
