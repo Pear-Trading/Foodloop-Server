@@ -55,7 +55,7 @@ sub post_category_list {
     $data->{essentials}->{$days}->{value} += $value;
   }
 
-  for my $day ( keys $data->{categories} ) {
+  for my $day ( keys %{ $data->{categories} } ) {
     $data->{categories}->{$day} = [ sort { $b->{value} <=> $a->{value} } @{ $data->{categories}->{$day} } ];
   }
 
