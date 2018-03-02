@@ -38,33 +38,9 @@ sub post_category_list {
     }
   );
 
-  my $month_transaction_rs = $c->schema->resultset('ViewQuantisedTransaction' . $driver)->search(
-    {
-      purchase_time => {
-        -between => [
-          $dtf->format_datetime($start),
-          $dtf->format_datetime($end),
-        ],
-      },
-      buyer_id => $entity->id,
-    },
-    {
-      columns => [
-        {
-          quantised        => 'quantised_weeks',
-          value            => 'value',
-          essential        => 'essential',
-        }
-      ],
-      group_by => [ qw/ essential quantised_weeks / ],
-      order_by => { '-desc' => 'value' },
-    }
-  );
-
   my $data = { categories => {}, essentials => {} };
 
   for my $cat_trans ( $month_transaction_category_rs->all ) {
-    use Devel::Dwarn; Dwarn {$cat_trans->get_columns};
     my $quantised = $c->db_datetime_parser->parse_datetime($cat_trans->get_column('quantised'));
     my $days = $c->format_iso_date( $quantised ) || 0;
     my $category = $cat_trans->get_column('category_id') || 0;
