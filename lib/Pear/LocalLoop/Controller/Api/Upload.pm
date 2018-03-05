@@ -187,7 +187,8 @@ sub post_upload {
   my $file = defined $upload ? $c->store_file_from_upload( $upload ) : undef;
   my $category = $validation->param('category');
   my $essential = $validation->param('essential');
-  my $recurring_period = $validation->('recurring');
+  my $recurring_period = $validation->param('recurring');
+  Dwarn $recurring_period;
   my $distance = $c->get_distance_from_coords( $user->entity->type_object, $organisation );
 
   my $new_transaction = $organisation->entity->create_related(
