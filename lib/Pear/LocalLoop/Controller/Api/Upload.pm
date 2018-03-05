@@ -187,7 +187,7 @@ sub post_upload {
   my $file = defined $upload ? $c->store_file_from_upload( $upload ) : undef;
   my $category = $validation->param('category');
   my $essential = $validation->param('essential');
-  my $recurring_type = $validation->('recurring');
+  my $recurring_period = $validation->('recurring');
   my $distance = $c->get_distance_from_coords( $user->entity->type_object, $organisation );
 
   my $new_transaction = $organisation->entity->create_related(
@@ -216,6 +216,13 @@ sub post_upload {
   if ( defined $category ) {
     $c->schema->resultset('TransactionCategory')->create({
       category_id => $category,
+      transaction_id => $new_transaction->id,
+    });
+  }
+
+  if ( defined $recurring_period ) {
+    $c->schema->resultset('TransactionRecurring')->create({
+      recurring_period => $recurring_period,
       transaction_id => $new_transaction->id,
     });
   }
