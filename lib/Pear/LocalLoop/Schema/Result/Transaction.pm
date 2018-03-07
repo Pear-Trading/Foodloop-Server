@@ -81,6 +81,11 @@ __PACKAGE__->might_have(
   "Pear::LocalLoop::Schema::Result::TransactionCategory" => "transaction_id",
 );
 
+__PACKAGE__->might_have(
+  "recurring",
+  "Pear::LocalLoop::Schema::Result::TransactionRecurring" => "transaction_id",
+);
+
 sub sqlt_deploy_hook {
   my ( $source_instance, $sqlt_table ) = @_;
   my $pending_field = $sqlt_table->get_field('essential');
