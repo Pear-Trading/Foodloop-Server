@@ -123,7 +123,7 @@ sub post_upload {
     my $valid_org_rs = $c->schema->resultset('Organisation')->search({
       pending => 0,
       entity_id => { "!=" => $user->entity_id },
-     });
+    });
     $validation->required('organisation_id')->number->in_resultset( 'id', $valid_org_rs );
 
     return $c->api_validation_error if $validation->has_error;
