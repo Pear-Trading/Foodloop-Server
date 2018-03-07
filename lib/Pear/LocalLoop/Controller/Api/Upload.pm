@@ -222,8 +222,13 @@ sub post_upload {
 
   if ( defined $recurring_period ) {
     $c->schema->resultset('TransactionRecurring')->create({
+      buyer => $user->entity,
+      seller => $organisation->entity,
+      value => $transaction_value * 100000,
+      start_time => $c->format_db_datetime($purchase_time),
+      essential => ( defined $essential ? $essential : 0 ),
+      category_id => ( defined $category ? $category : undef ),
       recurring_period => $recurring_period,
-      transaction_id => $new_transaction->id,
     });
   }
 

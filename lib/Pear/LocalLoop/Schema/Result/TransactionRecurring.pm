@@ -13,9 +13,41 @@ __PACKAGE__->add_columns(
     is_auto_increment => 1,
     is_nullable => 0,
   },
-  "transaction_id" => {
-    data_type => 'integer',
+  "buyer_id" => {
+    data_type => "integer",
+    is_foreign_key => 1,
     is_nullable => 0,
+  },
+  "seller_id" => {
+    data_type => "integer",
+    is_foreign_key => 1,
+    is_nullable => 0,
+  },
+  "value" => {
+    data_type => "numeric",
+    size => [ 100, 0 ],
+    is_nullable => 0,
+  },
+  "start_time" => {
+    data_type => "datetime",
+    timezone => "UTC",
+    is_nullable => 0,
+    set_on_create => 1,
+  },
+  "last_updated" => {
+    data_type => "datetime",
+    timezone => "UTC",
+    is_nullable => 0,
+    set_on_create => 1,
+  },
+  "essential" => {
+    data_type => "boolean",
+    default_value => \"false",
+    is_nullable => 0,
+  },
+  "category_id" => {
+    data_type => "integer",
+    is_nullable => 1,
     is_foreign_key => 1,
   },
   "recurring_period" => {
@@ -27,12 +59,24 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key("id");
 
-__PACKAGE__->add_unique_constraint(["transaction_id"]);
+__PACKAGE__->belongs_to(
+  "buyer",
+  "Pear::LocalLoop::Schema::Result::Entity",
+  { id => "buyer_id" },
+  { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },
+);
 
 __PACKAGE__->belongs_to(
-  "transaction",
-  "Pear::LocalLoop::Schema::Result::Transaction",
-  "transaction_id",
+  "seller",
+  "Pear::LocalLoop::Schema::Result::Entity",
+  { id => "seller_id" },
+  { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },
+);
+
+__PACKAGE__->belongs_to(
+  "category",
+  "Pear::LocalLoop::Schema::Result::Category",
+  "category_id",
   { cascade_delete => 0 },
 );
 
