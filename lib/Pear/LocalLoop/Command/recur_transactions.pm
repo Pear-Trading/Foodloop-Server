@@ -13,6 +13,8 @@ has usage => sub { shift->extract_usage };
 sub run {
   my ( $self, @args ) = @_;
 
+  my $app = $self->app;
+
   getopt \@args,
     'f|force' => \my $force,
     'd|date=s' => \my $date;
@@ -40,54 +42,54 @@ sub run {
     $datetime = DateTime->today;
   }
 
-  my $schema = $self->app->schema;
+  my $match_date_day = $app->format_iso_date($datetime->clone->subtract( days => 1 ));
+  my $match_date_week = $app->format_iso_date($datetime->clone->subtract( weeks => 1 ));
+  my $match_date_fortnight = $app->format_iso_date($datetime->clone->subtract( weeks => 2 ));
+  my $match_date_month = $app->format_iso_date($datetime->clone->subtract( months => 1 ));
+  my $match_date_quarter = $app->format_iso_date($datetime->clone->subtract( months => 3));
+
+  my $schema = $app->schema;
   my $dtf = $schema->storage->datetime_parser;
   my $recur_rs = $schema->resultset('TransactionRecurring');
-  my $org_rs = $c->schema->resultset('Organisation');
 
   for my $recur_result ( $recur_rs->all ) {
 
-    my $last_updated = $dtf->format_iso_date($recur_result->last_updated);
+    my $start_time = $app->format_iso_date($recur_result->start_time);
     my $recurring_period = $recur_result->recurring_period;
 
-    if ( $recurring_period = 'daily' ) {
-      my $match_date = $datetime->subtract( days => 1 );
-      next unless $last_updated = $match_date;
-    } elsif { $recurring_period = 'weekly' } {
-      my $match_date = $datetime->subtract( weeks => 1 );
-      next unless $last_updated = $match_date;
-    } elsif { $recurring_period = 'fortnightly' } {
-      my $match_date = $datetime->subtract( weeks => 2 );
-      next unless $last_updated = $match_date;
-    } elsif { $recurring_period = 'monthly' } {
-      my $match_date = $datetime->subtract( months => 1 );
-      next unless $last_updated = $match_date;
-    } elsif { $recurring_period = 'quarterly' } {
-      my $match_date = $datetime->subtract( months => 3 );
-      next unless $last_updated = $match_date;
+    if ( $recurring_period eq 'daily' ) {
+      next unless $start_time eq $match_date_day;
+      say "matched recurring transaction ID " . $recur_result->id . " to daily";
+    } elsif ( $recurring_period eq 'weekly' ) {
+      next unless $start_time eq $match_date_week;
+      say "matched recurring transaction ID " . $recur_result->id . " to weekly";
+    } elsif ( $recurring_period eq 'fortnightly' ) {
+      next unless $start_time eq $match_date_fortnight;
+      say "matched recurring transaction ID " . $recur_result->id . " to fortnightly";
+    } elsif ( $recurring_period eq 'monthly' ) {
+      next unless $start_time eq $match_date_month;
+      say "matched recurring transaction ID " . $recur_result->id . " to monthly";
+    } elsif ( $recurring_period eq 'quarterly' ) {
+      next unless $start_time eq $match_date_quarter;
+      say "matched recurring transaction ID " . $recur_result->id . " to quarterly";
     } else {
       say "Invalid recurring time period given";
       return;
     }
 
-    my $user_id = $recur_result->buyer_id;
-    my $organisation = $org_rs->find( entity_id => $recur_result->seller_id );
-    my $transaction_value = $recur_result->value;
     my $purchase_time = DateTime->now();
     my $category = $recur_result->category_id;
     my $essential = $recur_result->essential;
-    my $distance = $c->get_distance_from_coords( $user_id->type_object, $organisation );
+    my $distance = $recur_result->distance;
 
-    my $new_transaction = $organisation->entity->create_related(
-      'sales',
-      {
-        buyer => $user_id,
-        value => $transaction_value,
-        purchase_time => $c->format_db_datetime($purchase_time),
-        distance => $distance,
-        essential => ( defined $essential ? $essential : 0 ),
-      }
-    );
+    my $new_transaction = $schema->resultset('Transaction')->create({
+      buyer_id => $recur_result->buyer_id,
+      seller_id => $recur_result->seller_id,
+      value => $recur_result->value,
+      purchase_time => $app->format_db_datetime($purchase_time),
+      distance => $distance,
+      essential => ( defined $essential ? $essential : 0 ),
+    });
 
     unless ( defined $new_transaction ) {
       say "Error Adding Transaction";
@@ -101,7 +103,7 @@ sub run {
       });
     }
 
-    $recur_result->update({ last_updated => $purchase_time });
+    $recur_result->update({ start_time => $purchase_time });
 
   }
 }

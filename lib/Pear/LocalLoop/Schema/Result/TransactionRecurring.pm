@@ -5,6 +5,11 @@ use warnings;
 
 use base 'DBIx::Class::Core';
 
+__PACKAGE__->load_components(qw/
+  InflateColumn::DateTime
+  TimeStamp
+/);
+
 __PACKAGE__->table("transaction_recurring");
 
 __PACKAGE__->add_columns(
@@ -36,7 +41,6 @@ __PACKAGE__->add_columns(
   },
   "last_updated" => {
     data_type => "datetime",
-    timezone => "UTC",
     is_nullable => 0,
     set_on_create => 1,
   },
@@ -44,6 +48,11 @@ __PACKAGE__->add_columns(
     data_type => "boolean",
     default_value => \"false",
     is_nullable => 0,
+  },
+  "distance" => {
+    data_type => 'numeric',
+    size => [15],
+    is_nullable => 1,
   },
   "category_id" => {
     data_type => "integer",
