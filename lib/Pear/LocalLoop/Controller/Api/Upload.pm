@@ -197,8 +197,8 @@ sub post_upload {
       value => $transaction_value * 100000,
       ( defined $file ? ( proof_image => $file ) : () ),
       purchase_time => $c->format_db_datetime($purchase_time),
-      distance => $distance,
       essential => ( defined $essential ? $essential : 0 ),
+      distance => $distance,
     }
   );
 
@@ -227,6 +227,7 @@ sub post_upload {
       value => $transaction_value * 100000,
       start_time => $c->format_db_datetime($purchase_time),
       essential => ( defined $essential ? $essential : 0 ),
+      distance => $distance,
       category_id => ( defined $category ? $category : undef ),
       recurring_period => $recurring_period,
     });
