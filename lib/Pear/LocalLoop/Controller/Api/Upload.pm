@@ -123,7 +123,7 @@ sub post_upload {
     my $valid_org_rs = $c->schema->resultset('Organisation')->search({
       pending => 0,
       entity_id => { "!=" => $user->entity_id },
-     });
+    });
     $validation->required('organisation_id')->number->in_resultset( 'id', $valid_org_rs );
 
     return $c->api_validation_error if $validation->has_error;
@@ -197,8 +197,8 @@ sub post_upload {
       value => $transaction_value * 100000,
       ( defined $file ? ( proof_image => $file ) : () ),
       purchase_time => $c->format_db_datetime($purchase_time),
-      distance => $distance,
       essential => ( defined $essential ? $essential : 0 ),
+      distance => $distance,
     }
   );
 
@@ -222,8 +222,14 @@ sub post_upload {
 
   if ( defined $recurring_period ) {
     $c->schema->resultset('TransactionRecurring')->create({
+      buyer => $user->entity,
+      seller => $organisation->entity,
+      value => $transaction_value * 100000,
+      start_time => $c->format_db_datetime($purchase_time),
+      essential => ( defined $essential ? $essential : 0 ),
+      distance => $distance,
+      category_id => ( defined $category ? $category : undef ),
       recurring_period => $recurring_period,
-      transaction_id => $new_transaction->id,
     });
   }
 
