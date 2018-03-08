@@ -54,7 +54,13 @@ sub run {
 
   for my $recur_result ( $recur_rs->all ) {
 
-    my $start_time = $app->format_iso_date($recur_result->start_time);
+    my $start_time_dt;
+    if ( defined $recur_result->last_updated ) {
+      $start_time_dt = $recur_result->last_updated;
+    } else {
+      $start_time_dt = $recur_result->start_time;
+    }
+    my $start_time = $app->format_iso_date($start_time_dt);
     my $recurring_period = $recur_result->recurring_period;
 
     if ( $recurring_period eq 'daily' ) {
@@ -77,7 +83,16 @@ sub run {
       return;
     }
 
-    my $purchase_time = DateTime->now();
+    my $now = DateTime->now();
+    my $purchase_time = DateTime->new(
+      year => $now->year,
+      month => $now->month,
+      day => $now->day,
+      hour => $start_time_dt->hour,
+      minute => $start_time_dt->minute,
+      second => $start_time_dt->second,
+      time_zone => 'UTC',
+    );
     my $category = $recur_result->category_id;
     my $essential = $recur_result->essential;
     my $distance = $recur_result->distance;
@@ -103,7 +118,7 @@ sub run {
       });
     }
 
-    $recur_result->update({ start_time => $purchase_time });
+    $recur_result->update({ last_updated => $purchase_time });
 
   }
 }

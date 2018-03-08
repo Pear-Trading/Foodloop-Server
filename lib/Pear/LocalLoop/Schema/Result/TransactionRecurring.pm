@@ -37,12 +37,12 @@ __PACKAGE__->add_columns(
     data_type => "datetime",
     timezone => "UTC",
     is_nullable => 0,
-    set_on_create => 1,
   },
   "last_updated" => {
     data_type => "datetime",
-    is_nullable => 0,
-    set_on_create => 1,
+    timezone => "UTC",
+    is_nullable => 1,
+    datetime_undef_if_invalid => 1,
   },
   "essential" => {
     data_type => "boolean",
