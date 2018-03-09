@@ -1,6 +1,6 @@
 -- 
 -- Created by SQL::Translator::Producer::SQLite
--- Created on Wed Feb 21 12:51:23 2018
+-- Created on Fri Mar  9 17:43:36 2018
 -- 
 
 ;
@@ -102,7 +102,7 @@ CREATE INDEX entity_association_idx_entity_id ON entity_association (entity_id);
 --
 CREATE TABLE global_medals (
   id INTEGER PRIMARY KEY NOT NULL,
-  group_id varchar(255) NOT NULL,
+  group_id integer NOT NULL,
   threshold integer NOT NULL,
   points integer NOT NULL,
   FOREIGN KEY (group_id) REFERENCES global_medal_group(id) ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -123,7 +123,7 @@ CREATE INDEX leaderboard_sets_idx_leaderboard_id ON leaderboard_sets (leaderboar
 --
 CREATE TABLE org_medals (
   id INTEGER PRIMARY KEY NOT NULL,
-  group_id varchar(255) NOT NULL,
+  group_id integer NOT NULL,
   threshold integer NOT NULL,
   points integer NOT NULL,
   FOREIGN KEY (group_id) REFERENCES org_medal_group(id) ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -161,6 +161,7 @@ CREATE TABLE transactions (
   proof_image text,
   submitted_at datetime NOT NULL,
   purchase_time datetime NOT NULL,
+  essential boolean NOT NULL DEFAULT false,
   distance numeric(15),
   FOREIGN KEY (buyer_id) REFERENCES entities(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
   FOREIGN KEY (seller_id) REFERENCES entities(id) ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -202,8 +203,8 @@ CREATE INDEX feedback_idx_user_id ON feedback (user_id);
 --
 CREATE TABLE global_user_medal_progress (
   id INTEGER PRIMARY KEY NOT NULL,
-  entity_id varchar(255) NOT NULL,
-  group_id varchar(255) NOT NULL,
+  entity_id integer NOT NULL,
+  group_id integer NOT NULL,
   total integer NOT NULL,
   FOREIGN KEY (entity_id) REFERENCES entities(id),
   FOREIGN KEY (group_id) REFERENCES global_medal_group(id) ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -215,8 +216,8 @@ CREATE INDEX global_user_medal_progress_idx_group_id ON global_user_medal_progre
 --
 CREATE TABLE global_user_medals (
   id INTEGER PRIMARY KEY NOT NULL,
-  entity_id varchar(255) NOT NULL,
-  group_id varchar(255) NOT NULL,
+  entity_id integer NOT NULL,
+  group_id integer NOT NULL,
   points integer NOT NULL,
   awarded_at datetime NOT NULL,
   threshold integer NOT NULL,
@@ -243,8 +244,8 @@ CREATE INDEX import_lookups_idx_set_id ON import_lookups (set_id);
 --
 CREATE TABLE org_user_medal_progress (
   id INTEGER PRIMARY KEY NOT NULL,
-  entity_id varchar(255) NOT NULL,
-  group_id varchar(255) NOT NULL,
+  entity_id integer NOT NULL,
+  group_id integer NOT NULL,
   total integer NOT NULL,
   FOREIGN KEY (entity_id) REFERENCES entities(id),
   FOREIGN KEY (group_id) REFERENCES org_medal_group(id) ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -256,8 +257,8 @@ CREATE INDEX org_user_medal_progress_idx_group_id ON org_user_medal_progress (gr
 --
 CREATE TABLE org_user_medals (
   id INTEGER PRIMARY KEY NOT NULL,
-  entity_id varchar(255) NOT NULL,
-  group_id varchar(255) NOT NULL,
+  entity_id integer NOT NULL,
+  group_id integer NOT NULL,
   points integer NOT NULL,
   awarded_at datetime NOT NULL,
   threshold integer NOT NULL,
@@ -296,6 +297,27 @@ CREATE TABLE session_tokens (
 );
 CREATE INDEX session_tokens_idx_user_id ON session_tokens (user_id);
 CREATE UNIQUE INDEX session_tokens_token ON session_tokens (token);
+--
+-- Table: transaction_recurring
+--
+CREATE TABLE transaction_recurring (
+  id INTEGER PRIMARY KEY NOT NULL,
+  buyer_id integer NOT NULL,
+  seller_id integer NOT NULL,
+  value numeric(100,0) NOT NULL,
+  start_time datetime NOT NULL,
+  last_updated datetime,
+  essential boolean NOT NULL DEFAULT false,
+  distance numeric(15),
+  category_id integer,
+  recurring_period varchar(255) NOT NULL,
+  FOREIGN KEY (buyer_id) REFERENCES entities(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY (category_id) REFERENCES category(id),
+  FOREIGN KEY (seller_id) REFERENCES entities(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+);
+CREATE INDEX transaction_recurring_idx_buyer_id ON transaction_recurring (buyer_id);
+CREATE INDEX transaction_recurring_idx_category_id ON transaction_recurring (category_id);
+CREATE INDEX transaction_recurring_idx_seller_id ON transaction_recurring (seller_id);
 --
 -- Table: import_values
 --
