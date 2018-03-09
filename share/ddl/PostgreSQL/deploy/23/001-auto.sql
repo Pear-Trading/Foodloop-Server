@@ -1,6 +1,6 @@
 -- 
 -- Created by SQL::Translator::Producer::PostgreSQL
--- Created on Wed Feb 21 12:51:23 2018
+-- Created on Fri Mar  9 17:43:36 2018
 -- 
 ;
 --
@@ -127,7 +127,7 @@ CREATE INDEX "entity_association_idx_entity_id" on "entity_association" ("entity
 --
 CREATE TABLE "global_medals" (
   "id" serial NOT NULL,
-  "group_id" character varying(255) NOT NULL,
+  "group_id" integer NOT NULL,
   "threshold" integer NOT NULL,
   "points" integer NOT NULL,
   PRIMARY KEY ("id")
@@ -152,7 +152,7 @@ CREATE INDEX "leaderboard_sets_idx_leaderboard_id" on "leaderboard_sets" ("leade
 --
 CREATE TABLE "org_medals" (
   "id" serial NOT NULL,
-  "group_id" character varying(255) NOT NULL,
+  "group_id" integer NOT NULL,
   "threshold" integer NOT NULL,
   "points" integer NOT NULL,
   PRIMARY KEY ("id")
@@ -194,6 +194,7 @@ CREATE TABLE "transactions" (
   "proof_image" text,
   "submitted_at" timestamp NOT NULL,
   "purchase_time" timestamp NOT NULL,
+  "essential" boolean DEFAULT false NOT NULL,
   "distance" numeric(15),
   PRIMARY KEY ("id")
 );
@@ -240,8 +241,8 @@ CREATE INDEX "feedback_idx_user_id" on "feedback" ("user_id");
 --
 CREATE TABLE "global_user_medal_progress" (
   "id" serial NOT NULL,
-  "entity_id" character varying(255) NOT NULL,
-  "group_id" character varying(255) NOT NULL,
+  "entity_id" integer NOT NULL,
+  "group_id" integer NOT NULL,
   "total" integer NOT NULL,
   PRIMARY KEY ("id")
 );
@@ -254,8 +255,8 @@ CREATE INDEX "global_user_medal_progress_idx_group_id" on "global_user_medal_pro
 --
 CREATE TABLE "global_user_medals" (
   "id" serial NOT NULL,
-  "entity_id" character varying(255) NOT NULL,
-  "group_id" character varying(255) NOT NULL,
+  "entity_id" integer NOT NULL,
+  "group_id" integer NOT NULL,
   "points" integer NOT NULL,
   "awarded_at" timestamp NOT NULL,
   "threshold" integer NOT NULL,
@@ -284,8 +285,8 @@ CREATE INDEX "import_lookups_idx_set_id" on "import_lookups" ("set_id");
 --
 CREATE TABLE "org_user_medal_progress" (
   "id" serial NOT NULL,
-  "entity_id" character varying(255) NOT NULL,
-  "group_id" character varying(255) NOT NULL,
+  "entity_id" integer NOT NULL,
+  "group_id" integer NOT NULL,
   "total" integer NOT NULL,
   PRIMARY KEY ("id")
 );
@@ -298,8 +299,8 @@ CREATE INDEX "org_user_medal_progress_idx_group_id" on "org_user_medal_progress"
 --
 CREATE TABLE "org_user_medals" (
   "id" serial NOT NULL,
-  "entity_id" character varying(255) NOT NULL,
-  "group_id" character varying(255) NOT NULL,
+  "entity_id" integer NOT NULL,
+  "group_id" integer NOT NULL,
   "points" integer NOT NULL,
   "awarded_at" timestamp NOT NULL,
   "threshold" integer NOT NULL,
@@ -341,6 +342,27 @@ CREATE TABLE "session_tokens" (
   CONSTRAINT "session_tokens_token" UNIQUE ("token")
 );
 CREATE INDEX "session_tokens_idx_user_id" on "session_tokens" ("user_id");
+
+;
+--
+-- Table: transaction_recurring
+--
+CREATE TABLE "transaction_recurring" (
+  "id" serial NOT NULL,
+  "buyer_id" integer NOT NULL,
+  "seller_id" integer NOT NULL,
+  "value" numeric(100,0) NOT NULL,
+  "start_time" timestamp NOT NULL,
+  "last_updated" timestamp,
+  "essential" boolean DEFAULT false NOT NULL,
+  "distance" numeric(15),
+  "category_id" integer,
+  "recurring_period" character varying(255) NOT NULL,
+  PRIMARY KEY ("id")
+);
+CREATE INDEX "transaction_recurring_idx_buyer_id" on "transaction_recurring" ("buyer_id");
+CREATE INDEX "transaction_recurring_idx_category_id" on "transaction_recurring" ("category_id");
+CREATE INDEX "transaction_recurring_idx_seller_id" on "transaction_recurring" ("seller_id");
 
 ;
 --
@@ -481,6 +503,18 @@ ALTER TABLE "organisation_payroll" ADD CONSTRAINT "organisation_payroll_fk_org_i
 ;
 ALTER TABLE "session_tokens" ADD CONSTRAINT "session_tokens_fk_user_id" FOREIGN KEY ("user_id")
   REFERENCES "users" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+;
+ALTER TABLE "transaction_recurring" ADD CONSTRAINT "transaction_recurring_fk_buyer_id" FOREIGN KEY ("buyer_id")
+  REFERENCES "entities" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+;
+ALTER TABLE "transaction_recurring" ADD CONSTRAINT "transaction_recurring_fk_category_id" FOREIGN KEY ("category_id")
+  REFERENCES "category" ("id") DEFERRABLE;
+
+;
+ALTER TABLE "transaction_recurring" ADD CONSTRAINT "transaction_recurring_fk_seller_id" FOREIGN KEY ("seller_id")
+  REFERENCES "entities" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ;
 ALTER TABLE "import_values" ADD CONSTRAINT "import_values_fk_set_id" FOREIGN KEY ("set_id")
