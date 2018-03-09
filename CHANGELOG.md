@@ -2,6 +2,8 @@
 
 # Next Release
 
+# v0.10.4
+
 * Added API for category budget
 * Added working test for the new API
 * Added initial placeholder API for medals & user points being used in testing
