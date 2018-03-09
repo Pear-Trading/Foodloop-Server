@@ -35,3 +35,5 @@ __PACKAGE__->belongs_to(
   "transaction_id",
   { cascade_delete => 0 },
 );
+
+1;

@@ -48,6 +48,11 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
     set_on_create => 1,
   },
+  "essential" => {
+    data_type => "boolean",
+    default_value => \"false",
+    is_nullable => 0,
+  },
   distance => {
     data_type => 'numeric',
     size => [15],
@@ -75,5 +80,15 @@ __PACKAGE__->might_have(
   "category",
   "Pear::LocalLoop::Schema::Result::TransactionCategory" => "transaction_id",
 );
+
+sub sqlt_deploy_hook {
+  my ( $source_instance, $sqlt_table ) = @_;
+  my $pending_field = $sqlt_table->get_field('essential');
+  if ( $sqlt_table->schema->translator->producer_type =~ /SQLite$/ ) {
+    $pending_field->{default_value} = 0;
+  } else {
+    $pending_field->{default_value} = \"false";
+  }
+}
 
 1;
