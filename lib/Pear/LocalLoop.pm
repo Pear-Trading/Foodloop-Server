@@ -149,6 +149,7 @@ sub startup {
   $api->post('/user/account')->to('api-user#post_account_update');
   $api->post('/user-history')->to('api-user#post_user_history');
   $api->post('/stats')->to('api-stats#post_index');
+  $api->post('/stats/category')->to('api-categories#post_category_list');
   $api->post('/stats/customer')->to('api-stats#post_customer');
   $api->post('/stats/leaderboard')->to('api-stats#post_leaderboards');
   $api->post('/stats/leaderboard/paged')->to('api-stats#post_leaderboards_paged');
@@ -156,6 +157,11 @@ sub startup {
 
 
   my $api_v1 = $api->under('/v1');
+
+  my $api_v1_user = $api_v1->under('/user');
+
+  $api_v1_user->post('/medals')->to('api-v1-user-medals#index');
+  $api_v1_user->post('/points')->to('api-v1-user-points#index');
 
   my $api_v1_supplier = $api_v1->under('/supplier');
 

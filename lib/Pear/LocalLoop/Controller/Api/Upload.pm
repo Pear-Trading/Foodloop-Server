@@ -108,6 +108,8 @@ sub post_upload {
   #Check a proper purchase time was submitted
   $validation->optional('purchase_time')->is_full_iso_datetime;
   $validation->optional('category')->in_resultset( 'id', $c->schema->resultset('Category'));
+  $validation->optional('essential');
+  $validation->optional('recurring');
 
   # First pass of required items
   return $c->api_validation_error if $validation->has_error;
@@ -121,7 +123,7 @@ sub post_upload {
     my $valid_org_rs = $c->schema->resultset('Organisation')->search({
       pending => 0,
       entity_id => { "!=" => $user->entity_id },
-     });
+    });
     $validation->required('organisation_id')->number->in_resultset( 'id', $valid_org_rs );
 
     return $c->api_validation_error if $validation->has_error;
@@ -184,6 +186,8 @@ sub post_upload {
   $purchase_time ||= DateTime->now();
   my $file = defined $upload ? $c->store_file_from_upload( $upload ) : undef;
   my $category = $validation->param('category');
+  my $essential = $validation->param('essential');
+  my $recurring_period = $validation->param('recurring');
   my $distance = $c->get_distance_from_coords( $user->entity->type_object, $organisation );
 
   my $new_transaction = $organisation->entity->create_related(
@@ -193,6 +197,7 @@ sub post_upload {
       value => $transaction_value * 100000,
       ( defined $file ? ( proof_image => $file ) : () ),
       purchase_time => $c->format_db_datetime($purchase_time),
+      essential => ( defined $essential ? $essential : 0 ),
       distance => $distance,
     }
   );
@@ -212,6 +217,19 @@ sub post_upload {
     $c->schema->resultset('TransactionCategory')->create({
       category_id => $category,
       transaction_id => $new_transaction->id,
+    });
+  }
+
+  if ( defined $recurring_period ) {
+    $c->schema->resultset('TransactionRecurring')->create({
+      buyer => $user->entity,
+      seller => $organisation->entity,
+      value => $transaction_value * 100000,
+      start_time => $c->format_db_datetime($purchase_time),
+      essential => ( defined $essential ? $essential : 0 ),
+      distance => $distance,
+      category_id => ( defined $category ? $category : undef ),
+      recurring_period => $recurring_period,
     });
   }
 

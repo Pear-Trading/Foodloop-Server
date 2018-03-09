@@ -2,6 +2,20 @@
 
 # Next Release
 
+# v0.10.4
+
+* Added API for category budget
+* Added working test for the new API
+* Added initial placeholder API for medals & user points being used in testing
+* Added initial schema for medals
+* Added essential flag to purchases in schema
+* Amended upload API to account for essential purchases
+* **Admin Feature** Added ability to view essential flag on purchases
+* Made fixes to category viewing API
+* Added schema for storing recurring purchases
+* Amended Upload code to allow for if purchases are recurring
+* Added script for checking recurring purchases and creating them if required
+
 # v0.10.3
 
 * Added Category and Transaction Category tables to DB

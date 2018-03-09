@@ -425,6 +425,7 @@ $json = {
   purchase_time => $test_purchase_time,
   organisation_id => $unvalidatedOrganisationId,
   session_key => $session_key,
+  recurring_period => "daily",
 };
 $upload = {json => Mojo::JSON::encode_json($json), file => {file => './t/test.jpg'}};
 $t->post_ok('/api/upload' => form => $upload )
