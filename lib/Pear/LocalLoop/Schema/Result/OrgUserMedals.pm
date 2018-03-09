@@ -19,13 +19,11 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
   },
   "entity_id" => {
-    data_type => "varchar",
-    size => 255,
+    data_type => "integer",
     is_nullable => 0,
   },
   "group_id" => {
-    data_type => "varchar",
-    size => 255,
+    data_type => "integer",
     is_nullable => 0,
   },
   "points" => {
