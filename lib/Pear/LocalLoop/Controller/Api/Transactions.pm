@@ -30,7 +30,11 @@ sub post_transaction_list_purchases {
     },
   );
 
-# purchase_time needs timezone attached to it
+  my $recurring_transactions = $c->schema->resultset('TransactionRecurring')->search({
+    buyer_id => $user->id,
+  });
+
+  # purchase_time needs timezone attached to it
   my @transaction_list = (
     map {{
       seller => $_->seller->name,
@@ -39,9 +43,22 @@ sub post_transaction_list_purchases {
     }} $transactions->all
   );
 
+  my @recurring_transaction_list = (
+    map {{
+      seller => $_->seller->name,
+      value => $_->value / 100000,
+      start_time => $c->format_iso_datetime($_->start_time),
+      last_updated => $c->format_iso_datetime($_->last_updated),
+      essential => $_->essential,
+      category => $_->category->category->name,
+      recurring_period => $_->recurring_period,
+    }} $recurring_transactions->all
+  );
+
   return $c->render( json => {
     success => Mojo::JSON->true,
     transactions => \@transaction_list,
+    recurring_transactions => \@recurring_transaction_list,
     page_no => $transactions->pager->total_entries,
   });
 }

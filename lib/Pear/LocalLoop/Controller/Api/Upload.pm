@@ -147,7 +147,7 @@ sub post_upload {
     # Unknown Organisation
     $validation->required('organisation_name');
     $validation->optional('street_name');
-    $validation->required('town');
+    $validation->optional('town');
     $validation->optional('postcode')->postcode;
 
     return $c->api_validation_error if $validation->has_error;
@@ -198,7 +198,7 @@ sub post_upload {
       ( defined $file ? ( proof_image => $file ) : () ),
       purchase_time => $c->format_db_datetime($purchase_time),
       essential => ( defined $essential ? $essential : 0 ),
-      distance => $distance,
+      distance => ( defined $category ? $category : undef ),
     }
   );
 
@@ -227,7 +227,7 @@ sub post_upload {
       value => $transaction_value * 100000,
       start_time => $c->format_db_datetime($purchase_time),
       essential => ( defined $essential ? $essential : 0 ),
-      distance => $distance,
+      distance => ( defined $category ? $category : undef ),
       category_id => ( defined $category ? $category : undef ),
       recurring_period => $recurring_period,
     });
