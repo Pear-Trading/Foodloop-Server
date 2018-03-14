@@ -45,12 +45,13 @@ sub post_transaction_list_purchases {
 
   my @recurring_transaction_list = (
     map {{
+      id => $_->id,
       seller => $_->seller->name,
       value => $_->value / 100000,
       start_time => $c->format_iso_datetime($_->start_time),
       last_updated => $c->format_iso_datetime($_->last_updated),
       essential => $_->essential,
-      category => $_->category->category->name,
+      category => ( defined $_->category ? $_->category->name : 'Uncategorised' ),
       recurring_period => $_->recurring_period,
     }} $recurring_transactions->all
   );
@@ -61,6 +62,18 @@ sub post_transaction_list_purchases {
     recurring_transactions => \@recurring_transaction_list,
     page_no => $transactions->pager->total_entries,
   });
+}
+
+sub update_recurring {
+  my $c = shift;
+
+  my $user = $c->stash->{api_user};
+
+  my $validation = $c->validation;
+
+  $validation->input( $c->stash->{api_json} );
+  #TODO check that user matches seller on database before updating for that id
+
 }
 
 1;
