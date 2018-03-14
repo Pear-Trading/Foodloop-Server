@@ -198,7 +198,7 @@ sub post_upload {
       ( defined $file ? ( proof_image => $file ) : () ),
       purchase_time => $c->format_db_datetime($purchase_time),
       essential => ( defined $essential ? $essential : 0 ),
-      distance => ( defined $category ? $category : undef ),
+      distance => $distance,
     }
   );
 
@@ -227,7 +227,7 @@ sub post_upload {
       value => $transaction_value * 100000,
       start_time => $c->format_db_datetime($purchase_time),
       essential => ( defined $essential ? $essential : 0 ),
-      distance => ( defined $category ? $category : undef ),
+      distance => $distance,
       category_id => ( defined $category ? $category : undef ),
       recurring_period => $recurring_period,
     });
@@ -243,18 +243,22 @@ sub post_category {
   my $c = shift;
   my $self = $c;
 
-  my $categories = { ids => [], names => [] };
-
   my $category_rs = $c->schema->resultset('Category');
 
-  for ( $category_rs->all ) {
-    push @{ $categories->{ ids } }, $_->get_column('id');
-    push @{ $categories->{ names } }, $_->get_column('name');
-  }
+  # for ( $category_rs->all ) {
+  #   push @{ $categories->{ ids } }, $_->get_column('id');
+  #   push @{ $categories->{ names } }, $_->get_column('name');
+  # }
+  my @category_list = (
+    map {{
+      id => $_->id,
+      name => $_->name,
+    }} $category_rs->all
+  );
 
   return $self->render( json => {
     success => Mojo::JSON->true,
-    categories => $categories,
+    categories => \@category_list,
   });
 }
 
