@@ -4,7 +4,8 @@
 
 # v0.10.5
 
-* **Admin Fix** Removed generic Transaction List
+* **Admin Feature** Removed generic Transaction List, replaced with a new
+transaction statistic viewing list
 * **Admin Fix** Amended user view to have accordion
 
 # v0.10.4
