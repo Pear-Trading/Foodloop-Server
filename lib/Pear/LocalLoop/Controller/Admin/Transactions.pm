@@ -6,21 +6,6 @@ has result_set => sub {
   return $c->schema->resultset('Transaction');
 };
 
-sub index {
-  my $c = shift;
-
-  my $transactions = $c->result_set->search(
-    undef, {
-      page => $c->param('page') || 1,
-      rows => 10,
-      order_by => { -desc => 'submitted_at' },
-    },
-  );
-  $c->stash(
-    transactions => $transactions,
-  );
-}
-
 sub read {
   my $c = shift;
 
