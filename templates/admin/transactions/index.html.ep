@@ -11,3 +11,91 @@
     <strong>Success!</strong> <%= $success %>
   </div>
 % }
+<div class="card-deck">
+  <div class="card mb-3 text-center text-white bg-primary">
+    <div class="card-header card-inverse">
+      Number of Transactions
+    </div>
+    <div class="card-body">
+      <h2 class="card-title">
+        %= $weeks->{count}
+      </h2>
+    </div>
+  </div>
+  <div class="card mb-3 text-center text-white bg-success">
+    <div class="card-header card-inverse">
+      Sum of all Transaction Value
+    </div>
+    <div class="card-body">
+      <h2 class="card-title">
+        %= '£' . $weeks->{sum}
+      </h2>
+    </div>
+  </div>
+</div>
+<div class="card-deck">
+  <div class="card mb-3 text-center text-white bg-danger">
+    <div class="card-header card-inverse">
+      No. Transactions This Week
+    </div>
+    <div class="card-body">
+      <h2 class="card-title">
+        %= $weeks->{first_count}
+      </h2>
+    </div>
+  </div>
+  <div class="card mb-3 text-center text-white bg-danger">
+    <div class="card-header card-inverse">
+      No. Transactions Last Week
+    </div>
+    <div class="card-body">
+      <h2 class="card-title">
+        %= $weeks->{second_count}
+      </h2>
+    </div>
+  </div>
+</div>
+<div class="card-deck">
+  <div class="card mb-3 text-center text-white bg-danger">
+    <div class="card-header card-inverse">
+      Sum of Transactions This Week
+    </div>
+    <div class="card-body">
+      <h2 class="card-title">
+        %= $weeks->{first_value}
+      </h2>
+    </div>
+  </div>
+  <div class="card mb-3 text-center text-white bg-danger">
+    <div class="card-header card-inverse">
+      Sum of Transactions Last Week
+    </div>
+    <div class="card-body">
+      <h2 class="card-title">
+        %= $weeks->{second_value}
+      </h2>
+    </div>
+  </div>
+</div>
+<div class="card-deck">
+  <div class="card mb-3 text-center text-white bg-danger">
+    <div class="card-header card-inverse">
+      Maximum Transaction Value
+    </div>
+    <div class="card-body">
+      <h2 class="card-title">
+        %= '£' . $weeks->{max}
+      </h2>
+    </div>
+  </div>
+  <div class="card mb-3 text-center text-white bg-danger">
+    <div class="card-header card-inverse">
+      Average Transaction Value
+    </div>
+    <div class="card-body">
+      <h2 class="card-title">
+        %= '£' . $weeks->{avg}
+      </h2>
+    </div>
+  </div>
+</div>
