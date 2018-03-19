@@ -59,8 +59,8 @@
         <label for="local" class="col-md-4 col-form-label">Is Local</label>
         <div class="col-md-8">
           <select id="local" class="form-control" name="is_local">
-            <option value="0"<%= !$valid_org->is_local ? '' : ' selected' %>>Non Local</option>
-            <option value="1"<%= $valid_org->is_local ? ' selected' : '' %>>Local</option>
+            <option value="0" selected>Non Local</option>
+            <option value="1">Local</option>
           </select>
         </div>
       </div>
@@ -68,8 +68,8 @@
         <label for="local" class="col-md-4 col-form-label">Is Fairly Traded</label>
         <div class="col-md-8">
           <select id="local" class="form-control" name="is_fair">
-            <option value="0"<%= !$valid_org->is_fair ? '' : ' selected' %>>Non Fairly Traded</option>
-            <option value="1"<%= $valid_org->is_fair ? ' selected' : '' %>>Fairly Traded</option>
+            <option value="0" selected>Non Fairly Traded</option>
+            <option value="1">Fairly Traded</option>
           </select>
         </div>
       </div>
