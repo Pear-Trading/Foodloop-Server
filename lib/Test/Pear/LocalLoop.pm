@@ -114,6 +114,8 @@ sub dump_error {
     my $self = shift;
     if ( my $error = $self->tx->res->dom->at('pre[id="error"]') ) {
       diag $error->text;
+    } elsif ( my $route_error = $self->tx->res->dom->at('div[id="routes"] > p') ) {
+      diag $route_error->content;
     } else {
       diag $self->tx->res->to_string;
     }
