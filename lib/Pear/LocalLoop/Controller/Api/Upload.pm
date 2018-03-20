@@ -249,16 +249,15 @@ sub post_category {
   #   push @{ $categories->{ ids } }, $_->get_column('id');
   #   push @{ $categories->{ names } }, $_->get_column('name');
   # }
-  my @category_list = (
-    map {{
-      id => $_->id,
-      name => $_->name,
-    }} $category_rs->all
+  my %category_list = (
+    map {
+      $_->id => $_->name,
+    } $category_rs->all
   );
 
   return $self->render( json => {
     success => Mojo::JSON->true,
-    categories => \@category_list,
+    categories => \%category_list,
   });
 }
 
