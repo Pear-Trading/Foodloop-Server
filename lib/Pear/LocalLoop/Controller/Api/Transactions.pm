@@ -42,7 +42,7 @@ sub post_transaction_list_purchases {
       purchase_time => $c->format_iso_datetime($_->purchase_time),
     }} $transactions->all
   );
-  
+
   my @recurring_transaction_list = (
     map {{
       id => $_->id,
@@ -51,7 +51,7 @@ sub post_transaction_list_purchases {
       start_time => $c->format_iso_datetime($_->start_time),
       last_updated => $c->format_iso_datetime($_->last_updated) || undef,
       essential => $_->essential,
-      category => $_->category_id,
+      category => $_->category_id || 0,
       recurring_period => $_->recurring_period,
     }} $recurring_transactions->all
   );
