@@ -27,7 +27,7 @@ sub register {
         }
       );
     }
-    $app->minion->enqueue('test' => [ 'test arg 1', 'test_arg 2' ] );
+    # $app->minion->enqueue('test' => [ 'test arg 1', 'test_arg 2' ] );
   } else {
     $app->log->debug('No Minion Config');
   }
