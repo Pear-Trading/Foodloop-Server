@@ -161,7 +161,7 @@ sub delete_recurring {
 
   return $c->render( json => {
     success => Mojo::JSON->true,
-    message => 'Recurring Transaction Delete Successfully',
+    message => 'Recurring Transaction Deleted Successfully',
   });
 
 }
