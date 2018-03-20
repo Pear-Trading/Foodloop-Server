@@ -154,6 +154,8 @@ sub startup {
   $api->post('/stats/leaderboard')->to('api-stats#post_leaderboards');
   $api->post('/stats/leaderboard/paged')->to('api-stats#post_leaderboards_paged');
   $api->post('/outgoing-transactions')->to('api-transactions#post_transaction_list_purchases');
+  $api->post('/recurring-transactions')->to('api-transactions#update_recurring');
+  $api->post('/recurring-transactions/delete')->to('api-transactions#delete_recurring');
 
 
   my $api_v1 = $api->under('/v1');
