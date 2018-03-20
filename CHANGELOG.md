@@ -2,6 +2,15 @@
 
 # Next Release
 
+# v0.10.6
+
+* Fixed organisation submission
+* Changed category listing code
+* Made transaction upload code more lenient
+* Added API ability to edit and delete transactions
+* Added test for above
+* Made test dumping more sane
+
 # v0.10.5
 
 * **Admin Feature** Removed generic Transaction List, replaced with a new
