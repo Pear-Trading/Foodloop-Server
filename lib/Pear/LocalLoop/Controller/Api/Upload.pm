@@ -147,7 +147,7 @@ sub post_upload {
     # Unknown Organisation
     $validation->required('organisation_name');
     $validation->optional('street_name');
-    $validation->required('town');
+    $validation->optional('town');
     $validation->optional('postcode')->postcode;
 
     return $c->api_validation_error if $validation->has_error;
@@ -243,18 +243,21 @@ sub post_category {
   my $c = shift;
   my $self = $c;
 
-  my $categories = { ids => [], names => [] };
-
   my $category_rs = $c->schema->resultset('Category');
 
-  for ( $category_rs->all ) {
-    push @{ $categories->{ ids } }, $_->get_column('id');
-    push @{ $categories->{ names } }, $_->get_column('name');
-  }
+  # for ( $category_rs->all ) {
+  #   push @{ $categories->{ ids } }, $_->get_column('id');
+  #   push @{ $categories->{ names } }, $_->get_column('name');
+  # }
+  my %category_list = (
+    map {
+      $_->id => $_->name,
+    } $category_rs->all
+  );
 
   return $self->render( json => {
     success => Mojo::JSON->true,
-    categories => $categories,
+    categories => \%category_list,
   });
 }
 

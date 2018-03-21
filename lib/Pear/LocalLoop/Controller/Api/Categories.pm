@@ -31,9 +31,9 @@ sub post_category_list {
           value            => { sum => 'value' },
           category_id      => 'category_id',
           essential        => 'essential',
-        }
+        },
       ],
-      group_by => [ qw/ category_id quantised_weeks / ],
+      group_by => [ qw/ category_id quantised_weeks essential value / ],
       order_by => { '-desc' => 'value' },
     }
   );
@@ -43,7 +43,7 @@ sub post_category_list {
   for my $cat_trans ( $month_transaction_category_rs->all ) {
     my $quantised = $c->db_datetime_parser->parse_datetime($cat_trans->get_column('quantised'));
     my $days = $c->format_iso_date( $quantised ) || 0;
-    my $category = $cat_trans->get_column('category_id') || 0;
+    my $category = $cat_trans->get_column('category_id') || undef;
     my $value = ($cat_trans->get_column('value') || 0) / 100000;
     $data->{categories}->{$days} = [] unless exists $data->{categories}->{$days};
     push @{ $data->{categories}->{$days} }, {
