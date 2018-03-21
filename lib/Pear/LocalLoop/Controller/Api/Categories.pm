@@ -31,9 +31,9 @@ sub post_category_list {
           value            => { sum => 'value' },
           category_id      => 'category_id',
           essential        => 'essential',
-        }
+        },
       ],
-      group_by => [ qw/ category_id quantised_weeks / ],
+      group_by => [ qw/ category_id quantised_weeks essential value / ],
       order_by => { '-desc' => 'value' },
     }
   );
