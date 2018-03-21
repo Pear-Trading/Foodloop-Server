@@ -2,6 +2,10 @@
 
 # Next Release
 
+* **Admin Fix** Parse currency without a currency symbol on import
+* **Admin Fix** Fix large CSV issue on import
+* Use custom secrets for encryption
+
 # v0.10.6
 
 * Fixed organisation submission
