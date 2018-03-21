@@ -1,7 +1,5 @@
 package Pear::LocalLoop::Plugin::Minion::Job::test;
-use Mojo::Base -base;
-
-has [ qw/ job / ];
+use Mojo::Base 'Pear::LocalLoop::Plugin::Minion::Job';
 
 sub run {
   my ( $self, @args ) = @_;
