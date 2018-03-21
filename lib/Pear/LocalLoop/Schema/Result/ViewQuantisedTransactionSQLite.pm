@@ -17,7 +17,7 @@ SELECT "value",
        "seller_id",
        DATETIME(STRFTIME('%Y-%m-%d %H:00:00',"purchase_time")) AS "quantised_hours",
        DATETIME(STRFTIME('%Y-%m-%d 00:00:00',"purchase_time")) AS "quantised_days",
-       DATETIME(STRFTIME('%Y-%m-%d 00:00:00',"purchase_time", 'weekday 1')) AS "quantised_weeks"
+       DATETIME(STRFTIME('%Y-%m-%d 00:00:00',"purchase_time",'weekday 0','-6 days')) AS "quantised_weeks"
   FROM "transactions"
 /);
 

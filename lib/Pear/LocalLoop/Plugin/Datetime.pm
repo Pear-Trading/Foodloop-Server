@@ -66,6 +66,7 @@ sub register {
 
   $app->helper( format_iso_datetime => sub {
     my ( $c, $datetime_obj ) = @_;
+    return unless defined $datetime_obj;
     return $c->iso_datetime_parser->format_datetime(
       $datetime_obj,
     );
