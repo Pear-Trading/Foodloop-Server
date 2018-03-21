@@ -1,5 +1,9 @@
 use Mojo::Base -strict;
 
+BEGIN {
+  use Test::MockTime qw/ set_absolute_time /;
+}
+
 use FindBin qw/ $Bin /;
 
 use Test::More;
@@ -15,7 +19,7 @@ $framework->install_fixtures('users');
 my $t = $framework->framework;
 my $schema = $t->app->schema;
 
-$t->app->schema->resultset('Leaderboard')->create_new( 'monthly_total', DateTime->now->truncate(to => 'month' )->subtract( months => 1) );
+set_absolute_time('2017-01-02T00:00:00Z');
 
 my $start = DateTime->today->subtract( hours => 12 );
 
@@ -25,15 +29,19 @@ for my $count ( 0 .. 60 ) {
 
   create_random_transaction( 'test1@example.com', $trans_day );
   if ( $count % 2 ) {
-    create_random_transaction( 'test2@example.com', $trans_day );
+    create_random_transaction( 'test1@example.com', $trans_day );
   }
   if ( $count % 3 ) {
-    create_random_transaction( 'test3@example.com', $trans_day );
+    create_random_transaction( 'test1@example.com', $trans_day );
   }
   if ( $count % 4 ) {
-    create_random_transaction( 'test4@example.com', $trans_day );
+    create_random_transaction( 'test1@example.com', $trans_day );
   }
 }
+my $lb_start = $start->clone->truncate( to => 'month' )->subtract( months => 1);
+
+#use Devel::Dwarn; Dwarn({ $_->get_columns }) for $schema->resultset('Transaction')->all;
+$schema->resultset('Leaderboard')->create_new( 'monthly_total', $lb_start );
 
 my $session_key = $framework->login({
   email => 'test1@example.com',
@@ -45,7 +53,7 @@ $t->post_ok('/api/v1/customer/snippets' => json => {
   })
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/snippets', {
-      user_sum => 610,
+      user_sum => 1760,
       user_position => 1,
   });
 
