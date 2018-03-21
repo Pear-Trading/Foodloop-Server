@@ -10,7 +10,8 @@
 * Added API ability to edit and delete transactions
 * Added test for above
 * Made test dumping more sane
-* Fixed category view on postgres
+* Fixed quantised transaction calcuations for weeks on sqlite
+* Amended customer snippet, category list and customer stats tests
 
 # v0.10.5
 
