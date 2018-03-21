@@ -49,11 +49,11 @@ $t->post_ok('/api/stats/customer' => json => {
   })
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/weeks', {
-    first => 2,
-    second => 21,
+    first => 20,
+    second => 20,
     max => 22,
     sum => 118,
-    count => 7,
+    count => 6,
     })
   ->or($framework->dump_error)
   ->json_is('/sectors', {
