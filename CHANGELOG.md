@@ -10,6 +10,7 @@
 * Added API ability to edit and delete transactions
 * Added test for above
 * Made test dumping more sane
+* Fixed category view on postgres
 
 # v0.10.5
 
