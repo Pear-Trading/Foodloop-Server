@@ -92,7 +92,7 @@ sub post_customer {
   );
 
   my @all_weeks = $week_transaction_rs->all;
-  my $first = $all_weeks[0]->get_column('count') || 0;
+  my $first = defined $all_weeks[0] ? $all_weeks[0]->get_column('count') || 0 : 0;
   my $second = defined $all_weeks[1] ? $all_weeks[1]->get_column('count') || 0 : 0;
   my $max = max( map { $_->get_column('count') } @all_weeks );
   my $sum = sum( map { $_->get_column('count') } @all_weeks );
