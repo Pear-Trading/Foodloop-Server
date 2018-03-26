@@ -2,6 +2,7 @@
 
 # Next Release
 
+* Added `cron_daily` script for holding all daily cronjobs
 * **Admin Fix** Parse currency without a currency symbol on import
 * **Admin Fix** Fix large CSV issue on import
 * Use custom secrets for encryption
