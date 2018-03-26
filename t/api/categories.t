@@ -24,7 +24,7 @@ $schema->resultset('Category')->create({
   name => 'test',
 });
 
-set_absolute_time('2017-01-02T00:00:00Z');
+set_absolute_time('2018-01-08T00:00:00Z');
 
 my $start = DateTime->today->subtract( hours => 12 );
 
@@ -55,38 +55,38 @@ $t->post_ok('/api/stats/category' => json => {
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/data', {
     categories => {
-      "2016-12-05" => [{
-        days => "2016-12-05",
+      "2017-12-11" => [{
+        days => "2017-12-11",
         value => 210,
-        category => 1,
+        category => 'test',
       }],
-      "2016-12-12" => [{
-        days => "2016-12-12",
+      "2017-12-18" => [{
+        days => "2017-12-18",
         value => 200,
-        category => 1,
+        category => 'test',
       }],
-      "2016-12-19" => [{
-        days => "2016-12-19",
+      "2017-12-25" => [{
+        days => "2017-12-25",
         value => 210,
-        category => 1,
+        category => 'test',
       }],
-      "2016-12-26" => [{
-        days => "2016-12-26",
+      "2018-01-01" => [{
+        days => "2018-01-01",
         value => 190,
-        category => 1,
+        category => 'test',
       }],
     },
     essentials => {
-      "2016-12-05" => {
+      "2017-12-11" => {
         value => 210,
       },
-      "2016-12-12" => {
+      "2017-12-18" => {
         value => 200,
       },
-      "2016-12-19" => {
+      "2017-12-25" => {
         value => 210,
       },
-      "2016-12-26" => {
+      "2018-01-01" => {
         value => 190,
       },
     }
