@@ -6,7 +6,7 @@ sub index {
 
   my $entity = $c->stash->{api_user}->entity;
 
-  my $data = { local_all => {}, categories => {}, essentials => {} };
+  my $data = { local_all => {}, cat_total => {}, categories => {}, essentials => {} };
 
   my $purchase_rs = $entity->purchases;
 
@@ -98,6 +98,7 @@ sub index {
     my $days = $c->format_iso_date( $quantised ) || 0;
     my $category = $cat_trans->get_column('category_id') || 0;
     my $value = ($cat_trans->get_column('value') || 0) / 100000;
+    $data->{cat_total}->{$category_list->{$category}} += $value;
     $data->{categories}->{$days}->{$category_list->{$category}} += $value;
     next unless $cat_trans->get_column('essential');
     $data->{essentials}->{$days}->{value} += $value;
