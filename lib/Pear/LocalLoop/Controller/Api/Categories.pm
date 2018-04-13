@@ -33,30 +33,31 @@ sub post_category_list {
           essential        => 'essential',
         },
       ],
-      group_by => [ qw/ category_id quantised_weeks essential value / ],
-      order_by => { '-desc' => 'value' },
+      group_by => [ qw/ category_id quantised_weeks essential / ],
     }
   );
 
   my $data = { categories => {}, essentials => {} };
 
+  my $category_list = $c->schema->resultset('Category')->as_hash;
+
   for my $cat_trans ( $month_transaction_category_rs->all ) {
     my $quantised = $c->db_datetime_parser->parse_datetime($cat_trans->get_column('quantised'));
     my $days = $c->format_iso_date( $quantised ) || 0;
-    my $category = $cat_trans->get_column('category_id') || undef;
+    my $category = $cat_trans->get_column('category_id') || 0;
     my $value = ($cat_trans->get_column('value') || 0) / 100000;
-    $data->{categories}->{$days} = [] unless exists $data->{categories}->{$days};
-    push @{ $data->{categories}->{$days} }, {
-      days => $days,
-      value => $value,
-      category => $category,
-    };
+    $data->{categories}->{$days}->{$category_list->{$category}} += $value;
     next unless $cat_trans->get_column('essential');
     $data->{essentials}->{$days}->{value} += $value;
   }
 
   for my $day ( keys %{ $data->{categories} } ) {
-    $data->{categories}->{$day} = [ sort { $b->{value} <=> $a->{value} } @{ $data->{categories}->{$day} } ];
+    my @days = ( map{ {
+      days => $day,
+      value => $data->{categories}->{$day}->{$_},
+      category => $_,
+    } } keys %{ $data->{categories}->{$day} } );
+    $data->{categories}->{$day} = [ sort { $b->{value} <=> $a->{value} } @days ];
   }
 
   return $c->render(

@@ -42,7 +42,7 @@ $t->post_ok('/api/v1/customer/pies' => json => {
     session_key => $session_key,
   })
   ->status_is(200)->or($framework->dump_error)
-  ->json_is('/pie', {
+  ->json_is('/local_all', {
     'Local shop local purchaser' => 0,
     'Local shop non-local purchaser' => 0,
     'Non-local shop local purchaser' => 0,
