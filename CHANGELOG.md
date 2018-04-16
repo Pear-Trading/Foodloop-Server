@@ -2,10 +2,16 @@
 
 # Next Release
 
+# v.10.7
+
 * Added `cron_daily` script for holding all daily cronjobs
 * **Admin Fix** Parse currency without a currency symbol on import
 * **Admin Fix** Fix large CSV issue on import
 * Use custom secrets for encryption
+* Made purchase categories easier to pull
+* Added dashboard data for getting essential for all purchases along with
+weekly and monthly view of category purchases
+* Amended tests where relevant
 
 # v0.10.6
 
