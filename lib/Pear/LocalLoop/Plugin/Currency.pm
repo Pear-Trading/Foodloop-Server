@@ -9,6 +9,8 @@ sub register {
     my $value;
     if ( $currency_string =~ /^£([\d.]+)/ ) {
       $value = $1 * 1;
+    } elsif ( $currency_string =~ /^([\d.]+)/ ) {
+      $value = $1 * 1;
     }
     return $value;
   });

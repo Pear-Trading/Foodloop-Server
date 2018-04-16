@@ -34,6 +34,13 @@ sub startup {
   });
   my $config = $self->config;
 
+  if ( defined $config->{secret} ) {
+    $self->secrets([ $config->{secret} ]);
+  } elsif ( $self->mode eq 'production' ) {
+    # Just incase we end up in production and it hasnt been set!
+    $self->secrets([ Data::UUID->new->create() ]);
+  }
+
   push @{ $self->commands->namespaces }, __PACKAGE__ . '::Command';
 
   $self->plugin('Pear::LocalLoop::Plugin::BootstrapPagination', { bootstrap4 => 1 } );
@@ -155,6 +162,8 @@ sub startup {
   $api->post('/stats/leaderboard')->to('api-stats#post_leaderboards');
   $api->post('/stats/leaderboard/paged')->to('api-stats#post_leaderboards_paged');
   $api->post('/outgoing-transactions')->to('api-transactions#post_transaction_list_purchases');
+  $api->post('/recurring-transactions')->to('api-transactions#update_recurring');
+  $api->post('/recurring-transactions/delete')->to('api-transactions#delete_recurring');
 
 
   my $api_v1 = $api->under('/v1');
@@ -252,9 +261,9 @@ sub startup {
 #  $portal_api->post('/search')->to('api-upload#post_search');
 
   $self->hook( before_dispatch => sub {
-    my $self = shift;
+    my $c = shift;
 
-    $self->res->headers->header('Access-Control-Allow-Origin' => '*') if $self->app->mode eq 'development';
+    $c->res->headers->header('Access-Control-Allow-Origin' => '*') if $c->app->mode eq 'development';
   });
 
   $self->helper( copy_transactions_and_delete => sub {

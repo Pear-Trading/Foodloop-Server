@@ -2,6 +2,22 @@
 
 # Next Release
 
+* Added `cron_daily` script for holding all daily cronjobs
+* **Admin Fix** Parse currency without a currency symbol on import
+* **Admin Fix** Fix large CSV issue on import
+* Use custom secrets for encryption
+
+# v0.10.6
+
+* Fixed organisation submission
+* Changed category listing code
+* Made transaction upload code more lenient
+* Added API ability to edit and delete transactions
+* Added test for above
+* Made test dumping more sane
+* Fixed quantised transaction calcuations for weeks on sqlite
+* Amended customer snippet, category list and customer stats tests
+
 # v0.10.5
 
 * **Admin Feature** Removed generic Transaction List, replaced with a new
