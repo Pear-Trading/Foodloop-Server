@@ -38,8 +38,6 @@ my $session_key = $framework->login({
   password => 'abc123',
 });
 
-use Data::Dumper;
-
 $t->post_ok('/api/outgoing-transactions' => json => {
     session_key => $session_key,
   })
@@ -49,6 +47,36 @@ $t->post_ok('/api/outgoing-transactions' => json => {
   ->json_has('/transactions/1/seller')
   ->json_has('/transactions/1/value')
   ->json_has('/transactions/1/purchase_time');
+
+my $test_purchase_time = "2017-08-14T11:29:07.965+01:00";
+
+$t->post_ok('/api/recurring-transactions' => json => {
+  session_key      => $session_key,
+  id               => 1,
+  apply_time       => $test_purchase_time,
+  essential        => "false",
+  value            => 5,
+  recurring_period => 'daily',
+  })
+  ->status_is(200)->or($framework->dump_error)
+  ->json_is({
+    success => Mojo::JSON->true,
+    message => 'Recurring Transaction Updated Successfully',
+  });
+
+is $schema->resultset('TransactionRecurring')->count, 87;
+
+$t->post_ok('/api/recurring-transactions/delete' => json => {
+  session_key      => $session_key,
+  id               => 1,
+  })
+  ->status_is(200)->or($framework->dump_error)
+  ->json_is({
+    success => Mojo::JSON->true,
+    message => 'Recurring Transaction Deleted Successfully',
+  });
+
+is $schema->resultset('TransactionRecurring')->count, 86;
 
 
 sub create_random_transaction {
@@ -63,6 +91,14 @@ sub create_random_transaction {
     value => 10,
     proof_image => 'a',
     purchase_time => $time,
+  });
+  $schema->resultset('TransactionRecurring')->create({
+    buyer => $buyer_result,
+    seller => $seller_result,
+    value => 10,
+    start_time => $time,
+    essential => 1,
+    recurring_period => 'weekly',
   });
 }
 
