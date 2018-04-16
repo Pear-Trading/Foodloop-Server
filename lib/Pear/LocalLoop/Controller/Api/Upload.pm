@@ -243,21 +243,12 @@ sub post_category {
   my $c = shift;
   my $self = $c;
 
-  my $category_rs = $c->schema->resultset('Category');
-
-  # for ( $category_rs->all ) {
-  #   push @{ $categories->{ ids } }, $_->get_column('id');
-  #   push @{ $categories->{ names } }, $_->get_column('name');
-  # }
-  my %category_list = (
-    map {
-      $_->id => $_->name,
-    } $category_rs->all
-  );
+  my $category_list = $c->schema->resultset('Category')->as_hash;
+  delete $category_list->{0};
 
   return $self->render( json => {
     success => Mojo::JSON->true,
-    categories => \%category_list,
+    categories => $category_list,
   });
 }
 

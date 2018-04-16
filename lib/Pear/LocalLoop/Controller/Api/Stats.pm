@@ -63,9 +63,9 @@ sub post_customer {
 
   my $entity = $c->stash->{api_user}->entity;
 
-  my $duration = DateTime::Duration->new( weeks => 7 );
+  my $duration_weeks = DateTime::Duration->new( weeks => 7 );
   my $end = DateTime->today;
-  my $start = $end->clone->subtract_duration( $duration );
+  my $start_weeks = $end->clone->subtract_duration( $duration_weeks );
 
   my $dtf = $c->schema->storage->datetime_parser;
   my $driver = $c->schema->storage->dbh->{Driver}->{Name};
@@ -73,7 +73,7 @@ sub post_customer {
     {
       purchase_time => {
         -between => [
-          $dtf->format_datetime($start),
+          $dtf->format_datetime($start_weeks),
           $dtf->format_datetime($end),
         ],
       },
@@ -92,7 +92,7 @@ sub post_customer {
   );
 
   my @all_weeks = $week_transaction_rs->all;
-  my $first = $all_weeks[0]->get_column('count') || 0;
+  my $first = defined $all_weeks[0] ? $all_weeks[0]->get_column('count') || 0 : 0;
   my $second = defined $all_weeks[1] ? $all_weeks[1]->get_column('count') || 0 : 0;
   my $max = max( map { $_->get_column('count') } @all_weeks );
   my $sum = sum( map { $_->get_column('count') } @all_weeks );
@@ -125,8 +125,69 @@ sub post_customer {
     push @{ $sectors->{ purchases } }, ($_->get_column('count') || 0);
   }
 
+  my $data = { cat_total => {}, categories => {}, essentials => {} };
+
+  my $purchase_rs = $entity->purchases;
+
+  my $purchase_no_essential_rs = $purchase_rs->search({
+    "me.essential" => 1,
+  });
+
+  $data->{essentials} = {
+    purchase_no_total => $purchase_rs->count,
+    purchase_no_essential_total => $purchase_no_essential_rs->count,
+  };
+
+  my $duration_month = DateTime::Duration->new( days => 28 );
+  my $start_month = $end->clone->subtract_duration( $duration_month );
+  my $month_transaction_category_rs = $c->schema->resultset('ViewQuantisedTransactionCategory' . $driver)->search(
+    {
+      purchase_time => {
+        -between => [
+          $dtf->format_datetime($start_month),
+          $dtf->format_datetime($end),
+        ],
+      },
+      buyer_id => $entity->id,
+    },
+    {
+      columns => [
+        {
+          quantised        => 'quantised_weeks',
+          value            => { sum => 'value' },
+          category_id      => 'category_id',
+          essential        => 'essential',
+        },
+      ],
+      group_by => [ qw/ category_id quantised_weeks essential / ],
+    }
+  );
+
+  my $category_list = $c->schema->resultset('Category')->as_hash;
+
+  for my $cat_trans ( $month_transaction_category_rs->all ) {
+    my $quantised = $c->db_datetime_parser->parse_datetime($cat_trans->get_column('quantised'));
+    my $days = $c->format_iso_date( $quantised ) || 0;
+    my $category = $cat_trans->get_column('category_id') || 0;
+    my $value = ($cat_trans->get_column('value') || 0) / 100000;
+    $data->{cat_total}->{$category_list->{$category}} += $value;
+    $data->{categories}->{$days}->{$category_list->{$category}} += $value;
+    next unless $cat_trans->get_column('essential');
+    $data->{essentials}->{$days}->{value} += $value;
+  }
+
+  for my $day ( keys %{ $data->{categories} } ) {
+    my @days = ( map{ {
+      days => $day,
+      value => $data->{categories}->{$day}->{$_},
+      category => $_,
+    } } keys %{ $data->{categories}->{$day} } );
+    $data->{categories}->{$day} = [ sort { $b->{value} <=> $a->{value} } @days ];
+  }
+
   return $c->render( json => {
     success => Mojo::JSON->true,
+    data => $data,
     weeks => $weeks,
     sectors => $sectors,
   });
