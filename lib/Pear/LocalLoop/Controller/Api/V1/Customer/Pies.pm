@@ -7,6 +7,7 @@ sub index {
   my $entity = $c->stash->{api_user}->entity;
 
   my $purchase_rs = $entity->purchases;
+
   my $local_org_local_purchase = $purchase_rs->search({
     "me.distance" => { '<', 20000 },
     'organisation.is_local' => 1,
@@ -43,17 +44,17 @@ sub index {
   }
   );
 
-  my $data = {
+  my $local_all = {
     'Local shop local purchaser' => $local_org_local_purchase->count,
     'Local shop non-local purchaser' => $local_org_non_local_purchase->count,
     'Non-local shop local purchaser' => $non_local_org_local_purchase->count,
     'Non-local shop non-local purchaser' => $non_local_org_non_local_purchase->count,
   };
-  
+
   return $c->render(
     json => {
       success => Mojo::JSON->true,
-      pie => $data,
+      local_all => $local_all,
     }
   );
 

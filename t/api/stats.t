@@ -19,7 +19,7 @@ $framework->install_fixtures('users');
 my $t = $framework->framework;
 my $schema = $t->app->schema;
 
-set_absolute_time('2017-01-01T00:00:00Z');
+set_absolute_time('2018-01-08T00:00:00Z');
 
 my $start = DateTime->today->subtract( hours => 12 );
 
@@ -49,17 +49,50 @@ $t->post_ok('/api/stats/customer' => json => {
   })
   ->status_is(200)->or($framework->dump_error)
   ->json_is('/weeks', {
-    first => 20,
+    first => 17,
     second => 20,
-    max => 22,
+    max => 21,
     sum => 118,
     count => 6,
     })
-  ->or($framework->dump_error)
   ->json_is('/sectors', {
     sectors => ['A'],
     purchases => [118],
-  });
+  })
+  ->json_is('/data', {
+    cat_total => {
+      Uncategorised => 810,
+    },
+    categories => {
+      "2017-12-11" => [{
+        days => "2017-12-11",
+        value => 210,
+        category => 'Uncategorised',
+      }],
+      "2017-12-18" => [{
+        days => "2017-12-18",
+        value => 200,
+        category => 'Uncategorised',
+      }],
+      "2017-12-25" => [{
+        days => "2017-12-25",
+        value => 210,
+        category => 'Uncategorised',
+      }],
+      "2018-01-01" => [{
+        days => "2018-01-01",
+        value => 190,
+        category => 'Uncategorised',
+      }],
+    },
+    cat_total => {
+      Uncategorised => 810,
+    },
+    essentials => {
+      purchase_no_essential_total => 0,
+      purchase_no_total => 118,
+    },
+  })->or($framework->dump_error);
 
 sub create_random_transaction {
   my $buyer = shift;

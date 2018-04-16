@@ -144,7 +144,8 @@ sub _csv_flash_error {
 
   $c->flash(
     error => $error,
-    csv_data => $c->param('csv'),
+    # If csv info is huge, this fails epically
+    #csv_data => $c->param('csv'),
     date_format => $c->param('date_format'),
   );
 }

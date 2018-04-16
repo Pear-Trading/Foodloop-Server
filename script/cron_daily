@@ -1,0 +1,10 @@
+#! /bin/bash
+
+# Scripts to run daily.
+# This will be run sometime between 2 & 3AM every morning.
+# If order matters, make sure they are in the right place.
+
+eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+
+MOJO_MODE=production ./script/pear-local_loop recur_transactions --force
+MOJO_MODE=production ./script/pear-local_loop recalc_leaderboards
