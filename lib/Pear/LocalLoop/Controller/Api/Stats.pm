@@ -108,25 +108,6 @@ sub post_customer {
     count => $count,
   };
 
-  my $sectors = { sectors => [], purchases => [] };
-
-  my $sector_purchase_rs = $purchase_rs->search({},
-  {
-    join => { 'seller' => 'organisation' },
-    columns => {
-      sector => "organisation.sector",
-      count            => \"COUNT(*)",
-    },
-    group_by => "organisation.sector",
-    order_by => { '-desc' => $c->pg_or_sqlite('count',"COUNT(*)",)},
-  }
-  );
-
-  for ( $sector_purchase_rs->all ) {
-    push @{ $sectors->{ sectors } }, $_->get_column('sector');
-    push @{ $sectors->{ purchases } }, ($_->get_column('count') || 0);
-  }
-
   my $data = { cat_total => {}, categories => {}, essentials => {}, cat_list => {} };
 
   my $category_list = $c->schema->resultset('Category')->as_hash;
@@ -212,7 +193,6 @@ sub post_customer {
     success => Mojo::JSON->true,
     data => $data,
     weeks => $weeks,
-    sectors => $sectors,
   });
 }
 
