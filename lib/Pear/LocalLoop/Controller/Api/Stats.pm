@@ -63,6 +63,8 @@ sub post_customer {
 
   my $entity = $c->stash->{api_user}->entity;
 
+  my $purchase_rs = $entity->purchases;
+
   my $duration_weeks = DateTime::Duration->new( weeks => 7 );
   my $end = DateTime->today;
   my $start_weeks = $end->clone->subtract_duration( $duration_weeks );
@@ -108,7 +110,7 @@ sub post_customer {
 
   my $sectors = { sectors => [], purchases => [] };
 
-  my $sector_purchase_rs = $entity->purchases->search({},
+  my $sector_purchase_rs = $purchase_rs->search({},
   {
     join => { 'seller' => 'organisation' },
     columns => {
@@ -125,9 +127,32 @@ sub post_customer {
     push @{ $sectors->{ purchases } }, ($_->get_column('count') || 0);
   }
 
-  my $data = { cat_total => {}, categories => {}, essentials => {} };
+  my $data = { cat_total => {}, categories => {}, essentials => {}, cat_list => {} };
 
-  my $purchase_rs = $entity->purchases;
+  my $category_list = $c->schema->resultset('Category')->as_hash;
+
+  my $category_purchase_rs = $purchase_rs->search({},
+  {
+    join => 'category',
+    columns => {
+      category_id => "category.category_id",
+      value       => { sum => 'value' },
+    },
+    group_by => "category.category_id",
+  }
+  );
+
+  my %cat_total_list;
+
+  for ( $category_purchase_rs->all ) {
+    my $category = $_->get_column('category_id') || 0;
+    my $value = ($_->get_column('value') || 0) / 100000;
+
+    $cat_total_list{$category_list->{$category}} += $value;
+  }
+
+  my @cat_lists = map { { category => $_, value => $cat_total_list{$_} } } sort keys %cat_total_list;
+  $data->{cat_list} = [ sort { $b->{value} <=> $a->{value} } @cat_lists ];
 
   my $purchase_no_essential_rs = $purchase_rs->search({
     "me.essential" => 1,
@@ -162,8 +187,6 @@ sub post_customer {
       group_by => [ qw/ category_id quantised_weeks essential / ],
     }
   );
-
-  my $category_list = $c->schema->resultset('Category')->as_hash;
 
   for my $cat_trans ( $month_transaction_category_rs->all ) {
     my $quantised = $c->db_datetime_parser->parse_datetime($cat_trans->get_column('quantised'));
