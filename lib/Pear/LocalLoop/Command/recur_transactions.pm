@@ -47,6 +47,7 @@ sub run {
   my $match_date_fortnight = $app->format_iso_date($datetime->clone->subtract( weeks => 2 ));
   my $match_date_month = $app->format_iso_date($datetime->clone->subtract( months => 1 ));
   my $match_date_quarter = $app->format_iso_date($datetime->clone->subtract( months => 3));
+  my $match_date_year = $app->format_iso_date($datetime->clone->subtract( years => 1 ));
 
   my $schema = $app->schema;
   my $dtf = $schema->storage->datetime_parser;
@@ -78,6 +79,9 @@ sub run {
     } elsif ( $recurring_period eq 'quarterly' ) {
       next unless $start_time eq $match_date_quarter;
       say "matched recurring transaction ID " . $recur_result->id . " to quarterly";
+    } elsif ( $recurring_period eq 'yearly' ) {
+      next unless $start_time eq $match_date_year;
+      say "matched recurring transaction ID " . $recur_result->id . " to yearly";
     } else {
       say "Invalid recurring time period given";
       return;
