@@ -2,7 +2,11 @@
 
 # Next Release
 
-# v.10.7
+# v0.10.8
+
+* Added yearly recurring payments
+
+# v0.10.7
 
 * Added `cron_daily` script for holding all daily cronjobs
 * **Admin Fix** Parse currency without a currency symbol on import
