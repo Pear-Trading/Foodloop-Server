@@ -55,10 +55,6 @@ $t->post_ok('/api/stats/customer' => json => {
     sum => 118,
     count => 6,
     })
-  ->json_is('/sectors', {
-    sectors => ['A'],
-    purchases => [118],
-  })
   ->json_is('/data', {
     cat_total => {
       Uncategorised => 810,
@@ -88,6 +84,10 @@ $t->post_ok('/api/stats/customer' => json => {
     cat_total => {
       Uncategorised => 810,
     },
+    cat_list => [{
+      category => "Uncategorised",
+      value => 1180,
+    }],
     essentials => {
       purchase_no_essential_total => 0,
       purchase_no_total => 118,
