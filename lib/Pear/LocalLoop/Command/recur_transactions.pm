@@ -87,12 +87,11 @@ sub run {
       return;
     }
 
-    my $now = DateTime->now();
     my $purchase_time = DateTime->new(
-      year => $now->year,
-      month => $now->month,
-      day => $now->day,
-      hour => $start_time_dt->hour,
+      year   => $datetime->year,
+      month  => $datetime->month,
+      day    => $datetime->day,
+      hour   => $start_time_dt->hour,
       minute => $start_time_dt->minute,
       second => $start_time_dt->second,
       time_zone => 'UTC',
@@ -102,12 +101,12 @@ sub run {
     my $distance = $recur_result->distance;
 
     my $new_transaction = $schema->resultset('Transaction')->create({
-      buyer_id => $recur_result->buyer_id,
-      seller_id => $recur_result->seller_id,
-      value => $recur_result->value,
+      buyer_id      => $recur_result->buyer_id,
+      seller_id     => $recur_result->seller_id,
+      value         => $recur_result->value,
       purchase_time => $app->format_db_datetime($purchase_time),
-      distance => $distance,
-      essential => ( defined $essential ? $essential : 0 ),
+      distance      => $distance,
+      essential     => ( defined $essential ? $essential : 0 ),
     });
 
     unless ( defined $new_transaction ) {

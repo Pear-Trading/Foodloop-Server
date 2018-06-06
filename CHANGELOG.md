@@ -2,6 +2,11 @@
 
 # Next Release
 
+# v0.10.9
+
+* Removed sector list from dashboard stats and swapped it for category list
+* Added fix to recurring transaction script
+
 # v0.10.8
 
 * Added yearly recurring payments
