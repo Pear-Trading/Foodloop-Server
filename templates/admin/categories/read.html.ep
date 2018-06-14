@@ -13,13 +13,18 @@
 % }
 <form action="<%= url_for %>" method="post">
   <div class="form-group">
-    <label for="category-name">Token Name</label>
+    <label for="category-name">Category Name</label>
     <input id="category-name" type="text" class="form-control" placeholder="Token Text" name="category" value="<%= $category->name %>">
   </div>
   <div class="form-group">
-    <label for="category-id">Token ID</label>
+    <label for="category-id">Category ID</label>
     <input id="category-id" type="text" class="form-control" placeholder="Token ID" name="id" value="<%= $category->id %>">
     <p class="help-block">Do not change the ID unless <strong>absolutely</strong> necessary.</p>
+  </div>
+  <div class="form-group">
+    <label for="line-icon">Simple Line Icon</label>
+    <input id="line-icon" type="text" class="form-control" placeholder="Icon text" name="line_icon" value="<%= $category->line_icon %>">
+    <p class="help-block">See here for all possible options http://simplelineicons.com/.</p>
   </div>
   <div class="form-group">
     <button class="btn btn-primary form-control" type="submit">Update</button>
