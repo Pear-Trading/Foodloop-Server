@@ -59,6 +59,7 @@ sub update {
   my $validation = $c->validation;
   $validation->required('id');
   $validation->required('category', 'trim')->like(qr/^[\w]*$/);
+  $validation->optional('line_icon');
 
   my $id = $c->param('id');
 
@@ -70,6 +71,7 @@ sub update {
     $category->update({
       id => $validation->param('id'),
       name => $validation->param('category'),
+      line_icon => (defined $validation->param('line_icon') ? $validation->param('line_icon') : undef ),
     });
     $c->flash( success => 'Category Updated' );
     $c->redirect_to( '/admin/categories/' . $validation->param('id') );
