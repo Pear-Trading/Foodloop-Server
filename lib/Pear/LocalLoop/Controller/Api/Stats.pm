@@ -132,7 +132,8 @@ sub post_customer {
     $cat_total_list{$category_list->{$category}} += $value;
   }
 
-  my @cat_lists = map { { category => $_, value => $cat_total_list{$_} } } sort keys %cat_total_list;
+  my @cat_lists = map { { category => $_, value => $cat_total_list{$_},
+  icon => $c->schema->resultset('Category')->as_hash_name_icon->{$_} || 'question'} } sort keys %cat_total_list;
   $data->{cat_list} = [ sort { $b->{value} <=> $a->{value} } @cat_lists ];
 
   my $purchase_no_essential_rs = $purchase_rs->search({
