@@ -93,9 +93,23 @@ sub post_customer {
     }
   );
 
+  use Devel::Dwarn;
+
+  my $date_formatter = DateTime::Format::Strptime->new(
+    pattern => '%Y-%m-%d %H-%M-%S'
+  );
+
   my @all_weeks = $week_transaction_rs->all;
-  my $first = defined $all_weeks[0] ? $all_weeks[0]->get_column('count') || 0 : 0;
-  my $second = defined $all_weeks[1] ? $all_weeks[1]->get_column('count') || 0 : 0;
+  my ( $first, $second ) = (0,0);
+  my $this_week_object = $end->truncate( to => 'week' );
+  my $this_week = $date_formatter->parse_datetime($this_week_object);
+  if ($all_weeks[0]->get_column('quantised') eq $this_week) {
+    $first = defined $all_weeks[0] ? $all_weeks[0]->get_column('count') || 0 : 0;
+  }
+  my $last_week = $date_formatter->parse_datetime($this_week_object->subtract( weeks => 1 ));
+  if (defined $all_weeks[1] && $all_weeks[1]->get_column('quantised') eq $last_week) {
+    $second = defined $all_weeks[1] ? $all_weeks[1]->get_column('count') || 0 : 0;
+  }
   my $max = max( map { $_->get_column('count') } @all_weeks );
   my $sum = sum( map { $_->get_column('count') } @all_weeks );
   my $count = $week_transaction_rs->count;
