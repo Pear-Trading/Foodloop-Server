@@ -1,0 +1,32 @@
+% layout 'admin';
+% title 'Import From';
+% content_for javascript => begin
+% end
+% if (my $error = flash 'error') {
+<div class="alert alert-danger" role="alert">
+  <strong>Error!</strong> <%= $error %>
+</div>
+% }
+% elsif (my $success = flash 'success') {
+<div class="alert alert-success" role="alert">
+  <strong>Success!</strong> <%= $success %>
+</div>
+% }
+<div class="row">
+  <div class="col-12 mb-3">
+    <h3 class="float-left">Import From</h3>
+  </div>
+  <div class="col-12 mb-3">
+    <p>Various import options depending on source. Each one is custom.</p>
+  </div>
+  <div class="col col-md-4 mb-3">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">LCC Procurement Import</h5>
+        <div class="card-text">Creditor reports from LCC</div>
+        <a href="#" class="card-link">Suppliers</a>
+        <a href="#" class="card-link">Transactions</a>
+      </div>
+    </div>
+  </div>
+</div>
