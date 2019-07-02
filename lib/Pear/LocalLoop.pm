@@ -244,6 +244,9 @@ sub startup {
 
   $admin_routes->get('/import/:set_id/ignore/:value_id')->to('admin-import#ignore_value');
   $admin_routes->get('/import/:set_id/import')->to('admin-import#run_import');
+
+  $admin_routes->get('/import_from')->to('admin-import_from#index');
+
 #  my $user_routes = $r->under('/')->to('root#under');
 
 # $user_routes->get('/home')->to('root#home');

@@ -23,6 +23,7 @@ requires 'DBIx::Class::Fixtures';
 requires 'GIS::Distance';
 requires 'Text::CSV';
 requires 'Try::Tiny';
+requires 'Throwable::Error';
 
 on 'test' => sub {
   requires 'Test::More';
