@@ -8,7 +8,7 @@ use base 'DBIx::Class::Core';
 __PACKAGE__->table("transactions_external");
 
 __PACKAGE__->add_columns(
-  "id"                    => {
+  "id" => {
     data_type         => "integer",
     is_auto_increment => 1,
     is_nullable       => 0,
@@ -23,7 +23,7 @@ __PACKAGE__->add_columns(
     is_foreign_key => 1,
     is_nullable    => 0,
   },
-  "external_id"           => {
+  "external_id" => {
     data_type   => "varchar",
     size        => 255,
     is_nullable => 0,
