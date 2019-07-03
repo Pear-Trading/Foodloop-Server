@@ -105,6 +105,18 @@ __PACKAGE__->belongs_to(
   "entity_id",
 );
 
+__PACKAGE__->belongs_to(
+  "organisation_type",
+  "Pear::LocalLoop::Schema::Result::OrganisationType",
+  "type_id",
+);
+
+__PACKAGE__->belongs_to(
+  "social_type",
+  "Pear::LocalLoop::Schema::Result::OrganisationType",
+  "social_type_id",
+);
+
 __PACKAGE__->has_many(
   "payroll",
   "Pear::LocalLoop::Schema::Result::OrganisationPayroll",

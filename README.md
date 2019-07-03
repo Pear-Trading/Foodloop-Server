@@ -22,3 +22,31 @@ cpanm --installdeps . --with-feature postgres
 PEAR_TEST_PG=1 prove -lr
 ```
 
+# Dev notes
+
+## Local test database
+
+To install a local DB:
+
+```
+./script/deploy_db install -c 'dbi:SQLite:dbname=foodloop.db'
+```
+
+To do an upgrade of it after making DB changes to commit:
+
+```
+./script/deploy_db write_ddl -c 'dbi:SQLite:dbname=foodloop.db'
+./script/deploy_db upgrade -c 'dbi:SQLite:dbname=foodloop.db'
+```
+
+To redo leaderboards:
+
+```
+./script/pear-local_loop recalc_leaderboards
+```
+
+To serve a test version locally of the server:
+
+```
+morbo script/pear-local_loop
+```
