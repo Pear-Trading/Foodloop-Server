@@ -17,15 +17,25 @@
     <h3 class="float-left">Import From</h3>
   </div>
   <div class="col-12 mb-3">
-    <p>Various import options depending on source. Each one is custom.</p>
+    <p>Various import options depending on source. Each one is custom. For Creditor reports from LCC.</p>
   </div>
-  <div class="col col-md-4 mb-3">
-    <div class="card">
+  <div class="row">
+    <div class="card col-md-6 m-3">
       <div class="card-body">
-        <h5 class="card-title">LCC Procurement Import</h5>
-        <div class="card-text">Creditor reports from LCC</div>
-        <a href="#" class="card-link">Suppliers</a>
-        <a href="#" class="card-link">Transactions</a>
+        <h4 class="card-title">LCC Procurement Import - Suppliers</h4>
+        <form action="/admin/import_from/suppliers" method="POST" enctype="multipart/form-data">
+          <input type="file" name="suppliers_csv" accept="text/csv">
+          <input type="submit" value="Upload Suppliers CSV">
+        </form>
+      </div>
+    </div>
+    <div class="card col-md-6 m-3">
+      <div class="card-body">
+        <h4 class="card-title">LCC Procurement Import - Transactions</h4>
+        <form action="/admin/import_from/transactions" method="POST" enctype="multipart/form-data">
+          <input type="file" name="transactions_csv" accept="text/csv">
+          <input type="submit" value="Upload Transactions CSV">
+        </form>
       </div>
     </div>
   </div>
