@@ -246,6 +246,8 @@ sub startup {
   $admin_routes->get('/import/:set_id/import')->to('admin-import#run_import');
 
   $admin_routes->get('/import_from')->to('admin-import_from#index');
+  $admin_routes->post('/import_from/suppliers')->to('admin-import_from#post_suppliers');
+  $admin_routes->post('/import_from/transactions')->to('admin-import_from#post_transactions');
 
 #  my $user_routes = $r->under('/')->to('root#under');
 
