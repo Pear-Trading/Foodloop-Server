@@ -2,6 +2,8 @@
 myapp.conf
 hypnotoad.pid
 *.db
+*.db-wal
+*.db-shm
 *~
 /images
 *.swp

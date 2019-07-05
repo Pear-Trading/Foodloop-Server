@@ -49,6 +49,7 @@ sub startup {
   $self->plugin('Pear::LocalLoop::Plugin::Currency');
   $self->plugin('Pear::LocalLoop::Plugin::Postcodes');
   $self->plugin('Pear::LocalLoop::Plugin::TemplateHelpers');
+  $self->plugin('Pear::LocalLoop::Plugin::Minion');
 
   $self->plugin('Authentication' => {
     'load_user' => sub {
@@ -196,6 +197,12 @@ sub startup {
 
   my $admin_routes = $r->under('/admin')->to('admin#under');
 
+  if ( defined $config->{minion} ) {
+    $self->plugin( 'Minion::Admin' => {
+      return_to => '/admin/home',
+      route => $admin_routes->any('/minion'),
+    } );
+  }
   $admin_routes->get('/home')->to('admin#home');
 
   $admin_routes->get('/tokens')->to('admin-tokens#index');
