@@ -1,6 +1,5 @@
 package Pear::LocalLoop::Import::LCCCsv::Suppliers;
 use Moo;
-use Devel::Dwarn;
 
 extends qw/Pear::LocalLoop::Import::LCCCsv/;
 
@@ -15,7 +14,6 @@ sub import_csv {
   my ($self) = @_;
 
   my $rows = $self->csv_data;
-  return $self unless $rows;
   foreach my $row ( @{$rows} ) {
     $self->_row_to_result($row);
   }

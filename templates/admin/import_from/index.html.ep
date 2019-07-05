@@ -18,12 +18,16 @@
   </div>
   <div class="col-12 mb-3">
     <p>Various import options depending on source. Each one is custom. For Creditor reports from LCC.</p>
+    <p><strong>NOTE:</strong> Files must be in CSV format.<br>
+    Redundant columns and rows above and to the left of the table in the CSV must be deleted.<br>
+    There can be no duplicate header columns, and there can be no fields with values outside the table.</p>
     <p>Warning: Large files will take a long time to process, just leave the tab open until the Success message appears.</p>
   </div>
   <div class="row">
     <div class="card col-md-6 m-3">
       <div class="card-body">
         <h4 class="card-title">LCC Procurement Import - Suppliers</h4>
+        <p>Expected headers at very least: "supplier_id", "name", "post_code".</p>
         <form action="/admin/import_from/suppliers" method="POST" enctype="multipart/form-data">
           <input type="file" name="suppliers_csv" accept="text/csv">
           <input type="submit" value="Upload Suppliers CSV">
@@ -33,6 +37,7 @@
     <div class="card col-md-6 m-3">
       <div class="card-body">
         <h4 class="card-title">LCC Procurement Import - Transactions</h4>
+        <p>Expected headers at very least: "supplier_id", "transaction_id", "net_amount", "vat amount" , "gross_amount".</p>
         <form action="/admin/import_from/transactions" method="POST" enctype="multipart/form-data">
           <input type="file" name="transactions_csv" accept="text/csv">
           <input type="submit" value="Upload Transactions CSV">
