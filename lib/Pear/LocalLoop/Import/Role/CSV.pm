@@ -3,6 +3,8 @@ use strict;
 use warnings;
 use Moo::Role;
 use Text::CSV;
+use Try::Tiny;
+use Pear::LocalLoop::Error;
 
 requires 'csv_required_columns';
 
@@ -12,6 +14,11 @@ has csv_file => (
 );
 
 has csv_string => (
+  is => 'ro',
+  predicate => 1,
+);
+
+has csv_error => (
   is => 'ro',
   predicate => 1,
 );
@@ -54,7 +61,8 @@ has csv_data => (
   is      => 'lazy',
   builder => sub {
     my $self = shift;
-    $self->check_headers;
+    my $header_check = $self->check_headers;
+    return 0 unless $header_check;
     return $self->_text_csv->getline_hr_all( $self->_csv_filehandle );
   }
 );
@@ -65,7 +73,13 @@ sub check_headers {
   use Devel::Dwarn;
   Dwarn $req_headers;
   # TODO catch the boom
-  my @headers = $self->_text_csv->header( $self->_csv_filehandle );
+  my @headers;
+  try {
+    @headers = $self->_text_csv->header( $self->_csv_filehandle );
+  } catch {
+    $self->csv_error = $_->[1];
+  };
+  return 0 unless @headers;
   Dwarn \@headers;
   my %header_map = ( map { $_ => 1 } @headers );
   for my $req_header ( @$req_headers ) {

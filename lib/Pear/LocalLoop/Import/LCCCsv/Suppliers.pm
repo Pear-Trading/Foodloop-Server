@@ -15,6 +15,7 @@ sub import_csv {
   my ($self) = @_;
 
   my $rows = $self->csv_data;
+  return $self unless $rows;
   foreach my $row ( @{$rows} ) {
     $self->_row_to_result($row);
   }
