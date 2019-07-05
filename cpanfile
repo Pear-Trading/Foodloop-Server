@@ -40,6 +40,10 @@ feature 'postgres', 'PostgreSQL Support' => sub {
   requires 'Test::PostgreSQL';
 };
 
+feature 'sqlite', 'SQLite Support' => sub {
+  requires 'Minion::Backend::SQLite';
+};
+
 feature 'codepoint-open', 'Code Point Open manipulation' => sub {
   requires 'Geo::UK::Postcode::CodePointOpen';
 };
