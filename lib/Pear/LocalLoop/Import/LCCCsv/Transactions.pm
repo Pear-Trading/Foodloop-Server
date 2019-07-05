@@ -6,19 +6,19 @@ use DateTime::Format::Strptime;
 extends qw/Pear::LocalLoop::Import::LCCCsv/;
 
 has '+csv_required_columns' => (
-  builder => sub { return [ qw/
-  transaction_id
-  supplier_id
-  net_amount
-  gross_amount
-  / ]},
+  builder => sub { return [ (
+  'transaction_id',
+  'supplier_id',
+  'net_amount',
+  'vat amount',
+  'gross_amount',
+  )]},
 );
 
 sub import_csv {
   my ($self) = @_;
 
   my $rows = $self->csv_data;
-  return 0 unless $rows;
   my $lcc_org = $self->schema->resultset('Organisation')->find({ name => "Lancashire County Council" });
   foreach my $row ( @{$rows} ) {
     $self->_row_to_result($row, $lcc_org);
@@ -28,10 +28,6 @@ sub import_csv {
 
 sub _row_to_result {
   my ( $self, $row, $lcc_org ) = @_;
-
-    use Devel::Dwarn;
-
-    Dwarn $row;
 
     my $supplier_id = $row->{supplier_id};
 
@@ -49,7 +45,7 @@ sub _row_to_result {
 
     my $paid_date = ( $row->{paid_date} ? $date_formatter->parse_datetime($row->{paid_date}) : DateTime->today );
 
-    # TODO negative values
+    # TODO negative values are sometimes present
     $self->external_result->find_or_create_related('transactions', {
       external_id => $row->{transaction_id},
       transaction => {

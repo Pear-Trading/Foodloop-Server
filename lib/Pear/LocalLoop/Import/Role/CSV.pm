@@ -70,17 +70,8 @@ has csv_data => (
 sub check_headers {
   my $self = shift;
   my $req_headers = $self->csv_required_columns;
-  use Devel::Dwarn;
-  Dwarn $req_headers;
-  # TODO catch the boom
   my @headers;
-  try {
-    @headers = $self->_text_csv->header( $self->_csv_filehandle );
-  } catch {
-    $self->csv_error = $_->[1];
-  };
-  return 0 unless @headers;
-  Dwarn \@headers;
+  @headers = $self->_text_csv->header( $self->_csv_filehandle );
   my %header_map = ( map { $_ => 1 } @headers );
   for my $req_header ( @$req_headers ) {
     next if $header_map{$req_header};
