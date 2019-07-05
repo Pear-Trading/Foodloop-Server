@@ -4,6 +4,7 @@ use Moo;
 use Devel::Dwarn;
 
 use Pear::LocalLoop::Import::LCCCsv::Suppliers;
+use Pear::LocalLoop::Import::LCCCsv::Transactions;
 
 sub index {
   my $c = shift;
@@ -46,8 +47,10 @@ sub post_transactions {
     $c->flash( error => "CSV file size is too large" );
     return $c->redirect_to( '/admin/import_from' );
   }
-
-  my $csv_import = Pear::LocalLoop::Import::LCCCsv::Suppliers->import( $c->param('transactions_csv') );
+  my $csv_import = Pear::LocalLoop::Import::LCCCsv::Transactions->new(
+    csv_string => $c->param('transactions_csv')->slurp,
+    schema => $c->app->schema
+  )->import_csv;
 
   $c->flash( success => "CSV imported" );
   return $c->redirect_to( '/admin/import_from' );

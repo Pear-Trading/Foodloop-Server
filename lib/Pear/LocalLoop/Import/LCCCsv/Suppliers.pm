@@ -24,21 +24,21 @@ sub import_csv {
 sub _row_to_result {
   my ( $self, $row ) = @_;
 
-    my $addr2 = $row->{post_town};
+  my $addr2 = $row->{post_town};
 
-    my $address = ( defined $addr2 ? ( $row->{"address line 2"} . ' ' . $addr2) : $row->{"address line 2"} );
+  my $address = ( defined $addr2 ? ( $row->{"address line 2"} . ' ' . $addr2) : $row->{"address line 2"} );
 
-    $self->external_result->find_or_create_related('organisations', {
-      external_id => $row->{supplier_id},
-      organisation => {
-        name => $row->{name},
-        street_name => $row->{"address line 1"},
-        town => $address,
-        postcode => $row->{post_code},
-        country => $row->{country_code},
-        entity => { type => 'organisation' },
-      }
-    });
+  $self->external_result->find_or_create_related('organisations', {
+    external_id => $row->{supplier_id},
+    organisation => {
+      name => $row->{name},
+      street_name => $row->{"address line 1"},
+      town => $address,
+      postcode => $row->{post_code},
+      country => $row->{country_code},
+      entity => { type => 'organisation' },
+    }
+  });
 }
 
 1;
