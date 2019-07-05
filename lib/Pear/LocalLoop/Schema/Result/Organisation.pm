@@ -113,8 +113,14 @@ __PACKAGE__->belongs_to(
 
 __PACKAGE__->belongs_to(
   "social_type",
-  "Pear::LocalLoop::Schema::Result::OrganisationType",
+  "Pear::LocalLoop::Schema::Result::OrganisationSocialType",
   "social_type_id",
+);
+
+__PACKAGE__->has_many(
+  "external_reference",
+  "Pear::LocalLoop::Schema::Result::OrganisationExternal",
+  { 'foreign.org_id' => 'self.id' },
 );
 
 __PACKAGE__->has_many(

@@ -18,6 +18,7 @@
   </div>
   <div class="col-12 mb-3">
     <p>Various import options depending on source. Each one is custom. For Creditor reports from LCC.</p>
+    <p>Warning: Large files will take a long time to process, just leave the tab open until the Success message appears.</p>
   </div>
   <div class="row">
     <div class="card col-md-6 m-3">

@@ -8,13 +8,27 @@ requires 'csv_required_columns';
 
 has csv_file => (
   is       => 'ro',
-  required => 1,
+  predicate => 1,
+);
+
+has csv_string => (
+  is => 'ro',
+  predicate => 1,
 );
 
 has _csv_filehandle => (
   is      => 'lazy',
   builder => sub {
-    open my $fh, '<', $self->csv_file;
+    my $self = shift;
+    my $fh;
+    if ( $self->has_csv_file ) {
+      open $fh, '<', \${$self->csv_file};
+    } elsif ( $self->has_csv_string ) {
+      my $string = $self->csv_string;
+      open $fh, '<', \$string;
+    } else {
+      die "Must provide csv_file or csv_string"
+    }
     return $fh;
   }
 );
@@ -40,7 +54,25 @@ has csv_data => (
   is      => 'lazy',
   builder => sub {
     my $self = shift;
+    $self->check_headers;
+    return $self->_text_csv->getline_hr_all( $self->_csv_filehandle );
   }
 );
+
+sub check_headers {
+  my $self = shift;
+  my $req_headers = $self->csv_required_columns;
+  use Devel::Dwarn;
+  Dwarn $req_headers;
+  # TODO catch the boom
+  my @headers = $self->_text_csv->header( $self->_csv_filehandle );
+  Dwarn \@headers;
+  my %header_map = ( map { $_ => 1 } @headers );
+  for my $req_header ( @$req_headers ) {
+    next if $header_map{$req_header};
+    die "Require header [" . $req_header . "]";
+  }
+  return 1;
+}
 
 1;

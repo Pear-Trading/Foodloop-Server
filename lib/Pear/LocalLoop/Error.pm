@@ -5,6 +5,6 @@ extends 'Throwable::Error';
 package Pear::LocalLoop::ImplementationError;
 use Moo;
 use namespace::clean;
-extends Pear::LocalLoop::Error;
+extends 'Pear::LocalLoop::Error';
 
 1;
