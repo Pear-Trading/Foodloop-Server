@@ -52,8 +52,14 @@ sub post_transactions {
     schema => $c->app->schema
   )->import_csv;
 
-  $c->flash( success => "CSV imported" );
-  return $c->redirect_to( '/admin/import_from' );
+  if ($csv_import->csv_error) {
+    $c->flash( error => $csv_import->csv_error );
+    return $c->redirect_to( '/admin/import_from' );
+  } else {
+    $c->flash( success => "CSV imported" );
+    return $c->redirect_to( '/admin/import_from' );
+  }
+
 }
 
 1;

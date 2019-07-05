@@ -18,7 +18,8 @@ sub import_csv {
   my ($self) = @_;
 
   my $rows = $self->csv_data;
-  my $lcc_org = $self->schema->resultset('Organisation')->find( name => "Lancashire County Council" );
+  return 0 unless $rows;
+  my $lcc_org = $self->schema->resultset('Organisation')->find({ name => "Lancashire County Council" });
   foreach my $row ( @{$rows} ) {
     $self->_row_to_result($row, $lcc_org);
   }
@@ -28,9 +29,19 @@ sub import_csv {
 sub _row_to_result {
   my ( $self, $row, $lcc_org ) = @_;
 
+    use Devel::Dwarn;
+
     Dwarn $row;
 
-    my $organisation = $self->schema->resultset('Organisation')->find( external_id => $row->{supplier_id} );
+    my $supplier_id = $row->{supplier_id};
+
+    my $organisation = $self->schema->resultset('Organisation')->find({
+      'external_reference.external_id' => $supplier_id
+    }, { join => 'external_reference' });
+
+    unless ($organisation) {
+      Pear::LocalLoop::Error->throw("Cannot find an organisation with supplier_id $supplier_id");
+    }
 
     my $date_formatter = DateTime::Format::Strptime->new(
       pattern => '%Y/%m/%d'
@@ -38,15 +49,15 @@ sub _row_to_result {
 
     my $paid_date = ( $row->{paid_date} ? $date_formatter->parse_datetime($row->{paid_date}) : DateTime->today );
 
+    # TODO negative values
     $self->external_result->find_or_create_related('transactions', {
-      transaction_id => $row->{transaction_id},
+      external_id => $row->{transaction_id},
       transaction => {
-        seller => $organisation->entity->id,
+        seller => $organisation->entity,
         buyer => $lcc_org,
         purchase_time => $paid_date,
         value => $row->{net_amount},
         meta => {
-          transaction_id => $row->{transaction_id},
           gross_value => $row->{gross_amount},
           sales_tax_value => $row->{"vat amount"},
           net_value => $row->{net_amount},
