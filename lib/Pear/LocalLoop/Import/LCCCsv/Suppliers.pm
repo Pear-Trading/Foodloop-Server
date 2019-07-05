@@ -1,18 +1,44 @@
 package Pear::LocalLoop::Import::LCCCsv::Suppliers;
 use Moo;
+use Devel::Dwarn;
 
 extends qw/Pear::LocalLoop::Import::LCCCsv/;
 
-sub import {
-  my $self = shift;
+has '+csv_required_columns' => (
+  builder => sub { return [ qw/
+  supplier_id
+  name
+  / ]},
+);
 
-  $import = Pear::LocalLoop::Import::LCCCsv->new;
+sub import_csv {
+  my ($self) = @_;
+
+  my $rows = $self->csv_data;
+  foreach my $row ( @{$rows} ) {
+    $self->_row_to_result($row);
+  }
+  return 1;
 }
 
 sub _row_to_result {
   my ( $self, $row ) = @_;
 
+    my $addr2 = $row->{post_town};
 
+    my $address = ( defined $addr2 ? ( $row->{"address line 2"} . ' ' . $addr2) : $row->{"address line 2"} );
+
+    $self->external_result->find_or_create_related('organisations', {
+      external_id => $row->{supplier_id},
+      organisation => {
+        name => $row->{name},
+        street_name => $row->{"address line 1"},
+        town => $address,
+        postcode => $row->{post_code},
+        country => $row->{country_code},
+        entity => { type => 'organisation' },
+      }
+    });
 }
 
 1;

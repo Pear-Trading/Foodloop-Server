@@ -12,7 +12,7 @@ has external_result => (
   is      => 'lazy',
   builder => sub {
     my $self = shift;
-    return $self->resultset('ExternalReference')->find_or_create({ name => $self->external_name });
+    return $self->schema->resultset('ExternalReference')->find_or_create({ name => $self->external_name });
   }
 );
 
