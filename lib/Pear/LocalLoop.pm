@@ -26,6 +26,7 @@ sub startup {
   $self->plugin('Config', {
     default => {
       storage_path => tempdir,
+      upload_path => $self->home->child('upload'),
       sessionTimeSeconds => 60 * 60 * 24 * 7,
       sessionTokenJsonName => 'session_key',
       sessionExpiresJsonName => 'sessionExpires',

@@ -15,7 +15,9 @@ sub import_csv {
 
   my $rows = $self->csv_data;
 
-  return $rows;
+  foreach my $row ( @{$rows} ) {
+    $self->_row_to_result($row);
+  }
 }
 
 sub _row_to_result {

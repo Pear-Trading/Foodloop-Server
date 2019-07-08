@@ -29,7 +29,7 @@ has _csv_filehandle => (
     my $self = shift;
     my $fh;
     if ( $self->has_csv_file ) {
-      open $fh, '<', \${$self->csv_file};
+      open $fh, '<', $self->csv_file;
     } elsif ( $self->has_csv_string ) {
       my $string = $self->csv_string;
       open $fh, '<', \$string;
