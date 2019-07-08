@@ -2,9 +2,7 @@ package Pear::LocalLoop::Controller::Admin::ImportFrom;
 use Mojo::Base 'Mojolicious::Controller';
 use Moo;
 use Try::Tiny;
-
-use Pear::LocalLoop::Import::LCCCsv::Suppliers;
-use Pear::LocalLoop::Import::LCCCsv::Transactions;
+use Mojo::File qw/ path /;
 
 sub index {
   my $c = shift;
@@ -26,20 +24,17 @@ sub post_suppliers {
     return $c->redirect_to( '/admin/import_from' );
   }
 
-  my $filename;
+  my $file = $c->param('suppliers_csv');
 
-  $c->minion->enqueue('csv_supplier_import' => $filename );
+  my $filename = path($c->app->config->{upload_path}, time.'suppliers.csv' );
 
-  # my $csv_import = Pear::LocalLoop::Import::LCCCsv::Suppliers->new(
-  #   csv_string => $c->param('suppliers_csv')->slurp,
-  #   schema => $c->app->schema
-  # )->import_csv;
-  #
-  # my $job_id = $c->minion->enqueue('csv_supplier_import' => [$csv_import] );
+  $file->move_to($filename);
 
+  my $job_id = $c->minion->enqueue('csv_supplier_import' => [$filename] );
 
+  my $job_url = $c->url_for("/admin/minionjobs?id=$job_id")->to_abs;
 
-  $c->flash( success => "CSV imported" );
+  $c->flash(success => "CSV import started, see status of minion job at: $job_url");
   return $c->redirect_to( '/admin/import_from' );
 }
 
@@ -56,22 +51,19 @@ sub post_transactions {
     $c->flash( error => "CSV file size is too large" );
     return $c->redirect_to( '/admin/import_from' );
   }
-  my $csv_error;
-  try {
-    Pear::LocalLoop::Import::LCCCsv::Transactions->new(
-      csv_string => $c->param('transactions_csv')->slurp,
-      schema => $c->app->schema
-    )->import_csv;
-  } catch {
-    $csv_error = $_;
-  };
-  if ( $csv_error ) {
-    $c->flash( error => $csv_error );
-    return $c->redirect_to( '/admin/import_from' );
-  } else {
-    $c->flash( success => "CSV imported" );
-    return $c->redirect_to( '/admin/import_from' );
-  }
+
+  my $file = $c->param('transactions_csv');
+
+  my $filename = path($c->app->config->{upload_path}, time.'transactions.csv' );
+
+  $file->move_to($filename);
+
+  my $job_id = $c->minion->enqueue('csv_transaction_import' => [$filename] );
+
+  my $job_url = $c->url_for("/admin/minionjobs?id=$job_id")->to_abs;
+
+  $c->flash(success => "CSV import started, see status of minion job at: $job_url");
+  return $c->redirect_to( '/admin/import_from' );
 }
 
 1;
