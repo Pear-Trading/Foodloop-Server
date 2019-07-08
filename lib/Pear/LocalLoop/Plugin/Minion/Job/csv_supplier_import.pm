@@ -1,26 +1,18 @@
-package Pear::LocalLoop::Import::LCCCsv::Suppliers;
-use Moo;
+package Pear::LocalLoop::Plugin::Minion::Job::csv_supplier_import;
+use Mojo::Base 'Pear::LocalLoop::Plugin::Minion::Job';
+use Devel::Dwarn;
 
-extends qw/Pear::LocalLoop::Import::LCCCsv/;
+sub run {
+  my ( $self, $rows ) = @_;
 
-has '+csv_required_columns' => (
-  builder => sub { return [ qw/
-  supplier_id
-  name
-  / ]},
-);
-
-sub import_csv {
-  my ($self) = @_;
-
-  my $rows = $self->csv_data;
-
-  return $rows;
+  foreach my $row ( @{$rows} ) {
+    $self->_row_to_result($row);
+  }
 }
 
 sub _row_to_result {
   my ( $self, $row ) = @_;
-
+  # Dwarn $row->{supplier_id};
   my $addr2 = $row->{post_town};
 
   my $address = ( defined $addr2 ? ( $row->{"address line 2"} . ' ' . $addr2) : $row->{"address line 2"} );
@@ -36,6 +28,7 @@ sub _row_to_result {
       entity => { type => 'organisation' },
     }
   });
+  $self->app->log->debug('Imported the CSV fully!');
 }
 
 1;

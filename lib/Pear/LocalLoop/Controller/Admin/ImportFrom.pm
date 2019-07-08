@@ -25,10 +25,19 @@ sub post_suppliers {
     $c->flash( error => "CSV file size is too large" );
     return $c->redirect_to( '/admin/import_from' );
   }
-  my $csv_import = Pear::LocalLoop::Import::LCCCsv::Suppliers->new(
-    csv_string => $c->param('suppliers_csv')->slurp,
-    schema => $c->app->schema
-  )->import_csv;
+
+  my $filename;
+
+  $c->minion->enqueue('csv_supplier_import' => $filename );
+
+  # my $csv_import = Pear::LocalLoop::Import::LCCCsv::Suppliers->new(
+  #   csv_string => $c->param('suppliers_csv')->slurp,
+  #   schema => $c->app->schema
+  # )->import_csv;
+  #
+  # my $job_id = $c->minion->enqueue('csv_supplier_import' => [$csv_import] );
+
+
 
   $c->flash( success => "CSV imported" );
   return $c->redirect_to( '/admin/import_from' );
