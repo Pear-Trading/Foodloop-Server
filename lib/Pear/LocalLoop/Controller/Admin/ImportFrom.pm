@@ -32,7 +32,7 @@ sub post_suppliers {
 
   my $job_id = $c->minion->enqueue('csv_supplier_import' => [$filename] );
 
-  my $job_url = $c->url_for("/admin/minionjobs?id=$job_id")->to_abs;
+  my $job_url = $c->url_for("/admin/minion/jobs?id=$job_id")->to_abs;
 
   $c->flash(success => "CSV import started, see status of minion job at: $job_url");
   return $c->redirect_to( '/admin/import_from' );
@@ -60,7 +60,7 @@ sub post_transactions {
 
   my $job_id = $c->minion->enqueue('csv_transaction_import' => [$filename] );
 
-  my $job_url = $c->url_for("/admin/minionjobs?id=$job_id")->to_abs;
+  my $job_url = $c->url_for("/admin/minion/jobs?id=$job_id")->to_abs;
 
   $c->flash(success => "CSV import started, see status of minion job at: $job_url");
   return $c->redirect_to( '/admin/import_from' );
