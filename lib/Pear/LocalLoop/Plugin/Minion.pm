@@ -15,11 +15,13 @@ sub register {
     my $job_namespace = __PACKAGE__ . '::Job';
     my @modules = find_modules $job_namespace;
     for my $package ( @modules ) {
-      my ( $job ) = $package =~ /${job_namespace}::(.*)$/;
+      my ( $job_name ) = $package =~ /${job_namespace}::(.*)$/;
       $app->log->debug( $package );
-      load_class $package;
+      if (my $e = load_class $package) {
+        die ref $e ? "Exception: $e" : "$package not found";
+      }
       $app->minion->add_task(
-        $job => sub {
+        $job_name => sub {
           my ( $job, @args ) = @_;
           my $job_runner = $package->new(
             job => $job,

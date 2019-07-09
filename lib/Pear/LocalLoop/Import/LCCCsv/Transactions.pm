@@ -19,7 +19,7 @@ sub import_csv {
   my ($self) = @_;
 
   my $rows = $self->csv_data;
-  my $lcc_org = $self->schema->resultset('Organisation')->find({ name => "Lancashire County Council" });
+  # my $lcc_org = $self->schema->resultset('Organisation')->find({ name => "Lancashire County Council" });
   foreach my $row ( @{$rows} ) {
     $self->_row_to_result($row);
   }
@@ -44,6 +44,8 @@ sub _row_to_result {
 
     my $paid_date = ( $row->{paid_date} ? $date_formatter->parse_datetime($row->{paid_date}) : DateTime->today );
 
+    #my $distance = $self->get_distance_from_coords( $organisation, $lcc_org );
+
     # TODO negative values are sometimes present
     $self->external_result->find_or_create_related('transactions', {
       external_id => $row->{transaction_id},
@@ -53,10 +55,11 @@ sub _row_to_result {
         purchase_time => $paid_date,
         value => $row->{net_amount},
         meta => {
-          gross_value => $row->{gross_amount},
-          sales_tax_value => $row->{"vat amount"},
-          net_value => $row->{net_amount},
+          gross_value => $row->{gross_amount} * 100000,
+          sales_tax_value => $row->{"vat amount"} * 100000,
+          net_value => $row->{net_amount} * 100000,
         },
+        # distance => $distance,
       }
     });
 }
