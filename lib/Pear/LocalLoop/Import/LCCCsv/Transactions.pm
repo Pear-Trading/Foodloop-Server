@@ -19,7 +19,7 @@ sub import_csv {
   my ($self) = @_;
 
   my $rows = $self->csv_data;
-
+  my $lcc_org = $self->schema->resultset('Organisation')->find({ name => "Lancashire County Council" });
   foreach my $row ( @{$rows} ) {
     $self->_row_to_result($row);
   }
