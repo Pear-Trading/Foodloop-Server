@@ -27,15 +27,17 @@ sub _row_to_result {
 
   my $address = ( defined $addr2 ? ( $row->{"address line 2"} . ' ' . $addr2) : $row->{"address line 2"} );
 
-  $self->external_result->find_or_create_related('organisations', {
-    external_id => $row->{supplier_id},
+  return if $self->external_result->organisations->find({external_id => $row->{supplier_id}});
+
+  $self->schema->resultset('Entity')->create({
+    type => 'organisation',
     organisation => {
       name => $row->{name},
       street_name => $row->{"address line 1"},
       town => $address,
       postcode => $row->{post_code},
       country => $row->{country_code},
-      entity => { type => 'organisation' },
+      external_reference => [ { external_reference => $self->external_result, external_id => $row->{supplier_id} } ],
     }
   });
 }
