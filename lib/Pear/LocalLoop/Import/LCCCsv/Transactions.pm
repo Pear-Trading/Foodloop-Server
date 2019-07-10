@@ -19,9 +19,15 @@ sub import_csv {
   my ($self) = @_;
 
   my $rows = $self->csv_data;
-  # my $lcc_org = $self->schema->resultset('Organisation')->find({ name => "Lancashire County Council" });
+  my $lcc_org = $self->schema->resultset('Organisation')->find({
+    name => "Lancashire County Council",
+    street_name => "County Hall"
+  });
+  unless ($lcc_org) {
+    Pear::LocalLoop::Error->throw("Cannot find LCC Organisation, please contact an admin");
+  }
   foreach my $row ( @{$rows} ) {
-    $self->_row_to_result($row);
+    $self->_row_to_result($row, $lcc_org);
   }
 }
 
@@ -37,6 +43,9 @@ sub _row_to_result {
     unless ($organisation) {
       Pear::LocalLoop::Error->throw("Cannot find an organisation with supplier_id $supplier_id");
     }
+
+    use Devel::Dwarn;
+    Dwarn $organisation->entity->id;
 
     my $date_formatter = DateTime::Format::Strptime->new(
       pattern => '%Y/%m/%d'
@@ -56,9 +65,9 @@ sub _row_to_result {
       external_id => $row->{transaction_id},
       transaction => {
         seller => $organisation->entity,
-        buyer => $lcc_org,
+        buyer => $lcc_org->entity,
         purchase_time => $paid_date,
-        value => $row->{net_amount},
+        value => $gross_value * 100000,
         meta => {
           gross_value => $gross_value * 100000,
           sales_tax_value => $sales_tax_value * 100000,
