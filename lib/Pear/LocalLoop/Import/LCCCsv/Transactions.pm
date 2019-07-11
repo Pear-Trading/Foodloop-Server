@@ -44,9 +44,6 @@ sub _row_to_result {
       Pear::LocalLoop::Error->throw("Cannot find an organisation with supplier_id $supplier_id");
     }
 
-    use Devel::Dwarn;
-    Dwarn $organisation->entity->id;
-
     my $date_formatter = DateTime::Format::Strptime->new(
       pattern => '%Y/%m/%d'
     );

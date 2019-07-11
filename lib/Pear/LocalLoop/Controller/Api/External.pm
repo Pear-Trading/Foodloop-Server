@@ -5,9 +5,6 @@ use Mojo::JSON;
 sub post_lcc_transactions {
   my $c = shift;
 
-  use Devel::Dwarn;
-  Dwarn "hello";
-
   my $user = $c->stash->{api_user};
 
   # TODO Check the user is lancaster city council
