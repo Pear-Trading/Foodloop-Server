@@ -56,28 +56,49 @@ sub post_lcc_suppliers {
 
   # my $is_lcc = $user->entity->organisation->count({ name => "Lancashire County Council" });
 
-  my $validation = $c->validation;
-  $validation->input( $c->stash->{api_json} );
-  $validation->optional('page')->number;
-  $validation->optional('filter');
+  my $v = $c->validation;
+  $v->input( $c->stash->{api_json} );
+  $v->optional('page')->number;
+  $v->optional('sort_by');
+  $v->optional('sort_dir');
 
-  return $c->api_validation_error if $validation->has_error;
+  my $order_by = [
+    { -asc => 'organisation.name' },
+    { -asc => 'seller.id' },
+  ];
+  if ( $v->param('sort_by') ) {
+    my %dirs = ( 'asc' => '-asc', 'desc' => '-desc' );
+    my $dir = $dirs{$v->param('sort_dir')} // '-asc';
+    my %sorts = (
+      'name' => 'organisation.name',
+      'postcode' => 'organisation.postcode',
+      'spend' => 'total_spend',
+    );
+    my $sort = $sorts{$v->param('sort_by')} || 'organisation.name';
+    $order_by->[0] = { $dir => $sort };
+  }
+
+  return $c->api_validation_error if $v->has_error;
 
   my $lcc_import_ext_ref = $c->schema->resultset('ExternalReference')->find_or_create({ name => 'LCC CSV' });
 
   return 0 unless $lcc_import_ext_ref;
 
-  my $lcc_suppliers = $user->entity->purchases->search_related('seller',
+  my $lcc_suppliers = $user->entity->purchases->search_related('seller',undef)->search(
   undef,
   {
-    page => $validation->param('page') || 1,
-    rows => 10,
-    join => 'organisation',
-    order_by => [
-    { -asc => 'organisation.name' },
-    { -asc => 'seller.id' },
-    ],
+    prefetch => ['sales', 'organisation'],
     group_by => 'seller.id',
+    '+select' => [
+      {
+        'sum' => 'sales.value',
+        '-as' => 'total_spend',
+      },
+    ],
+    '+as' => ['total_spend'],
+    page => $v->param('page') || 1,
+    rows => 10,
+    order_by => $order_by,
   });
 
   my @supplier_list = (
@@ -88,7 +109,7 @@ sub post_lcc_suppliers {
       town => $_->organisation->town,
       postcode => $_->organisation->postcode,
       country => $_->organisation->country,
-      spend => ($_->sales->get_column('value')->sum / 100000) // 0,
+      spend => ($_->get_column('total_spend') / 100000) // 0,
     }} $lcc_suppliers->all
   );
 
