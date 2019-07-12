@@ -54,33 +54,41 @@ sub post_lcc_suppliers {
 
   # TODO give an error if user is not of Lancashire County Council
 
-  my $is_lcc = $user->entity->organisation->count({ name => "Lancashire County Council" });
+  # my $is_lcc = $user->entity->organisation->count({ name => "Lancashire County Council" });
 
   my $validation = $c->validation;
   $validation->input( $c->stash->{api_json} );
   $validation->optional('page')->number;
+  $validation->optional('filter');
 
   return $c->api_validation_error if $validation->has_error;
 
   my $lcc_import_ext_ref = $c->schema->resultset('ExternalReference')->find_or_create({ name => 'LCC CSV' });
 
-  my $lcc_suppliers = $lcc_import_ext_ref->search_related('organisations',
-    undef,
-    {
-      page => $validation->param('page') || 1,
-      rows => 10,
-      order_by => { -desc => 'organisation.name' },
-    },
-  );
+  return 0 unless $lcc_import_ext_ref;
+
+  my $lcc_suppliers = $user->entity->purchases->search_related('seller',
+  undef,
+  {
+    page => $validation->param('page') || 1,
+    rows => 10,
+    join => 'organisation',
+    order_by => [
+    { -asc => 'organisation.name' },
+    { -asc => 'seller.id' },
+    ],
+    group_by => 'seller.id',
+  });
 
   my @supplier_list = (
     map {{
-      supplier_external_id => $_->external_id,
-      name => $_->organisation->name,
+      entity_id => $_->id,
+      name => $_->name,
       street => $_->organisation->street_name,
       town => $_->organisation->town,
-      postcode => $_->organisation->post_code,
+      postcode => $_->organisation->postcode,
       country => $_->organisation->country,
+      spend => ($_->sales->get_column('value')->sum / 100000) // 0,
     }} $lcc_suppliers->all
   );
 
