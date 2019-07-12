@@ -45,7 +45,8 @@ sub _row_to_result {
     }
 
     my $date_formatter = DateTime::Format::Strptime->new(
-      pattern => '%Y/%m/%d'
+      pattern => '%m/%d/%Y',
+      time_zone => 'Europe/London'
     );
 
     my $paid_date = ( $row->{paid_date} ? $date_formatter->parse_datetime($row->{paid_date}) : DateTime->today );
