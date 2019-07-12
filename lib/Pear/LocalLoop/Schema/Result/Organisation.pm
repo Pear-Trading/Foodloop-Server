@@ -44,6 +44,7 @@ __PACKAGE__->add_columns(
     size        => 255,
     is_nullable => 1,
   },
+  # Stores codes based on https://www.ons.gov.uk/methodology/classificationsandstandards/ukstandardindustrialclassificationofeconomicactivities/uksic2007
   sector          => {
     data_type   => 'varchar',
     size        => 1,

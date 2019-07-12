@@ -160,6 +160,7 @@ sub startup {
   $api->post('/stats')->to('api-stats#post_index');
   $api->post('/stats/category')->to('api-categories#post_category_list');
   $api->post('/stats/customer')->to('api-stats#post_customer');
+  $api->post('/stats/organisation')->to('api-stats#post_organisation');
   $api->post('/stats/leaderboard')->to('api-stats#post_leaderboards');
   $api->post('/stats/leaderboard/paged')->to('api-stats#post_leaderboards_paged');
   $api->post('/outgoing-transactions')->to('api-transactions#post_transaction_list_purchases');
@@ -191,6 +192,7 @@ sub startup {
   $api_v1_org->post('/employee/add')->to('api-organisation#post_employee_add');
   $api_v1_org->post('/external/transactions')->to('api-external#post_lcc_transactions');
   $api_v1_org->post('/external/suppliers')->to('api-external#post_lcc_suppliers');
+  $api_v1_org->post('/pies')->to('api-v1-organisation-pies#index');
 
   my $api_v1_cust = $api_v1->under('/customer')->to('api-v1-customer#auth');
 

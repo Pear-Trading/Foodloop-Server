@@ -17,7 +17,8 @@ SELECT "value",
        "seller_id",
        DATE_TRUNC('hour', "purchase_time") AS "quantised_hours",
        DATE_TRUNC('day', "purchase_time") AS "quantised_days",
-       DATE_TRUNC('week', "purchase_time") AS "quantised_weeks"
+       DATE_TRUNC('week', "purchase_time") AS "quantised_weeks",
+       DATE_TRUNC('month', "purchase_time") AS "quantised_months"
   FROM "transactions"
 /);
 
