@@ -49,7 +49,9 @@ sub _row_to_result {
       time_zone => 'Europe/London'
     );
 
-    my $paid_date = ( $row->{paid_date} ? $date_formatter->parse_datetime($row->{paid_date}) : DateTime->today );
+    my $paid_date = ( $row->{paid_date} ?
+      $date_formatter->parse_datetime($row->{paid_date}) :
+      $date_formatter->parse_datetime($row->{invoice_date}) );
 
     my $gross_value = $row->{gross_amount};
     $gross_value =~ s/,//g;
