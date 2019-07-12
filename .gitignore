@@ -7,6 +7,7 @@ hypnotoad.pid
 *~
 /images
 *.swp
+/upload
 
 cover_db/
 schema.png

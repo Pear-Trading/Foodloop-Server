@@ -335,31 +335,35 @@ sub post_organisation {
     $data->{categories}->{$day} = [ sort { $b->{value} <=> $a->{value} } @days ];
   }
 
-  my $start_year_monthly = DateTime->now->truncate( to => 'year' );
-  my $current_year_monthly = DateTime->now->add( months => 1, end_of_month => 'limit' );
-  my $monthly_sector_transactions_rs = $c->schema->resultset('ViewQuantisedTransaction' . $driver)->search(
-    {
-      purchase_time => {
-        -between => [
-          $dtf->format_datetime($start_year_monthly),
-          $dtf->format_datetime($current_year_monthly),
-        ],
-      },
-      buyer_id => $entity->id,
-    },
-    {
-      columns => [
-        {
-          quantised        => 'quantised_months',
-          value            => { sum => 'value' },
-          sector        => 'sector',
-        },
-      ],
-      group_by => [ qw/ quantised_months sector / ],
-    }
-  );
-
-
+  # my $start_year_monthly = DateTime->now->truncate( to => 'year' );
+  # my $current_year_monthly = DateTime->now->add( months => 1, end_of_month => 'limit' );
+  # my $monthly_sector_transactions_rs = $c->schema->resultset('ViewQuantisedTransaction' . $driver)->search(
+  #   {
+  #     purchase_time => {
+  #       -between => [
+  #         $dtf->format_datetime($start_year_monthly),
+  #         $dtf->format_datetime($current_year_monthly),
+  #       ],
+  #     },
+  #     buyer_id => $entity->id,
+  #   },
+  #   {
+  #     columns => [
+  #       {
+  #         quantised        => 'quantised_months',
+  #         value            => { sum => 'value' },
+  #       },
+  #     ],
+  #     group_by => [ qw/ quantised_months / ],
+  #   }
+  # );
+  #
+  # for my $sector_transaction ( $monthly_sector_transactions_rs->all ) {
+  #   my $quantised = $c->db_datetime_parser->parse_datetime($cat_trans->get_column('quantised'));
+  #   my $months = $c->format_iso_date( $quantised ) || 0;
+  #   my $category = $cat_trans->get_column('category_id') || 0;
+  #   my $value = ($cat_trans->get_column('value') || 0) / 100000;
+  # }
 
   return $c->render( json => {
     success => Mojo::JSON->true,
