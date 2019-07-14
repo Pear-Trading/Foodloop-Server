@@ -265,6 +265,7 @@ sub post_search {
   $validation->input( $c->stash->{api_json} );
 
   $validation->required('search_name');
+  $validation->optional('page')->number;
 
   return $c->api_validation_error if $validation->has_error;
 
@@ -276,6 +277,11 @@ sub post_search {
   my $valid_orgs_rs = $org_rs->search({
     pending => 0,
     entity_id => { "!=" => $user->entity_id },
+  },
+  {
+    page => $validation->param('page') || 1,
+    rows => 10,
+    order_by => { -desc => 'name' },
   })->search(
     \$search_stmt,
   );

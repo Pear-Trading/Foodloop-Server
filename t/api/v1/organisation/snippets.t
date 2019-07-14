@@ -49,12 +49,16 @@ $t->post_ok('/api/v1/organisation/snippets' => json => {
       this_week_sales_total  => 190,
       today_sales_count      => 0,
       today_sales_total      => 0,
+      all_sales_count      => 87,
+      all_sales_total      => 870,
       this_month_purchases_count => 0,
       this_month_purchases_total => 0,
       this_week_purchases_count  => 0,
       this_week_purchases_total  => 0,
       today_purchases_count      => 0,
       today_purchases_total      => 0,
+      all_purchases_count      => 0,
+      all_purchases_total      => 0,
   });
 
 $framework->logout( $session_key );
