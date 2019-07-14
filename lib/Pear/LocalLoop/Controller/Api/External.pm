@@ -64,7 +64,6 @@ sub post_lcc_suppliers {
 
   my $order_by = [
     { -asc => 'organisation.name' },
-    { -asc => 'seller.id' },
   ];
   if ( $v->param('sort_by') ) {
     my %dirs = ( 'asc' => '-asc', 'desc' => '-desc' );
