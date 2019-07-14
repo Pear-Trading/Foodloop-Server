@@ -1,0 +1,53 @@
+% layout 'admin';
+% title 'Import From';
+% content_for javascript => begin
+% end
+% if (my $error = flash 'error') {
+<div class="alert alert-danger" role="alert">
+  <strong>Error!</strong> <%= $error %>
+</div>
+% }
+% elsif (my $success = flash 'success') {
+<div class="alert alert-success" role="alert">
+  <strong>Success!</strong> <%= $success %>
+</div>
+% }
+<div class="row">
+  <div class="col-12 mb-3">
+    <h3 class="float-left">Import From</h3>
+  </div>
+  <div class="col-12 mb-3">
+    <p>Various import options depending on source. Each one is custom. For Creditor reports from LCC.</p>
+    <p><strong>NOTE:</strong> Files must be in CSV format.<br>
+    Redundant columns and rows above and to the left of the table in the CSV must be deleted.<br>
+    There can be no duplicate header columns, and there can be no fields with values outside the table.</p>
+  </div>
+  <div class="row">
+    <div class="card col-md-6 m-3">
+      <div class="card-body">
+        <h4 class="card-title">LCC Procurement Import - Suppliers</h4>
+        <p>Expected headers at very least: "supplier_id", "name", "post_code".</p>
+        <form action="/admin/import_from/suppliers" method="POST" enctype="multipart/form-data">
+          <input type="file" name="suppliers_csv" accept="text/csv">
+          <input type="submit" value="Upload Suppliers CSV">
+        </form>
+      </div>
+    </div>
+    <div class="card col-md-6 m-3">
+      <div class="card-body">
+        <h4 class="card-title">LCC Procurement Import - Transactions</h4>
+        <p>Expected headers at very least: "supplier_id", "transaction_id", "net_amount", "vat amount" , "gross_amount".</p>
+        <form action="/admin/import_from/transactions" method="POST" enctype="multipart/form-data">
+          <select name="entity_id">
+            <option>Select an Organisation</option>
+            <% for my $org ( @$org_entities ) { %>
+            <option value="<%= $org->{id}; %>"><%= $org->{name}; %></option>
+            <% } %>
+          </select><br/>
+          <input type="file" name="transactions_csv" accept="text/csv">
+          <input type="submit" value="Upload Transactions CSV">
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

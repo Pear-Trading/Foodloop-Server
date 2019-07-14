@@ -104,8 +104,8 @@ sub check_vars{
     ->status_is(200)
     ->or($framework->dump_error)
     ->json_is('/success', Mojo::JSON->true)
-    ->json_has("unvalidated")
-    ->json_has("validated");
+    ->json_has("/unvalidated")
+    ->json_has("/validated");
 
   my $sessionJsonTest = $t->tx->res->json;
   my $validated = $sessionJsonTest->{validated};
