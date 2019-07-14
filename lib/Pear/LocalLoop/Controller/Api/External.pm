@@ -84,11 +84,23 @@ sub post_lcc_suppliers {
 
   return 0 unless $lcc_import_ext_ref;
 
+  my $columns = [qw/
+      sales.id
+      seller.id
+      organisation.id
+      organisation.name
+      organisation.street_name
+      organisation.town
+      organisation.postcode
+      organisation.country
+    /];
+
   my $lcc_suppliers = $user->entity->purchases->search_related('seller',undef)->search(
   undef,
   {
     prefetch => ['sales', 'organisation'],
-    group_by => 'seller.id',
+    columns => $columns,
+    group_by => $columns,
     '+select' => [
       {
         'sum' => 'sales.value',
