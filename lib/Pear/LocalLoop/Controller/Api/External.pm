@@ -80,38 +80,25 @@ sub post_lcc_suppliers {
 
   return $c->api_validation_error if $v->has_error;
 
-  my $lcc_import_ext_ref = $c->schema->resultset('ExternalReference')->find_or_create({ name => 'LCC CSV' });
-
-  return 0 unless $lcc_import_ext_ref;
-
-  my $columns = [qw/
-      sales.id
-      seller.id
-      organisation.id
-      organisation.name
-      organisation.street_name
-      organisation.town
-      organisation.postcode
-      organisation.country
-    /];
-
-  my $lcc_suppliers = $user->entity->purchases->search_related('seller',undef)->search(
-  undef,
-  {
-    prefetch => ['sales', 'organisation'],
-    columns => $columns,
-    group_by => $columns,
-    '+select' => [
-      {
-        'sum' => 'sales.value',
-        '-as' => 'total_spend',
-      },
-    ],
-    '+as' => ['total_spend'],
-    page => $v->param('page') || 1,
-    rows => 10,
-    order_by => $order_by,
-  });
+  my $lcc_suppliers = $c->schema->resultset('Entity')->search(
+    {
+      'sales.buyer_id' => $user->entity->id,
+    },
+    {
+      join => ['sales', 'organisation'],
+      group_by  => ['me.id', 'organisation.id'],
+      '+select' => [
+        {
+          'sum' => 'sales.value',
+          '-as' => 'total_spend',
+        }
+      ],
+      '+as' => ['total_spend'],
+      page => $v->param('page') || 1,
+      rows => 10,
+      order_by => $order_by,
+    }
+  );
 
   my @supplier_list = (
     map {{
