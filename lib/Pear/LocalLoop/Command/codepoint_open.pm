@@ -22,7 +22,12 @@ sub run {
 
   unless ( -d $output_dir ) {
     print "Unzipping code-point-open data\n" unless $quiet_mode;
-    system( 'unzip', '-q', $zip_file, '-d', $output_dir );
+    eval { system( 'unzip', '-q', $zip_file, '-d', $output_dir ) };
+    if ( my $err = $@ ) {
+        print "Error extracting zip: " . $err . "\n";
+        print "Manually create etc/code-point-open/codepo_gb directory and extract zip into it";
+        die;
+    }
   }
 
   my $cpo = Geo::UK::Postcode::CodePointOpen->new( path => $output_dir );

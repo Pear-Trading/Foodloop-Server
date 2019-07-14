@@ -4,11 +4,12 @@ use Mojo::Base 'Pear::LocalLoop::Plugin::Minion::Job';
 use Pear::LocalLoop::Import::LCCCsv::Transactions;
 
 sub run {
-  my ( $self, $filename ) = @_;
+  my ($self, $filename, $entity_id) = @_;
 
-  my $csv_import = Pear::LocalLoop::Import::LCCCsv::Transactions->new(
-    csv_file => $filename,
-    schema => $self->app->schema
+  Pear::LocalLoop::Import::LCCCsv::Transactions->new(
+    csv_file         => $filename,
+    schema           => $self->app->schema,
+    target_entity_id => $entity_id,
   )->import_csv;
 }
 
