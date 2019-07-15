@@ -159,7 +159,7 @@ sub post_year_spend {
   my @graph_data = (
     map { {
       count => $_->get_column('count'),
-      value => $_->get_column('total_spend'),
+      value  => ($_->get_column('total_spend') / 100000) // 0,
       date  => $_->get_column('quantised'),
       } } $spend_rs->all,
   );
@@ -227,7 +227,7 @@ sub post_supplier_count {
   my @graph_data = (
     map { {
       count  => $_->get_column('count'),
-      value  => $_->get_column('total_spend'),
+      value  => ($_->get_column('total_spend') / 100000) // 0,
       date   => $_->get_column('quantised'),
       seller => $name_map{ $_->get_column('seller_id') },
     } } $spend_rs->all,
