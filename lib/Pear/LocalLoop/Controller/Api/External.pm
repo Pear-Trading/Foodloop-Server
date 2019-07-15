@@ -17,14 +17,12 @@ sub post_lcc_transactions {
 
   return $c->api_validation_error if $validation->has_error;
 
-  my $search_ref = undef;
-  if ( $validation->param('search') ) {
-    $search_ref = {
-      "organisation.name" => { '-like' => join( '', '%', $validation->param('search'), '%' ) },
-    };
+  my $search_ref = { 'me.buyer_id' => $user->entity->id };
+  if ($validation->param('search')) {
+    $search_ref->{"organisation.name"} = { '-like' => join('', '%', $validation->param('search'), '%') };
   }
 
-  my $lcc_transactions = $lcc_import_ext_ref->transactions->search(
+  my $lcc_transactions = $c->schema->resultset('Transaction')->search(
     $search_ref,
     {
       page     => $validation->param('page') || 1,
