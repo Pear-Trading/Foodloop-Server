@@ -13,19 +13,23 @@ sub post_lcc_transactions {
   $validation->input($c->stash->{api_json});
   $validation->optional('page')->number;
   $validation->optional('per_page')->number;
+  $validation->optional('search');
 
   return $c->api_validation_error if $validation->has_error;
 
-  my $lcc_import_ext_ref = $c->schema->resultset('ExternalReference')->find({ name => 'LCC CSV' });
-
-  return 0 unless $lcc_import_ext_ref;
+  my $search_ref = undef;
+  if ( $validation->param('search') ) {
+    $search_ref = {
+      "organisation.name" => { '-like' => join( '', '%', $validation->param('search'), '%' ) },
+    };
+  }
 
   my $lcc_transactions = $lcc_import_ext_ref->transactions->search(
-    undef,
+    $search_ref,
     {
       page     => $validation->param('page') || 1,
       rows     => $validation->param('per_page') || 10,
-      join     => 'transaction',
+      join     => [ 'transaction', 'organisation' ],
       order_by => { -desc => 'transaction.purchase_time' },
     });
 
