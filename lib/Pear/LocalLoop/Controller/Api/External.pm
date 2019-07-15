@@ -155,7 +155,7 @@ sub post_year_spend {
     map { {
       count => $_->get_column('count'),
       value => $_->get_column('total_spend'),
-      date  => $_->get_column('quantised_days'),
+      date  => $_->get_column('quantised'),
       } } $spend_rs->all,
   );
 
