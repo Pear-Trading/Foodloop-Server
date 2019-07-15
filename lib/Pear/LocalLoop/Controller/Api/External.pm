@@ -198,12 +198,31 @@ sub post_supplier_count {
     }
   );
 
+  my $name_rs = $c->schema->resultset('Transaction')->search(
+    {
+      'me.buyer_id' => $user->entity->id,
+    },
+    {
+      prefetch => { entity => 'organisation' },
+      columns => [
+        'organisation.name',
+        'entity.id'
+      ]
+    }
+  );
+
+  my %name_map = (
+    map {
+      $_->entity->id => $_->entity->organisation->name,
+    } $name_rs->all
+  );
+
   my @graph_data = (
     map { {
       count  => $_->get_column('count'),
       value  => $_->get_column('total_spend'),
       date   => $_->get_column('quantised'),
-      seller => $_->seller->name,
+      seller => %name_map{ $_->get_column('seller_id') },
     } } $spend_rs->all,
   );
 
