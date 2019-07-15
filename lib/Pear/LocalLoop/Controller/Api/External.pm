@@ -257,49 +257,49 @@ sub post_supplier_history {
   my $dtf = $c->schema->storage->datetime_parser;
   my $year_rs = $c->schema->resultset('Transaction')->search(
     {
-      'me.purchase_time' => {
+      'sales.purchase_time' => {
         -between => [
           $dtf->format_datetime($first),
           $dtf->format_datetime($last),
         ],
       },
-      'me.buyer_id'      => $user->entity->id,
+      'sales.buyer_id'      => $user->entity->id,
     },
     {
-      join     => { seller => 'organisation' },
+      join     => [ 'sales', 'organisation' ],
       columns  => [
         {
-          id          => 'me.seller_id',
+          id          => 'me.id',
           name        => 'organisation.name',
           count       => \"COUNT(*)",
-          total_spend => { sum => 'me.value' },
+          total_spend => { sum => 'sales.value' },
         }
       ],
-      group_by => 'me.seller_id',
+      group_by => [ 'me.id', 'organisation.id' ],
       order_by => { '-asc' => 'organisation.name' },
     }
   );
   my $half_year_rs = $c->schema->resultset('Transaction')->search(
     {
-      'me.purchase_time' => {
+      'sales.purchase_time' => {
         -between => [
           $dtf->format_datetime($second),
           $dtf->format_datetime($last),
         ],
       },
-      'me.buyer_id'      => $user->entity->id,
+      'sales.buyer_id'      => $user->entity->id,
     },
     {
-      join     => { seller => 'organisation' },
+      join     => [ 'sales', 'organisation' ],
       columns  => [
         {
-          id          => 'me.seller_id',
+          id          => 'me.id',
           name        => 'organisation.name',
           count       => \"COUNT(*)",
-          total_spend => { sum => 'me.value' },
+          total_spend => { sum => 'sales.value' },
         }
       ],
-      group_by => 'me.seller_id',
+      group_by => [ 'me.id', 'organisation.id' ],
       order_by => { '-asc' => 'organisation.name' },
     }
   );
