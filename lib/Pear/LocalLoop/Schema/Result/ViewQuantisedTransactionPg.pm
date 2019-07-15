@@ -22,6 +22,48 @@ SELECT "value",
   FROM "transactions"
 /);
 
+__PACKAGE__->add_columns(
+  "buyer_id" => {
+    data_type => "integer",
+    is_foreign_key => 1,
+    is_nullable => 0,
+  },
+  "seller_id" => {
+    data_type => "integer",
+    is_foreign_key => 1,
+    is_nullable => 0,
+  },
+  "value" => {
+    data_type => "numeric",
+    size => [ 100, 0 ],
+    is_nullable => 0,
+  },
+  "quantised_hours" => {
+    data_type => "datetime",
+    timezone => "UTC",
+    is_nullable => 0,
+    set_on_create => 1,
+  },
+  "quantised_days" => {
+    data_type => "datetime",
+    timezone => "UTC",
+    is_nullable => 0,
+    set_on_create => 1,
+  },
+  "quantised_weeks" => {
+    data_type => "datetime",
+    timezone => "UTC",
+    is_nullable => 0,
+    set_on_create => 1,
+  },
+  "quantised_months" => {
+    data_type => "datetime",
+    timezone => "UTC",
+    is_nullable => 0,
+    set_on_create => 1,
+  },
+);
+
 __PACKAGE__->belongs_to(
   "buyer",
   "Pear::LocalLoop::Schema::Result::Entity",
