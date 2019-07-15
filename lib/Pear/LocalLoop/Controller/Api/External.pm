@@ -123,7 +123,12 @@ sub post_year_spend {
 
   my $user = $c->stash->{api_user};
 
-  my $last = DateTime->today;
+  # Temporary date lock for dev data
+  my $last = DateTime->new(
+    year  => 2019,
+    month => 4,
+    day   => 1
+  );
   my $first = $last->clone->subtract( years => 1 );
 
   my $dtf = $c->schema->storage->datetime_parser;
@@ -170,7 +175,12 @@ sub post_supplier_count {
 
   my $user = $c->stash->{api_user};
 
-  my $last = DateTime->today;
+  # Temporary date lock for dev data
+  my $last = DateTime->new(
+    year  => 2019,
+    month => 4,
+    day   => 1
+  );
   my $first = $last->clone->subtract( years => 1 );
 
   my $dtf = $c->schema->storage->datetime_parser;
@@ -187,6 +197,7 @@ sub post_supplier_count {
     },
     {
       columns  => [
+        'seller_id',
         {
           quantised   => 'quantised_days',
           count       => \"COUNT(*)",
@@ -203,17 +214,13 @@ sub post_supplier_count {
       'me.buyer_id' => $user->entity->id,
     },
     {
-      prefetch => { entity => 'organisation' },
-      columns => [
-        'organisation.name',
-        'entity.id'
-      ]
+      join => { seller => 'organisation' },
     }
   );
 
   my %name_map = (
     map {
-      $_->entity->id => $_->entity->organisation->name,
+      $_->seller->id => $_->seller->organisation->name,
     } $name_rs->all
   );
 
@@ -222,7 +229,7 @@ sub post_supplier_count {
       count  => $_->get_column('count'),
       value  => $_->get_column('total_spend'),
       date   => $_->get_column('quantised'),
-      seller => %name_map{ $_->get_column('seller_id') },
+      seller => $name_map{ $_->get_column('seller_id') },
     } } $spend_rs->all,
   );
 
