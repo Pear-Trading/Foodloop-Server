@@ -323,7 +323,7 @@ sub post_supplier_history {
           total_spend => { sum => 'sales.value' },
         }
       ],
-      group_by => [ 'me.id', 'organisation.name' ],
+      group_by => [ 'me.id', 'organisation.id' ],
       order_by => { '-asc' => 'organisation.name' },
     }
   );
