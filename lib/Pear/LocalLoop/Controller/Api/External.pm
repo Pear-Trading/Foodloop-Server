@@ -255,7 +255,7 @@ sub post_supplier_history {
   my $third = $last->clone->subtract(months => 3);
 
   my $dtf = $c->schema->storage->datetime_parser;
-  my $year_rs = $c->schema->resultset('Transaction')->search(
+  my $year_rs = $c->schema->resultset('Entity')->search(
     {
       'sales.purchase_time' => {
         -between => [
@@ -279,7 +279,7 @@ sub post_supplier_history {
       order_by => { '-asc' => 'organisation.name' },
     }
   );
-  my $half_year_rs = $c->schema->resultset('Transaction')->search(
+  my $half_year_rs = $c->schema->resultset('Entity')->search(
     {
       'sales.purchase_time' => {
         -between => [
@@ -338,7 +338,7 @@ sub post_supplier_history {
       half_count    => 0,
       half_total    => 0,
       year_count    => $row->get_column('count'),
-      year_total    => $row->get_column('total_spend'),
+      year_total    => $row->get_column('total_spend') / 100000,
     };
   }
 
@@ -349,7 +349,7 @@ sub post_supplier_history {
       quarter_count => 0,
       quarter_total => 0,
       half_count    => $row->get_column('count'),
-      half_total    => $row->get_column('total_spend'),
+      half_total    => $row->get_column('total_spend') / 100000,
       year_count    => 0,
       year_total    => 0,
       %{$data{$row->get_column('id')}},
@@ -361,7 +361,7 @@ sub post_supplier_history {
       id            => $row->get_column('id'),
       name          => $row->get_column('name'),
       quarter_count => $row->get_column('count'),
-      quarter_total => $row->get_column('total_spend'),
+      quarter_total => $row->get_column('total_spend') / 100000,
       half_count    => 0,
       half_total    => 0,
       year_count    => 0,
