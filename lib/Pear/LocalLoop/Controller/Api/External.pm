@@ -118,4 +118,51 @@ sub post_lcc_suppliers {
   });
 }
 
+sub post_year_spend {
+  my $c = shift;
+
+  my $user = $c->stash->{api_user};
+
+  my $last = DateTime->today;
+  my $first = $last->clone->subtract( years => 1 );
+
+  my $dtf = $c->schema->storage->datetime_parser;
+  my $driver = $c->schema->storage->dbh->{Driver}->{Name};
+  my $spend_rs = $c->schema->resultset('ViewQuantisedTransaction' . $driver)->search(
+    {
+      purchase_time => {
+        -between => [
+          $dtf->format_datetime($first),
+          $dtf->format_datetime($last),
+        ],
+      },
+      buyer_id      => $user->entity->id,
+    },
+    {
+      columns  => [
+        {
+          quantised   => 'quantised_days',
+          count       => \"COUNT(*)",
+          total_spend => { sum => 'value' },
+        }
+      ],
+      group_by => 'quantised_days',
+      order_by => { '-asc' => 'quantised_days' },
+    }
+  );
+
+  my @graph_data = (
+    map { {
+      count => $_->get_column('count'),
+      value => $_->get_column('total_spend'),
+      date  => $_->get_column('quantised_days'),
+      } } $spend_rs->all,
+  );
+
+  return $c->render( json => {
+    success => Mojo::JSON->true,
+    data    => \@graph_data,
+  });
+}
+
 1;
