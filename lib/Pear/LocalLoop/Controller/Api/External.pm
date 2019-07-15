@@ -12,6 +12,7 @@ sub post_lcc_transactions {
   my $validation = $c->validation;
   $validation->input($c->stash->{api_json});
   $validation->optional('page')->number;
+  $validation->optional('per_page')->number;
 
   return $c->api_validation_error if $validation->has_error;
 
@@ -23,7 +24,7 @@ sub post_lcc_transactions {
     undef,
     {
       page     => $validation->param('page') || 1,
-      rows     => 10,
+      rows     => $validation->param('per_page') || 10,
       join     => 'transaction',
       order_by => { -desc => 'transaction.purchase_time' },
     });
