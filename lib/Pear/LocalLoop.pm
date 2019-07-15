@@ -195,6 +195,7 @@ sub startup {
   $api_v1_org->post('/external/suppliers')->to('api-external#post_lcc_suppliers');
   $api_v1_org->post('/external/year_spend')->to('api-external#post_year_spend');
   $api_v1_org->post('/external/supplier_count')->to('api-external#post_supplier_count');
+  $api_v1_org->post('/external/supplier_history')->to('api-external#post_supplier_history');
 
   $api_v1_org->post('/pies')->to('api-v1-organisation-pies#index');
 

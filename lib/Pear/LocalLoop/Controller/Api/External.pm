@@ -10,7 +10,7 @@ sub post_lcc_transactions {
   # TODO Check the user is lancaster city council
 
   my $validation = $c->validation;
-  $validation->input( $c->stash->{api_json} );
+  $validation->input($c->stash->{api_json});
   $validation->optional('page')->number;
 
   return $c->api_validation_error if $validation->has_error;
@@ -20,30 +20,30 @@ sub post_lcc_transactions {
   return 0 unless $lcc_import_ext_ref;
 
   my $lcc_transactions = $lcc_import_ext_ref->transactions->search(
-  undef,
-  {
-    page => $validation->param('page') || 1,
-    rows => 10,
-    join => 'transaction',
-    order_by => { -desc => 'transaction.purchase_time' },
-  });
+    undef,
+    {
+      page     => $validation->param('page') || 1,
+      rows     => 10,
+      join     => 'transaction',
+      order_by => { -desc => 'transaction.purchase_time' },
+    });
 
   # purchase_time needs timezone attached to it
   my @transaction_list = (
     map {{
       transaction_external_id => $_->external_id,
-      seller => $_->transaction->seller->name,
-      net_value => $_->transaction->meta->net_value,
-      gross_value => $_->transaction->meta->gross_value,
-      sales_tax_value => $_->transaction->meta->sales_tax_value,
-      purchase_time => $c->format_iso_datetime($_->transaction->purchase_time),
+      seller                  => $_->transaction->seller->name,
+      net_value               => $_->transaction->meta->net_value,
+      gross_value             => $_->transaction->meta->gross_value,
+      sales_tax_value         => $_->transaction->meta->sales_tax_value,
+      purchase_time           => $c->format_iso_datetime($_->transaction->purchase_time),
     }} $lcc_transactions->all
   );
 
-  return $c->render( json => {
-    success => Mojo::JSON->true,
+  return $c->render(json => {
+    success      => Mojo::JSON->true,
     transactions => \@transaction_list,
-    page_no => $lcc_transactions->pager->total_entries,
+    page_no      => $lcc_transactions->pager->total_entries,
   });
 }
 
@@ -57,7 +57,7 @@ sub post_lcc_suppliers {
   # my $is_lcc = $user->entity->organisation->count({ name => "Lancashire County Council" });
 
   my $v = $c->validation;
-  $v->input( $c->stash->{api_json} );
+  $v->input($c->stash->{api_json});
   $v->optional('page')->number;
   $v->optional('sort_by');
   $v->optional('sort_dir');
@@ -65,13 +65,13 @@ sub post_lcc_suppliers {
   my $order_by = [
     { -asc => 'organisation.name' },
   ];
-  if ( $v->param('sort_by') ) {
-    my %dirs = ( 'asc' => '-asc', 'desc' => '-desc' );
+  if ($v->param('sort_by')) {
+    my %dirs = ('asc' => '-asc', 'desc' => '-desc');
     my $dir = $dirs{$v->param('sort_dir')} // '-asc';
     my %sorts = (
-      'name' => 'organisation.name',
+      'name'     => 'organisation.name',
       'postcode' => 'organisation.postcode',
-      'spend' => 'total_spend',
+      'spend'    => 'total_spend',
     );
     my $sort = $sorts{$v->param('sort_by')} || 'organisation.name';
     $order_by->[0] = { $dir => $sort };
@@ -84,37 +84,37 @@ sub post_lcc_suppliers {
       'sales.buyer_id' => $user->entity->id,
     },
     {
-      join => ['sales', 'organisation'],
-      group_by  => ['me.id', 'organisation.id'],
+      join      => [ 'sales', 'organisation' ],
+      group_by  => [ 'me.id', 'organisation.id' ],
       '+select' => [
         {
           'sum' => 'sales.value',
           '-as' => 'total_spend',
         }
       ],
-      '+as' => ['total_spend'],
-      page => $v->param('page') || 1,
-      rows => 10,
-      order_by => $order_by,
+      '+as'     => [ 'total_spend' ],
+      page      => $v->param('page') || 1,
+      rows      => 10,
+      order_by  => $order_by,
     }
   );
 
   my @supplier_list = (
     map {{
       entity_id => $_->id,
-      name => $_->name,
-      street => $_->organisation->street_name,
-      town => $_->organisation->town,
-      postcode => $_->organisation->postcode,
-      country => $_->organisation->country,
-      spend => ($_->get_column('total_spend') / 100000) // 0,
+      name      => $_->name,
+      street    => $_->organisation->street_name,
+      town      => $_->organisation->town,
+      postcode  => $_->organisation->postcode,
+      country   => $_->organisation->country,
+      spend     => ($_->get_column('total_spend') / 100000) // 0,
     }} $lcc_suppliers->all
   );
 
-  return $c->render( json => {
-    success => Mojo::JSON->true,
+  return $c->render(json => {
+    success   => Mojo::JSON->true,
     suppliers => \@supplier_list,
-    page_no => $lcc_suppliers->pager->total_entries,
+    page_no   => $lcc_suppliers->pager->total_entries,
   });
 }
 
@@ -129,7 +129,7 @@ sub post_year_spend {
     month => 4,
     day   => 1
   );
-  my $first = $last->clone->subtract( years => 1 );
+  my $first = $last->clone->subtract(years => 1);
 
   my $dtf = $c->schema->storage->datetime_parser;
   my $driver = $c->schema->storage->dbh->{Driver}->{Name};
@@ -157,14 +157,14 @@ sub post_year_spend {
   );
 
   my @graph_data = (
-    map { {
+    map {{
       count => $_->get_column('count'),
-      value  => ($_->get_column('total_spend') / 100000) // 0,
+      value => ($_->get_column('total_spend') / 100000) // 0,
       date  => $_->get_column('quantised'),
-      } } $spend_rs->all,
+    }} $spend_rs->all,
   );
 
-  return $c->render( json => {
+  return $c->render(json => {
     success => Mojo::JSON->true,
     data    => \@graph_data,
   });
@@ -181,7 +181,7 @@ sub post_supplier_count {
     month => 4,
     day   => 1
   );
-  my $first = $last->clone->subtract( years => 1 );
+  my $first = $last->clone->subtract(years => 1);
 
   my $dtf = $c->schema->storage->datetime_parser;
   my $driver = $c->schema->storage->dbh->{Driver}->{Name};
@@ -225,17 +225,154 @@ sub post_supplier_count {
   );
 
   my @graph_data = (
-    map { {
+    map {{
       count  => $_->get_column('count'),
       value  => ($_->get_column('total_spend') / 100000) // 0,
       date   => $_->get_column('quantised'),
       seller => $name_map{ $_->get_column('seller_id') },
-    } } $spend_rs->all,
+    }} $spend_rs->all,
   );
 
-  return $c->render( json => {
+  return $c->render(json => {
     success => Mojo::JSON->true,
     data    => \@graph_data,
+  });
+}
+
+sub post_supplier_history {
+  my $c = shift;
+
+  my $user = $c->stash->{api_user};
+
+  # Temporary date lock for dev data
+  my $last = DateTime->new(
+    year  => 2019,
+    month => 4,
+    day   => 1
+  );
+  my $first = $last->clone->subtract(years => 1);
+  my $second = $last->clone->subtract(months => 6);
+  my $third = $last->clone->subtract(months => 3);
+
+  my $dtf = $c->schema->storage->datetime_parser;
+  my $year_rs = $c->schema->resultset('Transaction')->search(
+    {
+      'me.purchase_time' => {
+        -between => [
+          $dtf->format_datetime($first),
+          $dtf->format_datetime($last),
+        ],
+      },
+      'me.buyer_id'      => $user->entity->id,
+    },
+    {
+      join     => { seller => 'organisation' },
+      columns  => [
+        {
+          id          => 'me.seller_id',
+          name        => 'organisation.name',
+          count       => \"COUNT(*)",
+          total_spend => { sum => 'me.value' },
+        }
+      ],
+      group_by => 'me.seller_id',
+      order_by => { '-asc' => 'organisation.name' },
+    }
+  );
+  my $half_year_rs = $c->schema->resultset('Transaction')->search(
+    {
+      'me.purchase_time' => {
+        -between => [
+          $dtf->format_datetime($second),
+          $dtf->format_datetime($last),
+        ],
+      },
+      'me.buyer_id'      => $user->entity->id,
+    },
+    {
+      join     => { seller => 'organisation' },
+      columns  => [
+        {
+          id          => 'me.seller_id',
+          name        => 'organisation.name',
+          count       => \"COUNT(*)",
+          total_spend => { sum => 'me.value' },
+        }
+      ],
+      group_by => 'me.seller_id',
+      order_by => { '-asc' => 'organisation.name' },
+    }
+  );
+  my $quarter_year_rs = $c->schema->resultset('Transaction')->search(
+    {
+      'me.purchase_time' => {
+        -between => [
+          $dtf->format_datetime($third),
+          $dtf->format_datetime($last),
+        ],
+      },
+      'me.buyer_id'      => $user->entity->id,
+    },
+    {
+      join     => { seller => 'organisation' },
+      columns  => [
+        {
+          id          => 'me.seller_id',
+          name        => 'organisation.name',
+          count       => \"COUNT(*)",
+          total_spend => { sum => 'me.value' },
+        }
+      ],
+      group_by => 'me.seller_id',
+      order_by => { '-asc' => 'organisation.name' },
+    }
+  );
+
+  my %data;
+  for my $row ($year_rs->all) {
+    $data{$row->get_column('id')} = {
+      id            => $row->get_column('id'),
+      name          => $row->get_column('name'),
+      quarter_count => 0,
+      quarter_total => 0,
+      half_count    => 0,
+      half_total    => 0,
+      year_count    => $row->get_column('count'),
+      year_total    => $row->get_column('total_spend'),
+    };
+  }
+
+  for my $row ($half_year_rs->all) {
+    $data{$row->get_column('id')} = {
+      id            => $row->get_column('id'),
+      name          => $row->get_column('name'),
+      quarter_count => 0,
+      quarter_total => 0,
+      half_count    => $row->get_column('count'),
+      half_total    => $row->get_column('total_spend'),
+      year_count    => 0,
+      year_total    => 0,
+      %{$data{$row->get_column('id')}},
+    };
+  }
+
+  for my $row ($quarter_year_rs->all) {
+    $data{$row->get_column('id')} = {
+      id            => $row->get_column('id'),
+      name          => $row->get_column('name'),
+      quarter_count => $row->get_column('count'),
+      quarter_total => $row->get_column('total_spend'),
+      half_count    => 0,
+      half_total    => 0,
+      year_count    => 0,
+      year_total    => 0,
+      %{$data{$row->get_column('id')}},
+    };
+  }
+
+  return $c->render(json => {
+    success => Mojo::JSON->true,
+    data    => [ values %data ],
   });
 }
 
