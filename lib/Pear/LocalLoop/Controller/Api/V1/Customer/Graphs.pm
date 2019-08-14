@@ -27,13 +27,14 @@ sub index {
   / );
 
   return $c->api_validation_error if $validation->has_error;
-  if ($validation->param('graph') == 'total_range' || $validation->param('graph') == 'avg_spend_range') {
-    $validation->required('start_date', 'end_date');
-  }
 
-  if ($validation->param('graph') == 'total_duration' || $validation->param('graph') == 'avg_spend_duration') {
-    $validation->required('duration');
-  }
+  if ($validation->param('graph') == 'total_range' || $validation->param('graph') == 'avg_spend_range') {
+     $validation->required('start_date', 'end_date');
+   }
+
+   if ($validation->param('graph') == 'total_duration' || $validation->param('graph') == 'avg_spend_duration') {
+     $validation->required('duration');
+   }
 
   my $graph_sub = "graph_" . $validation->param('graph');
 
@@ -74,7 +75,7 @@ sub _purchases_total_duration {
   my $data = { labels => [], data => [] };
 
 # if $start_date and $end_date are not present it will use $duration
-  my ( $start, $end ) = $c->_get_start_end_duration( $duration, $start_date, $end_date );
+  my ( $start, $end ) = $c->_get_start_end_duration( $duration, $start_date ? $start_date : 0, $end_date ? $end_Date : 0);
 
   $data->{bounds} = {
     min => $c->format_iso_datetime( $start ),
@@ -122,7 +123,7 @@ sub _purchases_avg_spend_duration {
   my $data = { labels => [], data => [] };
 
 # if $start_date and $end_date are not present it will use $duration
-  my ( $start, $end ) = $c->_get_start_end_duration( $duration, $start_date, $end_date );
+  my ( $start, $end ) = $c->_get_start_end_duration( $duration, $start_date ? $start_date : 0, $end_date ? $end_Date : 0);
     
   $data->{bounds} = {
     min => $c->format_iso_datetime( $start ),
@@ -180,7 +181,7 @@ sub _get_start_end_duration {
   my $start;
   my $end;
 
-  if ($end_date && $start_date) {
+  if ($end_date != 0 && $start_date != 0) {
     $start = DateTime->new(
       year    => substr $start_date, 0, 4,
       month   => substr $start_date, 4, 2,
@@ -192,7 +193,8 @@ sub _get_start_end_duration {
       days    => substr $end_date, 7, 2,
     );
   } else {
-    $end = $end->clone->subtract_duration( $duration );
+    $end = DateTime->today;
+    $start = $end->clone->subtract_duration( $duration );
   }
   
   return ( $start, $end );
