@@ -20,20 +20,9 @@ sub index {
     avg_spend_last_week
     total_last_month
     avg_spend_last_month
-    total_duration
-    total_range
-    avg_spend_duration
-    avg_spend_range
   / );
 
   return $c->api_validation_error if $validation->has_error;
-  if ($validation->param('graph') == 'total_range' || $validation->param('graph') == 'avg_spend_range') {
-    $validation->required('start_date', 'end_date');
-  }
-
-  if ($validation->param('graph') == 'total_duration' || $validation->param('graph') == 'avg_spend_duration') {
-    $validation->required('duration');
-  }
 
   my $graph_sub = "graph_" . $validation->param('graph');
 
@@ -55,26 +44,15 @@ sub index {
 sub graph_total_last_week { return shift->_purchases_total_duration( 7 ) }
 sub graph_total_last_month { return shift->_purchases_total_duration( 30 ) }
 
-sub graph_total_duration {
-  my ( $c, $duration ) = @_;
-  return shift->__purchases_total_duration( $duration );
-}
-
-sub graph_total_range {
-  my ( $c, $start_date, $end_date ) = @_;
-  return shift->__purchases_total_duration( $duration, $start_date, $end_date );
-}
-
 sub _purchases_total_duration {
-  my ( $c, $day_duration, $start_date, $end_date ) = @_;
+  my ( $c, $day_duration ) = @_;
 
   my $duration = DateTime::Duration->new( days => $day_duration );
   my $entity = $c->stash->{api_user}->entity;
 
   my $data = { labels => [], data => [] };
 
-# if $start_date and $end_date are not present it will use $duration
-  my ( $start, $end ) = $c->_get_start_end_duration( $duration, $start_date, $end_date );
+  my ( $start, $end ) = $c->_get_start_end_duration( $duration );
 
   $data->{bounds} = {
     min => $c->format_iso_datetime( $start ),
@@ -103,27 +81,16 @@ sub _purchases_total_duration {
 sub graph_avg_spend_last_week { return shift->_purchases_avg_spend_duration( 7 ) }
 sub graph_avg_spend_last_month { return shift->_purchases_avg_spend_duration( 30 ) }
 
-sub graph_avg_spend_duration {
-  my ( $c, $duration ) = @_;
-  return shift->_purchases_avg_spend_duration( $duration );
-}
-
-sub graph_avg_spend_range {
-  my ( $c, $start_date, $end_date ) = @_;
-  return shift->_purchases_avg_spend_duration( $duration, $start_date, $end_date );
-}
-
 sub _purchases_avg_spend_duration {
-  my ( $c, $day_duration, $start_date, $end_date ) = @_;
+  my ( $c, $day_duration ) = @_;
 
   my $duration = DateTime::Duration->new( days => $day_duration );
   my $entity = $c->stash->{api_user}->entity;
 
   my $data = { labels => [], data => [] };
 
-# if $start_date and $end_date are not present it will use $duration
-  my ( $start, $end ) = $c->_get_start_end_duration( $duration, $start_date, $end_date );
-    
+  my ( $start, $end ) = $c->_get_start_end_duration( $duration );
+
   $data->{bounds} = {
     min => $c->format_iso_datetime( $start ),
     max => $c->format_iso_datetime( $end ),
@@ -176,25 +143,9 @@ sub _purchases_avg_spend_duration {
 }
 
 sub _get_start_end_duration {
-  my ( $c, $duration, $start_date, $end_date ) = @_;
-  my $start;
-  my $end;
-
-  if ($end_date && $start_date) {
-    $start = DateTime->new(
-      year    => substr $start_date, 0, 4,
-      month   => substr $start_date, 4, 2,
-      days    => substr $start_date, 7, 2,
-    );
-    $end = DateTime->new(
-      year    => substr $end_date, 0, 4,
-      month   => substr $end_date, 4, 2,
-      days    => substr $end_date, 7, 2,
-    );
-  } else {
-    $end = $end->clone->subtract_duration( $duration );
-  }
-  
+  my ( $c, $duration ) = @_;
+  my $end = DateTime->today;
+  my $start = $end->clone->subtract_duration( $duration );
   return ( $start, $end );
 }
 
