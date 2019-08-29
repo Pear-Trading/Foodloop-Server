@@ -35,6 +35,16 @@
     </div>
     <div class="card col-md-6 m-3">
       <div class="card-body">
+        <h4 class="card-title">Postcode Data</h4>
+        <p>Expected headers at very least: "postcode", "ward".</p>
+        <form action="/admin/import_from/postcodes" method="POST" enctype="multipart/form-data">
+          <input type="file" name="postcodes_csv" accept="text/csv">
+          <input type="submit" value="Upload Postcode CSV">
+        </form>
+      </div>
+    </div>
+    <div class="card col-md-6 m-3">
+      <div class="card-body">
         <h4 class="card-title">LCC Procurement Import - Transactions</h4>
         <p>Expected headers at very least: "supplier_id", "transaction_id", "net_amount", "vat amount" , "gross_amount".</p>
         <form action="/admin/import_from/transactions" method="POST" enctype="multipart/form-data">
