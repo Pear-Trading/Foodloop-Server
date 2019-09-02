@@ -37,7 +37,10 @@ sub _row_to_result {
       town => $address,
       postcode => $row->{post_code},
       country => $row->{country_code},
-      external_reference => [ { external_reference => $self->external_result, external_id => $row->{supplier_id} } ],
+      external_reference => [ {
+        external_reference => $self->external_result,
+        external_id => $row->{supplier_id},
+      } ],
     }
   });
 }

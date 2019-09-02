@@ -3,6 +3,8 @@ use Moo;
 use DateTime;
 use DateTime::Format::Strptime;
 
+use Geo::UK::Postcode::Regex;
+
 extends qw/Pear::LocalLoop::Import::LCCCsv/;
 
 has target_entity_id => (
@@ -51,7 +53,32 @@ sub _row_to_result {
   }, { join => 'external_reference' });
 
   unless ($organisation) {
-    Pear::LocalLoop::Error->throw("Cannot find an organisation with supplier_id $supplier_id");
+    # Pear::LocalLoop::Error->throw("Cannot find an organisation with supplier_id $supplier_id");
+
+    my $town = $row->{post_town};
+
+    unless ($town) {
+      my $postcode_obj = Geo::UK::Postcode::Regex->parse( $row->{post_code} );
+      $town = Geo::UK::Postcode::Regex->outcode_to_posttowns($postcode_obj->{outcode});
+      $town = $town->[0];
+    }
+
+    return if $self->external_result->organisations->find({external_id => $row->{supplier_id}});
+
+    $organisation = $self->schema->resultset('Entity')->create({
+      type => 'organisation',
+      organisation => {
+        name => $row->{name},
+        street_name => $row->{"address line 1"},
+        town => $town,
+        postcode => $row->{post_code},
+        country => $row->{country_code},
+        external_reference => [ {
+          external_reference => $self->external_result,
+          external_id => $row->{supplier_id},
+        } ],
+      }
+    });
   }
 
   my $date_formatter = DateTime::Format::Strptime->new(
@@ -82,6 +109,13 @@ sub _row_to_result {
         gross_value     => $gross_value * 100000,
         sales_tax_value => $sales_tax_value * 100000,
         net_value       => $net_value * 100000,
+        ($row->{"local service"} ? (local_service => $row->{"local service"}) : ()),
+        ($row->{"regional service"} ? (regional_service => $row->{"regional service"}) : ()),
+        ($row->{"national service"} ? (national_service => $row->{"national service"}) : ()),
+        ($row->{"private household rebate"} ? (private_household_rebate => $row->{"private household rebate"}) : ()),
+        ($row->{"business tax and rebate"} ? (business_tax_and_rebate => $row->{"business tax and rebate"}) : ()),
+        ($row->{"stat loc gov"} ? (stat_loc_gov => $row->{"stat loc gov"}) : ()),
+        ($row->{"central loc gov"} ? (central_loc_gov => $row->{"central loc gov"}) : ()),
       },
     }
   });
