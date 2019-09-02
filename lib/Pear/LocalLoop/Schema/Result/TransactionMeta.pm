@@ -33,6 +33,41 @@ __PACKAGE__->add_columns(
         size        => [ 100, 0 ],
         is_nullable => 0,
     },
+    "local_service" => {
+      data_type => 'boolean',
+      default_value => \"false",
+      is_nullable => 0,
+    },
+    "regional_service" => {
+      data_type => 'boolean',
+      default_value => \"false",
+      is_nullable => 0,
+    },
+    "national_service" => {
+      data_type   => 'boolean',
+      default_value => \"false",
+      is_nullable => 0,
+    },
+    "private_household_rebate" => {
+      data_type   => 'boolean',
+      default_value => \"false",
+      is_nullable => 0,
+    },
+    "business_tax_and_rebate" => {
+      data_type   => 'boolean',
+      default_value => \"false",
+      is_nullable => 0,
+    },
+    "stat_loc_gov" => {
+      data_type   => 'boolean',
+      default_value => \"false",
+      is_nullable => 0,
+    },
+    "central_loc_gov" => {
+      data_type   => 'boolean',
+      default_value => \"false",
+      is_nullable => 0,
+    },
 );
 
 __PACKAGE__->set_primary_key("id");

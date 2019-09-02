@@ -52,17 +52,17 @@ __PACKAGE__->add_columns(
   },
   pending         => {
     data_type   => 'boolean',
-    default     => \"false",
+    default_value => \"false",
     is_nullable => 0,
   },
   is_local        => {
     data_type   => 'boolean',
-    default     => undef,
+    default_value => undef,
     is_nullable => 1,
   },
   is_fair         => {
     data_type   => 'boolean',
-    default     => undef,
+    default_value => undef,
     is_nullable => 1,
   },
   submitted_by_id => {
