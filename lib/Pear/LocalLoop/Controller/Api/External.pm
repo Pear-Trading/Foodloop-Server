@@ -379,4 +379,75 @@ sub post_supplier_history {
   });
 }
 
+sub post_lcc_table_summary {
+  my $c = shift;
+
+  my $validation = $c->validation;
+  $validation->input($c->stash->{api_json});
+
+  my $transaction_rs = $c->schema->resultset('Transaction');
+
+  my $ward_transactions_rs = $transaction_rs->search({},
+    {
+      join => { seller => { postcode => { gb_postcode => 'ward' } } },
+      group_by => 'ward.id',
+      select => [
+        { count => 'me.id', '-as' => 'count' },
+        { sum => 'me.value', '-as' => 'sum' },
+        'ward.ward'
+      ],
+      as => [ qw/ count sum ward_name /],
+    }
+  );
+
+  my $transaction_type_data = {};
+
+  for my $meta ( qw/
+    local_service
+    regional_service
+    national_service
+    private_household_rebate
+    business_tax_and_rebate
+    stat_loc_gov
+    central_loc_gov
+  / ) {
+    my $transaction_type_rs = $transaction_rs->search(
+      {
+        'meta.'.$meta => 1,
+      },
+      {
+        join => 'meta',
+        group_by => 'meta.' . $meta,
+        select => [
+          { count => 'me.id', '-as' => 'count' },
+          { sum => 'me.value', '-as' => 'sum' },
+        ],
+        as => [ qw/ count sum /],
+      }
+    )->first;
+
+
+    $transaction_type_data->{$meta} = {
+      ( $transaction_type_rs ? (
+        count => $transaction_type_rs->get_column('count'),
+        sum => $transaction_type_rs->get_column('sum'),
+        ) : () ),
+    }
+  }
+
+  my @ward_transaction_list = (
+    map {{
+      ward => $_->get_column('ward_name') || "N/A",
+      sum => $_->get_column('sum') / 100000,
+      count => $_->get_column('count'),
+    }} $ward_transactions_rs->all
+  );
+
+  return $c->render( json => {
+    success => Mojo::JSON->true,
+    wards => \@ward_transaction_list,
+    types => $transaction_type_data,
+  });
+}
+
 1;

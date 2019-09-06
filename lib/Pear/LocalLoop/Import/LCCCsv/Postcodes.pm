@@ -22,7 +22,6 @@ sub import_csv {
   }
 }
 
-use Devel::Dwarn;
 sub _row_to_result {
   my ( $self, $row ) = @_;
 
@@ -37,7 +36,7 @@ sub _row_to_result {
 
   return unless $postcode_r;
   return if $postcode_r->ward;
-  
+
   $postcode_r->update({ ward_id => $ward->id });
 }
 

@@ -55,6 +55,8 @@ sub _row_to_result {
   unless ($organisation) {
     # Pear::LocalLoop::Error->throw("Cannot find an organisation with supplier_id $supplier_id");
 
+    return unless $row->{'Company Name (WHO)'};
+
     my $town = $row->{post_town};
 
     unless ($town) {
@@ -68,7 +70,7 @@ sub _row_to_result {
     $organisation = $self->schema->resultset('Entity')->create({
       type => 'organisation',
       organisation => {
-        name => $row->{name},
+        name => $row->{'Company Name (WHO)'},
         street_name => $row->{"address line 1"},
         town => $town,
         postcode => $row->{post_code},
@@ -86,9 +88,9 @@ sub _row_to_result {
     time_zone => 'Europe/London'
   );
 
-    my $paid_date = ( $row->{paid_date} ?
-      $date_formatter->parse_datetime($row->{paid_date}) :
-      $date_formatter->parse_datetime($row->{invoice_date}) );
+  my $paid_date = ( $row->{paid_date} ?
+    $date_formatter->parse_datetime($row->{paid_date}) :
+    $date_formatter->parse_datetime($row->{invoice_date}) );
 
   my $gross_value = $row->{gross_amount};
   $gross_value =~ s/,//g;
@@ -98,26 +100,28 @@ sub _row_to_result {
   $net_value =~ s/,//g;
 
   # TODO negative values are sometimes present
-  $self->external_result->find_or_create_related('transactions', {
+  my $external_transaction = $self->external_result->update_or_create_related('transactions', { # This is a TransactionExternal result
     external_id => $row->{transaction_id},
-    transaction => {
-      seller        => $organisation->entity,
-      buyer         => $lcc_org,
-      purchase_time => $paid_date,
-      value         => $gross_value * 100000,
-      meta          => {
-        gross_value     => $gross_value * 100000,
-        sales_tax_value => $sales_tax_value * 100000,
-        net_value       => $net_value * 100000,
-        ($row->{"local service"} ? (local_service => $row->{"local service"}) : ()),
-        ($row->{"regional service"} ? (regional_service => $row->{"regional service"}) : ()),
-        ($row->{"national service"} ? (national_service => $row->{"national service"}) : ()),
-        ($row->{"private household rebate"} ? (private_household_rebate => $row->{"private household rebate"}) : ()),
-        ($row->{"business tax and rebate"} ? (business_tax_and_rebate => $row->{"business tax and rebate"}) : ()),
-        ($row->{"stat loc gov"} ? (stat_loc_gov => $row->{"stat loc gov"}) : ()),
-        ($row->{"central loc gov"} ? (central_loc_gov => $row->{"central loc gov"}) : ()),
-      },
-    }
+  });
+
+  my $transaction_result = $external_transaction->update_or_create_related( 'transaction', {
+    seller        => $organisation->entity,
+    buyer         => $lcc_org,
+    purchase_time => $paid_date,
+    value         => $gross_value * 100000,
+  });
+
+  my $meta_result = $transaction_result->update_or_create_related('meta', {
+    gross_value     => $gross_value * 100000,
+    sales_tax_value => $sales_tax_value * 100000,
+    net_value       => $net_value * 100000,
+    ($row->{"local service"} ? (local_service => $row->{"local service"}) : ()),
+    ($row->{"regional service"} ? (regional_service => $row->{"regional service"}) : ()),
+    ($row->{"national service"} ? (national_service => $row->{"national service"}) : ()),
+    ($row->{"private household rebate"} ? (private_household_rebate => $row->{"private household rebate"}) : ()),
+    ($row->{"business tax and rebate"} ? (business_tax_and_rebate => $row->{"business tax and rebate"}) : ()),
+    ($row->{"stat loc gov"} ? (stat_loc_gov => $row->{"stat loc gov"}) : ()),
+    ($row->{"central loc gov"} ? (central_loc_gov => $row->{"central loc gov"}) : ()),
   });
 }
 
