@@ -199,14 +199,15 @@ sub post_supplier_count {
       buyer_id      => $user->entity->id,
     },
     {
-      prefetch => { 'seller' => 'organisation' },
+      join => { 'seller' => 'organisation' },
       select => [
         { count => 'me.id', '-as' => 'count' },
         { sum => 'me.value', '-as' => 'total_spend' },
         'organisation.name',
         'me.quantised_days',
       ],
-      group_by => [ 'me.quantised_days', 'seller.id' ],
+      as => [ qw/ count total_spend name quantised_days / ],
+      group_by => [ qw/ me.quantised_days seller.id organisation.id / ],
       order_by => { '-asc' => 'me.quantised_days' },
     }
   );
@@ -216,7 +217,7 @@ sub post_supplier_count {
       count  => $_->get_column('count'),
       value  => ($_->get_column('total_spend') / 100000) // 0,
       date   => $_->get_column('quantised_days'),
-      seller => $_->seller->organisation->name,
+      seller => $_->get_column('name'),
     }} $spend_rs->all,
   );
 

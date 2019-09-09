@@ -18,8 +18,8 @@ sub index {
     {},
     {
       select => [
-        { count => 'id', '-as' => 'count' },
-        { sum => 'value', '-as' => 'sum_value' },
+        { count => 'me.value', '-as' => 'count' },
+        { sum => 'me.value', '-as' => 'sum_value' },
         'quantised_weeks',
       ],
       group_by => 'quantised_weeks',
