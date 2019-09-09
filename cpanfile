@@ -14,7 +14,6 @@ requires 'DBIx::Class::Schema::Loader';
 requires 'SQL::Translator';
 requires 'DateTime';
 requires 'DateTime::Format::Strptime', "1.73";
-requires 'DateTime::Format::SQLite';
 requires 'Try::Tiny';
 requires 'MooX::Options::Actions';
 requires 'Module::Runtime';
@@ -40,10 +39,12 @@ feature 'postgres', 'PostgreSQL Support' => sub {
   requires 'DBD::Pg';
   requires 'Test::PostgreSQL';
   requires 'Mojo::Pg';
+  requires 'DateTime::Format::Pg';
 };
 
 feature 'sqlite', 'SQLite Support' => sub {
   requires 'Minion::Backend::SQLite';
+  requires 'DateTime::Format::SQLite';
 };
 
 feature 'codepoint-open', 'Code Point Open manipulation' => sub {

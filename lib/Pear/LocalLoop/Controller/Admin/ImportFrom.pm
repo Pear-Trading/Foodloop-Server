@@ -98,4 +98,24 @@ sub post_transactions {
   return $c->redirect_to('/admin/import_from');
 }
 
+sub org_search {
+  my $c = shift;
+  my $term = $c->param('term');
+
+  my $rs = $c->schema->resultset('Organisation')->search(
+    { name => { like => $term . '%' } },
+    {
+      join    => 'entity',
+      columns => [ qw/ me.name entity.id / ]
+    },
+  );
+
+  my @results = ( map { {
+    label => $_->name,
+    value => $_->entity->id,
+  } } $rs->all);
+
+  $c->render( json => \@results );
+}
+
 1;
