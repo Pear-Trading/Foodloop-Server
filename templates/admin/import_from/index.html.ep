@@ -1,6 +1,20 @@
 % layout 'admin';
 % title 'Import From';
 % content_for javascript => begin
+<script>
+$(function() {
+    $('#select-org').autocomplete({
+      source: '<%= url_for '/admin/import_from/org_search' %>',
+      minLength: 2,
+      select: function( event, ui ) {
+          console.log(ui);
+          $('#select-org').val(ui.item.label);
+          $('#select-org-id').val(ui.item.value);
+          return false;
+      }
+    });
+})
+</script>
 % end
 % if (my $error = flash 'error') {
 <div class="alert alert-danger" role="alert">
@@ -35,25 +49,11 @@
     </div>
     <div class="card col-md-6 m-3">
       <div class="card-body">
-        <h4 class="card-title">Postcode Data</h4>
-        <p>Expected headers at very least: "postcode", "ward".</p>
-        <form action="/admin/import_from/postcodes" method="POST" enctype="multipart/form-data">
-          <input type="file" name="postcodes_csv" accept="text/csv">
-          <input type="submit" value="Upload Postcode CSV">
-        </form>
-      </div>
-    </div>
-    <div class="card col-md-6 m-3">
-      <div class="card-body">
         <h4 class="card-title">LCC Procurement Import - Transactions</h4>
         <p>Expected headers at very least: "supplier_id", "transaction_id", "net_amount", "vat amount" , "gross_amount".</p>
         <form action="/admin/import_from/transactions" method="POST" enctype="multipart/form-data">
-          <select name="entity_id">
-            <option>Select an Organisation</option>
-            <% for my $org ( @$org_entities ) { %>
-            <option value="<%= $org->{id}; %>"><%= $org->{name}; %></option>
-            <% } %>
-          </select><br/>
+          <input id="select-org" type="text">
+          <input id="select-org-id" name="entity_id" type="hidden">
           <input type="file" name="transactions_csv" accept="text/csv">
           <input type="submit" value="Upload Transactions CSV">
         </form>

@@ -267,6 +267,7 @@ sub startup {
   $admin_routes->post('/import_from/suppliers')->to('admin-import_from#post_suppliers');
   $admin_routes->post('/import_from/transactions')->to('admin-import_from#post_transactions');
   $admin_routes->post('/import_from/postcodes')->to('admin-import_from#post_postcodes');
+  $admin_routes->get('/import_from/org_search')->to('admin-import_from#org_search');
 
 #  my $user_routes = $r->under('/')->to('root#under');
 

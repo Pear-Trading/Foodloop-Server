@@ -4,5 +4,7 @@
 %= javascript '/static/user/js/home.js';
 % end
 <div>
-  <h1>App currently in development, please come back later!</h1>
+  <h1>Local Loop API Server</h1>
+  <p>If you have arrived here, you're either a developer or something has gone wrong! Oops!</p>
+  <a href="/admin" class="btn btn-primary">Go to Admin Login</a>
 </div>

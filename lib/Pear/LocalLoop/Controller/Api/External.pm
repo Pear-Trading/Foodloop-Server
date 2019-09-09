@@ -199,40 +199,24 @@ sub post_supplier_count {
       buyer_id      => $user->entity->id,
     },
     {
-      columns  => [
-        'seller_id',
-        {
-          quantised   => 'quantised_days',
-          count       => \"COUNT(*)",
-          total_spend => { sum => 'value' },
-        }
+      prefetch => { 'seller' => 'organisation' },
+      select => [
+        { count => 'me.id', '-as' => 'count' },
+        { sum => 'me.value', '-as' => 'total_spend' },
+        'organisation.name',
+        'me.quantised_days',
       ],
-      group_by => [ 'quantised_days', 'seller_id' ],
-      order_by => { '-asc' => 'quantised_days' },
+      group_by => [ 'me.quantised_days', 'seller.id' ],
+      order_by => { '-asc' => 'me.quantised_days' },
     }
-  );
-
-  my $name_rs = $c->schema->resultset('Transaction')->search(
-    {
-      'me.buyer_id' => $user->entity->id,
-    },
-    {
-      join => { seller => 'organisation' },
-    }
-  );
-
-  my %name_map = (
-    map {
-      $_->seller->id => $_->seller->organisation->name,
-    } $name_rs->all
   );
 
   my @graph_data = (
     map {{
       count  => $_->get_column('count'),
       value  => ($_->get_column('total_spend') / 100000) // 0,
-      date   => $_->get_column('quantised'),
-      seller => $name_map{ $_->get_column('seller_id') },
+      date   => $_->get_column('quantised_days'),
+      seller => $_->seller->organisation->name,
     }} $spend_rs->all,
   );
 

@@ -42,8 +42,22 @@ And then add the following to your configuration file:
   },
 ```
 
-This will then use an SQLite db for the minion backend, at minion.db
+This will then use an SQLite db for the minion backend, using `minion.db` as
+the database file. To start the minion itself, run:
 
+```
+./script/pear-local_loop minion worker
+```
+
+# Importing Ward Data
+
+To import ward data, get the ward data csv and then run the following command:
+
+```shell script
+./script/pear-local_loop minion job \
+  --enqueue 'csv_postcode_import' \
+  --args '[ "/path/to/ward/csv" ]'
+```
 
 ## Example PostgreSQL setup
 
@@ -57,7 +71,46 @@ psql=# alter user minion with encrypted password 'abc123';
 psql=# grant all privileges on database localloop_minion to minion;
 ```
 
-# Dev notes
+# Development
+
+There are a couple of setup steps to getting a development environment ready.
+Use the corresponding instructions depending on what state your current setup
+is in.
+
+## First Time Setup
+
+First, decide if you're using SQLite or PostgreSQL locally. Development supports
+both, however production uses PostgreSQL. For this example we will use SQLite.
+As the default config is set up for this, no configuration changes are
+needed initially. So, first off, install dependencies:
+
+```shell script
+cpanm --installdeps . --with-feature=sqlite
+```
+
+Then install the database:
+
+```shell script
+./script/deploy_db install -c 'dbi:SQLite:dbname=foodloop.db'
+```
+
+Then set up the development users:
+
+```shell script
+./script/pear-local_loop dev_data --force
+```
+
+***Note: do NOT run that script on production.***
+
+Then you can start the application:
+
+```shell script
+morbo script/pear-local_loop -l http://*:3000
+```
+
+You can modify the host and port for listening as needed.
+
+# Old Docs
 
 ## Local test database
 
