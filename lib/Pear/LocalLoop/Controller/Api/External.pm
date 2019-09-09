@@ -86,12 +86,12 @@ sub post_lcc_suppliers {
   my $lcc_suppliers = $c->schema->resultset('Entity')->search(
     {
       'sales.buyer_id' => $user->entity->id,
-      ( $v->param('search') ? (
+      ($v->param('search') ? (
         '-or' => [
           { 'organisation.name' => { 'like' => $v->param('search') . '%' } },
           { 'organisation.postcode' => { 'like' => $v->param('search') . '%' } },
         ]
-      ) : () ),
+      ) : ()),
     },
     {
       join      => [ 'sales', 'organisation' ],
@@ -133,13 +133,15 @@ sub post_year_spend {
 
   my $user = $c->stash->{api_user};
 
-  # Temporary date lock for dev data
-  my $last = DateTime->new(
-    year  => 2019,
-    month => 4,
-    day   => 1
-  );
-  my $first = $last->clone->subtract(years => 1);
+  my $v = $c->validation;
+  $v->input($c->stash->{api_json});
+  $v->required('from');
+  $v->required('to');
+
+  return $c->api_validation_error if $v->has_error;
+
+  my $last = $c->parse_iso_datetime($v->param('to'));
+  my $first = $c->parse_iso_datetime($v->param('from'));
 
   my $dtf = $c->schema->storage->datetime_parser;
   my $driver = $c->schema->storage->dbh->{Driver}->{Name};
@@ -185,13 +187,15 @@ sub post_supplier_count {
 
   my $user = $c->stash->{api_user};
 
-  # Temporary date lock for dev data
-  my $last = DateTime->new(
-    year  => 2019,
-    month => 4,
-    day   => 1
-  );
-  my $first = $last->clone->subtract(years => 1);
+  my $v = $c->validation;
+  $v->input($c->stash->{api_json});
+  $v->required('from');
+  $v->required('to');
+
+  return $c->api_validation_error if $v->has_error;
+
+  my $last = $c->parse_iso_datetime($v->param('to'));
+  my $first = $c->parse_iso_datetime($v->param('from'));
 
   my $dtf = $c->schema->storage->datetime_parser;
   my $driver = $c->schema->storage->dbh->{Driver}->{Name};
@@ -206,15 +210,15 @@ sub post_supplier_count {
       buyer_id      => $user->entity->id,
     },
     {
-      join => { 'seller' => 'organisation' },
-      select => [
+      join     => { 'seller' => 'organisation' },
+      select   => [
         { count => 'me.value', '-as' => 'count' },
         { sum => 'me.value', '-as' => 'total_spend' },
         'organisation.name',
         'me.quantised_days',
       ],
-      as => [ qw/ count total_spend name quantised_days / ],
-      group_by => [ qw/ me.quantised_days seller.id organisation.id / ],
+      as       => [ qw/count total_spend name quantised_days/ ],
+      group_by => [ qw/me.quantised_days seller.id organisation.id/ ],
       order_by => { '-asc' => 'me.quantised_days' },
     }
   );
@@ -374,37 +378,56 @@ sub post_supplier_history {
 sub post_lcc_table_summary {
   my $c = shift;
 
-  my $validation = $c->validation;
-  $validation->input($c->stash->{api_json});
+  my $user = $c->stash->{api_user};
+
+  my $v = $c->validation;
+  $v->input($c->stash->{api_json});
+  $v->required('from');
+  $v->required('to');
+
+  return $c->api_validation_error if $v->has_error;
+
+  my $last = $c->parse_iso_datetime($v->param('to'));
+  my $first = $c->parse_iso_datetime($v->param('from'));
 
   my $transaction_rs = $c->schema->resultset('Transaction');
 
-  my $ward_transactions_rs = $transaction_rs->search({},
+  my $dtf = $c->schema->storage->datetime_parser;
+  my $ward_transactions_rs = $transaction_rs->search(
     {
-      join => { seller => { postcode => { gb_postcode => 'ward' } } },
+      purchase_time => {
+        -between => [
+          $dtf->format_datetime($first),
+          $dtf->format_datetime($last),
+        ],
+        buyer_id => $user->entity->id,
+      },
+    },
+    {
+      join     => { seller => { postcode => { gb_postcode => 'ward' } } },
       group_by => 'ward.id',
-      select => [
+      select   => [
         { count => 'me.id', '-as' => 'count' },
         { sum => 'me.value', '-as' => 'sum' },
         'ward.ward'
       ],
-      as => [ qw/ count sum ward_name /],
+      as       => [ qw/count sum ward_name/ ],
     }
   );
 
   my $transaction_type_data = {};
 
   my %meta_names = (
-    local_service => "Local Services",
-    regional_service => "Regional Services",
-    national_service => "National Services",
+    local_service            => "Local Services",
+    regional_service         => "Regional Services",
+    national_service         => "National Services",
     private_household_rebate => "Private Household Rebates etc",
-    business_tax_and_rebate => "Business Tax & Service Rebates",
-    stat_loc_gov => "Statutory Loc Gov",
-    central_loc_gov => "Central Gov HMRC",
+    business_tax_and_rebate  => "Business Tax & Service Rebates",
+    stat_loc_gov             => "Statutory Loc Gov",
+    central_loc_gov          => "Central Gov HMRC",
   );
 
-  for my $meta ( qw/
+  for my $meta (qw/
     local_service
     regional_service
     national_service
@@ -412,48 +435,54 @@ sub post_lcc_table_summary {
     business_tax_and_rebate
     stat_loc_gov
     central_loc_gov
-  / ) {
+  /) {
     my $transaction_type_rs = $transaction_rs->search(
       {
-        'meta.'.$meta => 1,
+        'me.purchase_time' => {
+          -between => [
+            $dtf->format_datetime($first),
+            $dtf->format_datetime($last),
+          ],
+        },
+        'me.buyer_id'      => $user->entity->id,
+        'meta.' . $meta    => 1,
       },
       {
-        join => 'meta',
+        join     => 'meta',
         group_by => 'meta.' . $meta,
-        select => [
+        select   => [
           { count => 'me.id', '-as' => 'count' },
           { sum => 'me.value', '-as' => 'sum' },
         ],
-        as => [ qw/ count sum /],
+        as       => [ qw/count sum/ ],
       }
     )->first;
 
-
     $transaction_type_data->{$meta} = {
-      ( $transaction_type_rs ? (
+      ($transaction_type_rs ? (
         count => $transaction_type_rs->get_column('count'),
-        sum => $transaction_type_rs->get_column('sum'),
-        type => $meta_names{$meta},
-        ) : (
+        sum   => $transaction_type_rs->get_column('sum'),
+        type  => $meta_names{$meta},
+      ) : (
         count => 0,
-        sum => 0,
-        type => $meta_names{$meta},
-        ) ),
+        sum   => 0,
+        type  => $meta_names{$meta},
+      )),
     }
   }
 
   my @ward_transaction_list = (
     map {{
-      ward => $_->get_column('ward_name') || "N/A",
-      sum => $_->get_column('sum') / 100000,
+      ward  => $_->get_column('ward_name') || "N/A",
+      sum   => $_->get_column('sum') / 100000,
       count => $_->get_column('count'),
     }} $ward_transactions_rs->all
   );
 
-  return $c->render( json => {
+  return $c->render(json => {
     success => Mojo::JSON->true,
-    wards => \@ward_transaction_list,
-    types => $transaction_type_data,
+    wards   => \@ward_transaction_list,
+    types   => $transaction_type_data,
   });
 }
 
