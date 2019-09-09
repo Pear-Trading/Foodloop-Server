@@ -23,4 +23,18 @@ SELECT "value",
   FROM "transactions"
 /);
 
+__PACKAGE__->belongs_to(
+  "buyer",
+  "Pear::LocalLoop::Schema::Result::Entity",
+  { id => "buyer_id" },
+  { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },
+);
+
+__PACKAGE__->belongs_to(
+  "seller",
+  "Pear::LocalLoop::Schema::Result::Entity",
+  { id => "seller_id" },
+  { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },
+);
+
 1;

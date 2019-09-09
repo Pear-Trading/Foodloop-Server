@@ -59,6 +59,16 @@ To import ward data, get the ward data csv and then run the following command:
   --args '[ "/path/to/ward/csv" ]'
 ```
 
+# Setting up Entity Postcodes
+
+Assuming you have imported codepoint open, then to properly assign all
+ postcodes:
+ 
+```shell script
+./script/pear-local_loop minion job \
+  --enqueue entity_postcode_lookup
+```
+
 ## Example PostgreSQL setup
 
 ```

@@ -64,6 +64,7 @@ sub post_lcc_suppliers {
   $v->optional('page')->number;
   $v->optional('sort_by');
   $v->optional('sort_dir');
+  $v->optional('search');
 
   my $order_by = [
     { -asc => 'organisation.name' },
@@ -85,6 +86,12 @@ sub post_lcc_suppliers {
   my $lcc_suppliers = $c->schema->resultset('Entity')->search(
     {
       'sales.buyer_id' => $user->entity->id,
+      ( $v->param('search') ? (
+        '-or' => [
+          { 'organisation.name' => { 'like' => $v->param('search') . '%' } },
+          { 'organisation.postcode' => { 'like' => $v->param('search') . '%' } },
+        ]
+      ) : () ),
     },
     {
       join      => [ 'sales', 'organisation' ],
