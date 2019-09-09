@@ -402,6 +402,16 @@ sub post_lcc_table_summary {
 
   my $transaction_type_data = {};
 
+  my %meta_names = (
+    local_service => "Local Services",
+    regional_service => "Regional Services",
+    national_service => "National Services",
+    private_household_rebate => "Private Household Rebates etc",
+    business_tax_and_rebate => "Business Tax & Service Rebates",
+    stat_loc_gov => "Statutory Loc Gov",
+    central_loc_gov => "Central Gov HMRC",
+  );
+
   for my $meta ( qw/
     local_service
     regional_service
@@ -431,7 +441,12 @@ sub post_lcc_table_summary {
       ( $transaction_type_rs ? (
         count => $transaction_type_rs->get_column('count'),
         sum => $transaction_type_rs->get_column('sum'),
-        ) : () ),
+        type => $meta_names{$meta},
+        ) : (
+        count => 0,
+        sum => 0,
+        type => $meta_names{$meta},
+        ) ),
     }
   }
 
