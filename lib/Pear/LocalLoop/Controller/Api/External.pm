@@ -140,8 +140,8 @@ sub post_year_spend {
 
   return $c->api_validation_error if $v->has_error;
 
-  my $last = $c->parse_iso_datetime($v->param('to'));
-  my $first = $c->parse_iso_datetime($v->param('from'));
+  my $last = $c->parse_iso_date($v->param('to'));
+  my $first = $c->parse_iso_date($v->param('from'));
 
   my $dtf = $c->schema->storage->datetime_parser;
   my $driver = $c->schema->storage->dbh->{Driver}->{Name};
@@ -194,8 +194,8 @@ sub post_supplier_count {
 
   return $c->api_validation_error if $v->has_error;
 
-  my $last = $c->parse_iso_datetime($v->param('to'));
-  my $first = $c->parse_iso_datetime($v->param('from'));
+  my $last = $c->parse_iso_date($v->param('to'));
+  my $first = $c->parse_iso_date($v->param('from'));
 
   my $dtf = $c->schema->storage->datetime_parser;
   my $driver = $c->schema->storage->dbh->{Driver}->{Name};
@@ -387,8 +387,8 @@ sub post_lcc_table_summary {
 
   return $c->api_validation_error if $v->has_error;
 
-  my $last = $c->parse_iso_datetime($v->param('to'));
-  my $first = $c->parse_iso_datetime($v->param('from'));
+  my $last = $c->parse_iso_date($v->param('to'));
+  my $first = $c->parse_iso_date($v->param('from'));
 
   my $transaction_rs = $c->schema->resultset('Transaction');
 
@@ -400,8 +400,8 @@ sub post_lcc_table_summary {
           $dtf->format_datetime($first),
           $dtf->format_datetime($last),
         ],
-        buyer_id => $user->entity->id,
       },
+      buyer_id      => $user->entity->id,
     },
     {
       join     => { seller => { postcode => { gb_postcode => 'ward' } } },
