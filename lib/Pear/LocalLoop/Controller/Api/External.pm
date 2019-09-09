@@ -201,7 +201,7 @@ sub post_supplier_count {
     {
       join => { 'seller' => 'organisation' },
       select => [
-        { count => 'me.id', '-as' => 'count' },
+        { count => 'me.value', '-as' => 'count' },
         { sum => 'me.value', '-as' => 'total_spend' },
         'organisation.name',
         'me.quantised_days',
