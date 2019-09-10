@@ -15,6 +15,8 @@ has '+csv_required_columns' => (
 sub import_csv {
   my ($self) = @_;
 
+  $self->check_headers;
+
   while ( my $row = $self->get_csv_line ) {
     $self->_row_to_result($row);
   }
