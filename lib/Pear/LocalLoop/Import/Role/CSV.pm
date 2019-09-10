@@ -67,6 +67,11 @@ has csv_data => (
   }
 );
 
+sub get_csv_line {
+  my $self = shift;
+  return $self->_text_csv->getline_hr( $self->_csv_filehandle );
+}
+
 sub check_headers {
   my $self = shift;
   my $req_headers = $self->csv_required_columns;
