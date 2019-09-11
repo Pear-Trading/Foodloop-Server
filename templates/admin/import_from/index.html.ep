@@ -16,16 +16,6 @@ $(function() {
 })
 </script>
 % end
-% if (my $error = flash 'error') {
-<div class="alert alert-danger" role="alert">
-  <strong>Error!</strong> <%= $error %>
-</div>
-% }
-% elsif (my $success = flash 'success') {
-<div class="alert alert-success" role="alert">
-  <strong>Success!</strong> <%= $success %>
-</div>
-% }
 <div class="row">
   <div class="col-12 mb-3">
     <h3 class="float-left">Import From</h3>
