@@ -35,10 +35,10 @@ has '+csv_required_columns' => (
 sub import_csv {
   my ($self) = @_;
 
-  my $rows = $self->csv_data;
+  $self->check_headers;
   my $lcc_org = $self->target_entity;
 
-  foreach my $row (@{$rows}) {
+  while ( my $row = $self->get_csv_line ) {
     $self->_row_to_result($row, $lcc_org);
   }
 }
