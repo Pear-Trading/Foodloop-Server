@@ -55,6 +55,16 @@ sub post_transaction_list_purchases {
       seller => $_->seller->name,
       value => $_->value / 100000,
       purchase_time => $c->format_iso_datetime($_->purchase_time),
+        ( $_->meta ? (
+          net_value => $_->meta->net_value / 100000,
+          sales_tax_value => $_->meta->sales_tax_value / 100000,
+          gross_value => $_->meta->gross_value / 100000,
+        ) : (
+          net_value => undef,
+          sales_tax_value => undef,
+          gross_value => undef,
+        )),
+
     }} $transactions->all
   );
 

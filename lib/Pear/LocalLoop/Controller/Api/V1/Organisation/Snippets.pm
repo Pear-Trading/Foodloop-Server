@@ -6,6 +6,10 @@ sub index {
 
   my $entity = $c->stash->{api_user}->entity;
   my $data = {
+    all_sales_count => 0,
+    all_sales_total => 0,
+    all_purchases_count => 0,
+    all_purchases_total => 0,
     this_month_sales_count => 0,
     this_month_sales_total => 0,
     this_month_purchases_count => 0,
@@ -25,6 +29,12 @@ sub index {
   my $week_ago = $today->clone->subtract( days => 7 );
   my $month_ago = $today->clone->subtract( days => 30 );
 
+  # TODO check that sales is doing the right thing here
+  my $all_sales = $entity->sales;
+  $data->{ all_sales_count } = $all_sales->count;
+  $data->{ all_sales_total } = $all_sales->get_column('value')->sum || 0;
+  $data->{ all_sales_total } /= 100000;
+
   my $today_sales = $entity->sales->search_between( $today, $now );
   $data->{ today_sales_count } = $today_sales->count;
   $data->{ today_sales_total } = $today_sales->get_column('value')->sum || 0;
@@ -39,6 +49,11 @@ sub index {
   $data->{ this_month_sales_count } = $month_sales->count;
   $data->{ this_month_sales_total } = $month_sales->get_column('value')->sum || 0;
   $data->{ this_month_sales_total } /= 100000;
+
+  my $all_purchases = $entity->purchases;
+  $data->{ all_purchases_count } = $all_purchases->count;
+  $data->{ all_purchases_total } = $all_purchases->get_column('value')->sum || 0;
+  $data->{ all_purchases_total } /= 100000;
 
   my $today_purchases = $entity->purchases->search_between( $today, $now );
   $data->{ today_purchases_count } = $today_purchases->count;

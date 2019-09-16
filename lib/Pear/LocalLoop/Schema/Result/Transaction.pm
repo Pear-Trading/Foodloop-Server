@@ -81,6 +81,18 @@ __PACKAGE__->might_have(
   "Pear::LocalLoop::Schema::Result::TransactionCategory" => "transaction_id",
 );
 
+__PACKAGE__->has_one(
+    "meta",
+    "Pear::LocalLoop::Schema::Result::TransactionMeta",
+    { 'foreign.transaction_id' => 'self.id' },
+);
+
+__PACKAGE__->has_many(
+    "external_reference",
+    "Pear::LocalLoop::Schema::Result::TransactionExternal",
+    { 'foreign.transaction_id' => 'self.id' },
+);
+
 sub sqlt_deploy_hook {
   my ( $source_instance, $sqlt_table ) = @_;
   my $pending_field = $sqlt_table->get_field('essential');

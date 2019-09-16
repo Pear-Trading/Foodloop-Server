@@ -1,4 +1,4 @@
-% layout 'admin_errors';
+% layout 'admin';
 % title 'Import';
 <div class="row">
   <div class="col-8">

@@ -14,7 +14,6 @@ requires 'DBIx::Class::Schema::Loader';
 requires 'SQL::Translator';
 requires 'DateTime';
 requires 'DateTime::Format::Strptime', "1.73";
-requires 'DateTime::Format::SQLite';
 requires 'Try::Tiny';
 requires 'MooX::Options::Actions';
 requires 'Module::Runtime';
@@ -23,6 +22,8 @@ requires 'DBIx::Class::Fixtures';
 requires 'GIS::Distance';
 requires 'Text::CSV';
 requires 'Try::Tiny';
+requires 'Throwable::Error';
+requires 'Minion';
 
 on 'test' => sub {
   requires 'Test::More';
@@ -37,6 +38,13 @@ feature 'schema-graph', 'Draw diagrams of Schema' => sub {
 feature 'postgres', 'PostgreSQL Support' => sub {
   requires 'DBD::Pg';
   requires 'Test::PostgreSQL';
+  requires 'Mojo::Pg';
+  requires 'DateTime::Format::Pg';
+};
+
+feature 'sqlite', 'SQLite Support' => sub {
+  requires 'Minion::Backend::SQLite';
+  requires 'DateTime::Format::SQLite';
 };
 
 feature 'codepoint-open', 'Code Point Open manipulation' => sub {
