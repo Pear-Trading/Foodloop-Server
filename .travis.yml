@@ -6,7 +6,7 @@ language: perl
 #  postgresql: "9.6"
 
 perl:
-  - "5.20"
+  - "5.26"
 env:
   - HARNESS_PERL_SWITCHES="-MDevel::Cover"
 install:
