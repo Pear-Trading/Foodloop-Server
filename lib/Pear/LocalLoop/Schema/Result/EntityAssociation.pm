@@ -20,12 +20,12 @@ __PACKAGE__->add_columns(
   },
   "lis" => {
     data_type => 'boolean',
-    default => undef,
+    default_value => undef,
     is_nullable => 1,
   },
   "esta" => {
     data_type => 'boolean',
-    default => undef,
+    default_value => undef,
     is_nullable => 1,
   },
 );

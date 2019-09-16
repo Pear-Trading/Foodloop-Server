@@ -2,9 +2,13 @@
 myapp.conf
 hypnotoad.pid
 *.db
+*.db-wal
+*.db-shm
+*.db-journal
 *~
 /images
 *.swp
+/upload
 
 cover_db/
 schema.png

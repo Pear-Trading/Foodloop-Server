@@ -31,8 +31,19 @@ __PACKAGE__->add_columns(
     is_nullable => 1,
     default_value => undef,
   },
+  ward_id => {
+    data_type => 'integer',
+    is_nullable => 1,
+    default_value => undef,
+  },
 );
 
 __PACKAGE__->set_primary_key(qw/ outcode incode /);
+
+__PACKAGE__->belongs_to(
+  "ward",
+  "Pear::LocalLoop::Schema::Result::GbWard",
+  "ward_id",
+);
 
 1;
