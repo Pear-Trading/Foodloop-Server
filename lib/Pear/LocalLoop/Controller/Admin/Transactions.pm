@@ -17,15 +17,10 @@ sub index {
   my $week_transaction_rs = $c->schema->resultset('ViewQuantisedTransaction' . $driver)->search(
     {},
     {
-      columns => [
-        {
-          quantised        => 'quantised_weeks',
-          count            => \"COUNT(*)",
-          sum_value        => $c->pg_or_sqlite(
-                                'SUM("me"."value")',
-                                'SUM("me"."value")',
-                              ),
-        }
+      select => [
+        { count => 'me.value', '-as' => 'count' },
+        { sum => 'me.value', '-as' => 'sum_value' },
+        'quantised_weeks',
       ],
       group_by => 'quantised_weeks',
       order_by => { '-asc' => 'quantised_weeks' },
@@ -33,8 +28,8 @@ sub index {
   );
 
   my @all_weeks = $week_transaction_rs->all;
-  my $first_week_count = $all_weeks[0]->get_column('count') || 0;
-  my $first_week_value = $all_weeks[0]->get_column('sum_value') / 100000 || 0;
+  my $first_week_count = defined $all_weeks[0] ? $all_weeks[0]->get_column('count') || 0 : 0;
+  my $first_week_value = defined $all_weeks[0] ? $all_weeks[0]->get_column('sum_value') / 100000 || 0 : 0;
   my $second_week_count = defined $all_weeks[1] ? $all_weeks[1]->get_column('count') || 0 : 0;
   my $second_week_value = defined $all_weeks[1] ? $all_weeks[1]->get_column('sum_value') / 100000 || 0 : 0;
 

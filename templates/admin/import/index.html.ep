@@ -15,6 +15,7 @@
   <div class="col-12 mb-3">
     <h3 class="float-left">CSV Import</h3>
     <a href="<%= url_for . '/add' %>" class="btn btn-success float-right">Import Data</a>
+    <a href="<%= url_for '/admin/import_from' %>" class="btn btn-primary float-right">Import Suppliers/Transactions Data</a>
   </div>
   % for my $import ( $import_rs->all ) {
     % my $total = $import_rs->get_values( $import->id, 1, 1 )->count;

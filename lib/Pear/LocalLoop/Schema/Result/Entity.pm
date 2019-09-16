@@ -42,6 +42,11 @@ __PACKAGE__->might_have(
   "Pear::LocalLoop::Schema::Result::EntityAssociation" => "entity_id",
 );
 
+__PACKAGE__->might_have(
+  "postcode",
+  "Pear::LocalLoop::Schema::Result::EntityPostcode" => "entity_id",
+);
+
 __PACKAGE__->has_many(
   "purchases",
   "Pear::LocalLoop::Schema::Result::Transaction",

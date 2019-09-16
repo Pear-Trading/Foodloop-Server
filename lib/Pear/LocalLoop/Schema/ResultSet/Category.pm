@@ -19,4 +19,18 @@ sub as_hash {
   return \%category_list;
 }
 
+sub as_hash_name_icon {
+  my ( $self ) = @_;
+
+  my %category_list = (
+    (
+      map {
+        $_->name => $_->line_icon,
+      } $self->all
+    ),
+    0 => 'Uncategorised',
+  );
+  return \%category_list;
+}
+
 1;

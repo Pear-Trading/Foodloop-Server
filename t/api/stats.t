@@ -86,6 +86,7 @@ $t->post_ok('/api/stats/customer' => json => {
     },
     cat_list => [{
       category => "Uncategorised",
+      icon => 'question',
       value => 1180,
     }],
     essentials => {
