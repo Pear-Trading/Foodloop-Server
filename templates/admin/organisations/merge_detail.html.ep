@@ -1,4 +1,4 @@
-% layout 'admin_errors';
+% layout 'admin';
 % title 'Organisations';
 <div class="row">
   <div class="col-12">
