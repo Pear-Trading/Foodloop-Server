@@ -2,6 +2,8 @@
 
 # Next Release
 
+# v0.10.10
+
 * Added proper minion job support
 * **Admin Feature** Added importing of CSVs from Lancaster City Council
 * Added pagination support to searching of organisations during transaction submission in API
