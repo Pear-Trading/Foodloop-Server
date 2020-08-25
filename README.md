@@ -59,13 +59,11 @@ To start the minion itself, run:
 
 ## Importing Ward Data
 
-To import ward data, download CSV(s) from [here](https://www.doogal.co.uk/PostcodeDownloads.php) and then run the following command:
+To import ward data:
 
-```shell script
-./script/pear-local_loop minion job \
-  --enqueue 'csv_postcode_import' \
-  --args '[ "⟨ path to CSV ⟩ ]'
-```
+1. Download CSV(s) from [here](https://www.doogal.co.uk/PostcodeDownloads.php)
+1. Run the following command:
+    -- `./script/pear-local_loop minion job  --enqueue 'csv_postcode_import'  --args '[ "⟨ path to CSV ⟩ ]'`
 
 ## Setting Up Entity Postcodes
 
@@ -110,8 +108,8 @@ needed initially.
     - ***DO NOT RUN ON PROD.***
 1. Start the minion:
     - `./script/pear-local_loop minion worker`
-1. Import ward data (see Production instructions above)
-1. Set up postcodes (see Production intructions above)
+1. Import ward data (see [instructions](#importing-ward-data) above)
+1. Set up postcodes (see [intructions](#setting-up-entity-postcodes) above)
 1. Start the application:
     - `morbo script/pear-local_loop -l http://*:3000`
     - You can modify the host and port as needed.
