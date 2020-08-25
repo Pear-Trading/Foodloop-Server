@@ -95,7 +95,11 @@ There are a couple of setup steps to getting a development environment ready.
     - As the default config. is set up for this, no configuration changes are
 needed initially.
 1. Install dependencies:
-    - `cpanm --installdeps . --with-feature=sqlite --with-feature=codepoint-open`
+    - ```shell script
+      cpanm --installdeps . \
+      --with-feature=sqlite \
+      --with-feature=codepoint-open
+      ```
 1. Install the database:
     - `./script/deploy_db install -c 'dbi:SQLite:dbname=foodloop.db'`
 1. Set up the development users:
@@ -113,13 +117,9 @@ needed initially.
 
 To upgrade the database after making changes to commit:
 
-```
-./script/deploy_db write_ddl -c 'dbi:SQLite:dbname=foodloop.db'
-./script/deploy_db upgrade -c 'dbi:SQLite:dbname=foodloop.db'
-```
+1. `./script/deploy_db write_ddl -c 'dbi:SQLite:dbname=foodloop.db'`
+1. `./script/deploy_db upgrade -c 'dbi:SQLite:dbname=foodloop.db'`
 
 To redo leaderboards:
 
-```
-./script/pear-local_loop recalc_leaderboards
-```
+1. `./script/pear-local_loop recalc_leaderboards`
