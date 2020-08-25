@@ -15,18 +15,14 @@ This repository contains the server for the LocalSpend system.
 To run the main test framework, first install all the dependencies, then run 
 the tests:
 
-```
-cpanm --installdeps .
-prove -lr
-```
+- `cpanm --installdeps .`
+- `prove -lr`
 
 To run the main framework against a PostgreSQL backend, assuming you have 
 `postgres` installed, you will need some extra dependencies first:
 
-```
-cpanm --installdeps . --with-feature postgres
-PEAR_TEST_PG=1 prove -lr
-```
+- `cpanm --installdeps . --with-feature postgres`
+- `PEAR_TEST_PG=1 prove -lr`
 
 ## Setting Up Minion
 
@@ -35,27 +31,22 @@ it to connect to.
 In production his should be a PostgreSQL database, however SQLite can be used 
 in testing.
 
-To use the SQLite version, run the following command:
+To use the SQLite version:
 
-```
-cpanm --installdeps --with-feature sqlite .
-```
-
-And then ensure that the following is in your configuration file:
-
-```
-  minion => {
-    SQLite => 'sqlite:minion.db',
-  },
-```
+1. Install the SQLite dependencies:
+    - `cpanm --installdeps --with-feature sqlite .`
+2. Ensure that the following is in your configuration file:
+    - ```
+      minion => {
+        SQLite => 'sqlite:minion.db',
+      },
+      ```
 
 This will then use an SQLite DB for the Minion backend, using `minion.db` as
 the database file.
-To start the minion itself, run:
 
-```
-./script/pear-local_loop minion worker
-```
+To start the minion itself, run this command:
+- `./script/pear-local_loop minion worker`
 
 ## Importing Ward Data
 
@@ -63,7 +54,11 @@ To import ward data:
 
 1. Download CSV(s) from [here](https://www.doogal.co.uk/PostcodeDownloads.php)
 1. Run the following command:
-    -- `./script/pear-local_loop minion job  --enqueue 'csv_postcode_import'  --args '[ "⟨ path to CSV ⟩ ]'`
+    - ```shell script
+      ./script/pear-local_loop minion job \
+        --enqueue 'csv_postcode_import'  \
+        --args '[ "⟨ path to CSV ⟩ ]'
+      ```
 
 ## Setting Up Entity Postcodes
 
@@ -71,10 +66,10 @@ To import ward data:
     - included in `etc/`
     - `./script/pear-local_loop codepoint_open --outcodes LA1`
 1. Assign postcodes:
-```shell script
-./script/pear-local_loop minion job \
-  --enqueue entity_postcode_lookup
-```
+    - ```shell script
+      ./script/pear-local_loop minion job \
+        --enqueue entity_postcode_lookup
+      ```
 
 ## Example PostgreSQL setup
 
