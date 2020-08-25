@@ -108,7 +108,7 @@ needed initially.
 1. Start the minion:
     - `./script/pear-local_loop minion worker`
 1. Import ward data (see [instructions](#importing-ward-data) above)
-1. Set up postcodes (see [intructions](#setting-up-entity-postcodes) above)
+1. Set up postcodes (see [instructions](#setting-up-entity-postcodes) above)
 1. Start the application:
     - `morbo script/pear-local_loop -l http://*:3000`
     - You can modify the host and port as needed.
