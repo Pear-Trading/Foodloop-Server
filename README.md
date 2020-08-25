@@ -1,4 +1,6 @@
-# Pear LocalLoop Server
+# LocalSpend - Server
+
+This repository contains the server for the LocalSpend system.
 
 ## Current Status
 
@@ -6,35 +8,40 @@
 
 *Development:* [![Build Status](https://travis-ci.org/Pear-Trading/Foodloop-Server.svg?branch=development)](https://travis-ci.org/Pear-Trading/Foodloop-Server)
 
-# Testing
+# Test Environment
 
-To run the main test framework, first install all the dependencies, then run the tests:
+## Running Tests
+
+To run the main test framework, first install all the dependencies, then run 
+the tests:
 
 ```
 cpanm --installdeps .
 prove -lr
 ```
 
-To run the main framework against a PostgreSQL backend, assuming you have postgres installed, you will need some extra dependencies first:
+To run the main framework against a PostgreSQL backend, assuming you have 
+`postgres` installed, you will need some extra dependencies first:
 
 ```
 cpanm --installdeps . --with-feature postgres
 PEAR_TEST_PG=1 prove -lr
 ```
 
-# Minion
+## Setting Up Minion
 
-to set up minion support, you will need to create a database and user for
-minion to connect to. In production his should be a PostgreSQL database,
-however an SQLite db can be used in testing.
+To set up Minion support, you will need to create a database and user for
+it to connect to.
+In production his should be a PostgreSQL database, however SQLite can be used 
+in testing.
 
-To use the SQLite version, run the following commands:
+To use the SQLite version, run the following command:
 
 ```
 cpanm --installdeps --with-feature sqlite .
 ```
 
-And then add the following to your configuration file:
+And then ensure that the following is in your configuration file:
 
 ```
   minion => {
@@ -42,28 +49,30 @@ And then add the following to your configuration file:
   },
 ```
 
-This will then use an SQLite db for the minion backend, using `minion.db` as
-the database file. To start the minion itself, run:
+This will then use an SQLite DB for the Minion backend, using `minion.db` as
+the database file.
+To start the minion itself, run:
 
 ```
 ./script/pear-local_loop minion worker
 ```
 
-# Importing Ward Data
+## Importing Ward Data
 
-To import ward data, get the ward data csv and then run the following command:
+To import ward data, download CSV(s) from [here](https://www.doogal.co.uk/PostcodeDownloads.php) and then run the following command:
 
 ```shell script
 ./script/pear-local_loop minion job \
   --enqueue 'csv_postcode_import' \
-  --args '[ "/path/to/ward/csv" ]'
+  --args '[ "⟨ path to CSV ⟩ ]'
 ```
 
-# Setting up Entity Postcodes
+## Setting Up Entity Postcodes
 
-Assuming you have imported codepoint open, then to properly assign all
- postcodes:
- 
+1. Import Code-Point Open:
+    - included in `etc/`
+    - `./script/pear-local_loop codepoint_open --outcodes LA1`
+1. Assign postcodes:
 ```shell script
 ./script/pear-local_loop minion job \
   --enqueue entity_postcode_lookup
@@ -81,56 +90,35 @@ psql=# alter user minion with encrypted password 'abc123';
 psql=# grant all privileges on database localloop_minion to minion;
 ```
 
-# Development
+# Development Environment
 
 There are a couple of setup steps to getting a development environment ready.
-Use the corresponding instructions depending on what state your current setup
-is in.
 
 ## First Time Setup
 
-First, decide if you're using SQLite or PostgreSQL locally. Development supports
-both, however production uses PostgreSQL. For this example we will use SQLite.
-As the default config is set up for this, no configuration changes are
-needed initially. So, first off, install dependencies:
+1. Decide if you're using SQLite or PostgreSQL locally.
+    - Development supports both, however production uses PostgreSQL. 
+    - For this example we will use SQLite.
+    - As the default config. is set up for this, no configuration changes are
+needed initially.
+1. Install dependencies:
+    - `cpanm --installdeps . --with-feature=sqlite --with-feature=codepoint-open`
+1. Install the database:
+    - `./script/deploy_db install -c 'dbi:SQLite:dbname=foodloop.db'`
+1. Set up the development users:
+    - `./script/pear-local_loop dev_data --force`
+    - ***DO NOT RUN ON PROD.***
+1. Start the minion:
+    - `./script/pear-local_loop minion worker`
+1. Import ward data (see Production instructions above)
+1. Set up postcodes (see Production intructions above)
+1. Start the application:
+    - `morbo script/pear-local_loop -l http://*:3000`
+    - You can modify the host and port as needed.
 
-```shell script
-cpanm --installdeps . --with-feature=sqlite
-```
+## Database Scripts
 
-Then install the database:
-
-```shell script
-./script/deploy_db install -c 'dbi:SQLite:dbname=foodloop.db'
-```
-
-Then set up the development users:
-
-```shell script
-./script/pear-local_loop dev_data --force
-```
-
-***Note: do NOT run that script on production.***
-
-Then you can start the application:
-
-```shell script
-morbo script/pear-local_loop -l http://*:3000
-```
-
-You can modify the host and port for listening as needed.
-
-# Old Docs
-
-## Local test database
-
-To install a local DB:
-
-```
-./script/deploy_db install -c 'dbi:SQLite:dbname=foodloop.db'
-```
-
-To do an upgrade of it after making DB changes to commit:
+To upgrade the database after making changes to commit:
 
 ```
 ./script/deploy_db write_ddl -c 'dbi:SQLite:dbname=foodloop.db'
@@ -141,10 +129,4 @@ To redo leaderboards:
 
 ```
 ./script/pear-local_loop recalc_leaderboards
-```
-
-To serve a test version locally of the server:
-
-```
-morbo script/pear-local_loop
 ```
