@@ -104,11 +104,12 @@ needed initially.
     - `./script/deploy_db install -c 'dbi:SQLite:dbname=foodloop.db'`
 1. Set up the development users:
     - `./script/pear-local_loop dev_data --force`
-    - ***DO NOT RUN ON PROD.***
+    - **DO NOT RUN ON PROD.**
 1. Start the minion:
     - `./script/pear-local_loop minion worker`
 1. Import ward data (see [instructions](#importing-ward-data) above)
 1. Set up postcodes (see [instructions](#setting-up-entity-postcodes) above)
+1. Create an `environment.dev.ts` file in `src/environments` with your API keys
 1. Start the application:
     - `morbo script/pear-local_loop -l http://*:3000`
     - You can modify the host and port as needed.
