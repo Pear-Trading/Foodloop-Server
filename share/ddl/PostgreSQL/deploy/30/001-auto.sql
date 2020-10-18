@@ -1,7 +1,7 @@
---
+-- 
 -- Created by SQL::Translator::Producer::PostgreSQL
--- Created on Tue Aug 25 15:48:42 2020
---
+-- Created on Mon Sep  2 13:06:08 2019
+-- 
 ;
 --
 -- Table: account_tokens
