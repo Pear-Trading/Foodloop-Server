@@ -72,6 +72,13 @@ __PACKAGE__->has_many(
 );
 
 __PACKAGE__->has_many(
+  "device_tokens",
+  "Pear::LocalLoop::Schema::Result::DeviceToken",
+  { "foreign.user_id" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+__PACKAGE__->has_many(
   "feedback",
   "Pear::LocalLoop::Schema::Result::Feedback",
   { "foreign.user_id" => "self.id" },
