@@ -85,6 +85,7 @@ sub post_login {
       return $c->render( json => {
         success => Mojo::JSON->true,
         session_key => $session_key,
+        email => $email,
         display_name => $user_result->name,
         user_type => $user_result->type,
       });

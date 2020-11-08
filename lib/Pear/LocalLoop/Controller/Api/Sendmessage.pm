@@ -2,15 +2,18 @@ package Pear::LocalLoop::Controller::Api::Sendmessage;
 use Mojo::Base 'Mojolicious::Controller';
 use LWP::UserAgent;
 use JSON;
+use JSON::Parse 'parse_json';
 use Mojo::JWT;
 use Mojo::File;
 use Carp;
 
 has error_messages => sub {
   return {
-    email => {
-      required => { message => 'Email is required or not registered', status => 400 },
-      in_resultset => { message => 'Email is required or not registered', status => 400, error => "required" },
+    devicetoken => {
+      required => { message => 'Device token is required or not registered', status => 400 },
+    },
+    sender => {
+      required => { message => 'Sender name is required', status => 400 },
     },
     messagetext => {
       required => { message => 'Message is required', status => 400 },
@@ -25,15 +28,18 @@ has error_messages => sub {
     https://stackoverflow.com/q/56556438/4580273
 =cut
 
-my $jwt = create_jwt_from_path_and_scopes('./localspend-47012.json', 'email https://www.googleapis.com/auth/compute');
+my $jwt = create_jwt_from_path_and_scopes('./localspend-47012.json', 'email https://www.googleapis.com/auth/cloud-platform');
+
 my $ua = LWP::UserAgent->new();
 
-my $bearer_token = $ua->post('https://www.googleapis.com/oauth2/v4/token',
+my $response = $ua->post('https://www.googleapis.com/oauth2/v4/token',
   {
     'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
     'assertion' => $jwt
   }
 );
+
+my $bearer_token = parse_json($response->content);
 
 sub create_jwt_from_path_and_scopes
 {
@@ -66,50 +72,58 @@ sub post_message {
 
   my $user_rs = $c->schema->resultset('User');
 
-  #  $validation->required('email')->in_resultset( 'email', $user_rs );
+  $validation->required('devicetoken');
+  $validation->required('sender');
   $validation->required('messagetext');
 
   return $c->api_validation_error if $validation->has_error;
 
-  my $user = $user_rs->find({'email' => $validation->param('email')});
-
   my $end_point = "https://fcm.googleapis.com/v1/projects/localspend-47012/messages:send";
 
   my $request = HTTP::Request->new('POST', $end_point);
-  $request->header('Authorization' => "Bearer $bearer_token");
+  $request->header('Authorization' => "Bearer $bearer_token->{access_token}");
   $request->header('Content-Type' => 'application/json');
 
   $request->content(JSON::encode_json ({
     message => {
-      token => $user->param('token'),
+      token => $validation->param('devicetoken'),
       notification => {
-        title => 'test',
-        body => 'test content'
+        title => $validation->param('sender'),
+        body => $validation->param('messagetext')
       },
       webpush => {
         headers => {
-          Urgency => 'high'
+          urgency => 'very-low'
         },
         notification => {
-          body => 'test content',
-          requireInteraction => 'true'
+          title => $validation->param('sender'),
+          body => $validation->param('messagetext'),
         }
       }
     }
   }));
 
-  $ua->request($request);
+  my $response = $ua->request($request);
 
-=begin comment
-  $c->schema->resultset('Feedback')->create({
-    user           => $user,
-    messagetext   => $validation->param('messagetext'),
-  });
-=cut
-  return $c->render( json => {
-    success => Mojo::JSON->true,
-    message => 'Your message has been sent successfully!',
-  });
+  if ($response->is_success) {
+    return $c->render( json => {
+      success => Mojo::JSON->true,
+      message => 'Your message has been sent successfully!',
+    });
+  } elsif ($response->is_error) {
+    return $c->render(
+      json => {
+        success => Mojo::JSON->false,
+        message => [
+          $response->decoded_content,
+          $jwt,
+          $bearer_token
+        ],
+        error   => 'message_error',
+      },
+      status => $response->code,
+    );
+  }
 }
 
 1;
