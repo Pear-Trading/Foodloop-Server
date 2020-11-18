@@ -24,6 +24,7 @@ requires 'Text::CSV';
 requires 'Try::Tiny';
 requires 'Throwable::Error';
 requires 'Minion';
+requires 'WWW::FCM::HTTP';
 
 on 'test' => sub {
   requires 'Test::More';
