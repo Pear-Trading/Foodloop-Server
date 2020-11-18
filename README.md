@@ -118,6 +118,7 @@ needed initially.
 
 To upgrade the database after making changes to commit:
 
+1. Increment the `$VERSION` number in `lib/Pear/LocalLoop/Schema.pm`
 1. `./script/deploy_db write_ddl -c 'dbi:SQLite:dbname=foodloop.db'`
 1. `./script/deploy_db upgrade -c 'dbi:SQLite:dbname=foodloop.db'`
 
