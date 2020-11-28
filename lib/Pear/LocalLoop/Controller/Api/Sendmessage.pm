@@ -10,10 +10,12 @@ use Carp;
 has error_messages => sub {
   return {
     devicetoken => {
-      required => { message => 'Device token is required or not registered', status => 400 },
+      required => { message => 'Device token is required', status => 400 },
+      in_resultset => { message => 'Device token not found', status => 400 },
     },
     sender => {
       required => { message => 'Sender name is required', status => 400 },
+      in_resultset => { message => 'Sender org not found', status => 400 },
     },
     messagetext => {
       required => { message => 'Message is required', status => 400 },
@@ -70,10 +72,8 @@ sub post_message {
   my $validation = $c->validation;
   $validation->input( $c->stash->{api_json} );
 
-  my $user_rs = $c->schema->resultset('User');
-
-  $validation->required('devicetoken');
-  $validation->required('sender');
+  $validation->required('devicetoken')->in_resultset('token', $c->schema->resultset('DeviceToken'));
+  $validation->required('sender')->in_resultset('name', $c->schema->resultset('Organisation'));
   $validation->required('messagetext');
 
   return $c->api_validation_error if $validation->has_error;

@@ -137,11 +137,13 @@ sub startup {
   # Always available api routes
   my $api_public = $api_public_get->under('/')->to('api-auth#check_json');
 
+  $api_public->post('/test-connection')->to('api-auth#test_connection');
   $api_public->post('/login')->to('api-auth#post_login');
   $api_public->post('/register')->to('api-register#post_register');
   $api_public->post('/logout')->to('api-auth#post_logout');
   $api_public->post('/feedback')->to('api-feedback#post_feedback');
   $api_public->post('/add-device-token')->to('api-devices#add_token');
+  $api_public->post('/get-device-tokens')->to('api-devices#get_tokens');
   $api_public->post('/send-message')->to('api-sendmessage#post_message');
 
   # Private, must be authenticated api routes

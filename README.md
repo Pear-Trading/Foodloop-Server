@@ -110,7 +110,8 @@ needed initially.
     - `./script/pear-local_loop minion worker`
 1. Import ward data (see [instructions](#importing-ward-data) above)
 1. Set up postcodes (see [instructions](#setting-up-entity-postcodes) above)
-1. Create an `environment.dev.ts` file in `src/environments` with your API keys
+1. Set up your `pear-local_loop.⟨environment⟩.conf` file in the project root
+1. Ensure you have a copy of the FCM service user credentials saved in the project root (`localspend-47012.json`)
 1. Start the application:
     - `morbo script/pear-local_loop -l http://*:3000`
     - You can modify the host and port as needed.

@@ -60,6 +60,18 @@ sub auth {
   return 0;
 }
 
+sub test_connection {
+  my $c = shift;
+
+  return $c->render(
+    json => {
+      success => Mojo::JSON->true,
+      message => 'Database connection successful',
+    },
+    status => 200,
+  );
+}
+
 sub post_login {
   my $c = shift;
 
