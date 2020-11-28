@@ -100,6 +100,7 @@ needed initially.
       --with-feature=sqlite \
       --with-feature=codepoint-open
       ```
+    - See [Troubleshooting](#troubleshooting) if you encounter difficulties.
 1. Install the database:
     - `./script/deploy_db install -c 'dbi:SQLite:dbname=foodloop.db'`
 1. Set up the development users:
@@ -130,13 +131,14 @@ To redo leaderboards:
 
 ## ‘Can't write to /usr/local/share/perl/5.30.0 and /usr/local/bin: Installing modules to /home/<username>/perl5’ when running `cpanm` commands
 
-Intall `local::lib` by running the following commands:
+Install `local::lib` by running the following commands:
 
 ```
   cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
 ```
 
-NB: You must run this in each Terminal window; I don't know why.
+You will have to do every time you open a new Terminal window.
+To make it permanent, follow [these steps](https://www.cpan.org/modules/by-module/lib/local-lib-2.000018.readme).
 
 ## ‘Can't load application from file "<path-to-repo>/script/pear-local_loop": Can't locate Data/UUID.pm in @INC (you may need to install the DATA::UUID module)’ when running server
 
