@@ -9,9 +9,12 @@ use Carp;
 
 has error_messages => sub {
   return {
-    devicetoken => {
-      required => { message => 'Device token is required', status => 400 },
-      in_resultset => { message => 'Device token not found', status => 400 },
+    #devicetokens => {
+    #  required => { message => 'Device token is required', status => 400 },
+    #  in_resultset => { message => 'Device token not found', status => 400 },
+    #},
+    topic => {
+      required => { message => 'Topic is required', status => 400 },
     },
     sender => {
       required => { message => 'Sender name is required', status => 400 },
@@ -66,13 +69,33 @@ sub create_jwt_from_path_and_scopes
   return $jwt->encode;
 }
 
+sub get_topics {
+  my $c = shift;
+
+  my $topic_rs = $c->schema->resultset('Topic');
+
+  my @topics = (
+    map {{
+      id => $_->id,
+      name => $_->name,
+      numberOfSubscribers => $_->search_related('device_subscriptions', {'topic_id' => $_->id})->count,
+    }} $topic_rs->all
+  );
+
+  return $c->render( json => {
+    success => Mojo::JSON->true,
+    topics => \@topics,
+  });
+}
+
 sub post_message {
   my $c = shift;
 
   my $validation = $c->validation;
   $validation->input( $c->stash->{api_json} );
 
-  $validation->required('devicetoken')->in_resultset('token', $c->schema->resultset('DeviceToken'));
+  #$validation->required('devicetokens')->in_resultset('token', $c->schema->resultset('DeviceToken'));
+  $validation->required('topic');
   $validation->required('sender')->in_resultset('name', $c->schema->resultset('Organisation'));
   $validation->required('messagetext');
 
@@ -86,7 +109,7 @@ sub post_message {
 
   $request->content(JSON::encode_json ({
     message => {
-      token => $validation->param('devicetoken'),
+      topic => $validation->param('topic'),
       notification => {
         title => $validation->param('sender'),
         body => $validation->param('messagetext')

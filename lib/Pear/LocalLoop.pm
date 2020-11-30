@@ -142,7 +142,9 @@ sub startup {
   $api_public->post('/register')->to('api-register#post_register');
   $api_public->post('/logout')->to('api-auth#post_logout');
   $api_public->post('/feedback')->to('api-feedback#post_feedback');
+  $api_public->post('/check-device-token')->to('api-devices#check_token');
   $api_public->post('/add-device-token')->to('api-devices#add_token');
+  $api_public->post('/get-topics')->to('api-sendmessage#get_topics');
   $api_public->post('/get-device-tokens')->to('api-devices#get_tokens');
   $api_public->post('/send-message')->to('api-sendmessage#post_message');
 

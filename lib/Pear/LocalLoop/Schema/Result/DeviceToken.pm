@@ -44,4 +44,13 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },
 );
 
+__PACKAGE__->has_many(
+  "device_subscriptions",
+  "Pear::LocalLoop::Schema::Result::DeviceSubscription",
+  { "foreign.device_token_id" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+__PACKAGE__->many_to_many('topics' => 'device_subscriptions', 'topic');
+
 1;
