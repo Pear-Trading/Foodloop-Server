@@ -5,7 +5,9 @@ use warnings;
 
 use base 'DBIx::Class::ResultSet';
 
+## no critic (Subroutines::RequireArgUnpacking)
 sub sales { return shift->search_related( 'sales', @_ ) }
+## use critic
 
 sub create_org {
     my ( $self, $org ) = @_;
@@ -16,8 +18,6 @@ sub create_org {
             type         => 'organisation',
         }
     );
-    
-    return 1;
 }
 
 1;

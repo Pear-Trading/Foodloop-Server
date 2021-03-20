@@ -71,6 +71,7 @@ sub post_add {
         }
     );
 
+		## no critic (InputOutput::RequireBriefOpen)
     open my $fh, '<', \$csv_data;
 
     # List context returns the actual headers
@@ -99,6 +100,9 @@ sub post_add {
     }
 
     my $csv_output = $csv->getline_hr_all($fh);
+    
+    close $fh;
+    ## use critic
 
     unless ( scalar(@$csv_output) ) {
         $c->_csv_flash_error("No data found");

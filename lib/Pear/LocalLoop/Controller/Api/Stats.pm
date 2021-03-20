@@ -460,14 +460,16 @@ sub post_leaderboards {
     my @leaderboard_array = $today_values->all;
 
     if ( $validation->param('type') =~ /total$/ ) {
+    		## no critic (ValuesAndExpressions::ProhibitCommaSeparatedStatements)
         @leaderboard_array = (
             map {
                 {
                     %$_,
-                      value => $_->{value} / 100000,
+                    value => $_->{value} / 100000
                 }
             } @leaderboard_array
         );
+        ## use critic
     }
 
     my $current_user_position =
@@ -543,6 +545,7 @@ sub post_leaderboards_paged {
         $values_count = $today_values->pager->total_entries;
 
         if ( $validation->param('type') =~ /total$/ ) {
+    				## no critic (ValuesAndExpressions::ProhibitCommaSeparatedStatements)
             @leaderboard_array = (
                 map {
                     {
@@ -551,6 +554,7 @@ sub post_leaderboards_paged {
                     }
                 } @leaderboard_array
             );
+            ## use critic
         }
 
         $current_user_position = $today_values->find(

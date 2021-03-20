@@ -123,7 +123,7 @@ sub valid_read {
 }
 
 sub valid_edit {
-    my $c = shift;
+    my ($c, $warning) = @_;
 
     my $validation = $c->validation;
     $validation->required('name');
@@ -180,9 +180,9 @@ sub valid_edit {
         );
     }
     finally {
-        if (@_) {
+        if ($warning) {
             use Devel::Dwarn;
-            Dwarn \@_;
+            Dwarn \$warning;
             $c->flash(
                 error => 'Something went wrong Updating the Organisation' );
         }

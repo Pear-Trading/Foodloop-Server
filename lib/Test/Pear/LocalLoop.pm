@@ -69,7 +69,7 @@ has mojo => (
     builder => sub {
         my $self = shift;
 
-        $ENV{MOJO_CONFIG} = $self->config->filename;
+        local $ENV{MOJO_CONFIG} = $self->config->filename;
 
         my $t = Test::Mojo->new('Pear::LocalLoop');
         $t->app->schema->deploy;
@@ -197,8 +197,6 @@ sub gen_upload {
         json => Mojo::JSON::encode_json($args),
         file => $file,
     };
-    
-    return 1;
 }
 
 sub install_fixtures {

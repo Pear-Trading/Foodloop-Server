@@ -39,9 +39,9 @@ sub _unordered_get_values {
 }
 
 sub get_users {
-    my $self = shift;
+    my ($self, $set_id) = @_;
 
-    return $self->_unordered_get_values(@_)->search(
+    return $self->_unordered_get_values($set_id)->search(
         {},
         {
             group_by => 'user_name',
@@ -51,9 +51,9 @@ sub get_users {
 }
 
 sub get_orgs {
-    my $self = shift;
+    my ( $self, $set_id ) = shift;
 
-    return $self->_unordered_get_values(@_)->search(
+    return $self->_unordered_get_values($set_id)->search(
         {},
         {
             group_by => 'org_name',

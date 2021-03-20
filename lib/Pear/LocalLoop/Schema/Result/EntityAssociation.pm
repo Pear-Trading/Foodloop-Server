@@ -34,3 +34,5 @@ __PACKAGE__->set_primary_key("id");
 
 __PACKAGE__->belongs_to( "entity", "Pear::LocalLoop::Schema::Result::Entity",
     "entity_id", );
+    
+1;

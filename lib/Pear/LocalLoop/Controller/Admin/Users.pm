@@ -70,7 +70,7 @@ sub read {
 ## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub update {
 ## use critic
-    my $c = shift;
+    my ($c, $error) = @_;
 
     my $id = $c->param('id');
 
@@ -145,9 +145,9 @@ sub update {
             );
         }
         finally {
-            if (@_) {
+            if ($error) {
                 $c->flash( error => 'Something went wrong Updating the User' );
-                $c->app->log->warn( Dumper @_ );
+                $c->app->log->warn( Dumper $error );
             }
             else {
                 $c->flash( success => 'Updated User' );
@@ -188,9 +188,9 @@ sub update {
             );
         }
         finally {
-            if (@_) {
+            if ($error) {
                 $c->flash( error => 'Something went wrong Updating the User' );
-                $c->app->log->warn( Dumper @_ );
+                $c->app->log->warn( Dumper $error );
             }
             else {
                 $c->flash( success => 'Updated User' );
