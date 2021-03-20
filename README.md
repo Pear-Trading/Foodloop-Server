@@ -65,12 +65,14 @@ This server app. provides:
       --with-feature=sqlite \
       --with-feature=codepoint-open
       ```
-    - if you are using a PostgreSQL database, replace `--with-feature=sqlite` with `--with-feature=postgres`.
+    - if you are using a PostgreSQL database, replace `--with-feature=sqlite` 
+      with `--with-feature=postgres`.
 1. install the database:
     - run `./script/deploy_db install -c 'dbi:SQLite:dbname=foodloop.db'`;
     - development supports both SQLite and PostgreSQL (production uses PostgreSQL);
     - for this example we will use SQLite; so
-    - as the default config. is set up for this, no configuration changes are needed initially.
+    - as the default config. is set up for this, no configuration changes are 
+      needed initially.
 1. set up the development users:
     - `./script/pear-local_loop dev_data --force`
     - **DO NOT RUN ON PROD!**
@@ -98,14 +100,18 @@ This server app. provides:
 
 App. configuration settings are found in `pear-local_loop.⟨environment⟩.conf`.
 
-[Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/) (FCM) credentials should be placed in a file called `localspend-47012.json` in root. This file is not tracked by Git; ask another developer for a copy.
+[Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/) 
+(FCM) credentials should be placed in a file called `localspend-47012.json` in 
+root. This file is not tracked by Git; ask another developer for a copy.
 
 Default user credentials are found in `lib/Pear/LocalLoop/Command/dev_data.pm`.
 
 ## Usage
 
-- Run `./script/pear-local_loop minion worker` to start the Minion asynchronous job scheduler; and
-- run `morbo script/pear-local_loop -l http://*:3000` to start the server on the specific hostname and port.
+- Run `./script/pear-local_loop minion worker` to start the Minion asynchronous 
+  job scheduler; and
+- run `morbo script/pear-local_loop -l http://*:3000` to start the server on 
+  the specific hostname and port.
 
 ### Database Scripts
 
@@ -119,8 +125,11 @@ Run `./script/pear-local_loop recalc_leaderboards` to update the leaderboards.
 
 ## Testing
 
-- Run `prove -lr -j 9` to run the full test suite using [Test-Simple](https://metacpan.org/release/Test-Simple) (when using an SQLite database); and
-- run `PEAR_TEST_PG=1 prove -lr -j 9` to run the full test suite (when using a PostgreSQL database).
+- Run `prove -lr -j 9` to run the full test suite using
+  [Test-Simple](https://metacpan.org/release/Test-Simple) (when using an SQLite 
+  database); and
+- run `PEAR_TEST_PG=1 prove -lr -j 9` to run the full test suite (when using a 
+  PostgreSQL database).
 
 Test files are found in the `t/` directory.
 
@@ -138,7 +147,9 @@ TODO
 
 ## Acknowledgements
 
-LocalLoop is the result of collaboration between the [Small Green Consultancy](http://www.smallgreenconsultancy.co.uk/), [Shadowcat Systems](https://shadow.cat/), [Independent Lancaster](http://www.independent-lancaster.co.uk/) and the [Ethical Small Traders Association](http://www.lancasteresta.org/).
+LocalLoop is the result of collaboration between the [Small Green Consultancy](http://www.smallgreenconsultancy.co.uk/), 
+Shadowcat Systems](https://shadow.cat/), [Independent Lancaster](http://www.independent-lancaster.co.uk/) 
+and the [Ethical Small Traders Association](http://www.lancasteresta.org/).
 
 ## License
 
