@@ -39,7 +39,7 @@ sub _unordered_get_values {
 }
 
 sub get_users {
-    my ($self, $set_id) = @_;
+    my ( $self, $set_id ) = @_;
 
     return $self->_unordered_get_values($set_id)->search(
         {},

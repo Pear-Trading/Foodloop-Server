@@ -15,7 +15,7 @@ sub idx {
     ];
 
     $c->app->max_request_size(104857600);
-    
+
     return 1;
 }
 
@@ -127,12 +127,11 @@ sub org_search {
         },
     );
 
-    my @results = (
-        map { { label => $_->name, value => $_->entity->id, } } $rs->all
-    );
+    my @results =
+      ( map { { label => $_->name, value => $_->entity->id, } } $rs->all );
 
     $c->render( json => \@results );
-    
+
     return 1;
 }
 

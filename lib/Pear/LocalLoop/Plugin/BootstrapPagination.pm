@@ -99,11 +99,15 @@ sub register {
                 if ( $number eq ".." && $last_num < $actual ) {
                     my $offset = ceil( ( $actual - $round ) / 2 ) + 1;
                     $html .= "<li"
-                      . ( $bs4 ? " class=\"" . $bs4classes{list_class} . "\""
-                        : "" )
+                      . (
+                        $bs4 ? " class=\"" . $bs4classes{list_class} . "\""
+                        : ""
+                      )
                       . "><a"
-                      . ( $bs4 ? " class=\"" . $bs4classes{anchor_class} . "\""
-                        : "" )
+                      . (
+                        $bs4 ? " class=\"" . $bs4classes{anchor_class} . "\""
+                        : ""
+                      )
                       . " href=\""
                       . $self->url_with->query(
                         [ $param => $start == 0 ? $offset + 1 : $offset ] )
@@ -115,11 +119,15 @@ sub register {
                     my $forw   = $round + $actual;
                     my $offset = ceil( ( ( $back - $forw ) / 2 ) + $forw );
                     $html .= "<li"
-                      . ( $bs4 ? " class=\"" . $bs4classes{list_class} . "\""
-                        : "" )
+                      . (
+                        $bs4 ? " class=\"" . $bs4classes{list_class} . "\""
+                        : ""
+                      )
                       . "><a"
-                      . ( $bs4 ? " class=\"" . $bs4classes{anchor_class} . "\""
-                        : "" )
+                      . (
+                        $bs4 ? " class=\"" . $bs4classes{anchor_class} . "\""
+                        : ""
+                      )
                       . " href=\""
                       . $self->url_with->query(
                         [ $param => $start == 0 ? $offset + 1 : $offset ] )
@@ -131,18 +139,23 @@ sub register {
                         "<li class=\"active"
                       . ( $bs4 ? " " . $bs4classes{list_class} : "" )
                       . "\"><span"
-                      . ( $bs4
+                      . (
+                        $bs4
                         ? " class=\"" . $bs4classes{anchor_class} . "\""
-                        : "" )
-                      . ">$show_number</span></li>";
+                        : ""
+                      ) . ">$show_number</span></li>";
                 }
                 else {
                     $html .= "<li"
-                      . ( $bs4 ? " class=\"" . $bs4classes{list_class} . "\""
-                        : "" )
+                      . (
+                        $bs4 ? " class=\"" . $bs4classes{list_class} . "\""
+                        : ""
+                      )
                       . "><a"
-                      . ( $bs4 ? " class=\"" . $bs4classes{anchor_class} . "\""
-                        : "" )
+                      . (
+                        $bs4 ? " class=\"" . $bs4classes{anchor_class} . "\""
+                        : ""
+                      )
                       . " href=\""
                       . $self->url_with->query( [ $param => $number ] )
                       . $query
@@ -176,7 +189,7 @@ sub register {
             return b($html);
         }
     );
-    
+
     return 1;
 }
 

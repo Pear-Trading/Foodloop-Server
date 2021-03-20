@@ -9,10 +9,6 @@ use Carp;
 
 has error_messages => sub {
     return {
-      #devicetokens => {
-      #  required => { message => 'Device token is required', status => 400 },
-      #  in_resultset => { message => 'Device token not found', status => 400 },
-      #},
         topic => {
             required => { message => 'Topic is required', status => 400 },
         },
@@ -27,12 +23,8 @@ has error_messages => sub {
     };
 };
 
-=begin comment
-  Credit: Peter Scott/StackOverflow
-    https://stackoverflow.com/a/53357961/4580273
-  Credit: jeffez/StackOverflow
-    https://stackoverflow.com/q/56556438/4580273
-=cut
+# Credit: Peter Scott/StackOverflow https://stackoverflow.com/a/53357961/4580273
+# Credit: jeffez/StackOverflow https://stackoverflow.com/q/56556438/4580273
 
 my $jwt = create_jwt_from_path_and_scopes( './localspend-47012.json',
     'email https://www.googleapis.com/auth/cloud-platform' );
@@ -104,7 +96,6 @@ sub post_message {
     my $validation = $c->validation;
     $validation->input( $c->stash->{api_json} );
 
-#$validation->required('devicetokens')->in_resultset('token', $c->schema->resultset('DeviceToken'));
     $validation->required('topic');
     $validation->required('sender')
       ->in_resultset( 'name', $c->schema->resultset('Organisation') );

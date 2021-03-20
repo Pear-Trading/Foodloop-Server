@@ -34,7 +34,7 @@ sub index {
         }
     );
     $c->stash( user_rs => $user_rs );
-    
+
     return 1;
 }
 
@@ -63,14 +63,14 @@ sub read {
         $c->flash( error => 'No User found' );
         $c->redirect_to('/admin/users');
     }
-    
+
     return 1;
 }
 
 ## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub update {
 ## use critic
-    my ($c, $error) = @_;
+    my ( $c, $error ) = @_;
 
     my $id = $c->param('id');
 
@@ -199,7 +199,7 @@ sub update {
     }
 
     $c->redirect_to( '/admin/users/' . $id );
-    
+
     return 1;
 }
 

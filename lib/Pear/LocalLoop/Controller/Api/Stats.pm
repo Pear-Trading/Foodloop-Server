@@ -460,12 +460,11 @@ sub post_leaderboards {
     my @leaderboard_array = $today_values->all;
 
     if ( $validation->param('type') =~ /total$/ ) {
-    		## no critic (ValuesAndExpressions::ProhibitCommaSeparatedStatements)
+        ## no critic (ValuesAndExpressions::ProhibitCommaSeparatedStatements)
         @leaderboard_array = (
             map {
                 {
-                    %$_,
-                    value => $_->{value} / 100000
+                    %$_, value => $_->{value} / 100000
                 }
             } @leaderboard_array
         );
@@ -545,7 +544,7 @@ sub post_leaderboards_paged {
         $values_count = $today_values->pager->total_entries;
 
         if ( $validation->param('type') =~ /total$/ ) {
-    				## no critic (ValuesAndExpressions::ProhibitCommaSeparatedStatements)
+            ## no critic (ValuesAndExpressions::ProhibitCommaSeparatedStatements)
             @leaderboard_array = (
                 map {
                     {

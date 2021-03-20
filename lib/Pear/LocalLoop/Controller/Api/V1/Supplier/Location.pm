@@ -122,7 +122,7 @@ sub idx {
             }
         },
     );
-    
+
     return 1;
 }
 
@@ -206,7 +206,7 @@ sub trail_load {
             }
         },
     );
-    
+
     return 1;
 }
 

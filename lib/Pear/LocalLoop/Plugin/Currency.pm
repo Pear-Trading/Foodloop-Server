@@ -24,7 +24,7 @@ sub register {
             return sprintf( '£%.2f', $value / 100000 );
         }
     );
-    
+
     return 1;
 }
 

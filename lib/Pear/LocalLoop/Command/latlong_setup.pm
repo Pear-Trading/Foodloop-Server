@@ -29,7 +29,7 @@ sub run {
         );
         $result->update( { distance => $distance } ) if defined $distance;
     }
-    
+
     return 1;
 }
 
@@ -55,7 +55,7 @@ sub _set_lat_long_for_result {
             );
         }
     }
-    
+
     return 1;
 }
 

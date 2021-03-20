@@ -68,7 +68,7 @@ sub index {
             count        => $count,
         },
     );
-    
+
     return 1;
 }
 
@@ -86,7 +86,7 @@ sub read {
         $c->flash( error => 'No transaction found' );
         $c->redirect_to('/admin/transactions');
     }
-    
+
     return 1;
 }
 
@@ -103,7 +103,7 @@ sub image {
     else {
         $c->reply->static('image/no_transaction.jpg');
     }
-    
+
     return 1;
 }
 
@@ -126,7 +126,7 @@ sub delete {
         $c->flash( error => 'No transaction found' );
         $c->redirect_to('/admin/transactions');
     }
-    
+
     return 1;
 }
 

@@ -71,7 +71,7 @@ sub register {
             return;
         }
     );
-    
+
     return 1;
 }
 

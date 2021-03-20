@@ -13,7 +13,7 @@ sub run {
     my $leaderboard_rs = $self->app->schema->resultset('Leaderboard');
 
     $leaderboard_rs->recalculate_all;
-    
+
     return 1;
 }
 

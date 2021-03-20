@@ -124,6 +124,8 @@ sub post_login {
 sub post_logout {
     my $c = shift;
 
+    print STDERR "TEST";
+
     my $session_key = $c->req->json('/session_key');
 
     my $session_result =
@@ -139,7 +141,7 @@ sub post_logout {
             message => 'Logged Out',
         }
     );
-    
+
     return 1;
 }
 

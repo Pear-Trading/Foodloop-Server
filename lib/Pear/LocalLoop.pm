@@ -173,6 +173,7 @@ sub startup {
     $api_public->post('/register')->to('api-register#post_register');
     $api_public->post('/logout')->to('api-auth#post_logout');
     $api_public->post('/feedback')->to('api-feedback#post_feedback');
+
     $api_public->post('/check-device-token')->to('api-devices#check_token');
     $api_public->post('/add-device-token')->to('api-devices#add_token');
     $api_public->post('/get-topics')->to('api-sendmessage#get_topics');
@@ -282,8 +283,7 @@ sub startup {
     $admin_routes->post('/categories')->to('admin-categories#create');
     $admin_routes->get('/categories/:id')->to('admin-categories#get');
     $admin_routes->post('/categories/:id')->to('admin-categories#update');
-    $admin_routes->post('/categories/:id/delete')
-      ->to('admin-categories#del');
+    $admin_routes->post('/categories/:id/delete')->to('admin-categories#del');
 
     $admin_routes->get('/users')->to('admin-users#index');
     $admin_routes->get('/users/:id')->to('admin-users#read');

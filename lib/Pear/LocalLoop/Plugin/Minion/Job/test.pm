@@ -8,7 +8,7 @@ sub run {
     for my $arg (@args) {
         $self->job->app->log->debug($arg);
     }
-    
+
     return 1;
 }
 

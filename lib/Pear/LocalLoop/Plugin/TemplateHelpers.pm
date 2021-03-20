@@ -15,7 +15,7 @@ sub register {
             }
         }
     );
-    
+
     return 1;
 }
 

@@ -12,7 +12,7 @@ sub idx {
     my $category_rs = $c->result_set;
     $category_rs->result_class('DBIx::Class::ResultClass::HashRefInflator');
     $c->stash( categories => [ $category_rs->all ] );
-    
+
     return 1;
 }
 
@@ -45,7 +45,7 @@ sub create {
         $c->result_set->create( { name => $category_name } );
     }
     $c->redirect_to('/admin/categories');
-    
+
     return 1;
 }
 
@@ -62,7 +62,7 @@ sub get {
         $c->flash( error => 'No Category found' );
         $c->redirect_to('/admin/categories');
     }
-    
+
     return 1;
 }
 
@@ -101,7 +101,7 @@ sub update {
         $c->flash( error => 'No Category found' );
         $c->redirect_to('/admin/categories');
     }
-    
+
     return 1;
 }
 
@@ -120,7 +120,7 @@ sub del {
         $c->flash( error => 'No Category found' );
     }
     $c->redirect_to('/admin/categories');
-    
+
     return 1;
 }
 

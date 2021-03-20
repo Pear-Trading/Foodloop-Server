@@ -12,7 +12,7 @@ sub idx {
     my $token_rs = $c->result_set;
     $token_rs->result_class('DBIx::Class::ResultClass::HashRefInflator');
     $c->stash( tokens => [ $token_rs->all ] );
-    
+
     return 1;
 }
 
@@ -45,7 +45,7 @@ sub create {
         $c->result_set->create( { name => $token_name } );
     }
     $c->redirect_to('/admin/tokens');
-    
+
     return 1;
 }
 
@@ -62,7 +62,7 @@ sub get {
         $c->flash( error => 'No Token found' );
         $c->redirect_to('/admin/tokens');
     }
-    
+
     return 1;
 }
 
@@ -95,7 +95,7 @@ sub update {
         $c->flash( error => 'No Token found' );
         $c->redirect_to('/admin/tokens');
     }
-    
+
     return 1;
 }
 
@@ -113,7 +113,7 @@ sub del {
         $c->flash( error => 'No Token found' );
     }
     $c->redirect_to('/admin/tokens');
-    
+
     return 1;
 }
 

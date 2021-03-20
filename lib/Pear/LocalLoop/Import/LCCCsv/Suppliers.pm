@@ -22,7 +22,7 @@ sub import_csv {
     while ( my $row = $self->get_csv_line ) {
         $self->_row_to_result($row);
     }
-    
+
     return 1;
 }
 
@@ -34,7 +34,8 @@ sub _row_to_result {
     my $address = (
         defined $addr2
         ? ( $row->{"address line 2"} . ' ' . $addr2 )
-        : $row->{"address line 2"} );
+        : $row->{"address line 2"}
+    );
 
     return
       if $self->external_result->organisations->find(
@@ -58,7 +59,7 @@ sub _row_to_result {
             }
         }
     );
-    
+
     return 1;
 }
 

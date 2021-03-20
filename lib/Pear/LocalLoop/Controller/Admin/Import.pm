@@ -21,7 +21,7 @@ sub idx {
         },
     );
     $c->stash( import_rs => $import_rs );
-    
+
     return 1;
 }
 
@@ -48,13 +48,13 @@ sub list {
         import_org_rs    => $import_org_rs,
         import_lookup_rs => $import_lookup_rs,
     );
-    
+
     return 1;
 }
 
 sub get_add {
     my $c = shift;
-    
+
     return 1;
 }
 
@@ -71,7 +71,7 @@ sub post_add {
         }
     );
 
-		## no critic (InputOutput::RequireBriefOpen)
+    ## no critic (InputOutput::RequireBriefOpen)
     open my $fh, '<', \$csv_data;
 
     # List context returns the actual headers
@@ -100,7 +100,7 @@ sub post_add {
     }
 
     my $csv_output = $csv->getline_hr_all($fh);
-    
+
     close $fh;
     ## use critic
 
@@ -157,7 +157,7 @@ sub post_add {
 
     $c->flash( success => 'Created Value Set' );
     $c->redirect_to( '/admin/import/' . $value_set->id );
-    
+
     return 1;
 }
 
@@ -172,7 +172,7 @@ sub _csv_flash_error {
         #csv_data => $c->param('csv'),
         date_format => $c->param('date_format'),
     );
-    
+
     return 1;
 }
 
@@ -223,7 +223,7 @@ sub get_user {
         lookup    => $lookup_result,
         user_name => $user_name,
     );
-    
+
     return 1;
 }
 
@@ -274,7 +274,7 @@ sub get_org {
         lookup   => $lookup_result,
         org_name => $org_name,
     );
-    
+
     return 1;
 }
 

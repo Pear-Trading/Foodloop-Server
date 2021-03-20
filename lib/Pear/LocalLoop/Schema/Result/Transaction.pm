@@ -103,7 +103,7 @@ sub sqlt_deploy_hook {
     else {
         $pending_field->{default_value} = \"false";
     }
-    
+
     return 1;
 }
 

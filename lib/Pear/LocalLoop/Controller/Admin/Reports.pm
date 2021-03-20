@@ -59,7 +59,7 @@ sub transaction_data {
         json => { json           => { data => $transaction_data } },
         html => { transaction_rs => encode_json($transaction_data) },
     );
-    
+
     return 1;
 }
 

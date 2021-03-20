@@ -18,7 +18,7 @@ sub idx {
         },
     );
     $c->stash( feedback_rs => $feedback_rs );
-    
+
     return 1;
 }
 
@@ -34,7 +34,7 @@ sub get {
         $c->flash( error => 'No Feedback found' );
         $c->redirect_to('/admin/feedback');
     }
-    
+
     return 1;
 }
 
@@ -52,7 +52,7 @@ sub actioned {
         $c->flash( error => 'No Feedback found' );
         $c->redirect_to('/admin/feedback');
     }
-    
+
     return 1;
 }
 

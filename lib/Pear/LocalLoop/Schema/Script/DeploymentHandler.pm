@@ -207,7 +207,7 @@ sub cmd_write_ddl {
             }
         );
     }
-    
+
     return 1;
 }
 
@@ -227,7 +227,7 @@ sub cmd_install_dh {
             version => $self->version,
         }
     );
-    
+
     return 1;
 }
 
@@ -245,7 +245,7 @@ sub cmd_install {
             version => $self->version,
         }
     );
-    
+
     return 1;
 }
 
@@ -259,7 +259,7 @@ sub cmd_upgrade {
     my ($self) = @_;
 
     $self->dh->upgrade;
-    
+
     return 1;
 }
 
