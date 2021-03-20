@@ -124,8 +124,6 @@ sub post_login {
 sub post_logout {
     my $c = shift;
 
-    print STDERR "TEST";
-
     my $session_key = $c->req->json('/session_key');
 
     my $session_result =
