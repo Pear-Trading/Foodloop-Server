@@ -90,7 +90,13 @@ sub run {
             },
         }
     );
-    
+
+    $c->schema->resultset('DeviceToken')->create(
+        {
+            name => 'default'
+        }
+    );
+
     return 1;
 }
 
