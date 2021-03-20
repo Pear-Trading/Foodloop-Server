@@ -13,7 +13,7 @@ sub get_latest {
 
   my $type_result = $self->find_by_type( $type );
 
-  return undef unless defined $type_result;
+  return unless defined $type_result;
 
   my $latest = $type_result->search_related('sets', {}, {
     order_by => { -desc => 'date' },
@@ -29,7 +29,7 @@ sub create_new {
 
   my $type_result = $self->find_by_type($type);
 
-  return undef unless $type_result;
+  return unless $type_result;
 
   return $type_result->create_new($date);
 }

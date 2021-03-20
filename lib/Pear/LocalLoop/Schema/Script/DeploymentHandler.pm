@@ -1,5 +1,8 @@
 package Pear::LocalLoop::Schema::Script::DeploymentHandler;
 
+use strict;
+use warnings;
+
 use MooX::Options::Actions;
 use Module::Runtime qw/ use_module /;
 use DBIx::Class::DeploymentHandler;

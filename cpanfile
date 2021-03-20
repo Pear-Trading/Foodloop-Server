@@ -28,6 +28,7 @@ requires 'Text::CSV';
 requires 'Try::Tiny';
 requires 'Throwable::Error';
 requires 'Minion';
+requires 'Perl::Critic';
 requires 'WWW::FCM::HTTP';
 
 on 'test' => sub {

@@ -79,7 +79,7 @@ sub pg_or_sqlite {
     return \$sqlite_sql;
   } else {
     $c->app->log->warn('Unknown Driver Used');
-    return undef;
+    return;
   }
 }
 

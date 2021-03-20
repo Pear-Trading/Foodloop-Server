@@ -16,7 +16,7 @@ sub under {
     return 1;
   }
   $c->redirect_to('/');
-  return undef;
+  return;
 }
 
 sub auth_login {

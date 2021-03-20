@@ -32,13 +32,17 @@ This repository contains the server application for the LocalSpend system. See a
 
 The server app. is written in [Perl](https://www.perl.org/).
 
+Admin. portal pages are templated using [HTML::EP](https://metacpan.org/pod/distribution/HTML-EP/lib/HTML/EP.pod).
+
 | Technology  | Description                          | Link                |
 |-------------|--------------------------------------|---------------------|
 | Mojolicious | Perl Web framework	                 | [Link][mojolicious] |
 | PostgreSQL	|	Relational database managment system | [Link][postgresql] |
+| SQLite    	|	Relational database managment system | [Link][sqlite] |
 
 [mojolicious]: https://mojolicious.org/
 [postgresql]: https://www.postgresql.org/
+[sqlite]: https://sqlite.org/index.html
 
 ## Features
 
@@ -122,7 +126,7 @@ Test files are found in the `t/` directory.
 
 ## Code Formatting
 
-TODO
+Run `perlcritic lib/` to format all Perl files with [Perl::Critic](https://metacpan.org/pod/Perl::Critic).
 
 ## Documentation
 
