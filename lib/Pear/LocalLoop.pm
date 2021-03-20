@@ -216,20 +216,20 @@ sub startup {
 
     my $api_v1_user = $api_v1->under('/user');
 
-    $api_v1_user->post('/medals')->to('api-v1-user-medals#index');
-    $api_v1_user->post('/points')->to('api-v1-user-points#index');
+    $api_v1_user->post('/medals')->to('api-v1-user-medals#idx');
+    $api_v1_user->post('/points')->to('api-v1-user-points#idx');
 
     my $api_v1_supplier = $api_v1->under('/supplier');
 
-    $api_v1_supplier->post('/location')->to('api-v1-supplier-location#index');
+    $api_v1_supplier->post('/location')->to('api-v1-supplier-location#idx');
     $api_v1_supplier->post('/location/trail')
       ->to('api-v1-supplier-location#trail_load');
 
     my $api_v1_org =
       $api_v1->under('/organisation')->to('api-v1-organisation#auth');
 
-    $api_v1_org->post('/graphs')->to('api-v1-organisation-graphs#index');
-    $api_v1_org->post('/snippets')->to('api-v1-organisation-snippets#index');
+    $api_v1_org->post('/graphs')->to('api-v1-organisation-graphs#idx');
+    $api_v1_org->post('/snippets')->to('api-v1-organisation-snippets#idx');
     $api_v1_org->post('/payroll')->to('api-organisation#post_payroll_read');
     $api_v1_org->post('/payroll/add')->to('api-organisation#post_payroll_add');
     $api_v1_org->post('/supplier')->to('api-organisation#post_supplier_read');
@@ -252,13 +252,13 @@ sub startup {
     $api_v1_org->post('/external/lcc_tables')
       ->to('api-external#post_lcc_table_summary');
 
-    $api_v1_org->post('/pies')->to('api-v1-organisation-pies#index');
+    $api_v1_org->post('/pies')->to('api-v1-organisation-pies#idx');
 
     my $api_v1_cust = $api_v1->under('/customer')->to('api-v1-customer#auth');
 
-    $api_v1_cust->post('/graphs')->to('api-v1-customer-graphs#index');
-    $api_v1_cust->post('/snippets')->to('api-v1-customer-snippets#index');
-    $api_v1_cust->post('/pies')->to('api-v1-customer-pies#index');
+    $api_v1_cust->post('/graphs')->to('api-v1-customer-graphs#idx');
+    $api_v1_cust->post('/snippets')->to('api-v1-customer-snippets#idx');
+    $api_v1_cust->post('/pies')->to('api-v1-customer-pies#idx');
 
     my $admin_routes = $r->under('/admin')->to('admin#under');
 
@@ -272,18 +272,18 @@ sub startup {
     }
     $admin_routes->get('/home')->to('admin#home');
 
-    $admin_routes->get('/tokens')->to('admin-tokens#index');
+    $admin_routes->get('/tokens')->to('admin-tokens#idx');
     $admin_routes->post('/tokens')->to('admin-tokens#create');
-    $admin_routes->get('/tokens/:id')->to('admin-tokens#read');
+    $admin_routes->get('/tokens/:id')->to('admin-tokens#get');
     $admin_routes->post('/tokens/:id')->to('admin-tokens#update');
-    $admin_routes->post('/tokens/:id/delete')->to('admin-tokens#delete');
+    $admin_routes->post('/tokens/:id/delete')->to('admin-tokens#del');
 
-    $admin_routes->get('/categories')->to('admin-categories#index');
+    $admin_routes->get('/categories')->to('admin-categories#idx');
     $admin_routes->post('/categories')->to('admin-categories#create');
-    $admin_routes->get('/categories/:id')->to('admin-categories#read');
+    $admin_routes->get('/categories/:id')->to('admin-categories#get');
     $admin_routes->post('/categories/:id')->to('admin-categories#update');
     $admin_routes->post('/categories/:id/delete')
-      ->to('admin-categories#delete');
+      ->to('admin-categories#del');
 
     $admin_routes->get('/users')->to('admin-users#index');
     $admin_routes->get('/users/:id')->to('admin-users#read');
@@ -305,8 +305,8 @@ sub startup {
     $admin_routes->post('/organisations/:id/merge/:target_id')
       ->to('admin-organisations#merge_confirm');
 
-    $admin_routes->get('/feedback')->to('admin-feedback#index');
-    $admin_routes->get('/feedback/:id')->to('admin-feedback#read');
+    $admin_routes->get('/feedback')->to('admin-feedback#idx');
+    $admin_routes->get('/feedback/:id')->to('admin-feedback#get');
     $admin_routes->get('/feedback/:id/actioned')->to('admin-feedback#actioned');
 
     $admin_routes->get('/transactions')->to('admin-transactions#index');
@@ -319,7 +319,7 @@ sub startup {
     $admin_routes->get('/reports/transactions')
       ->to('admin-reports#transaction_data');
 
-    $admin_routes->get('/import')->to('admin-import#index');
+    $admin_routes->get('/import')->to('admin-import#idx');
     $admin_routes->get('/import/add')->to('admin-import#get_add');
     $admin_routes->post('/import/add')->to('admin-import#post_add');
     $admin_routes->get('/import/:set_id')->to('admin-import#list');
@@ -330,7 +330,7 @@ sub startup {
       ->to('admin-import#ignore_value');
     $admin_routes->get('/import/:set_id/import')->to('admin-import#run_import');
 
-    $admin_routes->get('/import_from')->to('admin-import_from#index');
+    $admin_routes->get('/import_from')->to('admin-import_from#idx');
     $admin_routes->post('/import_from/suppliers')
       ->to('admin-import_from#post_suppliers');
     $admin_routes->post('/import_from/transactions')

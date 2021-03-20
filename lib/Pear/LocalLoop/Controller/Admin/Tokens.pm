@@ -6,7 +6,7 @@ has result_set => sub {
     return $c->schema->resultset('AccountToken');
 };
 
-sub index {
+sub idx {
     my $c = shift;
 
     my $token_rs = $c->result_set;
@@ -50,7 +50,7 @@ sub create {
 }
 
 # GET
-sub read {
+sub get {
     my $c = shift;
 
     my $id = $c->param('id');
@@ -100,7 +100,7 @@ sub update {
 }
 
 # DELETE
-sub delete {
+sub del {
     my $c = shift;
 
     my $id = $c->param('id');

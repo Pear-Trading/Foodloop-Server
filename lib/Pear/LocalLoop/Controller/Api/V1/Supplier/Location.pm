@@ -47,7 +47,7 @@ has validation_data => sub {
     };
 };
 
-sub index {
+sub idx {
     my $c = shift;
 
     return if $c->validation_error('index');

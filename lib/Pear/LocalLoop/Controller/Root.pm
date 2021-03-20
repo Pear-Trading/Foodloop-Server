@@ -1,7 +1,9 @@
 package Pear::LocalLoop::Controller::Root;
 use Mojo::Base 'Mojolicious::Controller';
 
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub index {
+## use critic
     my $c = shift;
 
     #  if ( $c->is_user_authenticated ) {

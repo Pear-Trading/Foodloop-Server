@@ -1,7 +1,7 @@
 package Pear::LocalLoop::Controller::Api::V1::Organisation::Pies;
 use Mojo::Base 'Mojolicious::Controller';
 
-sub index {
+sub idx {
     my $c = shift;
 
     my $entity = $c->stash->{api_user}->entity;

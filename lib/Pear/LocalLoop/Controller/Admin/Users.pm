@@ -19,7 +19,9 @@ has organisation_result_set => sub {
     return $c->schema->resultset('Organisation');
 };
 
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub index {
+## use critic
     my $c = shift;
 
     my $user_rs = $c->user_result_set->search(
@@ -36,7 +38,9 @@ sub index {
     return 1;
 }
 
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub read {
+## use critic
     my $c = shift;
 
     my $id = $c->param('id');
@@ -63,7 +67,9 @@ sub read {
     return 1;
 }
 
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub update {
+## use critic
     my $c = shift;
 
     my $id = $c->param('id');

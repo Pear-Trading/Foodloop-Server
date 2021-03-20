@@ -8,7 +8,9 @@ has result_set => sub {
     return $c->schema->resultset('Transaction');
 };
 
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub index {
+## use critic
     my $c = shift;
 
     my $pending_transaction_rs =
@@ -70,7 +72,9 @@ sub index {
     return 1;
 }
 
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub read {
+## use critic
     my $c = shift;
 
     my $id = $c->param('id');
@@ -103,7 +107,9 @@ sub image {
     return 1;
 }
 
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub delete {
+## use critic
     my $c = shift;
 
     my $id = $c->param('id');

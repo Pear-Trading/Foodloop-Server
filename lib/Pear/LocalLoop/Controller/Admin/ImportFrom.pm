@@ -4,7 +4,7 @@ use Moo;
 use Try::Tiny;
 use Mojo::File qw/path/;
 
-sub index {
+sub idx {
     my $c = shift;
     $c->stash->{org_entities} = [
         map { { id => $_->entity_id, name => $_->name } }

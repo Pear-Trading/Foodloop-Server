@@ -10,7 +10,7 @@ has error_messages => sub {
     };
 };
 
-sub index {
+sub idx {
     my $c = shift;
 
     my $validation = $c->validation;

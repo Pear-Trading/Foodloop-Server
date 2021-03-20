@@ -2,7 +2,7 @@ package Pear::LocalLoop::Controller::Api::V1::User::Medals;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::JSON qw/true false/;
 
-sub index {
+sub idx {
     my $c = shift;
 
     my $validation = $c->validation;

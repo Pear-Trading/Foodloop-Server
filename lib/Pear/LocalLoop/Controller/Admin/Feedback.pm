@@ -6,7 +6,7 @@ has result_set => sub {
     return $c->schema->resultset('Feedback');
 };
 
-sub index {
+sub idx {
     my $c = shift;
 
     my $feedback_rs = $c->result_set->search(
@@ -22,7 +22,7 @@ sub index {
     return 1;
 }
 
-sub read {
+sub get {
     my $c = shift;
 
     my $id = $c->param('id');

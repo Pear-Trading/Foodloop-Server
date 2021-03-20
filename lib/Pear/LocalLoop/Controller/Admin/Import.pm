@@ -9,7 +9,7 @@ has result_set => sub {
     return $c->schema->resultset('ImportSet');
 };
 
-sub index {
+sub idx {
     my $c = shift;
 
     my $import_rs = $c->result_set->search(
