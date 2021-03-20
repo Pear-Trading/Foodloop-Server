@@ -207,6 +207,8 @@ sub cmd_write_ddl {
             }
         );
     }
+    
+    return 1;
 }
 
 =head2 install_dh
@@ -225,6 +227,8 @@ sub cmd_install_dh {
             version => $self->version,
         }
     );
+    
+    return 1;
 }
 
 =head2 install
@@ -241,6 +245,8 @@ sub cmd_install {
             version => $self->version,
         }
     );
+    
+    return 1;
 }
 
 =head2 upgrade
@@ -253,6 +259,8 @@ sub cmd_upgrade {
     my ($self) = @_;
 
     $self->dh->upgrade;
+    
+    return 1;
 }
 
 =head1 AUTHOR

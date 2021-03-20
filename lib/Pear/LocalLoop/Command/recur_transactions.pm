@@ -153,6 +153,8 @@ sub run {
         $recur_result->update( { last_updated => $purchase_time } );
 
     }
+    
+    return 1;
 }
 
 =head1 SYNOPSIS

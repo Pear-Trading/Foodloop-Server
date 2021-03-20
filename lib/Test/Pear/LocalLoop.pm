@@ -14,6 +14,8 @@ sub BUILD {
           or die "you need Test::PostgreSQL to run PG testing";
         Test::PostgreSQL->import;
     }
+    
+    return 1;
 }
 
 sub DEMOLISH {
@@ -23,6 +25,8 @@ sub DEMOLISH {
         $self->mojo->app->schema->storage->dbh->disconnect;
         $self->pg->stop;
     }
+    
+    return 1;
 }
 
 has pg => (
@@ -141,6 +145,8 @@ sub register_customer {
     $self->framework->post_ok( '/api/register' => json => $json )
       ->status_is(200)->or( $self->dump_error )
       ->json_is( '/success', Mojo::JSON->true )->or( $self->dump_error );
+    
+    return 1;
 }
 
 sub register_organisation {
@@ -151,6 +157,8 @@ sub register_organisation {
     $self->framework->post_ok( '/api/register' => json => $args )
       ->status_is(200)->or( $self->dump_error )
       ->json_is( '/success', Mojo::JSON->true )->or( $self->dump_error );
+    
+    return 1;
 }
 
 sub login {
@@ -172,6 +180,8 @@ sub logout {
         '/api/logout' => json => { session_key => $session_key } )
       ->status_is(200)->json_is( '/success', Mojo::JSON->true )
       ->json_like( '/message', qr/Logged Out/ );
+    
+    return 1;
 }
 
 sub gen_upload {
@@ -187,6 +197,8 @@ sub gen_upload {
         json => Mojo::JSON::encode_json($args),
         file => $file,
     };
+    
+    return 1;
 }
 
 sub install_fixtures {
@@ -241,6 +253,8 @@ sub install_fixtures {
             }
         );
     }
+    
+    return 1;
 }
 
 1;

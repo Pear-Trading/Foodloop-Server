@@ -92,6 +92,8 @@ sub recalculate_all {
             warn "Unrecognised Set";
         }
     }
+    
+    return 1;
 }
 
 sub _recalculate_leaderboard {
@@ -105,6 +107,8 @@ sub _recalculate_leaderboard {
             $lb_result->create_new($date);
         }
     );
+    
+    return 1;
 }
 
 1;

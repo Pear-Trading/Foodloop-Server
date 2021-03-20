@@ -21,6 +21,8 @@ sub index {
         },
     );
     $c->stash( import_rs => $import_rs );
+    
+    return 1;
 }
 
 sub list {
@@ -46,10 +48,14 @@ sub list {
         import_org_rs    => $import_org_rs,
         import_lookup_rs => $import_lookup_rs,
     );
+    
+    return 1;
 }
 
 sub get_add {
     my $c = shift;
+    
+    return 1;
 }
 
 sub post_add {
@@ -147,6 +153,8 @@ sub post_add {
 
     $c->flash( success => 'Created Value Set' );
     $c->redirect_to( '/admin/import/' . $value_set->id );
+    
+    return 1;
 }
 
 sub _csv_flash_error {
@@ -160,6 +168,8 @@ sub _csv_flash_error {
         #csv_data => $c->param('csv'),
         date_format => $c->param('date_format'),
     );
+    
+    return 1;
 }
 
 sub get_user {
@@ -209,6 +219,8 @@ sub get_user {
         lookup    => $lookup_result,
         user_name => $user_name,
     );
+    
+    return 1;
 }
 
 sub get_org {
@@ -258,6 +270,8 @@ sub get_org {
         lookup   => $lookup_result,
         org_name => $org_name,
     );
+    
+    return 1;
 }
 
 sub ignore_value {

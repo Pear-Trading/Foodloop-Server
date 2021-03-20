@@ -71,6 +71,8 @@ sub run {
             }
         }
     }
+    
+    return 1;
 }
 
 =head1 SYNOPSIS

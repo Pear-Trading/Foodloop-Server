@@ -10,6 +10,8 @@ sub run {
         csv_file => $filename,
         schema   => $self->app->schema
     )->import_csv;
+    
+    return 1;
 }
 
 1;

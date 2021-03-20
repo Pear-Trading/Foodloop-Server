@@ -32,6 +32,8 @@ sub index {
         }
     );
     $c->stash( user_rs => $user_rs );
+    
+    return 1;
 }
 
 sub read {
@@ -57,6 +59,8 @@ sub read {
         $c->flash( error => 'No User found' );
         $c->redirect_to('/admin/users');
     }
+    
+    return 1;
 }
 
 sub update {
@@ -189,6 +193,8 @@ sub update {
     }
 
     $c->redirect_to( '/admin/users/' . $id );
+    
+    return 1;
 }
 
 1;

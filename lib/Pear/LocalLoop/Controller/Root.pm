@@ -7,6 +7,8 @@ sub index {
     #  if ( $c->is_user_authenticated ) {
     #   $c->redirect_to('/home');
     #  }
+    
+    return 1;
 }
 
 sub under {
@@ -28,6 +30,8 @@ sub auth_login {
     else {
         $c->redirect_to('/');
     }
+    
+    return 1;
 }
 
 sub auth_logout {
@@ -35,10 +39,14 @@ sub auth_logout {
 
     $c->logout;
     $c->redirect_to('/');
+    
+    return 1;
 }
 
 sub home {
     my $c = shift;
+    
+    return 1;
 }
 
 1;

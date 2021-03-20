@@ -139,6 +139,8 @@ sub post_logout {
             message => 'Logged Out',
         }
     );
+    
+    return 1;
 }
 
 1;

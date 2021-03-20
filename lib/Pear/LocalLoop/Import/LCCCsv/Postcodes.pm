@@ -24,6 +24,8 @@ sub import_csv {
     while ( my $row = $self->get_csv_line ) {
         $self->_row_to_result($row);
     }
+    
+    return 1;
 }
 
 sub _row_to_result {
@@ -45,6 +47,8 @@ sub _row_to_result {
     return if $postcode_r->ward;
 
     $postcode_r->update( { ward_id => $ward->id } );
+    
+    return 1;
 }
 
 1;

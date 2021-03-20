@@ -46,6 +46,8 @@ sub import_csv {
     while ( my $row = $self->get_csv_line ) {
         $self->_row_to_result( $row, $lcc_org );
     }
+    
+    return 1;
 }
 
 sub _row_to_result {
@@ -181,6 +183,8 @@ sub _row_to_result {
             ),
         }
     );
+    
+    return 1;
 }
 
 1;

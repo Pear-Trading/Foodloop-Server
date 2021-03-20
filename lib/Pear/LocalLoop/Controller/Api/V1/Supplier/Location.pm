@@ -122,6 +122,8 @@ sub index {
             }
         },
     );
+    
+    return 1;
 }
 
 sub trail_load {
@@ -204,6 +206,8 @@ sub trail_load {
             }
         },
     );
+    
+    return 1;
 }
 
 1;

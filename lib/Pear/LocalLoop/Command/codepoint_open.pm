@@ -55,6 +55,8 @@ sub run {
             { key => 'primary' },
         );
     }
+    
+    return 1;
 }
 
 =head1 SYNOPSIS

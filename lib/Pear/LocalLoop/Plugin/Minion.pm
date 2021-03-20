@@ -34,7 +34,8 @@ sub register {
     else {
         $app->log->debug('No Minion Config');
     }
-
+    
+    return 1;
 }
 
 1;

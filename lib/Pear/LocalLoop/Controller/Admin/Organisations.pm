@@ -21,10 +21,14 @@ sub list {
     );
 
     $c->stash( orgs_rs => $orgs_rs, );
+    
+    return 1;
 }
 
 sub add_org {
     my $c = shift;
+    
+    return 1;
 }
 
 sub add_org_submit {
@@ -87,6 +91,8 @@ sub add_org_submit {
             $c->redirect_to( '/admin/organisations/' . $organisation->id );
         }
     };
+    
+    return 1;
 }
 
 sub valid_read {
@@ -112,6 +118,8 @@ sub valid_read {
         transactions => $transactions,
         associations => $assoc,
     );
+    
+    return 1;
 }
 
 sub valid_edit {
@@ -183,6 +191,8 @@ sub valid_edit {
         }
     };
     $c->redirect_to( '/admin/organisations/' . $c->param('id') );
+    
+    return 1;
 }
 
 sub merge_list {
@@ -212,6 +222,8 @@ sub merge_list {
         org_result => $org_result,
         org_rs     => $org_rs,
     );
+    
+    return 1;
 }
 
 sub merge_detail {
@@ -239,6 +251,8 @@ sub merge_detail {
         org_result    => $org_result,
         target_result => $target_result,
     );
+    
+    return 1;
 }
 
 sub merge_confirm {
@@ -295,6 +309,8 @@ sub merge_confirm {
     }
     $c->redirect_to(
         '/admin/organisations/' . $org_id . '/merge/' . $target_id );
+    
+    return 1;
 }
 
 1;

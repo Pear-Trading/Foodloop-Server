@@ -15,6 +15,8 @@ sub index {
     ];
 
     $c->app->max_request_size(104857600);
+    
+    return 1;
 }
 
 sub post_suppliers {
@@ -130,6 +132,8 @@ sub org_search {
     );
 
     $c->render( json => \@results );
+    
+    return 1;
 }
 
 1;

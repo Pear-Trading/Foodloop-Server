@@ -101,6 +101,8 @@ sub register {
     );
 
     $app->helper( validation_error => sub { _validation_error(@_) } );
+    
+    return 1;
 }
 
 =head2 validation_error

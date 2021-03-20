@@ -95,6 +95,7 @@ sub register {
         }
     );
 
+    return 1;
 }
 
 1;

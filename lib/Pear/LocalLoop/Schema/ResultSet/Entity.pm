@@ -5,7 +5,7 @@ use warnings;
 
 use base 'DBIx::Class::ResultSet';
 
-sub sales { shift->search_related( 'sales', @_ ) }
+sub sales { return shift->search_related( 'sales', @_ ) }
 
 sub create_org {
     my ( $self, $org ) = @_;
@@ -16,6 +16,8 @@ sub create_org {
             type         => 'organisation',
         }
     );
+    
+    return 1;
 }
 
 1;

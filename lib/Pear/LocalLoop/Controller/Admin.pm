@@ -34,6 +34,8 @@ sub home {
             pending => $pending_feedback_rs->count,
         },
     );
+    
+    return 1;
 }
 
 sub auth_login {
@@ -52,6 +54,8 @@ sub auth_login {
               . "]" );
         $c->redirect_to('/admin');
     }
+    
+    return 1;
 }
 
 sub auth_logout {
@@ -59,6 +63,8 @@ sub auth_logout {
 
     $c->logout;
     $c->redirect_to('/admin');
+    
+    return 1;
 }
 
 1;

@@ -176,7 +176,8 @@ sub register {
             return b($html);
         }
     );
-
+    
+    return 1;
 }
 
 1;

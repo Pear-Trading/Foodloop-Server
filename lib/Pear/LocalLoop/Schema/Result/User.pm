@@ -84,6 +84,12 @@ __PACKAGE__->has_many(
     { cascade_copy      => 0, cascade_delete => 0 },
 );
 
+__PACKAGE__->filter_column(
+    is_admin => {
+        filter_to_storage => 'to_bool',
+    }
+);
+
 sub sqlt_deploy_hook {
     my ( $source_instance, $sqlt_table ) = @_;
     my $pending_field = $sqlt_table->get_field('is_admin');
@@ -93,13 +99,9 @@ sub sqlt_deploy_hook {
     else {
         $pending_field->{default_value} = \"false";
     }
+    
+    return 1;
 }
-
-__PACKAGE__->filter_column(
-    is_admin => {
-        filter_to_storage => 'to_bool',
-    }
-);
 
 sub to_bool {
     my ( $self, $val ) = @_;
