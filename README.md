@@ -126,7 +126,10 @@ Test files are found in the `t/` directory.
 
 ## Code Formatting
 
-Run `perlcritic lib/` to format all Perl files with [Perl::Critic](https://metacpan.org/pod/Perl::Critic).
+Run `for f in ./lib/**/*.pm; do perltidy -b $f; done` to format all Perl files
+with [Perl-Tidy](https://metacpan.org/release/Perl-Tidy).
+
+Run `perlcritic lib` to lint all Perl files with [Perl-Critic](https://metacpan.org/release/Perl-Critic).
 
 ## Documentation
 

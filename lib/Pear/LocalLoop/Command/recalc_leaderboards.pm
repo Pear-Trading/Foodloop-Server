@@ -8,11 +8,11 @@ has description => 'Build All leaderboards';
 has usage => sub { shift->extract_usage };
 
 sub run {
-  my ( $self, @args ) = @_;
+    my ( $self, @args ) = @_;
 
-  my $leaderboard_rs = $self->app->schema->resultset('Leaderboard');
+    my $leaderboard_rs = $self->app->schema->resultset('Leaderboard');
 
-  $leaderboard_rs->recalculate_all;
+    $leaderboard_rs->recalculate_all;
 }
 
 =head1 SYNOPSIS

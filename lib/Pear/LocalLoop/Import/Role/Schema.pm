@@ -4,8 +4,8 @@ use warnings;
 use Moo::Role;
 
 has schema => (
-  is       => 'ro',
-  required => 1,
+    is       => 'ro',
+    required => 1,
 );
 
 1;

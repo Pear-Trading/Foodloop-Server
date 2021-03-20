@@ -4,131 +4,141 @@ use Data::Dumper;
 use Mojo::JSON qw/ decode_json /;
 
 has error_messages => sub {
-  return {
-    email => {
-      required => { message => 'No email sent.', status => 400 },
-      email => { message => 'Email is invalid.', status => 400 },
-    },
-    password => {
-      required => { message => 'No password sent.', status => 400 },
-    },
-  };
+    return {
+        email => {
+            required => { message => 'No email sent.',    status => 400 },
+            email    => { message => 'Email is invalid.', status => 400 },
+        },
+        password => {
+            required => { message => 'No password sent.', status => 400 },
+        },
+    };
 };
 
 sub check_json {
-  my $c = shift;
+    my $c = shift;
 
-  # JSON object is either the whole request, or under a json param for upload
-  my $json = $c->req->json || decode_json( $c->param('json') || '{}' );
+    # JSON object is either the whole request, or under a json param for upload
+    my $json = $c->req->json || decode_json( $c->param('json') || '{}' );
 
-  unless ( defined $json && ref $json eq 'HASH' && scalar( keys %$json ) > 0 ) {
-    $c->render(
-      json => {
-        success => Mojo::JSON->false,
-        message => 'JSON is missing.',
-      },
-      status => 400,
-    );
-    return 0;
-  }
+    unless ( defined $json && ref $json eq 'HASH' && scalar( keys %$json ) > 0 )
+    {
+        $c->render(
+            json => {
+                success => Mojo::JSON->false,
+                message => 'JSON is missing.',
+            },
+            status => 400,
+        );
+        return 0;
+    }
 
-  $c->stash( api_json => $json );
-  return 1;
+    $c->stash( api_json => $json );
+    return 1;
 }
 
 sub auth {
-  my $c = shift;
+    my $c = shift;
 
-  my $session_key = $c->stash->{api_json}->{session_key};
+    my $session_key = $c->stash->{api_json}->{session_key};
 
-  if ( defined $session_key ) {
-    my $session_result = $c->schema->resultset('SessionToken')->find({ token => $session_key });
+    if ( defined $session_key ) {
+        my $session_result = $c->schema->resultset('SessionToken')
+          ->find( { token => $session_key } );
 
-    if ( defined $session_result ) {
-      $c->stash( api_user => $session_result->user );
-      return 1;
+        if ( defined $session_result ) {
+            $c->stash( api_user => $session_result->user );
+            return 1;
+        }
     }
-  }
 
-  $c->render(
-    json => {
-      success => Mojo::JSON->false,
-      message => 'Invalid Session',
-    },
-    status => 401,
-  );
-  return 0;
+    $c->render(
+        json => {
+            success => Mojo::JSON->false,
+            message => 'Invalid Session',
+        },
+        status => 401,
+    );
+    return 0;
 }
 
 sub test_connection {
-  my $c = shift;
+    my $c = shift;
 
-  return $c->render(
-    json => {
-      success => Mojo::JSON->true,
-      message => 'Database connection successful',
-    },
-    status => 200,
-  );
+    return $c->render(
+        json => {
+            success => Mojo::JSON->true,
+            message => 'Database connection successful',
+        },
+        status => 200,
+    );
 }
 
 sub post_login {
-  my $c = shift;
+    my $c = shift;
 
-  my $validation = $c->validation;
+    my $validation = $c->validation;
 
-  $validation->input( $c->stash->{api_json} );
-  $validation->required('email')->email;
-  $validation->required('password');
+    $validation->input( $c->stash->{api_json} );
+    $validation->required('email')->email;
+    $validation->required('password');
 
-  return $c->api_validation_error if $validation->has_error;
+    return $c->api_validation_error if $validation->has_error;
 
-  my $email = $validation->param('email');
-  my $password = $validation->param('password');
+    my $email    = $validation->param('email');
+    my $password = $validation->param('password');
 
-  $c->app->log->debug( __PACKAGE__ . " login attempt for [" . $email . "]" );
+    $c->app->log->debug( __PACKAGE__ . " login attempt for [" . $email . "]" );
 
-  my $user_result = $c->schema->resultset('User')->find({ email => $email });
+    my $user_result =
+      $c->schema->resultset('User')->find( { email => $email } );
 
-  if ( defined $user_result ) {
-    if ( $user_result->check_password($password) ) {
-      my $session_key = $user_result->generate_session;
+    if ( defined $user_result ) {
+        if ( $user_result->check_password($password) ) {
+            my $session_key = $user_result->generate_session;
 
-      return $c->render( json => {
-        success => Mojo::JSON->true,
-        session_key => $session_key,
-        email => $email,
-        display_name => $user_result->name,
-        user_type => $user_result->type,
-      });
-    } else {
-      $c->app->log->info( __PACKAGE__ . " failed login for [" . $email . "]" );
+            return $c->render(
+                json => {
+                    success      => Mojo::JSON->true,
+                    session_key  => $session_key,
+                    email        => $email,
+                    display_name => $user_result->name,
+                    user_type    => $user_result->type,
+                }
+            );
+        }
+        else {
+            $c->app->log->info(
+                __PACKAGE__ . " failed login for [" . $email . "]" );
+        }
     }
-  }
-  return $c->render(
-    json => {
-      success => Mojo::JSON->false,
-      message => 'Email or password is invalid.',
-    },
-    status => 401
-  );
+    return $c->render(
+        json => {
+            success => Mojo::JSON->false,
+            message => 'Email or password is invalid.',
+        },
+        status => 401
+    );
 }
 
 sub post_logout {
-  my $c = shift;
+    my $c = shift;
 
-  my $session_key = $c->req->json( '/session_key' );
+    my $session_key = $c->req->json('/session_key');
 
-  my $session_result = $c->schema->resultset('SessionToken')->find({ token => $session_key });
+    my $session_result =
+      $c->schema->resultset('SessionToken')->find( { token => $session_key } );
 
-  if ( defined $session_result ) {
-    $session_result->delete;
-  }
+    if ( defined $session_result ) {
+        $session_result->delete;
+    }
 
-  $c->render( json => {
-    success => Mojo::JSON->true,
-    message => 'Logged Out',
-  });
+    $c->render(
+        json => {
+            success => Mojo::JSON->true,
+            message => 'Logged Out',
+        }
+    );
 }
 
 1;

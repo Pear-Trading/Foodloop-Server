@@ -5,6 +5,6 @@ use warnings;
 
 use base 'DBIx::Class::ResultSet';
 
-sub entity { shift->search_related('entity', @_) }
+sub entity { shift->search_related( 'entity', @_ ) }
 
 1;

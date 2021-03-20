@@ -1,6 +1,6 @@
-use utf8;
 package Pear::LocalLoop::Schema;
 
+use utf8;
 use strict;
 use warnings;
 

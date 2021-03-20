@@ -5,6 +5,7 @@ hypnotoad.pid
 *.db-wal
 *.db-shm
 *.db-journal
+*.bak
 *~
 /images
 *.swp

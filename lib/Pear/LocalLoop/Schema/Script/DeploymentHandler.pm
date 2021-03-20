@@ -37,11 +37,11 @@ This option is then provided to the Schema's 'connect' function.
 =cut
 
 option connection => (
-  is       => 'ro',
-  format   => 's',
-  required => 0,
-  short    => 'c',
-  doc      => "The DBI connection string to use",
+    is       => 'ro',
+    format   => 's',
+    required => 0,
+    short    => 'c',
+    doc      => "The DBI connection string to use",
 );
 
 =head2 --username ( -u )
@@ -51,11 +51,11 @@ The username to use for connection to the database
 =cut
 
 option username => (
-  is      => 'ro',
-  format  => 's',
-  default => '',
-  short   => 'u',
-  doc     => "The username for the DB connection",
+    is      => 'ro',
+    format  => 's',
+    default => '',
+    short   => 'u',
+    doc     => "The username for the DB connection",
 );
 
 =head2 --password ( -p )
@@ -65,11 +65,11 @@ The password to use for connection to the database
 =cut
 
 option password => (
-  is      => 'ro',
-  format  => 's',
-  default => '',
-  short   => 'p',
-  doc     => "The password for the supplied user",
+    is      => 'ro',
+    format  => 's',
+    default => '',
+    short   => 'p',
+    doc     => "The password for the supplied user",
 );
 
 =head2 --force ( -f )
@@ -80,10 +80,10 @@ the same version of ddl items.
 =cut
 
 option force => (
-  is      => 'ro',
-  default => sub { 0 },
-  short   => 'f',
-  doc     => "Force the action if required",
+    is      => 'ro',
+    default => sub { 0 },
+    short   => 'f',
+    doc     => "Force the action if required",
 );
 
 =head2 --version ( -v )
@@ -94,11 +94,11 @@ ddl.
 =cut
 
 option version => (
-  is => 'ro',
-  format => 'i',
-  default => sub { shift->dh->schema->schema_version },
-  short => 'v',
-  doc => "Version to use as target",
+    is      => 'ro',
+    format  => 'i',
+    default => sub { shift->dh->schema->schema_version },
+    short   => 'v',
+    doc     => "Version to use as target",
 );
 
 =head1 ATTRIBUTES
@@ -113,8 +113,8 @@ to be defined in the 'new_with_options' call.
 =cut
 
 has schema_class => (
-  is => 'ro',
-  required => 1,
+    is       => 'ro',
+    required => 1,
 );
 
 =head2 schema
@@ -125,15 +125,12 @@ This is the connected schema. This uses the 'schema_class' attribute and
 =cut
 
 has schema => (
-  is      => 'lazy',
-  builder => sub {
-    my $self = shift;
-    return use_module( $self->schema_class )->connect(
-      $self->connection,
-      $self->username,
-      $self->password,
-    );
-  },
+    is      => 'lazy',
+    builder => sub {
+        my $self = shift;
+        return use_module( $self->schema_class )
+          ->connect( $self->connection, $self->username, $self->password, );
+    },
 );
 
 =head2 script_directory
@@ -144,8 +141,8 @@ versions. Defaults to 'share/ddl'.
 =cut
 
 has script_directory => (
-  is      => 'ro',
-  default => 'share/ddl',
+    is      => 'ro',
+    default => 'share/ddl',
 );
 
 =head2 databases
@@ -160,8 +157,8 @@ defaults to returning the following:
 =cut
 
 has databases => (
-  is      => 'ro',
-  default => sub { [ qw/ PostgreSQL SQLite / ] },
+    is      => 'ro',
+    default => sub { [qw/ PostgreSQL SQLite /] },
 );
 
 =head2 dh
@@ -172,16 +169,18 @@ This returns the actual DeploymentHandler, set up using the 'schema',
 =cut
 
 has dh => (
-  is => 'lazy',
-  builder => sub {
-    my ( $self ) = @_;
-    return DBIx::Class::DeploymentHandler->new({
-      schema => $self->schema,
-      force_overwrite => $self->force,
-      script_directory => $self->script_directory,
-      databases => $self->databases,
-    });
-  }
+    is      => 'lazy',
+    builder => sub {
+        my ($self) = @_;
+        return DBIx::Class::DeploymentHandler->new(
+            {
+                schema           => $self->schema,
+                force_overwrite  => $self->force,
+                script_directory => $self->script_directory,
+                databases        => $self->databases,
+            }
+        );
+    }
 );
 
 =head1 COMMANDS
@@ -195,17 +194,19 @@ This will create the ddl files required to perform an upgrade.
 =cut
 
 sub cmd_write_ddl {
-  my ( $self ) = @_;
+    my ($self) = @_;
 
-  $self->dh->prepare_install;
-  my $v = $self->version;
+    $self->dh->prepare_install;
+    my $v = $self->version;
 
-  if ( $v > 1 ) {
-    $self->dh->prepare_upgrade({
-      from_version => $v - 1,
-      to_version   => $v,
-    });
-  }
+    if ( $v > 1 ) {
+        $self->dh->prepare_upgrade(
+            {
+                from_version => $v - 1,
+                to_version   => $v,
+            }
+        );
+    }
 }
 
 =head2 install_dh
@@ -216,12 +217,14 @@ database. Only for use on a pre-existing database.
 =cut
 
 sub cmd_install_dh {
-  my ( $self ) = @_;
+    my ($self) = @_;
 
-  $self->dh->install_version_storage;
-  $self->dh->add_database_version({
-    version => $self->version,
-  });
+    $self->dh->install_version_storage;
+    $self->dh->add_database_version(
+        {
+            version => $self->version,
+        }
+    );
 }
 
 =head2 install
@@ -231,11 +234,13 @@ This command will install all the tables to the provided database
 =cut
 
 sub cmd_install {
-  my ( $self ) = @_;
+    my ($self) = @_;
 
-  $self->dh->install({
-    version => $self->version,
-  });
+    $self->dh->install(
+        {
+            version => $self->version,
+        }
+    );
 }
 
 =head2 upgrade
@@ -245,9 +250,9 @@ This command will upgrade all tables to the latest versions
 =cut
 
 sub cmd_upgrade {
-  my ( $self ) = @_;
+    my ($self) = @_;
 
-  $self->dh->upgrade;
+    $self->dh->upgrade;
 }
 
 =head1 AUTHOR
