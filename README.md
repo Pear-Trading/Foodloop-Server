@@ -127,7 +127,8 @@ Test files are found in the `t/` directory.
 ## Code Formatting
 
 Run `for f in ./lib/**/*.pm; do perltidy -b $f; done` to format all Perl files
-with [Perl-Tidy](https://metacpan.org/release/Perl-Tidy).
+with [Perl-Tidy](https://metacpan.org/release/Perl-Tidy) (there is no built-in
+option to format files recursively).
 
 Run `perlcritic lib` to lint all Perl files with [Perl-Critic](https://metacpan.org/release/Perl-Critic).
 
