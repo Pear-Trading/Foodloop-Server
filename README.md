@@ -119,8 +119,8 @@ Run `./script/pear-local_loop recalc_leaderboards` to update the leaderboards.
 
 ## Testing
 
-- Run `prove -lr` to run the full test suite using [Test-Simple](https://metacpan.org/release/Test-Simple) (when using an SQLite database); and
-- run `PEAR_TEST_PG=1 prove -lr` to run the full test suite (when using a PostgreSQL database).
+- Run `prove -lr -j 9` to run the full test suite using [Test-Simple](https://metacpan.org/release/Test-Simple) (when using an SQLite database); and
+- run `PEAR_TEST_PG=1 prove -lr -j 9` to run the full test suite (when using a PostgreSQL database).
 
 Test files are found in the `t/` directory.
 
