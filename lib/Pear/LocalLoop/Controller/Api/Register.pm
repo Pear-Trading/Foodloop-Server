@@ -69,8 +69,8 @@ sub post_register {
   my $usertype = $validation->param('usertype') || '';
 
   if ( $usertype eq 'customer' ) {
-    $validation->required('display_name');
-    $validation->required('full_name');
+    $validation->required('display_name', 'not_empty');
+    $validation->required('full_name', 'not_empty');
     my $year = DateTime->now->year;
     $validation->required('year_of_birth')->number->gt_num($year - 150)->lt_num($year - 10);
   } elsif ( $usertype eq 'organisation' ) {

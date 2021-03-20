@@ -34,7 +34,7 @@ sub post_feedback {
   my $user_rs = $c->schema->resultset('User');
 
   $validation->required('email')->in_resultset( 'email', $user_rs );
-  $validation->required('feedbacktext');
+  $validation->required('feedbacktext', 'not_empty');
   $validation->required('app_name');
   $validation->required('package_name');
   $validation->required('version_code');
