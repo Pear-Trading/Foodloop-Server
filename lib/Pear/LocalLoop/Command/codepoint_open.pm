@@ -30,8 +30,6 @@ sub run {
             die;
         }
     }
-    
-    # 
 
     my $cpo = Geo::UK::Postcode::CodePointOpen->new( path => $output_dir );
 

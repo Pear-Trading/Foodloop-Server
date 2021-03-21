@@ -84,7 +84,7 @@ This server app. provides:
         - ```shell script
 		      ./script/pear-local_loop minion job \
 		      --enqueue 'csv_postcode_import'  \
-		      --args '[ "⟨ path to CSV ⟩ ]'
+		      --args '[ "⟨ path to CSV ⟩" ]'
 		      ```
 1. set up postcodes:
     1. import [Code-Point Open](https://www.ordnancesurvey.co.uk/business-government/products/code-point-open):
@@ -137,7 +137,9 @@ Test files are found in the `t/` directory.
 
 Run `for f in ./lib/**/*.pm; do perltidy -b $f; done` to format all Perl files
 with [Perl-Tidy](https://metacpan.org/release/Perl-Tidy) (there is no built-in
-option to format files recursively).
+option to format files recursively). This will produce backup files with `.bak`
+extensions, so run `rm -r *.bak` to clean up your local copy if you are happy
+with the formatted files.
 
 Run `perlcritic lib` to lint all Perl files with [Perl-Critic](https://metacpan.org/release/Perl-Critic).
 
