@@ -65,31 +65,6 @@ sub create_jwt_from_path_and_scopes {
     return $jwt->encode;
 }
 
-sub get_topics {
-    my $c = shift;
-
-    my $topic_rs = $c->schema->resultset('Topic');
-
-    my @topics = (
-        map {
-            {
-                id                  => $_->id,
-                name                => $_->name,
-                numberOfSubscribers =>
-                  $_->search_related( 'device_subscriptions',
-                    { 'topic_id' => $_->id } )->count,
-            }
-        } $topic_rs->all
-    );
-
-    return $c->render(
-        json => {
-            success => Mojo::JSON->true,
-            topics  => \@topics,
-        }
-    );
-}
-
 sub post_message {
     my $c = shift;
 

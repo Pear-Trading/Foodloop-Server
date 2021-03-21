@@ -174,12 +174,6 @@ sub startup {
     $api_public->post('/logout')->to('api-auth#post_logout');
     $api_public->post('/feedback')->to('api-feedback#post_feedback');
 
-    $api_public->post('/check-device-token')->to('api-devices#check_token');
-    $api_public->post('/add-device-token')->to('api-devices#add_token');
-    $api_public->post('/get-topics')->to('api-sendmessage#get_topics');
-    $api_public->post('/get-device-tokens')->to('api-devices#get_tokens');
-    $api_public->post('/send-message')->to('api-sendmessage#post_message');
-
     # Private, must be authenticated api routes
     my $api = $api_public->under('/')->to('api-auth#auth');
 
@@ -212,6 +206,15 @@ sub startup {
       ->to('api-transactions#update_recurring');
     $api->post('/recurring-transactions/delete')
       ->to('api-transactions#delete_recurring');
+      
+    $api->post('/device-token/check')->to('api-devices#check_exists');
+    $api->post('/device-token/add')->to('api-devices#create');
+    $api->post('/device-tokens')->to('api-devices#get_all');
+    
+    $api->post('/topic/add')->to('api-topic#create');
+    $api->post('/topics')->to('api-topic#get_all');
+    
+    $api->post('/send-message')->to('api-sendmessage#post_message');
 
     my $api_v1 = $api->under('/v1');
 

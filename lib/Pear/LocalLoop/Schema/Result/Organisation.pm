@@ -124,6 +124,13 @@ __PACKAGE__->has_many(
     { cascade_copy     => 0, cascade_delete => 0 },
 );
 
+__PACKAGE__->has_many(
+    "topics",
+    "Pear::LocalLoop::Schema::Result::Topic",
+    { "foreign.organisation_id" => "self.id" },
+    { cascade_copy      => 0, cascade_delete => 0 },
+);
+
 __PACKAGE__->filter_column(
     pending => {
         filter_to_storage => 'to_bool',

@@ -21,6 +21,11 @@ __PACKAGE__->add_columns(
         is_auto_increment => 1,
         is_nullable       => 0,
     },
+    "organisation_id" => {
+        data_type      => "integer",
+        is_foreign_key => 1,
+        is_nullable    => 1,
+    },
     "name" => {
         data_type   => "varchar",
         size        => 200,
@@ -29,6 +34,13 @@ __PACKAGE__->add_columns(
 );
 
 __PACKAGE__->set_primary_key("id");
+
+__PACKAGE__->belongs_to(
+    "organisation",
+    "Pear::LocalLoop::Schema::Result::Organisation",
+    { id            => "organisation_id" },
+    { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },
+);
 
 __PACKAGE__->has_many(
     "device_subscriptions",

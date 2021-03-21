@@ -19,7 +19,7 @@ has error_messages => sub {
     };
 };
 
-sub check_token {
+sub check_exists {
     my $c = shift;
 
     my $validation = $c->validation;
@@ -47,7 +47,7 @@ sub check_token {
     }
 }
 
-sub add_token {
+sub create {
     my $c = shift;
 
     my $validation = $c->validation;
@@ -120,7 +120,7 @@ sub add_token {
     }
 }
 
-sub get_tokens {
+sub get_all {
     my $c = shift;
 
     my $token_rs = $c->schema->resultset('DeviceToken');
