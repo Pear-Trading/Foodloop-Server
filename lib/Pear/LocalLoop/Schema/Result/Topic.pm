@@ -43,15 +43,17 @@ __PACKAGE__->belongs_to(
 );
 
 __PACKAGE__->has_many(
-    "device_subscriptions",
-    "Pear::LocalLoop::Schema::Result::DeviceSubscription",
+    "user_topic_subscriptions",
+    "Pear::LocalLoop::Schema::Result::UserTopicSubscription",
     { "foreign.topic_id" => "self.id" },
     { cascade_copy       => 0, cascade_delete => 0 },
 );
 
 __PACKAGE__->many_to_many(
-    'device_tokens' => 'device_subscriptions',
-    'device_token'
+    'users' => 'user_topic_subscriptions',
+    'user'
 );
+
+__PACKAGE__->many_to_many( 'topics' => 'user_topic_subscriptions', 'topic' );
 
 1;

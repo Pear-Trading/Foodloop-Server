@@ -25,7 +25,13 @@ sub run {
     }
 
     my $schema = $self->app->schema;
-
+    
+    $c->schema->resultset('Topic')->create(
+        {
+            name => 'default'
+        }
+    );
+    
     $schema->resultset('User')->create(
         {
             email    => 'test@example.com',
@@ -88,12 +94,6 @@ sub run {
                     postcode    => 'LA1 1AA',
                 },
             },
-        }
-    );
-
-    $c->schema->resultset('DeviceToken')->create(
-        {
-            name => 'default'
         }
     );
 

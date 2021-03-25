@@ -89,18 +89,6 @@ sub create {
     my $response = $ua->request($request);
 
     if ( $response->is_success ) {
-        my $deviceToken =
-          $c->schema->resultset('DeviceToken')->find( { 'token' => $token } );
-        my $topic =
-          $c->schema->resultset('Topic')->find( { 'name' => 'default' } );
-
-        $deviceToken->create_related(
-            'device_subscriptions',
-            {
-                topic => $topic
-            }
-        );
-
         return $c->render(
             json => {
                 success => Mojo::JSON->true,

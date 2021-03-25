@@ -213,6 +213,8 @@ sub startup {
     
     $api->post('/topic/add')->to('api-topic#create');
     $api->post('/topics')->to('api-topic#get_all');
+    $api->post('/topics/subscriptions')->to('api-topic#get_all_and_subscriptions');
+    $api->post('/topics/update')->to('api-topic#update_subscriptions');
     
     $api->post('/send-message')->to('api-sendmessage#post_message');
 
