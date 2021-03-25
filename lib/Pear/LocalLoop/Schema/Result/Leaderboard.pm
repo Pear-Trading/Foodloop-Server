@@ -10,242 +10,271 @@ use DateTime;
 __PACKAGE__->table("leaderboards");
 
 __PACKAGE__->add_columns(
-  "id" => {
-    data_type => "integer",
-    is_auto_increment => 1,
-    is_nullable => 0,
-  },
-  "name" => {
-    data_type => "varchar",
-    size => 255,
-    is_nullable => 0,
-  },
-  "type" => {
-    data_type => "varchar",
-    size => 255,
-    is_nullable => 0,
-  },
+    "id" => {
+        data_type         => "integer",
+        is_auto_increment => 1,
+        is_nullable       => 0,
+    },
+    "name" => {
+        data_type   => "varchar",
+        size        => 255,
+        is_nullable => 0,
+    },
+    "type" => {
+        data_type   => "varchar",
+        size        => 255,
+        is_nullable => 0,
+    },
 );
 
 __PACKAGE__->set_primary_key("id");
 
-__PACKAGE__->add_unique_constraint(["type"]);
+__PACKAGE__->add_unique_constraint( ["type"] );
 
 __PACKAGE__->has_many(
-  "sets",
-  "Pear::LocalLoop::Schema::Result::LeaderboardSet",
-  { "foreign.leaderboard_id" => "self.id" },
-  { cascade_copy => 0, cascade_delete => 0 },
+    "sets",
+    "Pear::LocalLoop::Schema::Result::LeaderboardSet",
+    { "foreign.leaderboard_id" => "self.id" },
+    { cascade_copy             => 0, cascade_delete => 0 },
 );
 
 sub create_new {
-  my $self = shift;
-  my $start = shift;
+    my $self  = shift;
+    my $start = shift;
 
-  my $type = $self->type;
+    my $type = $self->type;
 
-  if ( $type eq 'daily_total' ) {
-    return $self->_create_total_set( $start, $start->clone->add( days => 1 ) );
-  } elsif ( $type eq 'weekly_total' ) {
-    return $self->_create_total_set( $start, $start->clone->add( days => 7 ) );
-  } elsif ( $type eq 'monthly_total' ) {
-    return $self->_create_total_set( $start, $start->clone->add( months => 1 ) );
-  } elsif ( $type eq 'all_time_total' ) {
-    return $self->_create_total_all_time( $start );
-  } elsif ( $type eq 'daily_count' ) {
-    return $self->_create_count_set( $start, $start->clone->add( days => 1 ) );
-  } elsif ( $type eq 'weekly_count' ) {
-    return $self->_create_count_set( $start, $start->clone->add( days => 7 ) );
-  } elsif ( $type eq 'monthly_count' ) {
-    return $self->_create_count_set( $start, $start->clone->add( months => 1 ) );
-  } elsif ( $type eq 'all_time_count' ) {
-    return $self->_create_count_all_time( $start );
-  }
-  warn "Unrecognised type";
-  return $self;
+    if ( $type eq 'daily_total' ) {
+        return $self->_create_total_set( $start,
+            $start->clone->add( days => 1 ) );
+    }
+    elsif ( $type eq 'weekly_total' ) {
+        return $self->_create_total_set( $start,
+            $start->clone->add( days => 7 ) );
+    }
+    elsif ( $type eq 'monthly_total' ) {
+        return $self->_create_total_set( $start,
+            $start->clone->add( months => 1 ) );
+    }
+    elsif ( $type eq 'all_time_total' ) {
+        return $self->_create_total_all_time($start);
+    }
+    elsif ( $type eq 'daily_count' ) {
+        return $self->_create_count_set( $start,
+            $start->clone->add( days => 1 ) );
+    }
+    elsif ( $type eq 'weekly_count' ) {
+        return $self->_create_count_set( $start,
+            $start->clone->add( days => 7 ) );
+    }
+    elsif ( $type eq 'monthly_count' ) {
+        return $self->_create_count_set( $start,
+            $start->clone->add( months => 1 ) );
+    }
+    elsif ( $type eq 'all_time_count' ) {
+        return $self->_create_count_all_time($start);
+    }
+    warn "Unrecognised type";
+    return $self;
 }
 
 sub _get_customer_rs {
-  my $self = shift;
-  return $self->result_source->schema->resultset('Entity')->search({
-    type => 'customer',
-  });
+    my $self = shift;
+    return $self->result_source->schema->resultset('Entity')->search(
+        {
+            type => 'customer',
+        }
+    );
 }
 
 sub _set_position_and_trend {
-  my ( $self, @leaderboard ) = @_;
+    my ( $self, @leaderboard ) = @_;
 
-  # Sort numerically descending
-  @leaderboard = sort { $b->{value} <=> $a->{value} } @leaderboard;
+    # Sort numerically descending
+    @leaderboard = sort { $b->{value} <=> $a->{value} } @leaderboard;
 
-  my $position = 0;
+    my $position = 0;
 
-  my $previous_board = $self->get_latest;
-
-  if ( defined $previous_board ) {
-    $previous_board = $previous_board->values;
-  }
-
-  for my $lb_val ( @leaderboard ) {
-    $position++;
-    $lb_val->{position} = $position;
-
-    my $previous_value;
+    my $previous_board = $self->get_latest;
 
     if ( defined $previous_board ) {
-      $previous_value = $previous_board->find({ entity_id => $lb_val->{entity_id} });
+        $previous_board = $previous_board->values;
     }
 
-    my $trend;
+    for my $lb_val (@leaderboard) {
+        $position++;
+        $lb_val->{position} = $position;
 
-    if ( ! defined $previous_value ) {
-      $trend = 0;
-    } elsif ( $previous_value->position > $position ) {
-      $trend = -1;
-    } elsif ( $previous_value->position < $position ) {
-      $trend = 1;
-    } else {
-      $trend = 0;
+        my $previous_value;
+
+        if ( defined $previous_board ) {
+            $previous_value =
+              $previous_board->find( { entity_id => $lb_val->{entity_id} } );
+        }
+
+        my $trend;
+
+        if ( !defined $previous_value ) {
+            $trend = 0;
+        }
+        elsif ( $previous_value->position > $position ) {
+            $trend = -1;
+        }
+        elsif ( $previous_value->position < $position ) {
+            $trend = 1;
+        }
+        else {
+            $trend = 0;
+        }
+
+        $lb_val->{trend} = $trend;
     }
 
-    $lb_val->{trend} = $trend;
-  }
-
-  return @leaderboard;
+    return @leaderboard;
 }
 
 sub _create_total_set {
-  my ( $self, $start, $end ) = @_;
+    my ( $self, $start, $end ) = @_;
 
-  my $user_rs = $self->_get_customer_rs;
+    my $user_rs = $self->_get_customer_rs;
 
-  my @leaderboard;
+    my @leaderboard;
 
-  while ( my $user_result = $user_rs->next ) {
-    my $transaction_rs = $user_result->purchases->search_between( $start, $end );
+    while ( my $user_result = $user_rs->next ) {
+        my $transaction_rs =
+          $user_result->purchases->search_between( $start, $end );
 
-    my $transaction_sum = $transaction_rs->get_column('value')->sum;
+        my $transaction_sum = $transaction_rs->get_column('value')->sum;
 
-    push @leaderboard, {
-      entity_id => $user_result->id,
-      value => $transaction_sum || 0,
-    };
-  }
+        push @leaderboard,
+          {
+            entity_id => $user_result->id,
+            value     => $transaction_sum || 0,
+          };
+    }
 
-  @leaderboard = $self->_set_position_and_trend(@leaderboard);
+    @leaderboard = $self->_set_position_and_trend(@leaderboard);
 
-  $self->create_related(
-    'sets',
-    {
-      date => $start,
-      values => \@leaderboard,
-    },
-  );
+    $self->create_related(
+        'sets',
+        {
+            date   => $start,
+            values => \@leaderboard,
+        },
+    );
 
-  return $self;
+    return $self;
 }
 
 sub _create_count_set {
-  my ( $self, $start, $end ) = @_;
+    my ( $self, $start, $end ) = @_;
 
-  my $user_rs = $self->_get_customer_rs;
+    my $user_rs = $self->_get_customer_rs;
 
-  my @leaderboard;
+    my @leaderboard;
 
-  while ( my $user_result = $user_rs->next ) {
-    my $transaction_rs = $user_result->purchases->search_between( $start, $end );
+    while ( my $user_result = $user_rs->next ) {
+        my $transaction_rs =
+          $user_result->purchases->search_between( $start, $end );
 
-    my $transaction_count = $transaction_rs->count;
+        my $transaction_count = $transaction_rs->count;
 
-    push @leaderboard, {
-      entity_id => $user_result->id,
-      value => $transaction_count || 0,
-    };
-  }
+        push @leaderboard,
+          {
+            entity_id => $user_result->id,
+            value     => $transaction_count || 0,
+          };
+    }
 
-  @leaderboard = $self->_set_position_and_trend(@leaderboard);
+    @leaderboard = $self->_set_position_and_trend(@leaderboard);
 
-  $self->create_related(
-    'sets',
-    {
-      date => $start,
-      values => \@leaderboard,
-    },
-  );
+    $self->create_related(
+        'sets',
+        {
+            date   => $start,
+            values => \@leaderboard,
+        },
+    );
 
-  return $self;
+    return $self;
 }
 
 sub _create_total_all_time {
-  my ( $self, $end ) = @_;
+    my ( $self, $end ) = @_;
 
-  my $user_rs = $self->_get_customer_rs;
- 
-  my @leaderboard;
+    my $user_rs = $self->_get_customer_rs;
 
-  while ( my $user_result = $user_rs->next ) {
-    my $transaction_rs = $user_result->purchases->search_before( $end );
+    my @leaderboard;
 
-    my $transaction_sum = $transaction_rs->get_column('value')->sum;
+    while ( my $user_result = $user_rs->next ) {
+        my $transaction_rs = $user_result->purchases->search_before($end);
 
-    push @leaderboard, {
-      entity_id => $user_result->id,
-      value => $transaction_sum || 0,
-    };
-  }
+        my $transaction_sum = $transaction_rs->get_column('value')->sum;
 
-  @leaderboard = $self->_set_position_and_trend(@leaderboard);
+        push @leaderboard,
+          {
+            entity_id => $user_result->id,
+            value     => $transaction_sum || 0,
+          };
+    }
 
-  $self->create_related(
-    'sets',
-    {
-      date => $end,
-      values => \@leaderboard,
-    },
-  );
+    @leaderboard = $self->_set_position_and_trend(@leaderboard);
 
-  return $self;
+    $self->create_related(
+        'sets',
+        {
+            date   => $end,
+            values => \@leaderboard,
+        },
+    );
+
+    return $self;
 }
 
 sub _create_count_all_time {
-  my ( $self, $end ) = @_;
+    my ( $self, $end ) = @_;
 
-  my $user_rs = $self->_get_customer_rs;
+    my $user_rs = $self->_get_customer_rs;
 
-  my @leaderboard;
+    my @leaderboard;
 
-  while ( my $user_result = $user_rs->next ) {
-    my $transaction_rs = $user_result->purchases->search_before( $end );
+    while ( my $user_result = $user_rs->next ) {
+        my $transaction_rs = $user_result->purchases->search_before($end);
 
-    my $transaction_count = $transaction_rs->count;
+        my $transaction_count = $transaction_rs->count;
 
-    push @leaderboard, {
-      entity_id => $user_result->id,
-      value => $transaction_count || 0,
-    };
-  }
+        push @leaderboard,
+          {
+            entity_id => $user_result->id,
+            value     => $transaction_count || 0,
+          };
+    }
 
-  @leaderboard = $self->_set_position_and_trend(@leaderboard);
+    @leaderboard = $self->_set_position_and_trend(@leaderboard);
 
-  $self->create_related(
-    'sets',
-    {
-      date => $end,
-      values => \@leaderboard,
-    },
-  );
+    $self->create_related(
+        'sets',
+        {
+            date   => $end,
+            values => \@leaderboard,
+        },
+    );
 
-  return $self;
+    return $self;
 }
 
 sub get_latest {
-  my $self = shift;
+    my $self = shift;
 
-  my $latest = $self->search_related('sets', {}, {
-    order_by => { -desc => 'date' },
-  })->first;
+    my $latest = $self->search_related(
+        'sets',
+        {},
+        {
+            order_by => { -desc => 'date' },
+        }
+    )->first;
 
-  return $latest;
+    return $latest;
 }
 
 1;

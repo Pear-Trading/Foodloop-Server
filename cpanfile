@@ -2,7 +2,12 @@ requires 'Mojolicious';
 requires 'Mojolicious::Plugin::Authentication';
 requires 'Data::UUID';
 requires 'Devel::Dwarn';
+requires 'JSON::Parse';
 requires 'Mojo::JSON';
+requires 'LWP::UserAgent';
+requires 'Mojo::JWT';
+requires 'Mojo::File';
+requires 'Crypt::OpenSSL::RSA';
 requires 'Email::Valid';
 requires 'Geo::UK::Postcode::Regex' => '0.017';
 requires 'Authen::Passphrase::BlowfishCrypt';
@@ -24,6 +29,8 @@ requires 'Text::CSV';
 requires 'Try::Tiny';
 requires 'Throwable::Error';
 requires 'Minion';
+requires 'Perl::Critic';
+requires 'WWW::FCM::HTTP';
 
 on 'test' => sub {
   requires 'Test::More';

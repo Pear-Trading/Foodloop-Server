@@ -5,15 +5,19 @@ use warnings;
 
 use base 'DBIx::Class::ResultSet';
 
-sub sales { shift->search_related('sales', @_) }
+## no critic (Subroutines::RequireArgUnpacking)
+sub sales { return shift->search_related( 'sales', @_ ) }
+## use critic
 
 sub create_org {
-  my ( $self, $org ) = @_;
+    my ( $self, $org ) = @_;
 
-  return $self->create({
-    organisation => $org,
-    type => 'organisation',
-  });
+    return $self->create(
+        {
+            organisation => $org,
+            type         => 'organisation',
+        }
+    );
 }
 
 1;

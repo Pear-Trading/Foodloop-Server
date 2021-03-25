@@ -2,12 +2,14 @@ package Pear::LocalLoop::Plugin::Minion::Job::test;
 use Mojo::Base 'Pear::LocalLoop::Plugin::Minion::Job';
 
 sub run {
-  my ( $self, @args ) = @_;
+    my ( $self, @args ) = @_;
 
-  $self->job->app->log->debug( 'Testing Job' );
-  for my $arg ( @args ) {
-    $self->job->app->log->debug( $arg );
-  }
+    $self->job->app->log->debug('Testing Job');
+    for my $arg (@args) {
+        $self->job->app->log->debug($arg);
+    }
+
+    return 1;
 }
 
 1;

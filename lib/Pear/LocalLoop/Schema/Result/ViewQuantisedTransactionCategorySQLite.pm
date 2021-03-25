@@ -9,7 +9,8 @@ __PACKAGE__->table_class('DBIx::Class::ResultSource::View');
 __PACKAGE__->table('view_quantised_transactions');
 __PACKAGE__->result_source_instance->is_virtual(1);
 
-__PACKAGE__->result_source_instance->view_definition( qq/
+__PACKAGE__->result_source_instance->view_definition(
+    qq/
 SELECT "transactions"."value",
        "transactions"."distance",
        "transactions"."purchase_time",
@@ -22,6 +23,7 @@ SELECT "transactions"."value",
        DATETIME(STRFTIME('%Y-%m-%d 00:00:00',"transactions"."purchase_time", 'weekday 0','-6 days')) AS "quantised_weeks"
   FROM "transactions"
 LEFT JOIN "transaction_category" ON "transactions"."id" = "transaction_category"."transaction_id"
-/);
+/
+);
 
 1;

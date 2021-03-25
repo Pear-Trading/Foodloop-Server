@@ -1,150 +1,168 @@
-# Pear LocalLoop Server
+# LocalSpend (Server)
+
+Looking to discover if the value of spending local can be measured, understood and shown.
+
+This repository contains the server application for the LocalSpend system. See also:
+
+* the [Web application](https://github.com/Pear-Trading/Foodloop-Web); and
+* the [mobile application](https://github.com/Pear-Trading/LocalSpend-Tracker).
 
 ## Current Status
 
-*Master:* [![Build Status](https://travis-ci.org/Pear-Trading/Foodloop-Server.svg?branch=master)](https://travis-ci.org/Pear-Trading/Foodloop-Server)
+| Branch        | Status            |
+|---------------|------------------ |
+| `master`      | [![Build Status](https://travis-ci.org/Pear-Trading/Foodloop-Server.svg?branch=master)](https://travis-ci.org/Pear-Trading/Foodloop-Server) |
+| `development` | [![Build Status](https://travis-ci.org/Pear-Trading/Foodloop-Server.svg?branch=development)](https://travis-ci.org/Pear-Trading/Foodloop-Server) |
 
-*Development:* [![Build Status](https://travis-ci.org/Pear-Trading/Foodloop-Server.svg?branch=development)](https://travis-ci.org/Pear-Trading/Foodloop-Server)
+## Table of Contents
 
-# Testing
+* [Tech Stack](#tech-stack)
+* [Features](#features)
+* [Installation](#installation)
+* [Configuration](#configuration)
+* [Usage](#usage)
+* [Testing](#testing)
+* [Code Formatting](#code-formatting)
+* [Documentation](#documentation)
+* [Acknowledgments](#acknowledgements)
+* [License](#license)
+* [Contact](#contact)
 
-To run the main test framework, first install all the dependencies, then run the tests:
+## Technology Stack
 
-```
-cpanm --installdeps .
-prove -lr
-```
+The server app. is written in [Perl](https://www.perl.org/).
 
-To run the main framework against a PostgreSQL backend, assuming you have postgres installed, you will need some extra dependencies first:
+Admin. portal pages are templated using [HTML::EP](https://metacpan.org/pod/distribution/HTML-EP/lib/HTML/EP.pod).
 
-```
-cpanm --installdeps . --with-feature postgres
-PEAR_TEST_PG=1 prove -lr
-```
+| Technology  | Description                          | Link                |
+|-------------|--------------------------------------|---------------------|
+| Mojolicious | Perl Web framework	                 | [Link][mojolicious] |
+| PostgreSQL	|	Relational database managment system | [Link][postgresql] |
+| SQLite    	|	Relational database managment system | [Link][sqlite] |
 
-# Minion
+[mojolicious]: https://mojolicious.org/
+[postgresql]: https://www.postgresql.org/
+[sqlite]: https://sqlite.org/index.html
 
-to set up minion support, you will need to create a database and user for
-minion to connect to. In production his should be a PostgreSQL database,
-however an SQLite db can be used in testing.
+## Features
 
-To use the SQLite version, run the following commands:
+This server app. provides:
 
-```
-cpanm --installdeps --with-feature sqlite .
-```
+- user creation, updating and deletion;
+- organisation creation, updating and deletion;
+- an admin. management portal;
+- transaction logging;
+- transaction history analysis; and
+- leaderboard generation.
 
-And then add the following to your configuration file:
+## Installation
 
-```
-  minion => {
-    SQLite => 'sqlite:minion.db',
-  },
-```
+1. Clone the repo. to your dev. environment (`git clone git@github.com:Pear-Trading/FoodLoop-Server.git`);
+1. enter the new directory (`cd FoodLoop-Server`);
+1. install the dependencies:
+    - ```shell script
+      cpanm --installdeps . \
+      --with-feature=sqlite \
+      --with-feature=codepoint-open
+      ```
+    - if you are using a PostgreSQL database, replace `--with-feature=sqlite` 
+      with `--with-feature=postgres`.
+1. install the database:
+    - run `./script/deploy_db install -c 'dbi:SQLite:dbname=foodloop.db'`;
+    - development supports both SQLite and PostgreSQL (production uses PostgreSQL);
+    - for this example we will use SQLite; so
+    - as the default config. is set up for this, no configuration changes are 
+      needed initially.
+1. set up the development users:
+    - `./script/pear-local_loop dev_data --force`
+    - **DO NOT RUN ON PROD!**
+1. start the [Minion](https://docs.mojolicious.org/Minion) job scheduler:
+    - `./script/pear-local_loop minion worker`
+1. import ward data:
+    1. Download the CSV(s) from [here](https://www.doogal.co.uk/PostcodeDownloads.php); and
+    1. run the following command:
+        - ```shell script
+		      ./script/pear-local_loop minion job \
+		      --enqueue 'csv_postcode_import'  \
+		      --args '[ "⟨ path to CSV ⟩" ]'
+		      ```
+1. set up postcodes:
+    1. import [Code-Point Open](https://www.ordnancesurvey.co.uk/business-government/products/code-point-open):
+    		- a copy is included in `etc/`;
+    		- run `./script/pear-local_loop codepoint_open --outcodes LA1`
+		1. assign postcodes:
+    		- ```shell script
+      	  ./script/pear-local_loop minion job \
+          --enqueue entity_postcode_lookup
+     		  ```
 
-This will then use an SQLite db for the minion backend, using `minion.db` as
-the database file. To start the minion itself, run:
+## Configuration
 
-```
-./script/pear-local_loop minion worker
-```
+App. configuration settings are found in `pear-local_loop.⟨environment⟩.conf`.
 
-# Importing Ward Data
+[Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/) 
+(FCM) credentials should be placed in a file called `localspend-47012.json` in 
+root. This file is not tracked by Git; ask another developer for a copy.
 
-To import ward data, get the ward data csv and then run the following command:
+Default user credentials are found in `lib/Pear/LocalLoop/Command/dev_data.pm`.
 
-```shell script
-./script/pear-local_loop minion job \
-  --enqueue 'csv_postcode_import' \
-  --args '[ "/path/to/ward/csv" ]'
-```
+## Usage
 
-# Setting up Entity Postcodes
+- Run `./script/pear-local_loop minion worker` to start the Minion asynchronous 
+  job scheduler; and
+- run `morbo script/pear-local_loop -l http://*:3000` to start the server on 
+  the specific hostname and port.
 
-Assuming you have imported codepoint open, then to properly assign all
- postcodes:
- 
-```shell script
-./script/pear-local_loop minion job \
-  --enqueue entity_postcode_lookup
-```
+### Database Scripts
 
-## Example PostgreSQL setup
+To upgrade the database after making changes to commit:
 
-```
-# Example commands - probably not the best ones
-# TODO come back and improve these with proper ownership and DDL rights
-sudo -u postgres createuser minion
-sudo -u postgres createdb localloop_minion
-sudo -u postgres psql
-psql=# alter user minion with encrypted password 'abc123';
-psql=# grant all privileges on database localloop_minion to minion;
-```
+1. Increment the `$VERSION` number in `lib/Pear/LocalLoop/Schema.pm`;
+1. run `./script/deploy_db write_ddl -c 'dbi:SQLite:dbname=foodloop.db'`; and
+1. run `./script/deploy_db upgrade -c 'dbi:SQLite:dbname=foodloop.db'`.
 
-# Development
+Run `./script/pear-local_loop recalc_leaderboards` to update the leaderboards.
 
-There are a couple of setup steps to getting a development environment ready.
-Use the corresponding instructions depending on what state your current setup
-is in.
+## Testing
 
-## First Time Setup
+- Run `prove -lr -j 9` to run the full test suite using
+  [Test-Simple](https://metacpan.org/release/Test-Simple) (when using an SQLite 
+  database); and
+- run `PEAR_TEST_PG=1 prove -lr -j 9` to run the full test suite (when using a 
+  PostgreSQL database).
 
-First, decide if you're using SQLite or PostgreSQL locally. Development supports
-both, however production uses PostgreSQL. For this example we will use SQLite.
-As the default config is set up for this, no configuration changes are
-needed initially. So, first off, install dependencies:
+Test files are found in the `t/` directory.
 
-```shell script
-cpanm --installdeps . --with-feature=sqlite
-```
+## Code Formatting
 
-Then install the database:
+Run `for f in ./lib/**/*.pm; do perltidy -b $f; done` to format all Perl files
+with [Perl-Tidy](https://metacpan.org/release/Perl-Tidy) (there is no built-in
+option to format files recursively). This will produce backup files with `.bak`
+extensions, so run `find . -name '*.bak' -delete` to clean up your local copy 
+if you are happy with the formatted files.
 
-```shell script
-./script/deploy_db install -c 'dbi:SQLite:dbname=foodloop.db'
-```
+Run `perlcritic lib` to lint all Perl files with [Perl-Critic](https://metacpan.org/release/Perl-Critic).
 
-Then set up the development users:
+## Documentation
 
-```shell script
-./script/pear-local_loop dev_data --force
-```
+TODO
 
-***Note: do NOT run that script on production.***
+## Acknowledgements
 
-Then you can start the application:
+LocalLoop is the result of collaboration between the [Small Green Consultancy](http://www.smallgreenconsultancy.co.uk/), 
+Shadowcat Systems](https://shadow.cat/), [Independent Lancaster](http://www.independent-lancaster.co.uk/) 
+and the [Ethical Small Traders Association](http://www.lancasteresta.org/).
 
-```shell script
-morbo script/pear-local_loop -l http://*:3000
-```
+## License
 
-You can modify the host and port for listening as needed.
+This project is released under the [MIT license](https://mit-license.org/).
 
-# Old Docs
+## Contact
 
-## Local test database
+| Name           | Link(s)           |
+|----------------|-------------------|
+| Mark Keating   | [Email][mkeating] |
+| Michael Hallam | [Email][mhallam]  |
 
-To install a local DB:
-
-```
-./script/deploy_db install -c 'dbi:SQLite:dbname=foodloop.db'
-```
-
-To do an upgrade of it after making DB changes to commit:
-
-```
-./script/deploy_db write_ddl -c 'dbi:SQLite:dbname=foodloop.db'
-./script/deploy_db upgrade -c 'dbi:SQLite:dbname=foodloop.db'
-```
-
-To redo leaderboards:
-
-```
-./script/pear-local_loop recalc_leaderboards
-```
-
-To serve a test version locally of the server:
-
-```
-morbo script/pear-local_loop
-```
+[mkeating]: mailto:m.keating@shadowcat.co.uk
+[mhallam]: mailto:info@lancasteresta.org

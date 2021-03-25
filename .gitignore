@@ -5,6 +5,7 @@ hypnotoad.pid
 *.db-wal
 *.db-shm
 *.db-journal
+*.bak
 *~
 /images
 *.swp
@@ -14,5 +15,11 @@ cover_db/
 schema.png
 
 etc/code-point-open/codepo_gb/
+postcode-data/*.csv
 
 pear-local_loop.production.conf
+
+localspend-47012.json
+
+node_modules/
+package*

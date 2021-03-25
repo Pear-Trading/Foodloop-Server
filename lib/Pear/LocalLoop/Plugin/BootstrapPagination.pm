@@ -1,8 +1,9 @@
 package Pear::LocalLoop::Plugin::BootstrapPagination;
-# nabbed from Mojolicious::Plugin::BootstrapPagination - 
+
+# nabbed from Mojolicious::Plugin::BootstrapPagination -
 # https://github.com/csroli/Mojolicious-Plugin-BootstrapPagination
 use Mojo::Base 'Mojolicious::Plugin';
-use POSIX( qw/ceil/ );
+use POSIX(qw/ceil/);
 use Mojo::ByteStream 'b';
 
 use strict;
@@ -11,86 +12,185 @@ use warnings;
 our $VERSION = "0.14";
 
 # Homer: Well basically, I just copied the plant we have now.
-#        Then, I added some fins to lower wind resistance.  
+#        Then, I added some fins to lower wind resistance.
 #        And this racing stripe here I feel is pretty sharp.
 # Burns: Agreed.  First prize!
-sub  register{
-  my ( $self, $app, $args ) = @_;
-  $args ||= {};
+sub register {
+    my ( $self, $app, $args ) = @_;
+    $args ||= {};
 
-  $app->helper( bootstrap_pagination => sub{
-      my ( $self, $actual, $count, $opts ) = @_;
-      my %bs4classes = (list_class => "page-item", anchor_class => "page-link");
+    $app->helper(
+        bootstrap_pagination => sub {
+            my ( $self, $actual, $count, $opts ) = @_;
+            my %bs4classes =
+              ( list_class => "page-item", anchor_class => "page-link" );
 
-      my $localize = ( $opts->{localize} || $args->{localize} ) ?
-          ( $opts->{localize} || $args->{localize} ) : undef;
+            my $localize =
+                ( $opts->{localize} || $args->{localize} )
+              ? ( $opts->{localize} || $args->{localize} )
+              : undef;
 
-      $count = ceil($count);
-      return "" unless $count > 1;
-      $opts = {} unless $opts;
-      my $round = $opts->{round} || $args->{round} || 4;
-      my $param = $opts->{param} || $args->{param} || "page";
-      my $class = $opts->{class} || $args->{class} || "";
-      my $bs4 = $opts->{bootstrap4} || $args->{bootstrap4} || undef;
+            $count = ceil($count);
+            return "" unless $count > 1;
+            $opts = {} unless $opts;
+            my $round = $opts->{round}      || $args->{round}      || 4;
+            my $param = $opts->{param}      || $args->{param}      || "page";
+            my $class = $opts->{class}      || $args->{class}      || "";
+            my $bs4   = $opts->{bootstrap4} || $args->{bootstrap4} || undef;
 
-      if ($class ne ""){
-          $class = " " . $class;
-      }
-      my $outer = $opts->{outer} || $args->{outer} || 2;
-      my $query = exists $opts->{query} ? $opts->{query} : $args->{query} || "";
-      my $start = $opts->{start} // $args->{start} // 1;
-      my @current = ( $actual - $round .. $actual + $round );
-      my @first   = ($start.. $start + $outer - 1);
-      my @tail    = ( $count - $outer + 1 .. $count );
-      my @ret = ();
-      my $last = undef;
-      foreach my $number( sort { $a <=> $b } @current, @first, @tail ){
-        next if ( $last && $last == $number && $start > 0 ) || ( defined $last && $last == $number && $start == 0 );
-        next if ( $number <= 0 && $start > 0) || ( $number < 0 && $start == 0 );
-        last if ( $number > $count && $start > 0 ) || ( $number >= $count && $start == 0 );
-        push @ret, ".." if( $last && $last + 1 != $number );
-        push @ret, $number;
-        $last = $number;
-      }
-      my $html = "<ul class=\"pagination$class\">";
-      if( $actual == $start ){
-        $html .= "<li class=\"disabled".($bs4?" ".$bs4classes{list_class}:"")."\"><a".($bs4?" class=\"".$bs4classes{anchor_class}."\"":"")." href=\"#\" >&laquo;</a></li>";
-      } else {
-        $html .= "<li".($bs4?" class=\"".$bs4classes{list_class}."\"":"")."><a".($bs4?" class=\"".$bs4classes{anchor_class}."\"":"")." href=\"" . $self->url_with->query( [$param => $actual - 1] ) . $query . "\" >&laquo;</a></li>";
-      }
-      my $last_num = -1;
-      foreach my $number( @ret ){
-        my $show_number = $start > 0 ? $number : ( $number =~ /\d+/ ? $number + 1 : $number );
+            if ( $class ne "" ) {
+                $class = " " . $class;
+            }
+            my $outer = $opts->{outer} || $args->{outer} || 2;
+            my $query =
+              exists $opts->{query} ? $opts->{query} : $args->{query} || "";
+            my $start   = $opts->{start} // $args->{start} // 1;
+            my @current = ( $actual - $round .. $actual + $round );
+            my @first   = ( $start .. $start + $outer - 1 );
+            my @tail    = ( $count - $outer + 1 .. $count );
+            my @ret     = ();
+            my $last    = undef;
 
-        if ( $localize ) {
-            $show_number = $localize->($self, $show_number);
+            foreach my $number ( sort { $a <=> $b } @current, @first, @tail ) {
+                next
+                  if ( $last && $last == $number && $start > 0 )
+                  || ( defined $last && $last == $number && $start == 0 );
+                next
+                  if ( $number <= 0 && $start > 0 )
+                  || ( $number < 0 && $start == 0 );
+                last
+                  if ( $number > $count && $start > 0 )
+                  || ( $number >= $count && $start == 0 );
+                push @ret, ".." if ( $last && $last + 1 != $number );
+                push @ret, $number;
+                $last = $number;
+            }
+            my $html = "<ul class=\"pagination$class\">";
+            if ( $actual == $start ) {
+                $html .=
+                    "<li class=\"disabled"
+                  . ( $bs4 ? " " . $bs4classes{list_class} : "" ) . "\"><a"
+                  . (
+                    $bs4 ? " class=\"" . $bs4classes{anchor_class} . "\"" : "" )
+                  . " href=\"#\" >&laquo;</a></li>";
+            }
+            else {
+                $html .= "<li"
+                  . ( $bs4 ? " class=\"" . $bs4classes{list_class} . "\"" : "" )
+                  . "><a"
+                  . (
+                    $bs4 ? " class=\"" . $bs4classes{anchor_class} . "\"" : "" )
+                  . " href=\""
+                  . $self->url_with->query( [ $param => $actual - 1 ] )
+                  . $query
+                  . "\" >&laquo;</a></li>";
+            }
+            my $last_num = -1;
+            foreach my $number (@ret) {
+                my $show_number =
+                    $start > 0
+                  ? $number
+                  : ( $number =~ /\d+/ ? $number + 1 : $number );
+
+                if ($localize) {
+                    $show_number = $localize->( $self, $show_number );
+                }
+
+                if ( $number eq ".." && $last_num < $actual ) {
+                    my $offset = ceil( ( $actual - $round ) / 2 ) + 1;
+                    $html .= "<li"
+                      . (
+                        $bs4 ? " class=\"" . $bs4classes{list_class} . "\""
+                        : ""
+                      )
+                      . "><a"
+                      . (
+                        $bs4 ? " class=\"" . $bs4classes{anchor_class} . "\""
+                        : ""
+                      )
+                      . " href=\""
+                      . $self->url_with->query(
+                        [ $param => $start == 0 ? $offset + 1 : $offset ] )
+                      . $query
+                      . "\" >&hellip;</a></li>";
+                }
+                elsif ( $number eq ".." && $last_num > $actual ) {
+                    my $back   = $count - $outer + 1;
+                    my $forw   = $round + $actual;
+                    my $offset = ceil( ( ( $back - $forw ) / 2 ) + $forw );
+                    $html .= "<li"
+                      . (
+                        $bs4 ? " class=\"" . $bs4classes{list_class} . "\""
+                        : ""
+                      )
+                      . "><a"
+                      . (
+                        $bs4 ? " class=\"" . $bs4classes{anchor_class} . "\""
+                        : ""
+                      )
+                      . " href=\""
+                      . $self->url_with->query(
+                        [ $param => $start == 0 ? $offset + 1 : $offset ] )
+                      . $query
+                      . "\" >&hellip;</a></li>";
+                }
+                elsif ( $number == $actual ) {
+                    $html .=
+                        "<li class=\"active"
+                      . ( $bs4 ? " " . $bs4classes{list_class} : "" )
+                      . "\"><span"
+                      . (
+                        $bs4
+                        ? " class=\"" . $bs4classes{anchor_class} . "\""
+                        : ""
+                      ) . ">$show_number</span></li>";
+                }
+                else {
+                    $html .= "<li"
+                      . (
+                        $bs4 ? " class=\"" . $bs4classes{list_class} . "\""
+                        : ""
+                      )
+                      . "><a"
+                      . (
+                        $bs4 ? " class=\"" . $bs4classes{anchor_class} . "\""
+                        : ""
+                      )
+                      . " href=\""
+                      . $self->url_with->query( [ $param => $number ] )
+                      . $query
+                      . "\">$show_number</a></li>";
+                }
+                $last_num = $number;
+            }
+            if ( $actual == $count ) {
+                $html .=
+                    "<li class=\"disabled"
+                  . ( $bs4 ? " " . $bs4classes{list_class} : "" ) . "\"><a"
+                  . (
+                    $bs4 ? " class=\"" . $bs4classes{anchor_class} . "\"" : "" )
+                  . " href=\""
+                  . $self->url_with->query( [ $param => $actual + 1 ] )
+                  . $query
+                  . "\" >&raquo;</a></li>";
+            }
+            else {
+                $html .= "<li"
+                  . ( $bs4 ? " class=\"" . $bs4classes{list_class} . "\"" : "" )
+                  . "><a"
+                  . (
+                    $bs4 ? " class=\"" . $bs4classes{anchor_class} . "\"" : "" )
+                  . " href=\""
+                  . $self->url_with->query( [ $param => $actual + 1 ] )
+                  . $query
+                  . "\" >&raquo;</a></li>";
+            }
+            $html .= "</ul>";
+            return b($html);
         }
+    );
 
-        if( $number eq ".." && $last_num < $actual ){
-          my $offset = ceil( ( $actual - $round ) / 2 ) + 1 ;
-          $html .= "<li".($bs4?" class=\"".$bs4classes{list_class}."\"":"")."><a".($bs4?" class=\"".$bs4classes{anchor_class}."\"":"")." href=\"" . $self->url_with->query( [$param => $start == 0 ? $offset + 1 : $offset] ) . $query ."\" >&hellip;</a></li>";
-        }
-        elsif( $number eq ".." && $last_num > $actual ) {
-          my $back = $count - $outer + 1;
-          my $forw = $round + $actual;
-          my $offset = ceil( ( ( $back - $forw ) / 2 ) + $forw );
-          $html .= "<li".($bs4?" class=\"".$bs4classes{list_class}."\"":"")."><a".($bs4?" class=\"".$bs4classes{anchor_class}."\"":"")." href=\"" . $self->url_with->query( [$param => $start == 0 ? $offset + 1 : $offset] ) . $query ."\" >&hellip;</a></li>";
-        } elsif( $number == $actual ) {
-          $html .= "<li class=\"active".($bs4?" ".$bs4classes{list_class}:"")."\"><span".($bs4?" class=\"".$bs4classes{anchor_class}."\"":"").">$show_number</span></li>";
-        } else {
-          $html .= "<li".($bs4?" class=\"".$bs4classes{list_class}."\"":"")."><a".($bs4?" class=\"".$bs4classes{anchor_class}."\"":"")." href=\"" . $self->url_with->query( [$param => $number] ) . $query ."\">$show_number</a></li>";
-        }
-         $last_num = $number;
-      }
-      if( $actual == $count ){
-        $html .= "<li class=\"disabled".($bs4?" ".$bs4classes{list_class}:"")."\"><a".($bs4?" class=\"".$bs4classes{anchor_class}."\"":"")." href=\"" . $self->url_with->query( [$param => $actual + 1] ) . $query . "\" >&raquo;</a></li>";
-      } else {
-        $html .= "<li".($bs4?" class=\"".$bs4classes{list_class}."\"":"")."><a".($bs4?" class=\"".$bs4classes{anchor_class}."\"":"")." href=\"" . $self->url_with->query( [$param => $actual + 1] ) . $query . "\" >&raquo;</a></li>";
-      }
-      $html .= "</ul>";
-      return b( $html );
-    } );
-
+    return 1;
 }
 
 1;
