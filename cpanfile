@@ -2,6 +2,7 @@ requires 'Mojolicious';
 requires 'Mojolicious::Plugin::Authentication';
 requires 'Data::UUID';
 requires 'Devel::Dwarn';
+requires 'JSON::Parse';
 requires 'Mojo::JSON';
 requires 'LWP::UserAgent';
 requires 'Mojo::JWT';
